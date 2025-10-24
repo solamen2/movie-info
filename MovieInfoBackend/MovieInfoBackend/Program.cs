@@ -12,6 +12,11 @@ builder.Services.AddDbContext<MovieInfoContext>(options => options.UseSqlServer(
 
 var app = builder.Build();
 
+// For React
+app.UseDefaultFiles();
+app.UseStaticFiles();
+app.MapFallbackToFile("/index.html");
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -22,7 +27,6 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 WeatherEndpoints.Map(app);
-
 CreateDbIfNotExists(app);
 
 app.Run();

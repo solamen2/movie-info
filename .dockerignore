@@ -1,0 +1,9 @@
+# directories
+**/bin/
+# Next line is specifically to prevent Docker builds from failing with errors like "Assets file '/source/obj/project.assets.json' doesn't have a target"
+**/obj/
+**/out/
+
+# files
+Dockerfile*
+**/*.md
