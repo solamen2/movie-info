@@ -1,0 +1,19 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "publish project",
+            "command": "dotnet",
+            "type": "process",
+            "options":{
+                "cwd": "${workspaceFolder}/MovieInfoBackend/MovieInfoBackend"
+            },
+            "args": [
+                "build",
+                "MovieInfoBackend.csproj",
+                "-c",
+                "Debug"
+            ]
+        }
+    ]
+}

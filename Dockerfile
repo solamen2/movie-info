@@ -1,6 +1,6 @@
 # Learn about building .NET container images:
 # https://github.com/dotnet/dotnet-docker/blob/main/samples/README.md
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG TARGETARCH
 WORKDIR /source
 
@@ -19,9 +19,9 @@ COPY --link movie-info-frontend movie-info-frontend
 RUN dotnet publish -a $TARGETARCH --no-restore -o /app
 
 # Runtime stage
-FROM mcr.microsoft.com/dotnet/aspnet:9.0
-ENV ASPNETCORE_HTTPS_PORT=4430
-EXPOSE 4430
+FROM mcr.microsoft.com/dotnet/aspnet:10.0
+ENV ASPNETCORE_HTTP_PORT=8080
+EXPOSE 8080
 WORKDIR /app
 COPY --link --from=publish /app .
 USER $APP_UID

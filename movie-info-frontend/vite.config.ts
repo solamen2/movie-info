@@ -6,11 +6,11 @@ import basicSsl from '@vitejs/plugin-basic-ssl';
 export default defineConfig({
   plugins: [react(), basicSsl()],
   server: {
-    port: 4430,
+    port: 8080,
     strictPort: true,
     proxy: {
       '/api': {
-        target: 'https://localhost:4431',
+        target: 'http://localhost:8081',
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/api/, '/api'),
