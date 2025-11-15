@@ -19,7 +19,7 @@ if (builder.Environment.IsProduction() || builder.Environment.IsStaging())
 }
 else
 {
-    LocalDbConnType localDbConnType = LocalDbConnType.Local;
+    LocalDbConnType localDbConnType = LocalDbConnType.LocalDocker;
 
     switch (localDbConnType)
     {
@@ -30,7 +30,8 @@ else
             connectionString = builder.Configuration.GetConnectionString("MovieInfoLocalDockerDb");
             break;
         case LocalDbConnType.AzureDev:
-            connectionString = builder.Configuration.GetConnectionString("MOVIE_INFO_AZURE_DEV_DB");  // from .env file using --env-file in Docker, or from appsettings.Development.json outside of Docker
+            // from .env file using --env-file in Docker, or from appsettings.Development.json outside of Docker (env var needs to be added if you do this!)
+            connectionString = builder.Configuration.GetConnectionString("MOVIE_INFO_AZURE_DEV_DB");
             break;
         default:  // should never happen currently
             throw new ArgumentException("LocalDbConnType must be one of the expected values.");
@@ -40,6 +41,11 @@ else
 builder.Services.AddDbContext<MovieInfoContext>(options => options.UseSqlServer(connectionString));
 
 var app = builder.Build();
+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Error");
+}
 
 // For React
 app.UseDefaultFiles();
