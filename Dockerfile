@@ -19,7 +19,7 @@ COPY --link movie-info-frontend movie-info-frontend
 RUN dotnet publish -a $TARGETARCH --no-restore -o /app
 
 # Runtime stage
-FROM mcr.microsoft.com/dotnet/aspnet:10.0
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS deploy
 ENV ASPNETCORE_HTTP_PORT=8080
 EXPOSE 8080
 WORKDIR /app

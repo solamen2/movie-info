@@ -1,5 +1,5 @@
 # movie-info
-Small movie information querying app using info from the OMDB API. Made by Ed Younskevicius (solamen2 AT gmail).
+Small movie information querying app using info from the OMDB API. Made by Ed Younskevicius (solamen2 AT gmail). NOTE: Basic skeleton app has been coded and deployed to two different platforms, but funcionality is still WIP.
 
 ## Using The App
 If you'd like to see how the app works eventually (though it's not working yet), please go to [movieinfo.dev](https://movieinfo.dev) and use these credentials:
@@ -10,7 +10,7 @@ Password: **NO PASSWORD YET**
 This account will be heavily rate-limited, but hopefully will working for you to try eventually. (When there's a a real username and password above, and it's not working, feel free to send me an email and I'll investigate.)
 
 ## AI Usage During Development
-I did not use AI at all during the setup of the project, since I wanted to have a very good understanding of the basic architecture of the app and the technical tradeoffs I was making. After setting up the basic skeleton, I am planning to use Claude Code to help me code the React and .NET Core APIs quickly, since I have a good amount of experience with both already.
+I did not use AI at all during the setup of the project, since I wanted to have a very good understanding of the basic architecture of the app and the technical tradeoffs I was making. After setting up the basic skeleton, I am planning to use Claude Code to help me code the React pages and .NET Core APIs quickly, since I have a good amount of experience with both already.
 
 ## Architecture: Backend
 
@@ -18,19 +18,21 @@ I did not use AI at all during the setup of the project, since I wanted to have 
 The backend API is an ASP.Net Core 10 app (written in C#, of course), using [minimal APIs](https://learn.microsoft.com/en-us/aspnet/core/tutorials/min-web-api?view=aspnetcore-10.0&tabs=visual-studio).
 
 ### Deployment
-The app is deployed using Docker and a Dockerfile. Currently it is running as an Azure Container App and pulls the image from Docker Hub. Soon it will also be deployed on fly.io, which dictated several other architecture decisions that I will describe here. (For example, I have intentionally avoided using Azure Container Registry for the app registry, and avoided using a docker-compose.yaml file for the image building, since I wanted to be able to deploy to [fly.io](https://fly.io/docs/languages-and-frameworks/dotnet/) or other services. fly.io does not currently support docker-compose.yaml well, though using a Dockerfile also has the benefit of keeping the app simple as a single image.)
+The app is deployed using Docker. Currently it is running as an Azure Container App and pulls the image from Docker Hub. (I've used Azure Container Registry before, but ;I wanted to learn to use Docker Hub for this project.) I've also deployed it via Docker on fly.io (to learn the platform and test ease of multi-platform deployment), which dictated several other architecture decisions that I will describe here. (For example, I have intentionally avoided using Azure Container Registry for the app registry, and avoided using a docker-compose.yaml file (and also avoided using multiple containers), since I wanted to be able to deploy to [fly.io](https://fly.io/docs/languages-and-frameworks/dotnet/) or other services. fly.io does not currently support Docker Compose well, though not using Docker Compose also has the benefit of keeping the app simple as a single image.)
 
-A somewhat unusual feature of the app is that I build the Docker image using [Docker multi-platform builds](https://docs.docker.com/build/building/multi-platform/). Even though I'm building on an M-series MacBook, by specifying the platform as "linux/amd64,linux/arm64", I can build a Docker image that will work directly on my machine and Azure (and other places) from the exact same Docker image, ensuring uniformity and ease of debugging.
+A somewhat unusual feature of the app is that I build the Docker image using [Docker multi-platform builds](https://docs.docker.com/build/building/multi-platform/). Even though I'm building the image on an M-series MacBook, I specify the platform as "linux/amd64,linux/arm64" so I can build a Docker image that will work directly on my machine and Azure (and other places) from the exact same Docker image, ensuring uniformity and ease of debugging.
+
+(Also, the fly.io version of this app does not use Docker Hub. fly.io has a [private registry](https://fly.io/docs/blueprints/using-the-fly-docker-registry/), but I find it easy enough to just [build and deploy directly from the Dockerfile on fly.io](https://fly.io/docs/languages-and-frameworks/dockerfile/).)
 
 ### Database
 The app uses a SQL Server database to store user configration. This is a bit of overkill, as it could have easily been handled using Azure Cache For Redis or SQLite (both which I have used before successfully), or other technologies as well. But I wanted to teach myself how to build an app using SQL Server from the ground up, and it works well so far.
 
 Database operations are handled using Entity Framework Core. I'm very comfortable using SQL directly, but I like EF Core, and I think it's a great fit for many apps, especially simple apps like this one.
 
-(A small note: I develop this app on a Mac, so I run SQL Server locally using an official Docker image.)
+(Two small notes: I develop this app on a Mac, so I run SQL Server locally using an official Docker image. Also, using SQL Server in Azure on fly.io, due to IP address whitelisting requirements, requires either [setting up a small proxy app](https://fly.io/docs/networking/egress-ips/#the-proxy-pattern) or [paying for a static egress IP](https://community.fly.io/t/static-egress-ips-for-machines/22004). I chose the latter, since setting up the former is more complex and probably would cost about the same per year.)
 
 ### Secrets
-The secrets are stored in environment variables (and also Secrets in the Azure Container App configuration). Again, this is to facilitate using multiple services; I initially got the proof of concept working using Azure Key Vault, but I wanted to remain service-agnostic, so I changed over to using environment variables for the secrets. It would be easy to switch back in the unlikely case anyone besides me ever works on this app.
+The secrets are stored in environment variables (and also the native secrets storage in Azure Container App and fly.io). Again, this is to facilitate using multiple services; I initially got the proof of concept working using Azure Key Vault, but I wanted to remain service-agnostic, so I changed over to using environment variables for the secrets. It would be easy to switch back in the unlikely case anyone besides me ever works on this app.
 
 ## Architecture: Frontend
 
@@ -44,4 +46,4 @@ TODO
 In a local dev environment, Vite handles all requests, and proxies the API requests to the ASP.Net Core Kestrel server, which is configured using [vite.config.ts](https://vite.dev/config/server-options#server-proxy). Outside of development, the React files are copied to wwwroot (via a custom build step in the MovieInfoBackend.csproj file that runs when doing a "dotnet publish") and are therefore served statically, so in stage and prod ASP.Net Core handles all the requests instead.
 
 ## Architecture: Environments
-The app has three environments: local (dev), stage, and prod. Local is only run on my local machine, and the other two are separate Azure Container Apps with their own SQL Server instances.
+The app has three environments: local (dev), stage, and prod. Local is only run on my local machine, and the other two are separate Azure Container Apps with their own Azure SQL Server instances. (Stage is also running in fly.io instance, which accesses the same Azure SQL Server instance that the Azure Container App does.)
