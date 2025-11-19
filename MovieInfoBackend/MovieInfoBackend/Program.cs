@@ -13,11 +13,15 @@ builder.Services.AddOpenApi();
 
 string? connectionString;
 
-if (builder.Environment.IsProduction() || builder.Environment.IsStaging())
+if (builder.Environment.IsProduction())
 {
     connectionString = builder.Configuration.GetConnectionString("MOVIE_INFO_AZURE_PROD_DB");  // from environment variable
 }
-else
+else if (builder.Environment.IsStaging())
+{
+    connectionString = builder.Configuration.GetConnectionString("MOVIE_INFO_AZURE_DEV_DB");  // from environment variable
+}
+else  // should be builder.Environment.IsDevelopment()
 {
     LocalDbConnType localDbConnType = LocalDbConnType.LocalDocker;
 
