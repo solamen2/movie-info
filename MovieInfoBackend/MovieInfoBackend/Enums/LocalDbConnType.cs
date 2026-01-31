@@ -1,4 +1,4 @@
-enum LocalDbConnType
+public enum LocalDbConnType
 {
     Local,
     LocalDocker,

@@ -6,7 +6,7 @@ namespace MovieInfoBackend.Data
 {
     public static class TempDbInit
     {
-        public static void Initialize(MovieInfoContext context)
+        public static void Initialize(TempContext context)
         {
             context.Database.EnsureCreated();
 
