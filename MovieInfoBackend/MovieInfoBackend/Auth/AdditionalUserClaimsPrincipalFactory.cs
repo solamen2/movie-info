@@ -17,7 +17,13 @@ public class AdditionalUserClaimsPrincipalFactory
     public async override Task<ClaimsPrincipal> CreateAsync(ApplicationUser user)
     {
         var principal = await base.CreateAsync(user);
-        var identity = (ClaimsIdentity)principal.Identity;
+
+        var identity = principal.Identity as ClaimsIdentity;
+
+        if (identity == null)
+        {
+            throw new Exception("ClaimsIdentity was null");
+        }
 
         var claims = new List<Claim>();
 

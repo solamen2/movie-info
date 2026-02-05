@@ -1,8 +1,6 @@
-using Azure.Core;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MovieInfoBackend.Helpers;
-using MovieInfoBackend.Data;
 using MovieInfoBackend.Endpoints;
 using Scalar.AspNetCore;
 using MovieInfoBackend.Auth;
@@ -44,27 +42,8 @@ app.MapFallbackToFile("/index.html");
 app.UseHttpsRedirection();
 
 WeatherEndpoints.Map(app);
-//CreateDbIfNotExists(app);
 
 app.Run();
-
-void CreateDbIfNotExists(IHost host)
-{
-   // TODO: Remove me
-   using (var scope = host.Services.CreateScope())
-    {
-        var services = scope.ServiceProvider;
-        try
-        {
-            var context = services.GetRequiredService<TempContext>();
-        }
-        catch (Exception ex)
-        {
-            var logger = services.GetRequiredService<ILogger<Program>>();
-            logger.LogError(ex, "An error occurred creating the DB.");
-        }
-    }
-}
 
 void SetupDatabase()
 {

@@ -1,6 +1,6 @@
 namespace MovieInfoBackend.Models;
 
-    public class TestModel
+    public class TestModel  // TODO: Remove this
     {
         public int ID { get; set; }
         public string? LastName { get; set; }

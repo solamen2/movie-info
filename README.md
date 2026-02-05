@@ -53,7 +53,7 @@ The frontend framework is React, and the app is written using Typescript in TSX 
 TODO
 
 ### Handling Web Requests
-In a local dev environment, Vite handles all requests, and proxies the API requests to the ASP.Net Core Kestrel server, which is configured using [vite.config.ts](https://vite.dev/config/server-options#server-proxy). Outside of development, the React files are copied to wwwroot (via a custom build step in the MovieInfoBackend.csproj file that runs when doing a "dotnet publish") and are therefore served statically, so in stage and prod ASP.Net Core handles all the requests instead.
+In a local dev environment, Vite handles all requests, and proxies the API requests to the ASP.Net Core Kestrel server, which is configured using [vite.config.ts](https://vite.dev/config/server-options#server-proxy). Outside of development, the React files are copied to wwwroot (via a custom build step in the MovieInfoBackend.csproj file that runs when doing a "dotnet publish") and are therefore served statically, so in stage and prod ASP.Net Core handles all the requests instead. All traffic is over HTTPS using [Let's Encrypt](https://letsencrypt.org/) certs that renew every 3 months via [Acmebot for Microsoft Azure](https://github.com/shibayan/keyvault-acmebot).
 
 ## Architecture: Environments
-The app has three environments: local (dev), stage, and prod. Local is only run on my local machine, and the other two are separate Azure Container Apps with their own Azure SQL Server instances. (Stage is also running in fly.io instance, which accesses the same Azure SQL Server instance that the Azure Container App does.)
+The app has three environments: dev, stage, and prod. Dev is run on my local machine, and also on fly.io (and the fly.io version has its own Azure SQL Server database). Stage and prod are separate Azure Container Apps with their own Azure SQL Server databases.
