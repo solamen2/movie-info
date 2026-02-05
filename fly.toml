@@ -11,7 +11,7 @@ primary_region = 'sjc'
   build-target = "deploy"
 
 [env]
-  ASPNETCORE_ENVIRONMENT = "Staging"
+  ASPNETCORE_ENVIRONMENT = "Development"
 
 [http_service]
   internal_port = 8080
