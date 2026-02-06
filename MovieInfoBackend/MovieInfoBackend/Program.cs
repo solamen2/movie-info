@@ -39,8 +39,6 @@ app.UseDefaultFiles();
 app.UseStaticFiles();
 app.MapFallbackToFile("/index.html");
 
-app.UseHttpsRedirection();
-
 WeatherEndpoints.Map(app);
 
 app.Run();
