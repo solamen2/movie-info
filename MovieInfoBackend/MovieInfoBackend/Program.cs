@@ -56,7 +56,7 @@ void SetupDatabase()
     }
     else if (builder.Environment.IsStaging())
     {
-        connectionString = builder.Configuration.GetConnectionString("MOVIE_INFO_AZURE_DEV_DB");  // from environment variable
+        connectionString = builder.Configuration.GetConnectionString("MOVIE_INFO_AZURE_STAGE_DB");  // from environment variable
     }
     else  // should be builder.Environment.IsDevelopment()
     {
