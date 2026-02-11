@@ -19,12 +19,20 @@ SetupAuth();
 
 var app = builder.Build();
 
+// Run database migrations
+using var scope = app.Services.CreateScope();
+var db = scope.ServiceProvider.GetRequiredService<MovieInfoContext>();
+db.Database.Migrate();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
-    app.MapOpenApi();
-    app.MapScalarApiReference();
+    if (ProgramConfig.DbConnType != LocalDbConnType.AzureDev)
+    {
+        app.MapOpenApi();
+        app.MapScalarApiReference();
+    }
 }
 else
 {
@@ -98,8 +106,8 @@ void SetupAuth()
     // Configure auth cookie settings TODO fix these!
     builder.Services.ConfigureApplicationCookie(options =>
     {
-        options.LoginPath = "/LoginAsync"; // Set your login path
-        options.LogoutPath = "/LogoutAsync"; // Set your logout path
+        options.LoginPath = "/api/login"; // Set your login path
+        options.LogoutPath = "/api/logout"; // Set your logout path
         options.SlidingExpiration = true;
         options.Cookie.HttpOnly = true;
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
