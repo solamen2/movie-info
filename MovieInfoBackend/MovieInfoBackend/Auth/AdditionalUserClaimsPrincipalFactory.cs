@@ -31,7 +31,7 @@ public class AdditionalUserClaimsPrincipalFactory
         {
             claims.Add(new Claim(ClaimTypes.Role, ProgramConstants.LoggedInUsersOnlyPolicyClaimName));
         }
-        if (user.IsSearchUser)
+        if (user.IsSearchUser)  // TODO: Make this update without having to restart the app!
         {
             claims.Add(new Claim(ClaimTypes.Role, ProgramConstants.SearchUsersOnlyPolicyClaimName));
         }
