@@ -5,53 +5,66 @@ using MovieInfoBackend.Endpoints;
 using Scalar.AspNetCore;
 using MovieInfoBackend.Auth;
 using MovieInfoBackend.Areas.Identity.Data;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Security.Claims;
+using Serilog;
+using Polly;
+using Microsoft.AspNetCore.Authentication.BearerToken;
 
 var builder = WebApplication.CreateBuilder(args);
+WebApplication app;
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
-
-SetupDatabase();
-SetupAuth();
-
-var app = builder.Build();
-
-// Run database migrations
-using var scope = app.Services.CreateScope();
-var db = scope.ServiceProvider.GetRequiredService<MovieInfoContext>();
-db.Database.Migrate();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+ConfigLogging();
+try
 {
-    app.UseDeveloperExceptionPage();
-    if (ProgramConfig.DbConnType != LocalDbConnType.AzureDev)
+    Log.Information("Starting app configuration...");
+    AddServices();
+    ConfigDatabase();
+    ConfigAuth();
+
+    Log.Information("Building app...");
+    app = builder.Build();
+
+    Log.Information("Migrating database...");
+    MigrateDatabase();
+    Log.Information("Setting up web server...");
+    SetUpWebServer();
+
+    Log.Information("Mapping endpoints...");
+    MovieEndpoints.Map(app);
+
+    Log.Information("Starting app...");
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Application terminated unexpectedly");
+}
+finally
+{
+    Log.CloseAndFlush();
+}
+
+void AddServices()
+{
+    // Add non-auth services to the container.
+    // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+    builder
+        .Services
+            .AddMemoryCache()
+            .AddHttpClient<MovieHttpClient>()
+                .AddTransientHttpErrorPolicy(policyBuilder =>
+                    policyBuilder.WaitAndRetryAsync(3, retryNumber => TimeSpan.FromMilliseconds(600)))
+                .AddTransientHttpErrorPolicy(policyBuilder =>
+                    policyBuilder.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)))
+                .SetHandlerLifetime(TimeSpan.FromMinutes(2));  // NOTE: This is the default, but reminds me how to change if needed
+
+    if (builder.Environment.IsDevelopment())
     {
-        app.MapOpenApi();
-        app.MapScalarApiReference();
+        builder.Services.AddOpenApi();
     }
 }
-else
-{
-    app.UseExceptionHandler("/Error");
-}
 
-// Map authN routes
-app.MapIdentityApi<ApplicationUser>();
-
-// For React
-app.UseDefaultFiles();
-app.UseStaticFiles();
-app.MapFallbackToFile("/index.html");
-
-WeatherEndpoints.Map(app);
-
-app.Run();
-
-void SetupDatabase()
+void ConfigDatabase()
 {
     // Add DB
     string? connectionString;
@@ -83,16 +96,36 @@ void SetupDatabase()
         }
     }
 
-    builder.Services.AddDbContext<MovieInfoContext>(options => options.UseSqlServer(connectionString));
+    builder.Services.AddDbContext<MovieInfoDbContext>(options => options.UseSqlServer(connectionString));
 }
 
-void SetupAuth()
+void ConfigAuth()
 {
-    // Set up authN / authZ services
-    builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer("LocalAuthIssuer");  // TODO: Add fields to bearer token and validate later
+    // Authentication
+    
     builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
         .AddRoles<IdentityRole>()
-        .AddEntityFrameworkStores<MovieInfoContext>();
+        .AddEntityFrameworkStores<MovieInfoDbContext>();
+    builder.Services.AddAuthentication().AddBearerToken();
+    builder.Services.ConfigureApplicationCookie(options =>
+    {
+        // TODO: Maybe revisit these later
+        options.LoginPath = "/login"; // Set your login path
+        options.LogoutPath = "/logout"; // Set your logout path
+        options.SlidingExpiration = true;
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.ExpireTimeSpan = ProgramConfig.LoginCookieTimeout;
+    });
+
+    builder.Services.AddOptions<BearerTokenOptions>(IdentityConstants.BearerScheme).Configure(
+        options =>
+        {
+            options.BearerTokenExpiration = ProgramConfig.LoginCookieTimeout;
+        });
+
+    // Authorization
+
     builder.Services.AddAuthorization(options =>
     {
         options.AddPolicy(ProgramConstants.LoggedInUsersOnlyPolicyName, policy => 
@@ -102,15 +135,47 @@ void SetupAuth()
     });
     builder.Services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>,
         AdditionalUserClaimsPrincipalFactory>();
+}
 
-    // Configure auth cookie settings TODO fix these!
-    builder.Services.ConfigureApplicationCookie(options =>
+void ConfigLogging()
+{
+    builder.Host.UseSerilog((context, loggerConfig) =>
+        loggerConfig.ReadFrom.Configuration(context.Configuration)  // NOTE: from appsettings.json
+    );
+}
+
+void MigrateDatabase()
+{
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<MovieInfoDbContext>();
+    db.Database.Migrate();
+}
+
+void SetUpWebServer()
+{
+    // Set up exception handling and APIs
+    if (app.Environment.IsDevelopment())
     {
-        options.LoginPath = "/api/login"; // Set your login path
-        options.LogoutPath = "/api/logout"; // Set your logout path
-        options.SlidingExpiration = true;
-        options.Cookie.HttpOnly = true;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-        options.ExpireTimeSpan = ProgramConfig.LoginCookieTimeout;
-    });
+        app.UseDeveloperExceptionPage();
+        if (ProgramConfig.DbConnType != LocalDbConnType.AzureDev)
+        {
+            app.MapOpenApi();
+            app.MapScalarApiReference();
+        }
+    }
+    else
+    {
+        app.UseExceptionHandler("/Error");
+    }
+
+    // Map authN routes
+    app.MapIdentityApi<ApplicationUser>();
+
+    // For React
+    app.UseDefaultFiles();
+    app.UseStaticFiles();
+    app.MapFallbackToFile("/index.html");
+
+    // Logging
+    app.UseSerilogRequestLogging();
 }

@@ -11,7 +11,7 @@ using MovieInfoBackend.Areas.Identity.Data;
 
 namespace MovieInfoBackend.Migrations
 {
-    [DbContext(typeof(MovieInfoContext))]
+    [DbContext(typeof(MovieInfoDbContext))]
     [Migration("20260128002729_CustomUserData")]
     partial class CustomUserData
     {

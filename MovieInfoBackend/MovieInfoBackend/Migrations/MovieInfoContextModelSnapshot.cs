@@ -10,7 +10,7 @@ using MovieInfoBackend.Areas.Identity.Data;
 
 namespace MovieInfoBackend.Migrations
 {
-    [DbContext(typeof(MovieInfoContext))]
+    [DbContext(typeof(MovieInfoDbContext))]
     partial class MovieInfoContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

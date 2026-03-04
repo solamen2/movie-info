@@ -12,7 +12,8 @@
             "program": "${workspaceFolder}/MovieInfoBackend/MovieInfoBackend/bin/Debug/net10.0/MovieInfoBackend.dll",
             "cwd": "${workspaceFolder}/MovieInfoBackend/MovieInfoBackend",
             "launchSettingsFilePath": "${workspaceFolder}/MovieInfoBackend/MovieInfoBackend/Properties/launchSettings.json",
-            "launchSettingsProfile": "http (dev)"
+            "launchSettingsProfile": "http (dev)",
+            "console": "integratedTerminal"
         }
     ]
 }
