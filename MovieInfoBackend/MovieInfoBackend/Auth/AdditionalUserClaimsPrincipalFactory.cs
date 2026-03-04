@@ -27,11 +27,14 @@ public class AdditionalUserClaimsPrincipalFactory
 
         var claims = new List<Claim>();
 
+        // NOTE: Because claims are stored in a cookie, they are only ever updated at login
+        // This can be changed later if needed, by doing RefreshSignInAsync() followed by GetClaimsAsync()
+        // Or by only storing a session ID and always looking up user claims at runtime
         if (!String.IsNullOrWhiteSpace(user.Email))
         {
             claims.Add(new Claim(ClaimTypes.Role, ProgramConstants.LoggedInUsersOnlyPolicyClaimName));
         }
-        if (user.IsSearchUser)  // TODO: Make this update without having to restart the app!
+        if (user.IsSearchUser)
         {
             claims.Add(new Claim(ClaimTypes.Role, ProgramConstants.SearchUsersOnlyPolicyClaimName));
         }

@@ -1,4 +1,0 @@
-GET {{MovieInfoApi_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

@@ -4,8 +4,6 @@ import viteLogo from '/vite.svg';
 import './App.css';
 
 function App() {
-  /* TODO: Maybe remove Bootstrap and jQuery / jQuery validators from project? I think they were scaffolded */
-  
   const [count, setCount] = useState(0);
 
   return (
@@ -24,7 +22,7 @@ function App() {
           count is {count}
         </button>
         <p>
-          Edit <code>src/App.tsx</code> and save to test HMR yeah
+          Edit <code>src/App.tsx</code> and save to test HMR
         </p>
       </div>
       <p className="read-the-docs">

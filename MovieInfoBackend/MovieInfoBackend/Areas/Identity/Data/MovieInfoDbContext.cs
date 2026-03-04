@@ -1,13 +1,14 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using MovieInfoBackend.Auth;
 
 namespace MovieInfoBackend.Areas.Identity.Data;
 
-public class MovieInfoContext : IdentityDbContext<ApplicationUser>
+public class MovieInfoDbContext : IdentityDbContext<ApplicationUser>
 {
-    public MovieInfoContext(DbContextOptions<MovieInfoContext> options)
+    public MovieInfoDbContext(DbContextOptions<MovieInfoDbContext> options)
         : base(options)
     {
     }
@@ -18,6 +19,8 @@ public class MovieInfoContext : IdentityDbContext<ApplicationUser>
         // Customize the ASP.NET Identity model and override the defaults if needed.
         // For example, you can rename the ASP.NET Identity table names and more.
         // Add your customizations after calling base.OnModelCreating(builder);
-        // TODO: Add other things that are needed here, like TestModel for the time being
     }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        => optionsBuilder.ConfigureWarnings(c => c.Log((RelationalEventId.CommandExecuted, LogLevel.Debug)));
 }
