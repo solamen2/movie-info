@@ -17,7 +17,7 @@ I did not use AI at all during the setup of the project, since I wanted to have 
 ## Architecture: Backend
 
 ### API
-The backend API is an ASP.Net Core 10.0.2 app (written in C#, of course), using [minimal APIs](https://learn.microsoft.com/en-us/aspnet/core/tutorials/min-web-api?view=aspnetcore-10.0&tabs=visual-studio).
+The backend API is an ASP.Net Core 10.0.2 app (written in C# 14+, of course), using [minimal APIs](https://learn.microsoft.com/en-us/aspnet/core/tutorials/min-web-api?view=aspnetcore-10.0&tabs=visual-studio).
 
 ### Deployment
 The app is deployed using Docker. Currently it is running as an Azure Container App and pulls the image from Docker Hub. (I've used Azure Container Registry before, but I wanted to learn to use Docker Hub for this project.) I've also deployed it via Docker on fly.io (to learn the platform and test ease of multi-platform deployment), which dictated several other architecture decisions described later. (For example, I've intentionally avoided using Azure Container Registry for the app registry, and avoided using a docker-compose.yaml file (and also avoided using multiple containers), since I wanted to be able to deploy to [fly.io](https://fly.io/docs/languages-and-frameworks/dotnet/) or other services. fly.io does not currently support Docker Compose well, and also, not using Docker Compose also has the benefit of keeping the app simple as a single image.)

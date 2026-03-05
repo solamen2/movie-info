@@ -26,24 +26,24 @@ public class MovieEndpoints
                         HttpClient httpClient = clientFactory.CreateClient(nameof(MovieHttpClient));
                         MovieHttpClient movieHttpClient = typedHttpClientFactory.CreateClient(httpClient);
 
-                        MovieSuggestionsResponseDataModel? suggestions;
+                        MovieSuggestionsResponseDataModel? suggestionsResponse;
                         string suggestionsCacheKey = MovieHttpClient.CachePrefix + searchQuery;
-                        if (!cache.TryGetValue(suggestionsCacheKey, out suggestions))
+                        if (!cache.TryGetValue(suggestionsCacheKey, out suggestionsResponse))
                         {
-                            suggestions = await movieHttpClient.GetSuggestions(searchQuery);
+                            suggestionsResponse = await movieHttpClient.GetSuggestions(searchQuery);
 
                             var cacheEntryOptions = new MemoryCacheEntryOptions()
                                 .SetAbsoluteExpiration(TimeSpan.FromDays(1))
                                 .SetSlidingExpiration(TimeSpan.FromHours(1));
 
-                            cache.Set(suggestionsCacheKey, suggestions, cacheEntryOptions);
+                            cache.Set(suggestionsCacheKey, suggestionsResponse, cacheEntryOptions);
                         }
 
                         string username = user?.Identity?.Name ?? "<no username found>";
 
                         Log.Debug($"Username: {username}");
-                        Log.Debug($"Suggestions:\n\n{suggestions}\n\n");   // NOTE: Not destructuring using @ operator because Serilog doesn't
-                                                                                       // let you configure output easily (and Seq doesn't support Azure Container Apps)
+                        Log.Debug($"Suggestions:\n\n{suggestionsResponse}\n\n");   // NOTE: Not destructuring using @ operator because Serilog doesn't
+                                                                                   // let you configure output easily (and Seq doesn't support Azure Container Apps)
                     }
                     catch (Exception e)
                     {
