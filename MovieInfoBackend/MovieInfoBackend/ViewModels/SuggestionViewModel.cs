@@ -32,16 +32,16 @@ public record SuggestionViewModel
         this.Years = suggestionDataModel.Years;
     }
 
-    public Guid ID;
-    public SuggestionImageViewModel? Image;
-    public string ItemID;
-    public string Name;
-    public SearchResultType? SearchType;
-    public MediaResultType? MediaType;
-    public int? Rank;
-    public string KnownFor;
-    public int? Year;
-    public string? Years;
+    public Guid ID { get; init; }
+    public SuggestionImageViewModel? Image { get; init; }
+    public string ItemID { get; init; }
+    public string Name { get; init; }
+    public SearchResultType? SearchType { get; init; }
+    public MediaResultType? MediaType { get; init; }
+    public int? Rank { get; init; }
+    public string KnownFor { get; init; }
+    public int? Year { get; init; }
+    public string? Years { get; init; }
 
     public override string ToString()
     {

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Http;
 using MovieInfoBackend.DataModels;
 using MovieInfoBackend.Helpers;
+using MovieInfoBackend.ViewModels;
 using Serilog;
 
 namespace MovieInfoBackend.Endpoints;
@@ -44,6 +45,16 @@ public class MovieEndpoints
                         Log.Debug($"Username: {username}");
                         Log.Debug($"Suggestions:\n\n{suggestionsResponse}\n\n");   // NOTE: Not destructuring using @ operator because Serilog doesn't
                                                                                    // let you configure output easily (and Seq doesn't support Azure Container Apps)
+
+                        List<SuggestionViewModel> suggestionViewModels = new List<SuggestionViewModel>();
+                        if (suggestionsResponse == null || suggestionsResponse.Suggestions == null)
+                            return null;  // TODO: return proper HTML error codes
+                        foreach (SuggestionDataModel suggestionDataModel in suggestionsResponse.Suggestions)
+                        {
+                            suggestionViewModels.Add(new SuggestionViewModel(suggestionDataModel));
+                        }
+
+                        return Results.Json(suggestionViewModels);
                     }
                     catch (Exception e)
                     {

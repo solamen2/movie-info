@@ -9,6 +9,7 @@ using System.Security.Claims;
 using Serilog;
 using Polly;
 using Microsoft.AspNetCore.Authentication.BearerToken;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 WebApplication app;
@@ -51,6 +52,10 @@ void AddServices()
     builder
         .Services
             .AddMemoryCache()
+            .ConfigureHttpJsonOptions(options =>
+            {
+                options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());  // serializes enums as string, not backing int
+            })
             .AddHttpClient<MovieHttpClient>()
                 .AddTransientHttpErrorPolicy(policyBuilder =>
                     policyBuilder.WaitAndRetryAsync(3, retryNumber => TimeSpan.FromMilliseconds(600)))

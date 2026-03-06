@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace MovieInfoBackend.DataModels;
 
-public class SuggestionImageDataModel
+public record SuggestionImageDataModel
 {
     [JsonPropertyName("height")]
     public required int Height { get; init; }

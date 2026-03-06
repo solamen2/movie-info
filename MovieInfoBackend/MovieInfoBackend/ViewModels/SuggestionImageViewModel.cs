@@ -11,9 +11,9 @@ public record SuggestionImageViewModel
         this.Width = suggestionImageDataModel.Width;
     }
     
-    public int Height;
-    public string ImageURL;
-    public int Width;
+    public int Height { get; init; }
+    public string ImageURL { get; init; }
+    public int Width { get; init; }
 
     public override string ToString()
     {
