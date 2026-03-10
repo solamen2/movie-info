@@ -21,52 +21,54 @@ public class MovieEndpoints
                 [FromServices] IMemoryCache cache,
                 [FromServices] IHttpClientFactory clientFactory,
                 [FromServices] ITypedHttpClientFactory <MovieHttpClient> typedHttpClientFactory) =>
+            {
+                try
                 {
-                    try
+                    HttpClient httpClient = clientFactory.CreateClient(nameof(MovieHttpClient));
+                    MovieHttpClient movieHttpClient = typedHttpClientFactory.CreateClient(httpClient);
+
+                    MovieSuggestionsResponseDataModel? suggestionsResponse;
+                    string suggestionsCacheKey = MovieHttpClient.CachePrefix + searchQuery;
+                    if (!cache.TryGetValue(suggestionsCacheKey, out suggestionsResponse))
                     {
-                        HttpClient httpClient = clientFactory.CreateClient(nameof(MovieHttpClient));
-                        MovieHttpClient movieHttpClient = typedHttpClientFactory.CreateClient(httpClient);
+                        suggestionsResponse = await movieHttpClient.GetSuggestions(searchQuery);
 
-                        MovieSuggestionsResponseDataModel? suggestionsResponse;
-                        string suggestionsCacheKey = MovieHttpClient.CachePrefix + searchQuery;
-                        if (!cache.TryGetValue(suggestionsCacheKey, out suggestionsResponse))
-                        {
-                            suggestionsResponse = await movieHttpClient.GetSuggestions(searchQuery);
+                        var cacheEntryOptions = new MemoryCacheEntryOptions()
+                            .SetAbsoluteExpiration(TimeSpan.FromDays(1))
+                            .SetSlidingExpiration(TimeSpan.FromHours(1));
 
-                            var cacheEntryOptions = new MemoryCacheEntryOptions()
-                                .SetAbsoluteExpiration(TimeSpan.FromDays(1))
-                                .SetSlidingExpiration(TimeSpan.FromHours(1));
-
-                            cache.Set(suggestionsCacheKey, suggestionsResponse, cacheEntryOptions);
-                        }
-
-                        string username = user?.Identity?.Name ?? "<no username found>";
-
-                        Log.Debug($"Username: {username}");
-                        Log.Debug($"Suggestions:\n\n{suggestionsResponse}\n\n");   // NOTE: Not destructuring using @ operator because Serilog doesn't
-                                                                                   // let you configure output easily (and Seq doesn't support Azure Container Apps)
-
-                        List<SuggestionViewModel> suggestionViewModels = new List<SuggestionViewModel>();
-                        if (suggestionsResponse == null || suggestionsResponse.Suggestions == null)
-                            return null;  // TODO: return proper HTML error codes
-                        foreach (SuggestionDataModel suggestionDataModel in suggestionsResponse.Suggestions)
-                        {
-                            suggestionViewModels.Add(new SuggestionViewModel(suggestionDataModel));
-                        }
-
-                        return Results.Json(suggestionViewModels);
+                        cache.Set(suggestionsCacheKey, suggestionsResponse, cacheEntryOptions);
                     }
-                    catch (Exception e)
+
+                    string username = user?.Identity?.Name ?? "<no username found>";
+
+                    Log.Debug($"Username: {username}");
+                    Log.Debug($"Suggestions:\n\n{suggestionsResponse}\n\n");   // NOTE: Not destructuring using @ operator because Serilog doesn't
+                                                                                // let you configure output easily (and Seq doesn't support Azure Container Apps)
+
+                    List<SuggestionViewModel> suggestionViewModels = new List<SuggestionViewModel>();
+                    if (suggestionsResponse == null || suggestionsResponse.Suggestions == null)
+                        return null;  // TODO: return proper HTML error codes
+                    foreach (SuggestionDataModel suggestionDataModel in suggestionsResponse.Suggestions)
                     {
-                        string username = user.Identity?.Name ?? "<no username found>";
-
-                        Log.ForContext("Username", username)
-                            .Error(e, "An error occurred while processing the request");
-
-                        throw;
+                        suggestionViewModels.Add(new SuggestionViewModel(suggestionDataModel));
                     }
-                })
-        .WithName("Search")
+
+                    return Results.Json(suggestionViewModels);
+                }
+                catch (Exception e)
+                {
+                    string username = user.Identity?.Name ?? "<no username found>";
+
+                    Log.ForContext("Username", username)
+                        .Error(e, $"An error occurred while processing the /search request '{searchQuery}'.");
+
+                    throw;
+                }
+            }
+        )
+        .WithSummary("Search")
+        .WithDescription("Searches IMDB for people, movies, and many other media types, and returns basic information on them.")
         .RequireAuthorization(ProgramConstants.LoggedInUsersOnlyPolicyName)
         .RequireAuthorization(ProgramConstants.SearchUsersOnlyPolicyName);
     }

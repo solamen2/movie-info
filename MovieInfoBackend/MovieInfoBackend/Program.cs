@@ -8,7 +8,6 @@ using MovieInfoBackend.Areas.Identity.Data;
 using System.Security.Claims;
 using Serilog;
 using Polly;
-using Microsoft.AspNetCore.Authentication.BearerToken;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,7 +16,7 @@ WebApplication app;
 ConfigLogging();
 try
 {
-    Log.Information("Starting app configuration...");
+    Log.Information("Starting app service configuration...");
     AddServices();
     ConfigDatabase();
     ConfigAuth();
@@ -27,10 +26,11 @@ try
 
     Log.Information("Migrating database...");
     MigrateDatabase();
-    Log.Information("Setting up web server...");
-    SetUpWebServer();
+    Log.Information("Setting up app...");
+    SetUpApp();
 
     Log.Information("Mapping endpoints...");
+    AuthEndpoints.Map(app);
     MovieEndpoints.Map(app);
 
     Log.Information("Starting app...");
@@ -107,30 +107,22 @@ void ConfigDatabase()
 void ConfigAuth()
 {
     // Authentication
-    
-    builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
+    builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme)
+        .AddIdentityCookies();
+    builder.Services.AddIdentityCore<ApplicationUser>()
         .AddRoles<IdentityRole>()
-        .AddEntityFrameworkStores<MovieInfoDbContext>();
-    builder.Services.AddAuthentication().AddBearerToken();
+        .AddEntityFrameworkStores<MovieInfoDbContext>()
+        .AddApiEndpoints();
     builder.Services.ConfigureApplicationCookie(options =>
     {
-        // TODO: Maybe revisit these later
-        options.LoginPath = "/login"; // Set your login path
-        options.LogoutPath = "/logout"; // Set your logout path
         options.SlidingExpiration = true;
         options.Cookie.HttpOnly = true;
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
         options.ExpireTimeSpan = ProgramConfig.LoginCookieTimeout;
+        options.Cookie.SameSite = SameSiteMode.Strict;
     });
 
-    builder.Services.AddOptions<BearerTokenOptions>(IdentityConstants.BearerScheme).Configure(
-        options =>
-        {
-            options.BearerTokenExpiration = ProgramConfig.LoginCookieTimeout;
-        });
-
     // Authorization
-
     builder.Services.AddAuthorization(options =>
     {
         options.AddPolicy(ProgramConstants.LoggedInUsersOnlyPolicyName, policy => 
@@ -156,7 +148,7 @@ void MigrateDatabase()
     db.Database.Migrate();
 }
 
-void SetUpWebServer()
+void SetUpApp()
 {
     // Set up exception handling and APIs
     if (app.Environment.IsDevelopment())
