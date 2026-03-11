@@ -5,9 +5,13 @@ meta {
 }
 
 post {
-  url: {{base-url}}/login
+  url: {{base-url}}/api/login?useCookies=true
   body: json
   auth: inherit
+}
+
+params:query {
+  useCookies: true
 }
 
 headers {

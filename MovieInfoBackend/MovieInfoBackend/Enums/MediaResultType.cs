@@ -1,5 +1,7 @@
 // NOTE: Yeah, not technically an enum, but I wanted the string mapping to the IMDB API and it's very similar
 
+using Serilog;
+
 public class MediaResultType
 {
     private MediaResultType (string value) { Value = value;}
@@ -18,18 +20,14 @@ public class MediaResultType
     public static MediaResultType MusicVideo { get { return new MediaResultType("Music Video"); } }
     public static MediaResultType PodcastEpisode { get { return new MediaResultType("Podcast Episode"); } }
     public static MediaResultType PodcastSeries { get { return new MediaResultType("Podcast Series"); } }
-    public static MediaResultType Error { get { return new MediaResultType("Error"); } }
 
     public override string ToString()
     {
         return Value;
     }
 
-    public static MediaResultType GetMediaType(string? mediaType)
+    public static MediaResultType? GetMediaType(string? mediaType)
     {
-        if (String.IsNullOrWhiteSpace(mediaType))
-            throw new ArgumentException("Media result type is null, empty, or whitespace!");
-        
         switch (mediaType)  // From IMDB 
         {
             case "movie":
@@ -59,7 +57,10 @@ public class MediaResultType
             case "podcastSeries":
                 return PodcastSeries;
             default:
-                throw new ArgumentException("Media result type is invalid: '" + mediaType + "'.");
+            {
+                Log.Warning("Media result type is invalid: '" + mediaType + "'.");
+                return null;
+            }
         }
     }
 }

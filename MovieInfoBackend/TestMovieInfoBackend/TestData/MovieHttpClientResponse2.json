@@ -69,6 +69,16 @@
       "rank": 1876,
       "s": "Robert Garcia, Jose Williams",
       "y": 2013
+    },
+    {
+      "i": {
+        "height": 1005,
+        "imageUrl": "https://example.com/example14.jpg",
+        "width": 680
+      },
+      "id": "/spotlight/",
+      "l": "Lemur History Month",
+      "s": "A Celebration of Lemur Storytellers and Stories"
     }
   ],
   "q": "second%20test%20query%20not%20actual",

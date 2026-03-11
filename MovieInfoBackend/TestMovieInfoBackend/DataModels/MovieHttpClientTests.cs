@@ -86,7 +86,7 @@ public class MovieHttpClientTests
                 Assert.True(suggestion2image?.Width > 0, "Movie Width must be a positive number");
                 Assert.False(String.IsNullOrWhiteSpace(suggestion2?.ItemID), "Movie ID must not be empty");
                 Assert.False(String.IsNullOrWhiteSpace(suggestion2?.Name), "Movie Name must not be empty");
-                Assert.Equal(MediaResultType.GetMediaType(suggestion2?.MediaType).Value, MediaResultType.Movie.Value);
+                Assert.Equal(MediaResultType.Movie.Value, MediaResultType.GetMediaType(suggestion2?.MediaType)?.Value);
                 Assert.True(suggestion2?.Rank > 0, "Movie Rank must be a positive number");
                 Assert.False(String.IsNullOrWhiteSpace(suggestion2?.KnownFor), "Movie KnownFor must not be empty");
                 Assert.True(suggestion2?.Year > 0, "Movie Year must be a positive number");
@@ -100,7 +100,7 @@ public class MovieHttpClientTests
                 Assert.True(suggestion3image?.Width > 0, "TV series Width must be a positive number");
                 Assert.False(String.IsNullOrWhiteSpace(suggestion3?.ItemID), "TV series ID must not be empty");
                 Assert.False(String.IsNullOrWhiteSpace(suggestion3?.Name), "TV series Name must not be empty");
-                Assert.Equal(MediaResultType.GetMediaType(suggestion3?.MediaType).Value, MediaResultType.TVSeries.Value);
+                Assert.Equal(MediaResultType.TVSeries.Value, MediaResultType.GetMediaType(suggestion3?.MediaType)?.Value);
                 Assert.True(suggestion3?.Rank > 0, "TV series Rank must be a positive number");
                 Assert.False(String.IsNullOrWhiteSpace(suggestion3?.KnownFor), "TV series KnownFor must not be empty");
                 Assert.True(suggestion3?.Year > 0, "TV series Year must be a positive number");
@@ -115,7 +115,7 @@ public class MovieHttpClientTests
                 Assert.True(suggestion4image?.Width > 0, "TV mini series Width must be a positive number");
                 Assert.False(String.IsNullOrWhiteSpace(suggestion4?.ItemID), "TV mini series ID must not be empty");
                 Assert.False(String.IsNullOrWhiteSpace(suggestion4?.Name), "TV mini series Name must not be empty");
-                Assert.Equal(MediaResultType.GetMediaType(suggestion4?.MediaType).Value, MediaResultType.TVMiniSeries.Value);
+                Assert.Equal(MediaResultType.TVMiniSeries.Value, MediaResultType.GetMediaType(suggestion4?.MediaType)?.Value);
                 Assert.True(suggestion4?.Rank > 0, "TV mini series Rank must be a positive number");
                 Assert.False(String.IsNullOrWhiteSpace(suggestion4?.KnownFor), "TV mini series KnownFor must not be empty");
                 Assert.True(suggestion4?.Year > 0, "TV mini series Year must be a positive number");
@@ -128,7 +128,7 @@ public class MovieHttpClientTests
                 Assert.Null(suggestion5image);
                 Assert.False(String.IsNullOrWhiteSpace(suggestion5?.ItemID), "TV movie ID must not be empty");
                 Assert.False(String.IsNullOrWhiteSpace(suggestion5?.Name), "TV movie Name must not be empty");
-                Assert.Equal(MediaResultType.GetMediaType(suggestion5?.MediaType).Value, MediaResultType.TVMovie.Value);
+                Assert.Equal(MediaResultType.TVMovie.Value, MediaResultType.GetMediaType(suggestion5?.MediaType)?.Value);
                 Assert.True(suggestion5?.Rank > 0, "TV movie Rank must be a positive number");
                 Assert.False(String.IsNullOrWhiteSpace(suggestion5?.KnownFor), "TV movie KnownFor must not be empty");
                 Assert.True(suggestion5?.Year > 0, "TV movie Year must be a positive number");
@@ -142,7 +142,7 @@ public class MovieHttpClientTests
                 Assert.True(suggestion6image?.Width > 0, "TV special Width must be a positive number");
                 Assert.False(String.IsNullOrWhiteSpace(suggestion6?.ItemID), "TV special ID must not be empty");
                 Assert.False(String.IsNullOrWhiteSpace(suggestion6?.Name), "TV special Name must not be empty");
-                Assert.Equal(MediaResultType.GetMediaType(suggestion6?.MediaType).Value, MediaResultType.TVSpecial.Value);
+                Assert.Equal(MediaResultType.TVSpecial.Value, MediaResultType.GetMediaType(suggestion6?.MediaType)?.Value);
                 Assert.True(suggestion6?.Rank > 0, "TV special Rank must be a positive number");
                 Assert.False(String.IsNullOrWhiteSpace(suggestion6?.KnownFor), "TV special KnownFor must not be empty");
                 Assert.True(suggestion6?.Year > 0, "TV special Year must be a positive number");
@@ -156,7 +156,7 @@ public class MovieHttpClientTests
                 Assert.True(suggestion7image?.Width > 0, "TV short Width must be a positive number");
                 Assert.False(String.IsNullOrWhiteSpace(suggestion7?.ItemID), "TV short ID must not be empty");
                 Assert.False(String.IsNullOrWhiteSpace(suggestion7?.Name), "TV short Name must not be empty");
-                Assert.Equal(MediaResultType.GetMediaType(suggestion7?.MediaType).Value, MediaResultType.TVShort.Value);
+                Assert.Equal(MediaResultType.TVShort.Value, MediaResultType.GetMediaType(suggestion7?.MediaType)?.Value);
                 Assert.True(suggestion7?.Rank > 0, "TV short Rank must be a positive number");
                 Assert.False(String.IsNullOrWhiteSpace(suggestion7?.KnownFor), "TV short KnownFor must not be empty");
                 Assert.True(suggestion7?.Year > 0, "TV short Year must be a positive number");
@@ -170,7 +170,7 @@ public class MovieHttpClientTests
                 Assert.True(suggestion8image?.Width > 0, "Short Width must be a positive number");
                 Assert.False(String.IsNullOrWhiteSpace(suggestion8?.ItemID), "Short ID must not be empty");
                 Assert.False(String.IsNullOrWhiteSpace(suggestion8?.Name), "Short Name must not be empty");
-                Assert.Equal(MediaResultType.GetMediaType(suggestion8?.MediaType).Value, MediaResultType.Short.Value);
+                Assert.Equal(MediaResultType.Short.Value, MediaResultType.GetMediaType(suggestion8?.MediaType)?.Value);
                 Assert.True(suggestion8?.Rank > 0, "Short Rank must be a positive number");
                 Assert.False(String.IsNullOrWhiteSpace(suggestion8?.KnownFor), "Short KnownFor must not be empty");
                 Assert.True(suggestion8?.Year > 0, "Short Year must be a positive number");
@@ -179,7 +179,7 @@ public class MovieHttpClientTests
 
         {  // Second movie suggestions data file
             SuggestionDataModel[]? suggestions2 = actual2?.Suggestions;
-            Assert.Equal(5, suggestions2?.Length);
+            Assert.Equal(6, suggestions2?.Length);
 
             {  // Ninth suggestion
                 SuggestionDataModel? suggestion9 = suggestions2?[0];
@@ -189,7 +189,7 @@ public class MovieHttpClientTests
                 Assert.True(suggestion9image?.Width > 0, "Video game Width must be a positive number");
                 Assert.False(String.IsNullOrWhiteSpace(suggestion9?.ItemID), "Video game ID must not be empty");
                 Assert.False(String.IsNullOrWhiteSpace(suggestion9?.Name), "Video game Name must not be empty");
-                Assert.Equal(MediaResultType.GetMediaType(suggestion9?.MediaType).Value, MediaResultType.VideoGame.Value);
+                Assert.Equal(MediaResultType.VideoGame.Value, MediaResultType.GetMediaType(suggestion9?.MediaType)?.Value);
                 Assert.True(suggestion9?.Rank > 0, "Video game Rank must be a positive number");
                 Assert.False(String.IsNullOrWhiteSpace(suggestion9?.KnownFor), "Video game KnownFor must not be empty");
                 Assert.True(suggestion9?.Year > 0, "Video game Year must be a positive number");
@@ -203,7 +203,7 @@ public class MovieHttpClientTests
                 Assert.True(suggestion10image?.Width > 0, "Video 1 Width must be a positive number");
                 Assert.False(String.IsNullOrWhiteSpace(suggestion10?.ItemID), "Video 1 ID must not be empty");
                 Assert.False(String.IsNullOrWhiteSpace(suggestion10?.Name), "Video 1 Name must not be empty");
-                Assert.Equal(MediaResultType.GetMediaType(suggestion10?.MediaType).Value, MediaResultType.Video.Value);
+                Assert.Equal(MediaResultType.Video.Value, MediaResultType.GetMediaType(suggestion10?.MediaType)?.Value);
                 Assert.True(suggestion10?.Rank > 0, "Video 1 Rank must be a positive number");
                 Assert.False(String.IsNullOrWhiteSpace(suggestion10?.KnownFor), "Video 1 KnownFor must not be empty");
                 Assert.True(suggestion10?.Year > 0, "Video 1 Year must be a positive number");
@@ -217,7 +217,7 @@ public class MovieHttpClientTests
                 Assert.True(suggestion11image?.Width > 0, "Music video Width must be a positive number");
                 Assert.False(String.IsNullOrWhiteSpace(suggestion11?.ItemID), "Music video ID must not be empty");
                 Assert.False(String.IsNullOrWhiteSpace(suggestion11?.Name), "Music video Name must not be empty");
-                Assert.Equal(MediaResultType.GetMediaType(suggestion11?.MediaType).Value, MediaResultType.MusicVideo.Value);
+                Assert.Equal(MediaResultType.MusicVideo.Value, MediaResultType.GetMediaType(suggestion11?.MediaType)?.Value);
                 Assert.True(suggestion11?.Rank > 0, "Music video Rank must be a positive number");
                 Assert.False(String.IsNullOrWhiteSpace(suggestion11?.KnownFor), "Music video KnownFor must not be empty");
                 Assert.True(suggestion11?.Year > 0, "Music video Year must be a positive number");
@@ -231,7 +231,7 @@ public class MovieHttpClientTests
                 Assert.True(suggestion12image?.Width > 0, "Podcast series Width must be a positive number");
                 Assert.False(String.IsNullOrWhiteSpace(suggestion12?.ItemID), "Podcast series ID must not be empty");
                 Assert.False(String.IsNullOrWhiteSpace(suggestion12?.Name), "Podcast series Name must not be empty");
-                Assert.Equal(MediaResultType.GetMediaType(suggestion12?.MediaType).Value, MediaResultType.PodcastSeries.Value);
+                Assert.Equal(MediaResultType.PodcastSeries.Value, MediaResultType.GetMediaType(suggestion12?.MediaType)?.Value);
                 Assert.True(suggestion12?.Rank > 0, "Podcast series Rank must be a positive number");
                 Assert.False(String.IsNullOrWhiteSpace(suggestion12?.KnownFor), "Podcast series KnownFor must not be empty");
                 Assert.True(suggestion12?.Year > 0, "Podcast series Year must be a positive number");
@@ -245,11 +245,25 @@ public class MovieHttpClientTests
                 Assert.True(suggestion13image?.Width > 0, "Video 2 Width must be a positive number");
                 Assert.False(String.IsNullOrWhiteSpace(suggestion13?.ItemID), "Video 2 ID must not be empty");
                 Assert.False(String.IsNullOrWhiteSpace(suggestion13?.Name), "Video 2 Name must not be empty");
-                Assert.Equal(MediaResultType.GetMediaType(suggestion13?.MediaType).Value, MediaResultType.Video.Value);
+                Assert.Equal(MediaResultType.Video.Value, MediaResultType.GetMediaType(suggestion13?.MediaType)?.Value);
                 Assert.True(suggestion13?.Rank > 0, "Video 2 Rank must be a positive number");
                 Assert.False(String.IsNullOrWhiteSpace(suggestion13?.KnownFor), "Video 2 KnownFor must not be empty");
                 Assert.True(suggestion13?.Year > 0, "Video 2 Year must be a positive number");
             }
+
+            {  // Fourteenth suggestion
+                SuggestionDataModel? suggestion14 = suggestions2?[5];
+                SuggestionImageDataModel? suggestion14image = suggestion14?.Image;
+                Assert.True(suggestion14image?.Height > 0, "Spotlight image Height must be a positive number");
+                Assert.False(String.IsNullOrWhiteSpace(suggestion14image?.ImageURL), "Spotlight ImageURL must not be empty");
+                Assert.True(suggestion14image?.Width > 0, "Spotlight Width must be a positive number");
+                Assert.False(String.IsNullOrWhiteSpace(suggestion14?.ItemID), "Spotlight ID must not be empty");
+                Assert.False(String.IsNullOrWhiteSpace(suggestion14?.Name), "Spotlight Name must not be empty");
+                Assert.Null(MediaResultType.GetMediaType(suggestion14?.MediaType)?.Value);
+                Assert.False(String.IsNullOrWhiteSpace(suggestion14?.KnownFor), "Video 2 KnownFor must not be empty");
+            }
         }  // End second movie suggestions data file
     }
+
+    // TODO: Do some error tests here
 }

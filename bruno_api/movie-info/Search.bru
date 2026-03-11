@@ -1,0 +1,20 @@
+meta {
+  name: Search
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{base-url}}/api/search?searchQuery=Movie Title Or Person Name
+  body: none
+  auth: inherit
+}
+
+params:query {
+  searchQuery: Movie Title Or Person Name
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
