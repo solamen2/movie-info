@@ -28,17 +28,7 @@ export default defineConfig({
             );
           });
         },
-      },
-      '/register': 'http://localhost:8080',
-      '/login': 'http://localhost:8080',
-      '/refresh': 'http://localhost:8080',
-      '/confirmEmail': 'http://localhost:8080',
-      '/resendConfirmationEmail': 'http://localhost:8080',
-      '/forgotPassword': 'http://localhost:8080',
-      '/resetPassword': 'http://localhost:8080',
-      '/manage/2fa': 'http://localhost:8080',
-      '/manage/info': 'http://localhost:8080',
-      '/logout': 'http://localhost:8080'
+      }
     },
   },
 });

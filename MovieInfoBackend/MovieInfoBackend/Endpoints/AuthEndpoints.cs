@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using MovieInfoBackend.Auth;
 using MovieInfoBackend.Helpers;
+using static MovieInfoBackend.Helpers.ProgramConstants;  // for ApiRoutePrefix
 using Serilog;
 
 namespace MovieInfoBackend.Endpoints;
@@ -11,7 +12,7 @@ public class AuthEndpoints
 {
     public static void Map(WebApplication app)
     {
-        app.MapPost("/logout", async (SignInManager<ApplicationUser> signInManager,
+        app.MapPost($"{ApiRoutePrefix}/logout", async (SignInManager<ApplicationUser> signInManager,
             [FromBody] EmptyBodyRequest emptyBodyRequest,
             ClaimsPrincipal user) =>
             {

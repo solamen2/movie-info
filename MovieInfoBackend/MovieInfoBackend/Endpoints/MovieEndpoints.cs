@@ -5,6 +5,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Http;
 using MovieInfoBackend.DataModels;
 using MovieInfoBackend.Helpers;
+using static MovieInfoBackend.Helpers.ProgramConstants;  // for ApiRoutePrefix
 using MovieInfoBackend.ViewModels;
 using Serilog;
 
@@ -14,7 +15,7 @@ public class MovieEndpoints
 {
     public static void Map(WebApplication app)
     {
-        app.MapGet("/api/search", [Authorize]
+        app.MapGet($"{ApiRoutePrefix}/search", [Authorize]
             async (
                 string searchQuery,
                 ClaimsPrincipal user,

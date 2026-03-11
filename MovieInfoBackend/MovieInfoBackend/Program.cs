@@ -166,7 +166,8 @@ void SetUpApp()
     }
 
     // Map authN routes
-    app.MapIdentityApi<ApplicationUser>();
+    RouteGroupBuilder apiGroup = app.MapGroup(ProgramConstants.ApiRoutePrefix);
+    apiGroup.MapIdentityApi<ApplicationUser>();
 
     // For React
     app.UseDefaultFiles();
