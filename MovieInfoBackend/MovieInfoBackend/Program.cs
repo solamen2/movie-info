@@ -51,6 +51,14 @@ void AddServices()
     // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
     builder
         .Services
+            .AddCors(options =>
+            {
+                options.AddDefaultPolicy(
+                    policy =>
+                    {
+                        policy.WithOrigins("http://localhost:*");
+                    });
+            })
             .AddMemoryCache()
             .ConfigureHttpJsonOptions(options =>
             {
@@ -61,7 +69,8 @@ void AddServices()
                     policyBuilder.WaitAndRetryAsync(3, retryNumber => TimeSpan.FromMilliseconds(600)))
                 .AddTransientHttpErrorPolicy(policyBuilder =>
                     policyBuilder.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)))
-                .SetHandlerLifetime(TimeSpan.FromMinutes(2));  // NOTE: This is the default, but reminds me how to change if needed
+                .SetHandlerLifetime(TimeSpan.FromMinutes(2))  // NOTE: This is the default, but reminds me how to change if needed
+            ;
 
     if (builder.Environment.IsDevelopment())
     {
@@ -176,4 +185,7 @@ void SetUpApp()
 
     // Logging
     app.UseSerilogRequestLogging();
+
+    // CORS (only used for localhost currently)
+    app.UseCors();
 }
