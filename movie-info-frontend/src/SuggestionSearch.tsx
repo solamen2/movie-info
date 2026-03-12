@@ -1,31 +1,8 @@
 import { type FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import SuggestionSearchCard, { type Suggestion } from "./SuggestionSearchCard";
 
-interface SuggestionImage {
-  height: number;
-  imageURL: string;
-  width: number;
-}
-
-interface Suggestion {
-  id: string;
-  image: SuggestionImage | null;
-  itemID: string;
-  name: string;
-  searchType: number | null;
-  mediaType: { value: string } | null;
-  rank: number | null;
-  knownFor: string;
-  year: number | null;
-  years: string | null;
-}
-
-const SEARCH_TYPE_LABELS: Record<number, string> = {
-  0: "Person",
-  1: "Media",
-};
-
-function MovieSearch() {
+function SuggestionSearch() {
   const [searchQuery, setSearchQuery] = useState("");
   const [results, setResults] = useState<Suggestion[]>([]);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
@@ -41,7 +18,8 @@ function MovieSearch() {
 
     try {
       const response = await fetch(
-        `/api/search?searchQuery=${encodeURIComponent(searchQuery)}`
+        `/api/search?searchQuery=${encodeURIComponent(searchQuery)}`,
+        { redirect: "error" }
       );
 
       if (!response.ok) {
@@ -78,7 +56,7 @@ function MovieSearch() {
       if (response.ok) {
         navigate("/login");
       } else {
-        setError("Logout failed. Please try again.");
+        setError("Logout failed. Please try again."); // TODO: Maybe redirect to login instead
       }
     } catch {
       setError("An unexpected error occurred. Please try again.");
@@ -107,51 +85,16 @@ function MovieSearch() {
 
       <div className="results-container">
         {results.map((item) => (
-          <div
+          <SuggestionSearchCard
             key={item.id}
-            className={`result-card${selectedItemId === item.itemID ? " selected" : ""}`}
+            item={item}
+            selected={selectedItemId === item.itemID}
             onClick={() => handleCardClick(item.itemID)}
-          >
-            {item.image ? (
-              <img
-                src={item.image.imageURL}
-                alt={item.name} 
-                width={item.image.width} 
-                height={item.image.height} 
-                className="card-image"
-              />
-            ) : (
-              <div className="card-image-placeholder">No image</div>
-            )}
-            <div className="card-details">
-              <h3 className="card-name">{item.name}</h3>
-              <p><strong>Item ID:</strong> {item.itemID}</p>
-              <p><strong>ID:</strong> {item.id}</p>
-              <p>
-                <strong>Search Type:</strong>{" "}
-                {item.searchType != null
-                  ? SEARCH_TYPE_LABELS[item.searchType] ?? String(item.searchType)
-                  : "—"}
-              </p>
-              <p>
-                <strong>Media Type:</strong>{" "}
-                {item.mediaType?.value ? item.mediaType.value : "—"}
-              </p>
-              <p><strong>Rank:</strong> {item.rank ?? "—"}</p>
-              <p><strong>Known For:</strong> {item.knownFor}</p>
-              <p><strong>Year:</strong> {item.year ?? "—"}</p>
-              <p><strong>Years:</strong> {item.years ?? "—"}</p>
-              {item.image && (
-                <p>
-                  <strong>Image Size:</strong> {item.image.width} x {item.image.height}
-                </p>
-              )}
-            </div>
-          </div>
+          />
         ))}
       </div>
     </div>
   );
 }
 
-export default MovieSearch;
+export default SuggestionSearch;
