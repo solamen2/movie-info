@@ -29,6 +29,16 @@ interface SuggestionSearchCardProps {
 }
 
 function SuggestionSearchCard({ item, selected, onClick }: SuggestionSearchCardProps) {
+  const searchTypeLabel =
+    item.searchType != null
+      ? SEARCH_TYPE_LABELS[item.searchType] ?? String(item.searchType)
+      : "—";
+  const isPerson = searchTypeLabel === "Person";
+  const mediaTypeValue = item.mediaType?.value;
+  const showYears =
+    !isPerson &&
+    (mediaTypeValue === "TV Series" || mediaTypeValue === "TV Mini Series");
+
   return (
     <div
       className={`result-card${selected ? " selected" : ""}`}
@@ -47,27 +57,19 @@ function SuggestionSearchCard({ item, selected, onClick }: SuggestionSearchCardP
       )}
       <div className="card-details">
         <h3 className="card-name">{item.name}</h3>
-        <p><strong>Item ID:</strong> {item.itemID}</p>
-        <p><strong>ID:</strong> {item.id}</p>
         <p>
-          <strong>Search Type:</strong>{" "}
-          {item.searchType != null
-            ? SEARCH_TYPE_LABELS[item.searchType] ?? String(item.searchType)
-            : "—"}
+          <strong>Search Type:</strong> {searchTypeLabel}
         </p>
-        <p>
-          <strong>Media Type:</strong>{" "}
-          {item.mediaType?.value ? item.mediaType.value : "—"}
-        </p>
-        <p><strong>Rank:</strong> {item.rank ?? "—"}</p>
-        <p><strong>Known For:</strong> {item.knownFor}</p>
-        <p><strong>Year:</strong> {item.year ?? "—"}</p>
-        <p><strong>Years:</strong> {item.years ?? "—"}</p>
-        {item.image && (
+        {!isPerson && (
           <p>
-            <strong>Image Size:</strong> {item.image.width} x {item.image.height}
+            <strong>Media Type:</strong>{" "}
+            {mediaTypeValue ? mediaTypeValue : "—"}
           </p>
         )}
+        <p><strong>Rank:</strong> {item.rank ?? "—"}</p>
+        <p><strong>Known For:</strong> {item.knownFor}</p>
+        {!isPerson && <p><strong>Year:</strong> {item.year ?? "—"}</p>}
+        {showYears && <p><strong>Years:</strong> {item.years ?? "—"}</p>}
       </div>
     </div>
   );
