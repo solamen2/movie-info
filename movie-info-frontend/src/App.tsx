@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LoginUser from "./LoginUser";
 import RegisterUser from "./RegisterUser";
-import MovieSearch from "./MovieSearch";
+import SuggestionSearch from "./SuggestionSearch";
 import "./App.css";
 
 function App() {
@@ -10,7 +10,7 @@ function App() {
       <Routes>
         <Route path="/login" element={<LoginUser />} />
         <Route path="/register" element={<RegisterUser />} />
-        <Route path="/search" element={<MovieSearch />} />
+        <Route path="/search" element={<SuggestionSearch />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>
