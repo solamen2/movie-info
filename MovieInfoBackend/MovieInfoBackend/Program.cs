@@ -56,7 +56,7 @@ void AddServices()
                 options.AddDefaultPolicy(
                     policy =>
                     {
-                        policy.WithOrigins("http://localhost:*");
+                        policy.WithOrigins("http://localhost:*");  // TODO: Maybe doesn't work? Need to revisit
                     });
             })
             .AddMemoryCache()

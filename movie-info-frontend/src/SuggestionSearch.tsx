@@ -1,4 +1,4 @@
-import { type FormEvent, useState } from "react";
+import { type SubmitEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SuggestionSearchCard, { type Suggestion } from "./SuggestionSearchCard";
 
@@ -7,13 +7,14 @@ function SuggestionSearch() {
   const [results, setResults] = useState<Suggestion[]>([]);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [error, setError] = useState("");
-  const [noResults, setNoResults] = useState(false);
+  const [searchMessage, setSearchMessage] = useState("");
   const navigate = useNavigate();
 
-  async function handleSearch(e: FormEvent) {
+  async function handleSearch(e: SubmitEvent) {
     e.preventDefault();
     setError("");
-    setNoResults(false);
+    setSearchMessage("");
+    setResults([]);
     setSelectedItemId(null);
 
     try {
@@ -24,20 +25,17 @@ function SuggestionSearch() {
 
       if (!response.ok) {
         setError(`Search failed with status ${response.status}. Please try again.`);
-        setResults([]);
         return;
       }
 
       const data: Suggestion[] = await response.json();
       if (!data || data.length === 0) {
-        setResults([]);
-        setNoResults(true);
+        setSearchMessage("No results.");
       } else {
         setResults(data);
       }
     } catch {
       setError("An unexpected error occurred. Please try again.");
-      setResults([]);
     }
   }
 
@@ -53,11 +51,11 @@ function SuggestionSearch() {
         body: JSON.stringify({}),
       });
 
-      if (response.ok) {
-        navigate("/login");
-      } else {
-        setError("Logout failed. Please try again."); // TODO: Maybe redirect to login instead
+      if (!response.ok) {
+        setError("Logout failed. Redirecting to login page...");
+        await new Promise(f => setTimeout(f, 5000));
       }
+      navigate("/login");
     } catch {
       setError("An unexpected error occurred. Please try again.");
     }
@@ -81,7 +79,7 @@ function SuggestionSearch() {
       </div>
 
       {error && <p className="error-message">{error}</p>}
-      {noResults && <p className="no-results">No results</p>}
+      {searchMessage && <p className="search-message">{searchMessage}</p>}
 
       <div className="results-container">
         {results.map((item) => (

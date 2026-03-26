@@ -57,8 +57,8 @@ public class MovieHttpClientTests
 
         // Act
 
-        MovieSuggestionsResponseDataModel? actual1 = movieHttpClient.GetModelFromResponse(movieHttpClientResponse1);
-        MovieSuggestionsResponseDataModel? actual2 = movieHttpClient.GetModelFromResponse(movieHttpClientResponse2);
+        MovieSuggestionsResponseDataModel? actual1 = MovieHttpClient.GetModelFromResponse(movieHttpClientResponse1);
+        MovieSuggestionsResponseDataModel? actual2 = MovieHttpClient.GetModelFromResponse(movieHttpClientResponse2);
 
         // Assert
 

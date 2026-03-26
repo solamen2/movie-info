@@ -1,4 +1,4 @@
-import { type FormEvent, useState } from "react";
+import { type SubmitEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function LoginUser() {
@@ -7,7 +7,7 @@ function LoginUser() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  async function handleLogin(e: FormEvent) {
+  async function handleLogin(e: SubmitEvent) {
     e.preventDefault();
     setError("");
 
@@ -21,7 +21,7 @@ function LoginUser() {
       if (response.ok) {
         navigate("/search");
       } else {
-        setError("Login failed. Please check your credentials and try again.");
+        setError("Login failed. Please check your credentials and try again.");  // TODO: Make this more specific (like when backend is down)
       }
     } catch {
       setError("An unexpected error occurred. Please try again.");
@@ -54,7 +54,7 @@ function LoginUser() {
         </div>
         {error && <p className="error-message">{error}</p>}
         <div className="form-actions">
-          <button type="submit">Login</button>
+          <button aria-label="login" id="login" type="submit">Login</button>
           <button type="button" onClick={() => navigate("/register")}>
             Register
           </button>

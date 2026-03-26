@@ -1,4 +1,4 @@
-import { type FormEvent, useState } from "react";
+import { type SubmitEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function RegisterUser() {
@@ -7,18 +7,19 @@ function RegisterUser() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  async function handleRegister(e: FormEvent) {
+  async function handleRegister(e: SubmitEvent) {
     e.preventDefault();
     setError("");
 
     try {
-      const response = await fetch("/api/register", {
+      const response = await fetch("/api/register", {  // TODO: Disable this page in prod
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
       if (response.ok) {
+        // TODO: Change this to say success message and add a link to go back to login
         navigate("/login");
       } else {
         const data = await response.json().catch(() => null);
@@ -62,7 +63,7 @@ function RegisterUser() {
         </div>
         {error && <p className="error-message">{error}</p>}
         <div className="form-actions">
-          <button type="submit">Register</button>
+          <button aria-label="register" type="submit">Register</button>
         </div>
       </form>
     </div>

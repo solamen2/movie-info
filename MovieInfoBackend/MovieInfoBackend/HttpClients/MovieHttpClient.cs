@@ -36,7 +36,7 @@ public class MovieHttpClient
         return GetModelFromResponse(responseJsonString);
     }
 
-    public MovieSuggestionsResponseDataModel? GetModelFromResponse(string responseJsonString)
+    public static MovieSuggestionsResponseDataModel? GetModelFromResponse(string responseJsonString)
     {
         return JsonSerializer.Deserialize<MovieSuggestionsResponseDataModel>(responseJsonString);
     }
