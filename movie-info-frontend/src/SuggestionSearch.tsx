@@ -32,6 +32,7 @@ function SuggestionSearch() {
       if (!data || data.length === 0) {
         setSearchMessage("No results.");
       } else {
+        setSearchMessage(`${data.length} results.`)
         setResults(data);
       }
     } catch {
@@ -57,7 +58,7 @@ function SuggestionSearch() {
       }
       navigate("/login");
     } catch {
-      setError("An unexpected error occurred. Please try again.");
+      setError("An unexpected logout error occurred. Please try again.");
     }
   }
 
@@ -66,14 +67,15 @@ function SuggestionSearch() {
       <div className="search-header">
         <form className="search-bar" onSubmit={handleSearch}>
           <input
+            aria-label="search-query-input"
             type="text"
             placeholder="Search movies, people..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
-          <button type="submit">Search</button>
+          <button aria-label="search" type="submit">Search</button>
         </form>
-        <button className="logout-button" onClick={handleLogout}>
+        <button aria-label="logout" className="logout-button" onClick={handleLogout}>
           Logout
         </button>
       </div>

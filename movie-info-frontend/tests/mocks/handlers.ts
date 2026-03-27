@@ -1,6 +1,6 @@
 import { http, HttpResponse } from "msw"
 import searchDataJson1 from './data/searchData1.json';
-import searchDataJson2 from './data/searchData1.json';
+import searchDataJson2 from './data/searchData2.json';
 
 interface LoginPathParams {
 }
@@ -81,6 +81,8 @@ export const handlers = [
         return HttpResponse.json(searchDataJson1, { status: 200 });
       case "2":
         return HttpResponse.json(searchDataJson2, { status: 200 });
+      case "empty":
+        return HttpResponse.json([ ], { status: 200 });
       default:
         return HttpResponse.json({"error": "Not a valid search query for mock"}, { status: 404 });
     }
