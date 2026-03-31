@@ -54,15 +54,16 @@ The frontend framework is React, and the app is written using Typescript in TSX 
 
 ### Testing
 Frontend unit/component/integration tests are done using [Vitest](https://vitest.dev/) as the test runner, [React Testing Library](https://testing-library.com/) and [@testing-library/jest-dom](https://github.com/testing-library/jest-dom) for the tests themselves, and [MSW](https://mswjs.io/) to mock the HTTP calls. End-to-end tests are done on the frontend using (Playwright)[https://playwright.dev/], with toggleable MSW using [mswjs/playwright](https://github.com/mswjs/playwright). (Yes, I am aware then when using MSW, it's not a true end-to-end test.) Ad-hoc UI tests are performed the same as the end-to-end tests, but by me instead of Playwright.
+TODO: Talk about code coverage
 
 ### Handling Web Requests
 In a local dev environment, Vite handles all requests, and proxies the API requests to the ASP.Net Core Kestrel server, which is configured using [vite.config.ts](https://vite.dev/config/server-options#server-proxy). Outside of development, the React files are copied to wwwroot (via a custom build step in the MovieInfoBackend.csproj file that runs when doing a "dotnet publish") and are therefore served statically, so in stage and prod ASP.Net Core handles all the requests instead. All traffic is over HTTPS using [Let's Encrypt](https://letsencrypt.org/) certs that renew every 3 months via [Acmebot for Microsoft Azure](https://github.com/shibayan/keyvault-acmebot). Routing is handled using [React Router](https://www.npmjs.com/package/react-router-dom).
 
 ### CSS
-TODO (no Tailwind)
+The CSS and presentation is fairly basic (and does not use Tailwind), and was determined mostly by AI. It uses Flexbox to display the search cards and extended data (from subsequent OMDB / TMDB searches). It does not support dark mode. TODO: Support dark mode?
 
 ### Accessibility
-TODO
+TODO: Make app more accessible?
 
 ## Architecture: Environments
 The app has three environments: dev, stage, and prod. Dev is run on my local machine, and also on fly.io (and the fly.io version has its own Azure SQL Server database). Stage and prod are separate Azure Container Apps with their own Azure SQL Server databases.

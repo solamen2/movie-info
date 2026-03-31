@@ -1,6 +1,6 @@
 import { http, HttpResponse } from "msw"
-import searchDataJson1 from './data/searchData1.json';
-import searchDataJson2 from './data/searchData2.json';
+import searchDataJson1 from "./data/searchData1.json" with { type: "json" };
+import searchDataJson2 from "./data/searchData2.json" with { type: "json" };
 
 interface LoginPathParams {
 }

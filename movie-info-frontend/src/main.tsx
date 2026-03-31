@@ -2,7 +2,7 @@ import { StrictMode } from "react"
 import { createRoot } from "react-dom/client"
 import "./index.css"
 import App from "./App.tsx"
-import { config } from "./config.ts"
+import { config } from "./movieinfo.config.ts"
 
 async function enableMocking() {
   if ((process.env.NODE_ENV === 'development') && config.useMockHttpCalls) {

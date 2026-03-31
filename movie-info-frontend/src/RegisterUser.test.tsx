@@ -1,9 +1,10 @@
-import { fireEvent, render, screen} from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it } from "vitest";
 import { MemoryRouter } from "react-router-dom"
 import RegisterUser from "./RegisterUser";
 
-  describe("RegisterUser", async () => {
+// screen.logTestingPlaygroundURL();
+describe("RegisterUser", async () => {
   describe("When using good registration info", async () => {
     it("Should register user successfully", async () => {
       render(<MemoryRouter><RegisterUser /></MemoryRouter>);  // MemoryRouter required to use navigate()

@@ -10,7 +10,11 @@
             "cwd": "${workspaceFolder}/MovieInfoBackend/MovieInfoBackend",
             "launchSettingsFilePath": "${workspaceFolder}/MovieInfoBackend/MovieInfoBackend/Properties/launchSettings.json",
             "launchSettingsProfile": "http (dev)",
-            "console": "integratedTerminal"
+            "console": "integratedTerminal",
+            "env": {
+                "CUSTOMCONNSTR_MOVIE_INFO_LOCAL_DB": "Server=localhost,1433;Database=movieinfo;MultipleActiveResultSets=true;User=sa;Password=$QLServerPWSA;Encrypt=false",
+                "CUSTOMCONNSTR_MOVIE_INFO_LOCAL_DOCKER_DB": "Server=host.docker.internal,1433;Database=movieinfo;MultipleActiveResultSets=true;User=sa;Password=$QLServerPWSA;Encrypt=false"
+            }
         },
         {
             "name": "Frontend MovieInfo debug",
@@ -19,6 +23,43 @@
             "url": "http://localhost:8081",
             "webRoot": "${workspaceFolder}/movie-info-frontend",
             "preLaunchTask": "Compile and run Vite React App"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Frontend Playwright tests debug",
+            "console": "integratedTerminal",
+            "skipFiles": ["<node_internals>/**"],
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run-script",
+                "playwright-debug-script"
+            ],
+            "env": {  // PS: Test Explorer version of these lives in Playwright Test for VSCode -> Settings
+                "E2E_TEST_LOCAL_BASE_URL": "http://localhost:8081/",
+                "E2E_TEST_LOCAL_USERNAME": "localtest@example.com",
+                "E2E_TEST_LOCAL_PASSWORD": "Pa$sw0rd"
+            },
+            "cwd": "${workspaceFolder}/movie-info-frontend"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Frontend Playwright Inspector debug",
+            "console": "integratedTerminal",
+            "skipFiles": ["<node_internals>/**"],
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run-script",
+                "playwright-debug-script"
+            ],
+            "env": {
+                "PWDEBUG": "1",
+                "E2E_TEST_LOCAL_BASE_URL": "http://localhost:8081/",
+                "E2E_TEST_LOCAL_USERNAME": "localtest@example.com",
+                "E2E_TEST_LOCAL_PASSWORD": "Pa$sw0rd"
+            },
+            "cwd": "${workspaceFolder}/movie-info-frontend"
         }
     ]
 }

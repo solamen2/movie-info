@@ -1,8 +1,9 @@
-import { fireEvent, render, screen} from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it } from "vitest";
 import { MemoryRouter } from "react-router-dom"
 import SuggestionSearch from './SuggestionSearch';
 
+// screen.logTestingPlaygroundURL();
 describe("SuggestionSearch", async () => {
   describe("When using search terms with results", async () => {
     it("Should return search results", async () => {

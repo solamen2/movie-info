@@ -56,7 +56,12 @@ void AddServices()
                 options.AddDefaultPolicy(
                     policy =>
                     {
-                        policy.WithOrigins("http://localhost:*");  // TODO: Maybe doesn't work? Need to revisit
+                    policy.WithOrigins("http://localhost:8080", // TODO: Test that all these work!
+                                       "http://localhost:8081",
+                                       "https://movie-info-flyio.fly.dev",
+                                       "https://movie-info-stage.*",
+                                       "https://movie-info-prod.*",
+                                       "https://movieinfo.dev");
                     });
             })
             .AddMemoryCache()
@@ -96,13 +101,13 @@ void ConfigDatabase()
         switch (ProgramConfig.DbConnType)
         {
             case LocalDbConnType.Local:
-                connectionString = builder.Configuration.GetConnectionString("MovieInfoLocalDb");
+                connectionString = builder.Configuration.GetConnectionString("MOVIE_INFO_LOCAL_DB");  // from launch.json environment variable
                 break;
-            case LocalDbConnType.LocalDocker:
-                connectionString = builder.Configuration.GetConnectionString("MovieInfoLocalDockerDb");
+            case LocalDbConnType.LocalDocker: // TODO: Get this working again
+                connectionString = builder.Configuration.GetConnectionString("MOVIE_INFO_LOCAL_DOCKER_DB");  // from launch.json environment variable
                 break;
             case LocalDbConnType.AzureDev:
-                // from .env file using --env-file in Docker, or from appsettings.Development.json outside of Docker (env var needs to be added if you do this!)
+                // from .env file using --env-file in Docker, or from launch.json outside of Docker (env var needs to be added if you do this!)
                 connectionString = builder.Configuration.GetConnectionString("MOVIE_INFO_AZURE_DEV_DB");
                 break;
             default:  // should never happen currently
@@ -126,7 +131,7 @@ void ConfigAuth()
     {
         options.SlidingExpiration = true;
         options.Cookie.HttpOnly = true;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
         options.ExpireTimeSpan = ProgramConfig.LoginCookieTimeout;
         options.Cookie.SameSite = SameSiteMode.Strict;
     });
@@ -186,6 +191,6 @@ void SetUpApp()
     // Logging
     app.UseSerilogRequestLogging();
 
-    // CORS (only used for localhost currently)
+    // CORS
     app.UseCors();
 }

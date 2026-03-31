@@ -1,12 +1,9 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it } from "vitest";
 import { MemoryRouter } from "react-router-dom"
 import SuggestionSearch from './SuggestionSearch';
  
-  // TODO: Card tests:
-  //          Test all good card types as separate tests
-  //          Test card selection and deselection
-
+// screen.logTestingPlaygroundURL();
 describe("SuggestionSearchCard", async () => {
   
   // First search: 8 cards

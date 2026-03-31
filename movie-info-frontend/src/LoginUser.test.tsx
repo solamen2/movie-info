@@ -1,18 +1,9 @@
-import { fireEvent, render, screen} from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it } from "vitest";
 import { MemoryRouter } from "react-router-dom"
 import LoginUser from "./LoginUser";
- 
-  // TODO: Card tests:
-  //          Test all good card types as separate tests
-  //          Test card selection and deselection
-  // TODO: Search tests:
-  //          Test search that returns good results
-  //          Test search that returns no results
-  //          Test search that returns error
-  //          Test good logout?
-  //          Test logout error
 
+// screen.logTestingPlaygroundURL();
 describe("LoginUser", async () => {
   describe("When using good login info", async () => {
     it("Should log in user successfully", async () => {

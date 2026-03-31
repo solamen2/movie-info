@@ -19,8 +19,7 @@ function SuggestionSearch() {
 
     try {
       const response = await fetch(
-        `/api/search?searchQuery=${encodeURIComponent(searchQuery)}`,
-        { redirect: "error" }
+        `/api/search?searchQuery=${encodeURIComponent(searchQuery)}`
       );
 
       if (!response.ok) {

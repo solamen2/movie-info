@@ -12,7 +12,7 @@ function RegisterUser() {
     setError("");
 
     try {
-      const response = await fetch("/api/register", {  // TODO: Disable this page in prod
+      const response = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -37,9 +37,13 @@ function RegisterUser() {
     }
   }
 
+  // TODO: Hide register button in prod (to not confuse people, not for security)
+
   return (
     <div className="auth-page">
       <h1>Register</h1>
+      <h2>Hey there! This page is technically accessible to the public, and you can make accounts here, but since accounts have to be manually enabled in the database, 
+        it's pointless for anyone but me to make them. It's just a convenience page for me, the admin.</h2>
       <form onSubmit={handleRegister}>
         <div className="form-field">
           <label htmlFor="email">Email</label>
