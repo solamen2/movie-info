@@ -6,14 +6,15 @@ on:
   push:
     branches:
       - main
+
 jobs:
   deploy:
-    name: Deploy app
+    name: Deploy app to fly.io and run integration tests
     runs-on: ubuntu-latest
     concurrency: deploy-group    # optional: ensure only one action runs at a time
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: superfly/flyctl-actions/setup-flyctl@master
       - run: flyctl deploy --remote-only
         env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}  # TODO: set this up so automatic deploys to fly.io work
+          FLY_API_TOKEN: "TODO" #${{ secrets.FLY_API_TOKEN }}  # TODO: set this up so automatic deploys to fly.io work, and run all tests

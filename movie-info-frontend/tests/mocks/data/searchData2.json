@@ -1,0 +1,108 @@
+[
+  {
+    "id": "40b4d3f8-2ecb-4a77-b786-b9643816e7f1",
+    "image": {
+      "height": 4096,
+      "imageURL": "https://example.com/images/m/example9.v1.jpg",
+      "width": 1987
+    },
+    "itemID": "tt0100008",
+    "name": "Example Video Game",
+    "searchType": "Media",
+    "mediaType": {
+      "value": "Video Game"
+    },
+    "rank": 989,
+    "knownFor": "Action, Adventure, Sci-Fi",
+    "year": 1996,
+    "years": null
+  },
+  {
+    "id": "768ffd09-658d-4931-8d01-f0d8324e6621",
+    "image": {
+      "height": 2222,
+      "imageURL": "https://example.com/example10.jpg",
+      "width": 1111
+    },
+    "itemID": "tt0444441",
+    "name": "Example Video",
+    "searchType": "Media",
+    "mediaType": {
+      "value": "Video"
+    },
+    "rank": 65439,
+    "knownFor": "Robert Johnson, James Williams",
+    "year": 2016,
+    "years": null
+  },
+  {
+    "id": "f1b55c4e-d1db-490a-93a8-5406fa0872b0",
+    "image": {
+      "height": 987,
+      "imageURL": "https://example.com/example11.jpg",
+      "width": 667
+    },
+    "itemID": "tt1347654",
+    "name": "Example Music Video",
+    "searchType": "Media",
+    "mediaType": {
+      "value": "Music Video"
+    },
+    "rank": 4455,
+    "knownFor": "James Brown, Jose Garcia",
+    "year": 2001,
+    "years": null
+  },
+  {
+    "id": "1ae2ae48-6c64-4cea-bea9-177e1cb4c2c2",
+    "image": {
+      "height": 1562,
+      "imageURL": "https://example.com/example12.jpg",
+      "width": 798
+    },
+    "itemID": "tt81000605",
+    "name": "Example Podcast Series",
+    "searchType": "Media",
+    "mediaType": {
+      "value": "Podcast Series"
+    },
+    "rank": 27,
+    "knownFor": "Maria Gonzalez, David Brown",
+    "year": 1992,
+    "years": null
+  },
+  {
+    "id": "011b9091-9006-4bd7-96b6-b860490f5766",
+    "image": {
+      "height": 890,
+      "imageURL": "https://example.com/example13.jpg",
+      "width": 675
+    },
+    "itemID": "tt0544543",
+    "name": "Example Video 2",
+    "searchType": "Media",
+    "mediaType": {
+      "value": "Video"
+    },
+    "rank": 1876,
+    "knownFor": "Robert Garcia, Jose Williams",
+    "year": 2013,
+    "years": null
+  },
+  {
+    "id": "4465e689-9d21-4094-92f0-bb4234010c0b",
+    "image": {
+      "height": 1005,
+      "imageURL": "https://example.com/example14.jpg",
+      "width": 680
+    },
+    "itemID": "/spotlight/",
+    "name": "Lemur History Month",
+    "searchType": null,
+    "mediaType": null,
+    "rank": null,
+    "knownFor": "A Celebration of Lemur Storytellers and Stories",
+    "year": null,
+    "years": null
+  }
+]

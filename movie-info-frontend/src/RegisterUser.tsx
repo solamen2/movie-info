@@ -1,4 +1,4 @@
-import { type FormEvent, useState } from "react";
+import { type SubmitEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function RegisterUser() {
@@ -7,7 +7,7 @@ function RegisterUser() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  async function handleRegister(e: FormEvent) {
+  async function handleRegister(e: SubmitEvent) {
     e.preventDefault();
     setError("");
 
@@ -19,6 +19,7 @@ function RegisterUser() {
       });
 
       if (response.ok) {
+        // TODO: Change this to say success message and add a link to go back to login
         navigate("/login");
       } else {
         const data = await response.json().catch(() => null);
@@ -36,9 +37,13 @@ function RegisterUser() {
     }
   }
 
+  // TODO: Hide register button in prod (to not confuse people, not for security)
+
   return (
     <div className="auth-page">
       <h1>Register</h1>
+      <h2>Hey there! This page is technically accessible to the public, and you can make accounts here, but since accounts have to be manually enabled in the database, 
+        it's pointless for anyone but me to make them. It's just a convenience page for me, the admin.</h2>
       <form onSubmit={handleRegister}>
         <div className="form-field">
           <label htmlFor="email">Email</label>
@@ -62,7 +67,7 @@ function RegisterUser() {
         </div>
         {error && <p className="error-message">{error}</p>}
         <div className="form-actions">
-          <button type="submit">Register</button>
+          <button aria-label="register" type="submit">Register</button>
         </div>
       </form>
     </div>

@@ -41,6 +41,7 @@ function SuggestionSearchCard({ item, selected, onClick }: SuggestionSearchCardP
 
   return (
     <div
+      id="search-card"
       className={`result-card${selected ? " selected" : ""}`}
       onClick={onClick}
     >

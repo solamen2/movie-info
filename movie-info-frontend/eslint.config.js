@@ -8,7 +8,7 @@ import { defineConfig, globalIgnores } from 'eslint/config'
 export default defineConfig([
   globalIgnores(['dist']),
   {
-    files: ['**/*.{ts,tsx}'],
+    files: ['**/*.{js,jsx,ts,tsx,mts}'],
     extends: [
       js.configs.recommended,
       tseslint.configs.recommended,
@@ -20,7 +20,6 @@ export default defineConfig([
       globals: globals.browser,
     },
     rules: {
-			semi: "error"
 		},
   },
 ])

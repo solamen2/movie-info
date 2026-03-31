@@ -29,6 +29,7 @@ public class MovieEndpoints
                     MovieHttpClient movieHttpClient = typedHttpClientFactory.CreateClient(httpClient);
 
                     MovieSuggestionsResponseDataModel? suggestionsResponse;
+
                     string suggestionsCacheKey = MovieHttpClient.CachePrefix + searchQuery;
                     if (!cache.TryGetValue(suggestionsCacheKey, out suggestionsResponse))
                     {
@@ -44,8 +45,8 @@ public class MovieEndpoints
                     string username = user?.Identity?.Name ?? "<no username found>";
 
                     Log.Debug($"Username: {username}");
-                    Log.Debug($"Suggestions:\n\n{suggestionsResponse}\n\n");   // NOTE: Not destructuring using @ operator because Serilog doesn't
-                                                                                // let you configure output easily (and Seq doesn't support Azure Container Apps)
+                    Log.Debug($"Suggestions:\n\n{suggestionsResponse}\n\n");   // NOTE: Not destructuring using @ operator because Serilog doesn't let you configure output easily
+                                                                               // (and Seq doesn't support Azure Container Apps, so it's not used in this app)
 
                     List<SuggestionViewModel> suggestionViewModels = new List<SuggestionViewModel>();
                     if (suggestionsResponse == null || suggestionsResponse.Suggestions == null)
@@ -70,7 +71,25 @@ public class MovieEndpoints
         )
         .WithSummary("Search")
         .WithDescription("Searches IMDB for people, movies, and many other media types, and returns basic information on them.")
-        .RequireAuthorization(ProgramConstants.LoggedInUsersOnlyPolicyName)
-        .RequireAuthorization(ProgramConstants.SearchUsersOnlyPolicyName);
+        .RequireAuthorization(ProgramConstants.LoggedInUsersOnlyPolicyName)  // TODO: Check that this returns appropropriate error on frontend
+        .RequireAuthorization(ProgramConstants.SearchUsersOnlyPolicyName);  // TODO: Check that this returns appropropriate error on frontend
+    }
+
+    // WARNING: This function should only ever be used in local development to generate test case data
+    private static MovieSuggestionsResponseDataModel? LoadMockData()
+    {
+        string movieHttpClientResponse;
+        string testDataFilename = "MovieHttpClientResponse2.json";
+
+        using (StreamReader sr = File.OpenText($"../TestMovieInfoBackend/TestData/{testDataFilename}"))
+        {
+            movieHttpClientResponse = sr.ReadToEnd();
+        }
+        if (String.IsNullOrWhiteSpace(movieHttpClientResponse))
+        {
+            throw new ArgumentException($"{testDataFilename} is not valid test data.");
+        }
+
+        return MovieHttpClient.GetModelFromResponse(movieHttpClientResponse);
     }
 }

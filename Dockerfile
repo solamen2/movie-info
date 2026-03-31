@@ -16,7 +16,7 @@ RUN dotnet restore -a $TARGETARCH
 FROM build AS publish
 COPY --link MovieInfoBackend/MovieInfoBackend/. .
 COPY --link movie-info-frontend movie-info-frontend
-RUN dotnet publish -a $TARGETARCH --no-restore -o /app
+RUN dotnet publish -a $TARGETARCH --no-restore -o /app -c Release
 
 # Runtime stage
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS deploy
