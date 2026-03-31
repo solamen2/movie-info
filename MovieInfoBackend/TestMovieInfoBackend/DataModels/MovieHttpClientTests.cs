@@ -70,7 +70,7 @@ public class MovieHttpClientTests
                 SuggestionDataModel? suggestion1 = suggestions1?[0];
                 SuggestionImageDataModel? suggestion1image = suggestion1?.Image;
                 Assert.True(suggestion1image?.Height > 0, "Person image Height must be a positive number");
-                Assert.True(String.IsNullOrWhiteSpace(suggestion1image?.ImageURL), "Person ImageURL must not be empty");
+                Assert.False(String.IsNullOrWhiteSpace(suggestion1image?.ImageURL), "Person ImageURL must not be empty");
                 Assert.True(suggestion1image?.Width > 0, "Person Width must be a positive number");
                 Assert.False(String.IsNullOrWhiteSpace(suggestion1?.ItemID), "Person ID must not be empty");
                 Assert.False(String.IsNullOrWhiteSpace(suggestion1?.Name), "Person Name must not be empty");
