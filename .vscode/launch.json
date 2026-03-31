@@ -12,8 +12,7 @@
             "launchSettingsProfile": "http (dev)",
             "console": "integratedTerminal",
             "env": {
-                "CUSTOMCONNSTR_MOVIE_INFO_LOCAL_DB": "Server=localhost,1433;Database=movieinfo;MultipleActiveResultSets=true;User=sa;Password=$QLServerPWSA;Encrypt=false",
-                "CUSTOMCONNSTR_MOVIE_INFO_LOCAL_DOCKER_DB": "Server=host.docker.internal,1433;Database=movieinfo;MultipleActiveResultSets=true;User=sa;Password=$QLServerPWSA;Encrypt=false"
+                "CUSTOMCONNSTR_MOVIE_INFO_LOCAL_DB": "Server=localhost,1433;Database=movieinfo;MultipleActiveResultSets=true;User=sa;Password=$QLServerPWSA;Encrypt=false"
             }
         },
         {
@@ -35,10 +34,11 @@
                 "run-script",
                 "playwright-debug-script"
             ],
-            "env": {  // PS: Test Explorer version of these lives in Playwright Test for VSCode -> Settings
-                "E2E_TEST_LOCAL_BASE_URL": "http://localhost:8081/",
-                "E2E_TEST_LOCAL_USERNAME": "localtest@example.com",
-                "E2E_TEST_LOCAL_PASSWORD": "Pa$sw0rd"
+            "env": {
+                // PS: Test Explorer version of these lives in Playwright Test for VSCode -> Settings, and Docker version is in .env file
+                "E2E_TEST_LOCAL_BASE_URL": "http://localhost:8081/" // NOTE: Use port 8080 for Docker
+                //"E2E_TEST_LOCAL_USERNAME": "localtest@example.com", // NOTE: Comment out to use non-local db, and use .env file
+                //"E2E_TEST_LOCAL_PASSWORD": "Pa$sw0rd" // NOTE: Comment out to use non-local db, and use .env file
             },
             "cwd": "${workspaceFolder}/movie-info-frontend"
         },
@@ -55,9 +55,9 @@
             ],
             "env": {
                 "PWDEBUG": "1",
-                "E2E_TEST_LOCAL_BASE_URL": "http://localhost:8081/",
-                "E2E_TEST_LOCAL_USERNAME": "localtest@example.com",
-                "E2E_TEST_LOCAL_PASSWORD": "Pa$sw0rd"
+                "E2E_TEST_LOCAL_BASE_URL": "http://localhost:8081/" // NOTE: Use port 8080 for Docker
+                //"E2E_TEST_LOCAL_USERNAME": "localtest@example.com", // NOTE: Comment out to use non-local db, and use .env file
+                //"E2E_TEST_LOCAL_PASSWORD": "Pa$sw0rd" // NOTE: Comment out to use non-local db, and use .env file
             },
             "cwd": "${workspaceFolder}/movie-info-frontend"
         }

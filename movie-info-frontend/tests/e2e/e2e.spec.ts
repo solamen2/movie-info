@@ -1,4 +1,4 @@
-import { expect, selectors } from "@playwright/test";
+import { expect } from "@playwright/test";
 import { test } from "./e2ebase.ts";
 import { config } from "../../src/movieinfo.config.ts";
 
