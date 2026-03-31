@@ -36,9 +36,9 @@
             ],
             "env": {
                 // PS: Test Explorer version of these lives in Playwright Test for VSCode -> Settings, and Docker version is in .env file
-                "E2E_TEST_LOCAL_BASE_URL": "http://localhost:8081/" // NOTE: Use port 8080 for Docker
-                //"E2E_TEST_LOCAL_USERNAME": "localtest@example.com", // NOTE: Comment out to use non-local db, and use .env file
-                //"E2E_TEST_LOCAL_PASSWORD": "Pa$sw0rd" // NOTE: Comment out to use non-local db, and use .env file
+                "E2E_TEST_LOCAL_BASE_URL": "http://localhost:8081/", // NOTE: Use port 8080 for Docker
+                "E2E_TEST_LOCAL_USERNAME": "localtest@example.com", // NOTE: Comment out to use non-local db, and use .env file
+                "E2E_TEST_LOCAL_PASSWORD": "Pa$sw0rd" // NOTE: Comment out to use non-local db, and use .env file
             },
             "cwd": "${workspaceFolder}/movie-info-frontend"
         },
