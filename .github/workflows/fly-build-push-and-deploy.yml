@@ -1,20 +1,100 @@
 # See https://fly.io/docs/app-guides/continuous-deployment-with-github-actions/
-# TODO: Set up API token when app hits 1.0 for automatic deployment to stage
+# Made with help from https://github.com/PREreview/prereview.org/blob/0864a9beb3ee6d2090b1a294dfff5c6c0fa97701/.github/workflows/ci.yml#L285-L350
 
-name: Fly Deploy
+name: Fly Build Image, Push, And Deploy
 on:
   push:
     branches:
       - main
+  pull_request:  # Just for testing; TODO remove this later
+    branches:
+      - main
 
 jobs:
-  deploy:
-    name: Deploy app to fly.io and run integration tests
+  build-image:
+    name: Build Docker dev image
     runs-on: ubuntu-latest
-    concurrency: deploy-group    # optional: ensure only one action runs at a time
+    outputs:
+      image: ${{ steps.build.outputs.imageid }}
+
     steps:
-      - uses: actions/checkout@v6
-      - uses: superfly/flyctl-actions/setup-flyctl@master
-      - run: flyctl deploy --remote-only
+      - name: Check out repository code
+        uses: actions/checkout@v6
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build Docker dev image
+        id: build
+        uses: docker/build-push-action@v7
+        with:
+          provenance: false
+          platforms: linux/amd64,linux/arm64
+          outputs: type=docker,dest=/tmp/movie-info-image.tar
+          cache-from: type=gha,ignore-error=true
+          cache-to: type=gha,mode=max,ignore-error=true
+
+      - name: Upload build
+        uses: actions/upload-artifact@v6
+        with:
+          name: image
+          path: /tmp/movie-info-image.tar
+  
+  push:
+    name: Push Docker dev image to fly.io
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    outputs:
+      image: ${{ steps.image.outputs.image }}
+    needs: build-image
+    steps:
+      - name: Set up flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@v1.4
+
+      - name: Log in to the registry
+        run: flyctl auth docker
         env:
-          FLY_API_TOKEN: "TODO" #${{ secrets.FLY_API_TOKEN }}  # TODO: set this up so automatic deploys to fly.io work, and run all tests
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+      - name: Download image
+        uses: actions/download-artifact@v8
+        with:
+          name: movie-info-image
+          path: /tmp
+
+      - name: Load image
+        run: docker load --input /tmp/image.tar
+
+      - name: Generate image name
+        id: image
+        run: echo "registry.fly.io/movie-info-flyio:dev" >> $GITHUB_OUTPUT
+
+      - name: Tag image
+        run: docker tag ${{ needs.build-image.outputs.image }} ${{ steps.image.outputs.image }}
+
+      - name: Push image
+        run: docker push ${{ steps.image.outputs.image }}
+
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    needs:
+      - push
+    strategy:
+      fail-fast: false
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v6
+
+      - name: Set up flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@v1.4
+
+      - name: Deploy app
+        run: flyctl deploy --config fly.toml --image ${{ needs.push.outputs.image }} --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

@@ -1,16 +1,15 @@
 
 # Made with help from https://playwright.dev/docs/ci#via-containers
-name: 'CI - Build And Run Playwright End-To-End Tests'
+name: 'CI - Run Playwright End-To-End Tests On Fly.Io Dev Instance'
 on:
-  push:
-    branches:
-      - main
-  pull_request:  # Just for testing; TODO remove this later
-    branches:
-      - main
+  workflow_run:
+    workflows: ["Fly Build Image, Push, And Deploy"]
+    branches: [main]
+    types: 
+      - completed
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     container:
       image: mcr.microsoft.com/playwright:v1.58.2-noble  # NOTE: Update this when updating Playwright!
@@ -32,5 +31,10 @@ jobs:
       - name: Run Playwright end-to-end tests
         run: npx playwright test --config ./playwright.config.ts --workers=1
         working-directory: ./movie-info-frontend
-        env: 
+        env:
+            CI: 1
             E2E_TEST_USE_MOCK_HTTP_CALLS: false
+            E2E_TEST_BASE_URL: https://movie-info-flyio.fly.dev/
+            E2E_TEST_USERNAME: ${{ secrets.E2E_TEST_USERNAME }}
+            E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
+
