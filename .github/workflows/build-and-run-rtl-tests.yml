@@ -12,6 +12,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    permissions:
+      pull-requests: write  # Needed for unit test coverage report
+
     steps:
     - name: Check out repository code
       uses: actions/checkout@v6
@@ -24,7 +27,7 @@ jobs:
       run: npm install
     - name: Run React Testing Library unit tests
       working-directory: ./movie-info-frontend
-      run: npx vitest --coverage.enabled true --coverage.reporter=json-summary
+      run: npx vitest --coverage.enabled true --coverage.reporter=json-summary --coverage.reporter=json
     - name: Report unit test coverage
       if: success()
       with:
