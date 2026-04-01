@@ -13,7 +13,10 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      pull-requests: write  # Needed for unit test coverage report
+      # Required to checkout the code (when any permissions are listed in this section)
+      contents: read
+      # Required to put a comment into the pull request for vitest-coverage-support-action
+      pull-requests: write
 
     steps:
     - name: Check out repository code
