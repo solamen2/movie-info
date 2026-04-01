@@ -1,6 +1,5 @@
 import { expect } from "@playwright/test";
 import { test } from "./e2ebase.ts";
-import { config } from "../../src/movieinfo.config.ts";
 
 test.beforeEach(async ({ page }) => {
   console.log("Logging in...");
@@ -26,16 +25,16 @@ test.afterEach(async ({ page }) => {
 
 test("Basic happy path: search, check results are valid, and select a search card", async ({ page }) => {
   console.log("Starting basic happy path test...");
-  const searchText = config.useMockHttpCalls === true ? "1" : "The Shawshank Redemption";
+  const searchText = process.env.E2E_TEST_USE_MOCK_HTTP_CALLS === "true" ? "1" : "The Shawshank Redemption";
   const searchQueryInput = page.getByRole("textbox", { name: "search-query-input" });
   await searchQueryInput.fill(searchText);
   const searchButton = page.getByRole("button", { name: "search" });
   await searchButton.click();
 
-  const movieNameTextToSearch = config.useMockHttpCalls === true ? "Example Movie" : "The Shawshank Redemption";
+  const movieNameTextToSearch = process.env.E2E_TEST_USE_MOCK_HTTP_CALLS === "true" ? "Example Movie" : "The Shawshank Redemption";
   const movieTextElement = await page.getByText(movieNameTextToSearch, { exact: true });
   const movieCard = movieTextElement.locator("ancestor=#search-card");
-  const movieCardText = config.useMockHttpCalls === true
+  const movieCardText = process.env.E2E_TEST_USE_MOCK_HTTP_CALLS === "true"
     ? "Example MovieSearch Type: MediaMedia Type: MovieRank: 4444Known For: Example Jones, Example BrownYear: 2016"
     : "The Shawshank RedemptionSearch Type: MediaMedia Type: MovieRank: 109Known For: Tim Robbins, Morgan FreemanYear: 1994";
   expect(await movieCard.textContent()).toBe(movieCardText);

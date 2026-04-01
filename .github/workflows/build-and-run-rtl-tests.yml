@@ -1,0 +1,28 @@
+name: CI - Build And Run React Testing Library Unit Tests
+
+on: 
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out repository code
+      uses: actions/checkout@v6
+    - name: Install Node
+      uses: actions/setup-node@v6
+      with:
+        node-version: "25.x"
+    - name: Install dependencies
+      run: npm install
+    - name: Run React Testing Library unit tests
+      run: npx vitest --coverage.enabled true
+    - name: Report unit test coverage
+      if: success()
+      uses:  davelosert/vitest-coverage-report-action@v2

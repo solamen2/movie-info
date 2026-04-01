@@ -14,30 +14,6 @@
                 "-c",
                 "Debug"
             ]
-        },
-        {
-            "label": "Compile and run Vite React App",
-            "type": "shell",
-            "command": "npm run dev",
-            "options": {
-                "cwd": "${workspaceFolder}/movie-info-frontend"
-            },
-            "isBackground": true,
-            "problemMatcher": {
-                "owner": "custom",
-                "pattern": {
-                    "regexp": ".",
-                    "file": 1,
-                    "location": 2,
-                    "message": 3
-                },
-                // Since Vite dev runs indefinitely in the background, this is a workaround telling VS Code not to wait
-                "background": {
-                    "activeOnStart": true,
-                    "beginsPattern": ".",
-                    "endsPattern": "."
-                }
-            }
         }
     ]
 }

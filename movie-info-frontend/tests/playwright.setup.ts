@@ -2,7 +2,6 @@ import { test as testBase } from "@playwright/test"
 import { type AnyHandler } from "msw"
 import { defineNetworkFixture, type NetworkFixture } from "@msw/playwright"
 import { handlers } from "./mocks/handlers.ts"
-import { config } from "../src/movieinfo.config.ts"
 
 interface Fixtures {
   handlers: Array<AnyHandler>
@@ -10,7 +9,7 @@ interface Fixtures {
 }
 
 export const test = 
-  config.useMockHttpCalls
+  process.env.E2E_TEST_USE_MOCK_HTTP_CALLS === "true"
   ? testBase.extend<Fixtures>({
       // Initial list of the network handlers.
       handlers: [handlers, { option: true }],
