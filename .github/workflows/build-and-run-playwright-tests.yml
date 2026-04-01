@@ -5,6 +5,9 @@ on:
   push:
     branches:
       - main
+  pull_request:  # Just for testing; TODO remove this later
+    branches:
+      - main
 
 jobs:
   build:
