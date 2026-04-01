@@ -53,20 +53,20 @@ TODO: Mention IMDB, OMDB, and maybe TMDB
 The frontend framework is React, and the app is written using Typescript in TSX files. It was created using a basic template with Vite (version 7.3.1 currently) by running "npm create vite@latest", selecting "React" as the framework, and "Typescript" as the variant. Most of the UI was created using AI.
 
 ### Testing
-Frontend unit/component/integration tests are done using [Vitest](https://vitest.dev/) as the test runner, [React Testing Library](https://testing-library.com/) and [@testing-library/jest-dom](https://github.com/testing-library/jest-dom) for the tests themselves, and [MSW](https://mswjs.io/) to mock the HTTP calls. End-to-end tests are done on the frontend using (Playwright)[https://playwright.dev/], with toggleable MSW using [mswjs/playwright](https://github.com/mswjs/playwright) and testing environment variables (in local Azure dev) are provided by (dotenv)[https://github.com/motdotla/dotenv]. (Yes, I am aware then when using MSW, it's not a true end-to-end test.) Ad-hoc UI tests are performed the same as the end-to-end tests, but by me instead of Playwright.
-TODO: Talk about code coverage
+Frontend unit/component/integration tests are done using [Vitest](https://vitest.dev/) as the test runner, [React Testing Library](https://testing-library.com/) and [@testing-library/jest-dom](https://github.com/testing-library/jest-dom) for the tests themselves, and [MSW](https://mswjs.io/) to mock the HTTP calls. End-to-end tests are done on the frontend using (Playwright)[https://playwright.dev/], with toggleable MSW using [mswjs/playwright](https://github.com/mswjs/playwright) and testing environment variables (in local Azure dev) are provided by (dotenv)[https://github.com/motdotla/dotenv]. (Yes, I am aware then when using MSW, it's not a true end-to-end test.) Ad-hoc UI tests are performed the same as the end-to-end tests, but by me instead of Playwright. Code coverage is handled on the frontend with (@vitest/coverage-v8)[https://vitest.dev/guide/coverage].
+TODO: Talk about backend code coverage
 
 ### Handling Web Requests
 In a local dev environment, Vite handles all requests, and proxies the API requests to the ASP.Net Core Kestrel server, which is configured using [vite.config.ts](https://vite.dev/config/server-options#server-proxy). Outside of development, the React files are copied to wwwroot (via a custom build step in the MovieInfoBackend.csproj file that runs when doing a "dotnet publish") and are therefore served statically, so in stage and prod ASP.Net Core handles all the requests instead. All traffic is over HTTPS using [Let's Encrypt](https://letsencrypt.org/) certs that renew every 3 months via [Acmebot for Microsoft Azure](https://github.com/shibayan/keyvault-acmebot). Routing is handled using [React Router](https://www.npmjs.com/package/react-router-dom).
 
 ### CSS
-The CSS and presentation is fairly basic (and does not use Tailwind), and was determined mostly by AI. It uses Flexbox to display the search cards and extended data (from subsequent OMDB / TMDB searches). It does not support dark mode. TODO: Support dark mode?
+The CSS and presentation is fairly basic (and does not use Tailwind), and was determined mostly by AI. It uses Flexbox to display the search cards and extended data (from subsequent OMDB / TMDB searches). Media queries are used to render the UI as mainly vertical (mobile) or mainly horizontal (desktop). It does not support dark mode. TODO: Support dark mode? And implement media query
 
 ### Accessibility
 TODO: Make app more accessible?
 
 ## Architecture: Environments
-The app has three environments: dev, stage, and prod. Dev is run on my local machine, and also on fly.io (and the fly.io version has its own Azure SQL Server database). Stage and prod are separate Azure Container Apps with their own Azure SQL Server databases.
+The app has four environments: local, dev, stage, and prod. Local is run on my local machine and features hot-reloading on both the backend and frontend. Dev is automatically built (as a Docker container) and deployed to fly.io after the PR checks pass (and the fly.io version has its own Azure SQL Server database). Stage and prod reuse the built container from fly.io, but are released semi-manually by me as separate Azure Container Apps with their own Azure SQL Server databases. The container used for dev, stage, and prod can also be run locally if required.
 
 ## Architecture: CI/CD
-CI/CD is performed at the PR level. All unit / integration tests (backend and frontend) must pass for a PR to be able to be merged. When the PR is merged, the app is automatically deployed to the dev environment in Fly.io and all end-to-end tests are run. TODO: What happens when end-to-end tests fail?
+CI/CD is performed at the PR level. All unit / integration tests (backend and frontend) are checked when a PR is created or merged. (TODO: May change frontend tests to run at PR merge time instead.) When the PR is merged, the app is automatically deployed to the dev environment in Fly.io and all end-to-end tests are run. TODO: What happens when end-to-end tests fail?
