@@ -20,8 +20,10 @@ jobs:
       with:
         node-version: "25.x"
     - name: Install dependencies
+      working-directory: ./movie-info-frontend
       run: npm install
     - name: Run React Testing Library unit tests
+      working-directory: ./movie-info-frontend
       run: npx vitest --coverage.enabled true
     - name: Report unit test coverage
       if: success()
