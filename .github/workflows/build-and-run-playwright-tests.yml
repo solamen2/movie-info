@@ -12,6 +12,7 @@ on:
 jobs:
   deploy-dev:
     uses: ./.github/workflows/fly-build-push-and-deploy.yml
+    secrets: inherit
   test:
     needs: deploy-dev
     runs-on: ubuntu-latest

@@ -3,10 +3,10 @@
 
 name: Fly Build Image, Push, And Deploy
 on:
-  #[workflow_call]
-  pull_request:  # For testing if something breaks
-    branches:
-      - main
+  [workflow_call]
+  #pull_request:  # For testing if something breaks
+    #branches:
+      #- main
 
 jobs:
   build-image:
