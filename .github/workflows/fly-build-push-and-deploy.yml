@@ -65,9 +65,7 @@ jobs:
           path: /tmp
 
       - name: Load image
-        run: |
-          ls /tmp
-          docker load --input /tmp/movie-info-image.zip
+        run: docker load --input /tmp/mi-image.tar
 
       - name: Generate image name
         id: image-name
