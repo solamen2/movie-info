@@ -50,6 +50,8 @@ jobs:
     steps:
       - name: Set up flyctl
         uses: superfly/flyctl-actions/setup-flyctl@v1.4
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
       - name: Log in to the registry
         run: flyctl auth docker
@@ -99,6 +101,8 @@ jobs:
 
       - name: Set up flyctl
         uses: superfly/flyctl-actions/setup-flyctl@v1.4
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
       - name: Deploy app
         run: flyctl deploy --config fly.toml --image ${{ needs.push-image.outputs.pushed-image }} --remote-only
