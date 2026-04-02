@@ -46,7 +46,6 @@ jobs:
   push:
     name: Push Docker dev image to fly.io
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
     outputs:
       image: ${{ steps.image.outputs.image }}
     needs: build-image
@@ -81,7 +80,6 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
     needs:
       - push
     strategy:
