@@ -66,8 +66,8 @@ jobs:
 
       - name: Load image
         run: |
-          - ls /tmp
-          - docker load --input /tmp/movie-info-image.zip
+          ls /tmp
+          docker load --input /tmp/movie-info-image.zip
 
       - name: Generate image name
         id: image-name
