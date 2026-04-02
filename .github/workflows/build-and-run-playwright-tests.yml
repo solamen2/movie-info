@@ -15,7 +15,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     container:
-      image: mcr.microsoft.com/playwright:v1.58.2-noble  # NOTE: Update this when updating Playwright!
+      image: mcr.microsoft.com/playwright:v1.58.2-noble  # NOTE: Update this when updating Playwright! Much faster than installing each time
       options: --user 1001
 
     steps:
@@ -29,15 +29,22 @@ jobs:
 
       - name: Install dependencies
         working-directory: ./movie-info-frontend
-        run: npm install
+        run: npm ci
 
       - name: Run Playwright end-to-end tests
         run: npx playwright test --config ./playwright.config.ts --workers=1
         working-directory: ./movie-info-frontend
         env:
-            CI: 1
-            E2E_TEST_USE_MOCK_HTTP_CALLS: false
-            E2E_TEST_BASE_URL: https://movie-info-flyio.fly.dev/
-            E2E_TEST_USERNAME: ${{ secrets.E2E_TEST_USERNAME }}
-            E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
+          CI: 1
+          E2E_TEST_USE_MOCK_HTTP_CALLS: false
+          E2E_TEST_BASE_URL: https://movie-info-flyio.fly.dev/
+          E2E_TEST_USERNAME: ${{ secrets.E2E_TEST_USERNAME }}
+          E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
+
+      - uses: actions/upload-artifact@v7
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
 

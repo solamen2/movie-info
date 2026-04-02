@@ -29,7 +29,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: ./movie-info-frontend
-        run: npm install
+        run: npm ci
         
       - name: Run React Testing Library unit tests
         working-directory: ./movie-info-frontend
