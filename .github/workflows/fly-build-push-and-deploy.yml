@@ -33,7 +33,7 @@ jobs:
         with:
           provenance: false
           platforms: linux/amd64,linux/arm64
-          outputs: type=docker,dest=/tmp/movie-info-image.tar
+          outputs: type=oci,dest=/tmp/movie-info-image.tar
           cache-from: type=gha,ignore-error=true
           cache-to: type=gha,mode=max,ignore-error=true
 
