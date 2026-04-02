@@ -6,7 +6,7 @@ on:
   push:
     branches:
       - main
-  pull_request:  # Just for testing; TODO remove this later
+  pull_request:  # For testing if something breaks
     branches:
       - main
 

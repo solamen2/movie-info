@@ -4,5 +4,5 @@ namespace MovieInfoBackend.Auth;
 
 public class ApplicationUser : IdentityUser
 {
-    public bool IsSearchUser { get; set; }  // TODO: Refactor to "IsEnabled"
+    public bool IsSearchUser { get; set; }  // NOTE: Cannot use any feature of app without this
 }
