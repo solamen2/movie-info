@@ -2,17 +2,18 @@
 # Made with help from https://playwright.dev/docs/ci#via-containers
 name: 'CI - Run Playwright End-To-End Tests On Fly.Io Dev Instance'
 on:
-  workflow_run:
-    workflows: ["Fly Build Image, Push, And Deploy"]
-    branches: [main]
-    types: 
-      - completed
+  push:
+    branches:
+      - main
   #pull_request:  # For testing if something breaks
     #branches:
       #- main
 
 jobs:
+  deploy-dev:
+    uses: ./.github/workflows/fly-build-push-and-deploy.yml
   test:
+    needs: deploy-dev
     runs-on: ubuntu-latest
     container:
       image: mcr.microsoft.com/playwright:v1.58.2-noble  # NOTE: Update this when updating Playwright! Much faster than installing each time

@@ -3,9 +3,7 @@
 
 name: Fly Build Image, Push, And Deploy
 on:
-  push:
-    branches:
-      - main
+  [workflow_call]
   #pull_request:  # For testing if something breaks
     #branches:
       #- main
