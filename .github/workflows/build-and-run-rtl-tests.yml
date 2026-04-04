@@ -33,8 +33,15 @@ jobs:
         
       - name: Run React Testing Library unit tests
         working-directory: ./movie-info-frontend
-        run: npx vitest --coverage.enabled true --coverage.reporter=json-summary --coverage.reporter=json
-        
+        run: npx vitest --coverage.enabled true --coverage.reporter=json-summary --coverage.reporter=json | tee rtl-output.txt
+
+      - name: Add test results as a PR comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        if: github.event_name == 'pull_request'
+        with:
+          recreate: true
+          path: ./MovieInfoBackend/TestMovieInfoBackend/rtl-output.txt
+
       - name: Report unit test coverage
         if: success()
         with:
