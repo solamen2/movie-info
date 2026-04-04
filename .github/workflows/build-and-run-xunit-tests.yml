@@ -12,6 +12,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read  # For private repos TODO remove me when public
+      issues: read  # For private repos TODO remove me when public
+      checks: write
+      pull-requests: write
+
     steps:
       - name: Check out repository code
         uses: actions/checkout@v6
@@ -28,10 +34,11 @@ jobs:
         run: dotnet build ./movie-info.sln --configuration Release --no-restore
 
       - name: Run unit tests with report
-        run: dotnet test ./MovieInfoBackend/TestMovieInfoBackend/TestMovieInfoBackend.csproj -c Release --no-build --logger "trx;LogFileName=XUnitTestResults.trx"
+        run: dotnet test ./MovieInfoBackend/TestMovieInfoBackend/TestMovieInfoBackend.csproj -c Release --no-build --logger "xunit;LogFileName=TestOutputResults.xml"
 
-      - name: Upload test results
-        uses: actions/upload-artifact@v6
+      - name: Publish test results to PR (and other places)
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: (!cancelled())
         with:
-          name: XUnitTestResults
-          path: ./MovieInfoBackend/TestMovieInfoBackend/TestResults/XUnitTestResults.trx
+          files: |
+            TestResults/**/*.xml
