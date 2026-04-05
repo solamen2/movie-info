@@ -41,7 +41,7 @@ jobs:
         if: (!cancelled())
         with:
           files: |
-            ./MovieInfoBackend/TestMovieInfoBackend/test-results/**/*.xml
+            ./MovieInfoBackend/TestMovieInfoBackend/**/*.xml
 
       - name: Convert code coverage summary to Markdown format
         uses: irongut/CodeCoverageSummary@v1.3.0
