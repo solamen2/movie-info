@@ -7,7 +7,7 @@ export default mergeConfig(viteConfig, defineConfig({
   test: {
     globals: true,  // Provided for React Testing Library to automatically perform cleanup *sigh*
     environment: "jsdom",
-    reporters: process.env.GITHUB_ACTIONS === 'true' ? ['dot', 'github-actions'] : ['default'],
+    reporters: process.env.GITHUB_ACTIONS === 'true' ? ['default', 'github-actions'] : ['default'],
     setupFiles: ["./tests/vitest.setup.ts"],
     include: [
       "src/**/*.test.{js,jsx,ts,tsx}"  // This avoids running Playwright tests on accident
