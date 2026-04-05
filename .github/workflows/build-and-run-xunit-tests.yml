@@ -38,6 +38,10 @@ jobs:
 
       - name: Publish test results to PR (and other places)
         uses: EnricoMi/publish-unit-test-result-action@v2
+        if: (!cancelled())
+        with:
+          files: |
+            ./MovieInfoBackend/TestMovieInfoBackend/test-results/**/*.xml
 
       - name: Convert code coverage summary to Markdown format
         uses: irongut/CodeCoverageSummary@v1.3.0

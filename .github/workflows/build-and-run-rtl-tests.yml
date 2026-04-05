@@ -40,7 +40,7 @@ jobs:
         if: github.event_name == 'pull_request'
         with:
           recreate: true
-          path: ./MovieInfoBackend/TestMovieInfoBackend/rtl-output.txt
+          path: ./movie-info-frontend/rtl-output.txt
 
       - name: Report unit test coverage
         if: success()
