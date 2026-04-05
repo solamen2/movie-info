@@ -56,7 +56,7 @@ jobs:
         if: github.event_name == 'pull_request'
         with:
           recreate: true
-          path: ./test-results/code-coverage-results.md
+          path: ./code-coverage-results.md
 
       - name: Write code coverage summary to Job Summary
         run: cat ./MovieInfoBackend/TestMovieInfoBackend/code-coverage-results.md >> $GITHUB_STEP_SUMMARY
