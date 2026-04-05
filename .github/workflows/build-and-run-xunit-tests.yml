@@ -59,4 +59,4 @@ jobs:
           path: ./code-coverage-results.md
 
       - name: Write code coverage summary to Job Summary
-        run: cat ./MovieInfoBackend/TestMovieInfoBackend/code-coverage-results.md >> $GITHUB_STEP_SUMMARY
+        run: cat ./code-coverage-results.md >> $GITHUB_STEP_SUMMARY
