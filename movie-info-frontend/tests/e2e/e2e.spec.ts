@@ -36,7 +36,7 @@ test("Basic happy path: search, check results are valid, and select a search car
   const movieCard = movieTextElement.locator("ancestor=#search-card");
   const movieCardText = process.env.E2E_TEST_USE_MOCK_HTTP_CALLS === "true"
     ? "Example MovieSearch Type: MediaMedia Type: MovieRank: 4444Known For: Example Jones, Example BrownYear: 2016"
-    : "The Shashank RedemptionSearch Type: MediaMedia Type: MovieRank: 109Known For: Tim Robbins, Morgan FreemanYear: 1994";
+    : "The Shawshank RedemptionSearch Type: MediaMedia Type: MovieRank: 109Known For: Tim Robbins, Morgan FreemanYear: 1994";
   expect(await movieCard.textContent()).toBe(movieCardText);
   console.log("Basic happy path test finished.");
 });
