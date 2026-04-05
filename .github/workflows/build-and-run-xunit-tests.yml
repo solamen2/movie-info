@@ -40,6 +40,7 @@ jobs:
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: (!cancelled())
         with:
+          check_name: Backend Unit Test Results
           files: |
             ./test-results/**/Test*.xml
 

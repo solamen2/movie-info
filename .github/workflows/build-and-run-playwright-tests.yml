@@ -47,7 +47,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: ${{ !cancelled() }}
         with:
-          name: playwright-report
+          name: playwright-mock-report
           path: ./movie-info-frontend/mock-report/
           retention-days: 30
 
@@ -65,7 +65,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: ${{ !cancelled() }}
         with:
-          name: playwright-report
+          name: playwright-real-report
           path: ./movie-info-frontend/real-report/
           retention-days: 30
 
