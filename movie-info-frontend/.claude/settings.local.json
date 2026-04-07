@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/eyounske/Documents/myRepos/movie-info/**)",
+      "Bash(dotnet test --logger \"console;verbosity=detailed\")",
+      "Bash(dotnet test --logger \"console;verbosity=normal\")"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

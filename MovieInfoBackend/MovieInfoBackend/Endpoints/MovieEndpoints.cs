@@ -8,6 +8,7 @@ using MovieInfoBackend.Helpers;
 using static MovieInfoBackend.Helpers.ProgramConstants;  // for ApiRoutePrefix
 using MovieInfoBackend.ViewModels;
 using Serilog;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MovieInfoBackend.Endpoints;
 
@@ -76,20 +77,24 @@ public class MovieEndpoints
     }
 
     // WARNING: This function should only ever be used in local development to generate test case data
-    private static MovieSuggestionsResponseDataModel? LoadMockData()
+    [ExcludeFromCodeCoverage]
+    private class MovieEndpointsHelpers
     {
-        string movieHttpClientResponse;
-        string testDataFilename = "MovieHttpClientResponse2.json";
-
-        using (StreamReader sr = File.OpenText($"../TestMovieInfoBackend/TestData/{testDataFilename}"))
+        private static MovieSuggestionsResponseDataModel? LoadMockData()
         {
-            movieHttpClientResponse = sr.ReadToEnd();
-        }
-        if (String.IsNullOrWhiteSpace(movieHttpClientResponse))
-        {
-            throw new ArgumentException($"{testDataFilename} is not valid test data.");
-        }
+            string movieHttpClientResponse;
+            string testDataFilename = "MovieHttpClientResponse2.json";
 
-        return MovieHttpClient.GetModelFromResponse(movieHttpClientResponse);
+            using (StreamReader sr = File.OpenText($"../TestMovieInfoBackend/TestData/{testDataFilename}"))
+            {
+                movieHttpClientResponse = sr.ReadToEnd();
+            }
+            if (String.IsNullOrWhiteSpace(movieHttpClientResponse))
+            {
+                throw new ArgumentException($"{testDataFilename} is not valid test data.");
+            }
+
+            return MovieHttpClient.GetModelFromResponse(movieHttpClientResponse);
+        }
     }
 }
