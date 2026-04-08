@@ -74,7 +74,8 @@ public class MovieEndpoints
         .WithSummary("Search")
         .WithDescription("Searches IMDB for people, movies, and many other media types, and returns basic information on them.")
         .RequireAuthorization(ProgramConstants.LoggedInUsersOnlyPolicyName)  // TODO: Check that this returns appropropriate error on frontend
-        .RequireAuthorization(ProgramConstants.SearchUsersOnlyPolicyName);  // TODO: Check that this returns appropropriate error on frontend
+        .RequireAuthorization(ProgramConstants.SearchUsersOnlyPolicyName)  // TODO: Check that this returns appropropriate error on frontend
+        .RequireRateLimiting(ProgramConstants.TokenRateLimiterPolicyName);
     }
 
     // WARNING: This function should only ever be used in local development to generate test case data

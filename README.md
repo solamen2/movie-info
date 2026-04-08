@@ -2,12 +2,12 @@
 Small movie information querying app using info from the IMDB and OMDB / TMDB APIs. Made by Ed Younskevicius (solamen2 AT gmail). NOTE: Basic skeleton app has been coded and deployed to two different platforms, but functionality is still WIP.
 
 ## Using The App
-If you'd like to see how the app works eventually (though it's not working yet), please go to [movieinfo.dev](https://movieinfo.dev) and use these credentials:
+If you'd like to see how the app works (though the TMDB / OMDB info still needs to be integrated), please go to [movieinfo.dev](https://movieinfo.dev) and use these credentials:
 
-Username: TODO **NO USERNAME YET**
-Password: TODO **NO PASSWORD YET**
+Username: demo
+Password: moviepass2
 
-This account will be heavily rate-limited and will not allow you to configure which fields are returned, but hopefully will be working for you to try eventually. (When there's a a real username and password above, and it's not working, feel free to send me an email and I'll investigate.)
+This account is heavily rate-limited (60 requests / minute). If it's not working after retrying for a couple of minutes, feel free to send me an email and I'll investigate.
 
 ## AI Usage During Development
 I did not use AI at all during the setup of the project, since I wanted to have a very good understanding of the basic architecture of the app and the technical tradeoffs I was making. After setting up the basic skeleton and backend, I have been using Claude Code to help me code the frontend React pages quickly, since I have some experience with React already. (I go over every change it makes by hand, and sometimes re-prompt or make small changes myself.) Also, I used AI to generate some test cases after I had set up some test cases myself, to increase test coverage of similar cases and catch scenarios I had not considered. Finally, anytime AI was used, I have included the prompts as a comment on the PR that merged those changes.

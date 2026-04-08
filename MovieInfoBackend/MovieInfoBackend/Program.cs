@@ -9,6 +9,8 @@ using System.Security.Claims;
 using Serilog;
 using Polly;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.RateLimiting;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 WebApplication app;
@@ -69,13 +71,25 @@ void AddServices()
             {
                 options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());  // serializes enums as string, not backing int
             })
+            .AddRateLimiter(rlOptions => {
+                rlOptions.RejectionStatusCode = 429;
+                rlOptions.AddTokenBucketLimiter(policyName: ProgramConstants.TokenRateLimiterPolicyName, tbOptions =>
+                {
+                    // Rate limiter is 1 token / second, but with some buffer
+                    tbOptions.TokenLimit = 60;
+                    tbOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                    tbOptions.QueueLimit = 5;  // Up to 5 requests can be pending when tokens are depleted
+                    tbOptions.ReplenishmentPeriod = TimeSpan.FromSeconds(10);
+                    tbOptions.TokensPerPeriod = 6;
+                    tbOptions.AutoReplenishment = true;
+                });
+            })
             .AddHttpClient<MovieHttpClient>()
                 .AddTransientHttpErrorPolicy(policyBuilder =>
                     policyBuilder.WaitAndRetryAsync(3, retryNumber => TimeSpan.FromMilliseconds(600)))
                 .AddTransientHttpErrorPolicy(policyBuilder =>
                     policyBuilder.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)))
-                .SetHandlerLifetime(TimeSpan.FromMinutes(2))  // NOTE: This is the default, but reminds me how to change if needed
-            ;
+                .SetHandlerLifetime(TimeSpan.FromMinutes(2));  // NOTE: This is the default, but reminds me how to change if needed
 
     if (builder.Environment.IsDevelopment())
     {
@@ -194,4 +208,7 @@ void SetUpApp()
 
     // CORS
     app.UseCors();
+
+    // Rate limiting (only used for search API call currently)
+    app.UseRateLimiter();
 }
