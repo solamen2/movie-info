@@ -2,7 +2,7 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Publish backend .NET Core project",
+            "label": "Build backend .NET Core project",
             "command": "dotnet",
             "type": "process",
             "options":{
