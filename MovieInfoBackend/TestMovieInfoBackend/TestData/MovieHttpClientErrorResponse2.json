@@ -1,0 +1,26 @@
+{
+  "d": [
+    {
+      "id": "xx0000001",
+      "l": "Invalid Item",
+      "s": "Unknown Actor",
+      "y": 2023,
+      "q": "actor",
+      "i": {
+        "height": 0,
+        "imageUrl": "",
+        "width": 0
+      }
+    },
+    {
+      "id": "",
+      "l": "",
+      "s": "",
+      "y": null,
+      "q": "invalidmediatype",
+      "i": null
+    }
+  ],
+  "q": "errortest",
+  "v": 1
+}

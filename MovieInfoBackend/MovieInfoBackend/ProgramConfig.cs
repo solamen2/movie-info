@@ -1,3 +1,6 @@
+using System.Diagnostics.CodeAnalysis;
+
+[ExcludeFromCodeCoverage]
 public class ProgramConfig
 {
     public static readonly TimeSpan LoginCookieTimeout = TimeSpan.FromMinutes(30);

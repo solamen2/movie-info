@@ -2,12 +2,13 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using MovieInfoBackend.Auth;
-using MovieInfoBackend.Helpers;
 using static MovieInfoBackend.Helpers.ProgramConstants;  // for ApiRoutePrefix
 using Serilog;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MovieInfoBackend.Endpoints;
 
+[ExcludeFromCodeCoverage]
 public class AuthEndpoints
 {
     public static void Map(WebApplication app)
@@ -39,8 +40,7 @@ public class AuthEndpoints
         .WithDescription("Logs out the current user and deletes their session cookie. This function is user-defined, "
                             + "as it is not included in ASP.NET Core Identity in .NET 10.0, oddly. See https://github.com/dotnet/aspnetcore/issues/52834 for details, and code at "
                             + "https://learn.microsoft.com/en-us/aspnet/core/security/authentication/identity-api-authorization?view=aspnetcore-10.0&preserve-view=true#log-out ."
-                            + "NOTE: A JSON body must be specified for this request to work properly, but all content in it is ignored.")
-        .RequireAuthorization(ProgramConstants.LoggedInUsersOnlyPolicyName);
+                            + "NOTE: A JSON body must be specified for this request to work properly, but all content in it is ignored.");
     }
 }
 
