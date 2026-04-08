@@ -7,4 +7,5 @@ public static class ProgramConstants
         public static string SearchUsersOnlyPolicyName => "SearchUsersOnlyPolicy";
         public static string SearchUsersOnlyPolicyClaimName => "IsSearchUserClaim";
         public static string ApiRoutePrefix = "/api";
+        public static string TokenRateLimiterPolicyName => "TokenRateLimiterPolicy";
 }
