@@ -55,9 +55,7 @@ function LoginUser() {
         {error && <p className="error-message">{error}</p>}
         <div className="form-actions">
           <button aria-label="login" id="login" type="submit">Login</button>
-          <button type="button" onClick={() => navigate("/register")}>
-            Register
-          </button>
+          {import.meta.env.DEV && <button type="button" onClick={() => navigate("/register")}>Register</button>}
         </div>
       </form>
     </div>

@@ -3,7 +3,7 @@
     "configurations": [
         {
             "name": "Backend MovieInfo debug",
-            "preLaunchTask": "Publish backend .NET Core project",
+            "preLaunchTask": "Build backend .NET Core project",
             "type": "coreclr",
             "request": "launch",
             "program": "${workspaceFolder}/MovieInfoBackend/MovieInfoBackend/bin/Debug/net10.0/MovieInfoBackend.dll",
