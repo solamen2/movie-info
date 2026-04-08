@@ -40,9 +40,10 @@
           </CodeCoverage>
         </Configuration>
       </DataCollector>
-      <DataCollector friendlyName="XPlat code coverage">
+      <DataCollector friendlyName="XPlat Code Coverage">
         <Configuration>
           <Format>cobertura</Format>
+          <Exclude>[coverlet.*.tests?]*,[*]Coverlet.Core*</Exclude> <!-- [Assembly-Filter]Type-Filter -->
           <ExcludeByFile>**/Program.cs,**/obj/**/*.*,**/Migrations/**/*.*,</ExcludeByFile> <!-- Globbing filter -->
           <IncludeTestAssembly>false</IncludeTestAssembly>
         </Configuration>
