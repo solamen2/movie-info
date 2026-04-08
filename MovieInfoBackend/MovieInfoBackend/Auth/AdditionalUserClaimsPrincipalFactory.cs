@@ -16,16 +16,16 @@ public class AdditionalUserClaimsPrincipalFactory
 
     public async override Task<ClaimsPrincipal> CreateAsync(ApplicationUser user)
     {
-        var principal = await base.CreateAsync(user);
+        ClaimsPrincipal principal = await base.CreateAsync(user);
 
-        var identity = principal.Identity as ClaimsIdentity;
+        ClaimsIdentity? identity = principal.Identity as ClaimsIdentity;
 
         if (identity == null)
         {
             throw new Exception("ClaimsIdentity was null");
         }
 
-        var claims = new List<Claim>();
+        List<Claim> claims = [];
 
         // NOTE: Because claims are stored in a cookie, they are only ever updated at login
         // This can be changed later if needed, by doing RefreshSignInAsync() followed by GetClaimsAsync()

@@ -303,5 +303,104 @@ public class SuggestionDataModelTests
         }  // End second movie suggestions data file
     }
 
-    // TODO: Do some error tests here
+    [Fact]
+    public void SuggestionImageDataModel_EdgeCaseValues_HandlesCorrectly()
+    {
+        // Arrange & Act
+        var imageDataModel = new SuggestionImageDataModel
+        {
+            Height = 0,
+            Width = 0,
+            ImageURL = ""
+        };
+
+        // Assert
+        Assert.NotNull(imageDataModel);
+        Assert.Equal(0, imageDataModel.Height);
+        Assert.Equal(0, imageDataModel.Width);
+        Assert.Equal("", imageDataModel.ImageURL);
+        Assert.Equal("Height: 0\nImageURL: \nWidth: 0", imageDataModel.ToString());
+    }
+
+    [Fact]
+    public void SuggestionDataModel_ExtremeValues_HandlesCorrectly()
+    {
+        // Arrange
+        var suggestionDataModel = new SuggestionDataModel
+        {
+            ItemID = "tt" + new string('9', 1000), // Very long ID
+            Name = new string('A', 10000), // Very long name
+            MediaType = "movie",
+            Rank = int.MaxValue,
+            KnownFor = new string('B', 5000), // Very long known for
+            Year = int.MaxValue,
+            Years = new string('C', 100) + "-" + new string('D', 100),
+            Image = new SuggestionImageDataModel
+            {
+                Height = int.MaxValue,
+                Width = int.MaxValue,
+                ImageURL = "https://" + new string('e', 2000) + ".com/image.jpg"
+            }
+        };
+
+        // Act & Assert
+        Assert.NotNull(suggestionDataModel);
+        Assert.Equal(new string('A', 10000), suggestionDataModel.Name);
+        Assert.Equal(int.MaxValue, suggestionDataModel.Rank);
+        Assert.Equal(int.MaxValue, suggestionDataModel.Year);
+        Assert.Equal(int.MaxValue, suggestionDataModel.Image.Height);
+        Assert.Equal(int.MaxValue, suggestionDataModel.Image.Width);
+    }
+
+    [Fact]
+    public void SuggestionDataModel_ValidModelToString_ReturnsCorrectValue()
+    {
+        // Act
+
+        MovieSuggestionsResponseDataModel? actual1 = MovieHttpClient.GetModelFromResponse(movieHttpClientResponse1);
+        Assert.NotNull(actual1);
+        SuggestionDataModel[]? suggestions1 = actual1.Suggestions;
+        Assert.NotNull(suggestions1);
+        SuggestionDataModel suggestion3 = suggestions1[2];
+
+        // Assert
+        Assert.Equal(
+            "Image:\n*****\nHeight: 400\nImageURL: https://example.com/example3.jpg\nWidth: 313\n*****\nItemID: tt10000002\nName: Example TV Series\nMediaType: tvSeries\nRank: 4444\nKnownFor: John Smith, James Johnson\nYear: 2001\nYears: 2001-2003"
+                , suggestion3.ToString());
+    }
+
+    [Fact]
+    public void MovieSuggestionsResponseDataModel_NullSuggestions_HandlesCorrectly()
+    {
+        // Arrange & Act
+        var responseModel = new MovieSuggestionsResponseDataModel
+        {
+            Suggestions = null
+        };
+
+        // Act & Assert
+        Assert.NotNull(responseModel);
+        Assert.Null(responseModel.Suggestions);
+
+        string result = responseModel.ToString();
+        Assert.NotNull(result);
+    }
+
+    [Fact]
+    public void MovieSuggestionsResponseDataModel_EmptySuggestions_HandlesCorrectly()
+    {
+        // Arrange & Act
+        var responseModel = new MovieSuggestionsResponseDataModel
+        {
+            Suggestions = []
+        };
+
+        // Assert
+        Assert.NotNull(responseModel);
+        Assert.NotNull(responseModel.Suggestions);
+        Assert.Empty(responseModel.Suggestions);
+
+        string result = responseModel.ToString();
+        Assert.NotNull(result);
+    }
 }

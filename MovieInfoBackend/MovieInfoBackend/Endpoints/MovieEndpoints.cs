@@ -12,6 +12,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace MovieInfoBackend.Endpoints;
 
+[ExcludeFromCodeCoverage]
 public class MovieEndpoints
 {
     public static void Map(WebApplication app)

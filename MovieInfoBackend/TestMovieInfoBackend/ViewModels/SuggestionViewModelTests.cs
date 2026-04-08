@@ -380,6 +380,7 @@ public class SuggestionViewModelTests
         string tvMiniSeriesViewModelString = tvMiniSeriesViewModel.ToString();
 
         // Assert
+
         Assert.Contains("Image:\n*****\nHeight: 300\nImageURL: https://example.com/example4.jpg\nWidth: 209\n*****\nItemID: tt0100005\nName: Example TV Mini Series\nSearchType: Media\nMediaType: TV Mini Series\nRank: 4444\nKnownFor: Maria Garcia, James Smith\nYear: 1982\nYears: 1982-1982"
             , tvMiniSeriesViewModelString);
     }
@@ -400,6 +401,7 @@ public class SuggestionViewModelTests
         SuggestionViewModel movieViewModel2 = new(suggestions1[1]);
 
         // Assert
+
         Assert.NotEqual(Guid.Empty, movieViewModel1.ID);
         Assert.NotEqual(Guid.Empty, movieViewModel2.ID);
         Assert.NotEqual(movieViewModel1.ID, movieViewModel2.ID);
@@ -506,6 +508,7 @@ public class SuggestionViewModelTests
         var viewModel = new SuggestionViewModel(suggestionDataModel);
 
         // Assert
+        
         Assert.Equal(SearchResultType.Media, viewModel.SearchType);
         Assert.Equal(MediaResultType.Movie.Value, viewModel.MediaType?.Value);
         Assert.Equal(0, viewModel.Rank);

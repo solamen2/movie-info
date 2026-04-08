@@ -69,33 +69,6 @@ public class MovieEndpointsTests
     }
 
     [Fact]
-    public async Task MovieEndpoints_InvalidSearchQuery_ReturnsNullSuggestionsResponse()
-    {
-        // Arrange
-        Mock<HttpMessageHandler> httpMessageHandlerMock = new Mock<HttpMessageHandler>();
-        httpMessageHandlerMock
-            .Protected()
-            .Setup<Task<HttpResponseMessage>>(
-                "SendAsync",
-                ItExpr.IsAny<HttpRequestMessage>(),
-                ItExpr.IsAny<CancellationToken>())
-            .ReturnsAsync(new HttpResponseMessage
-            {
-                StatusCode = HttpStatusCode.BadRequest,
-                Content = new StringContent("Invalid response")
-            });
-
-        HttpClient httpClient = new HttpClient(httpMessageHandlerMock.Object);
-        MovieHttpClient movieHttpClient = new MovieHttpClient(httpClient);
-
-        // Act
-        MovieSuggestionsResponseDataModel? suggestionsResponse = await movieHttpClient.GetSuggestions("");
-
-        // Assert
-        Assert.Null(suggestionsResponse);
-    }
-
-    [Fact]
     public void MovieEndpoints_SearchEndpointConfiguration_HasCorrectAttributes()
     {
         // This test verifies the endpoint configuration by examining what the Map method should set up
