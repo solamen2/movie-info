@@ -49,7 +49,7 @@ jobs:
         with:
           name: playwright-mock-report
           path: ./movie-info-frontend/mock-report/
-          retention-days: 30
+          retention-days: 7
 
       - name: Run Playwright end-to-end tests with real data
         run: npx playwright test --config ./playwright.config.ts --workers=1
@@ -67,5 +67,5 @@ jobs:
         with:
           name: playwright-real-report
           path: ./movie-info-frontend/real-report/
-          retention-days: 30
+          retention-days: 7
 

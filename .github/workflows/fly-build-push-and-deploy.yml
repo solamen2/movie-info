@@ -40,6 +40,7 @@ jobs:
         with:
           name: movie-info-image
           path: /tmp/mi-image.tar
+          retention-days: 7
   
   push-image:
     name: Push Docker dev image to fly.io Docker registry
