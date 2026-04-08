@@ -1,5 +1,6 @@
 import { expect } from "@playwright/test";
 import { test } from "./e2ebase.ts";
+import process from "node:process";
 
 test.beforeEach(async ({ page }) => {
   console.log("Logging in...");
@@ -34,9 +35,13 @@ test("Basic happy path: search, check results are valid, and select a search car
   const movieNameTextToSearch = process.env.E2E_TEST_USE_MOCK_HTTP_CALLS === "true" ? "Example Movie" : "The Shawshank Redemption";
   const movieTextElement = await page.getByText(movieNameTextToSearch, { exact: true });
   const movieCard = movieTextElement.locator("ancestor=#search-card");
-  const movieCardText = process.env.E2E_TEST_USE_MOCK_HTTP_CALLS === "true"
-    ? "Example MovieSearch Type: MediaMedia Type: MovieRank: 4444Known For: Example Jones, Example BrownYear: 2016"
-    : "The Shawshank RedemptionSearch Type: MediaMedia Type: MovieRank: 109Known For: Tim Robbins, Morgan FreemanYear: 1994";
-  expect(await movieCard.textContent()).toBe(movieCardText);
+  const movieCardText1 = process.env.E2E_TEST_USE_MOCK_HTTP_CALLS === "true"
+    ? "Example MovieSearch Type: MediaMedia Type: MovieRank: "
+    : "The Shawshank RedemptionSearch Type: MediaMedia Type: MovieRank: ";
+  const movieCardText2 = process.env.E2E_TEST_USE_MOCK_HTTP_CALLS === "true"
+    ? "4444Known For: Example Jones, Example BrownYear: 2016"
+    : "Known For: Tim Robbins, Morgan FreemanYear: 1994";  // remove rank from Shawshank because it changes over time
+  expect(await movieCard.textContent()).toContain(movieCardText1);
+  expect(await movieCard.textContent()).toContain(movieCardText2);
   console.log("Basic happy path test finished.");
 });
