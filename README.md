@@ -1,11 +1,11 @@
 # movie-info
-Small movie information querying app using info from the IMDB and OMDB / TMDB APIs. Made by Ed Younskevicius (solamen2 AT gmail). NOTE: Basic skeleton app has been coded and deployed to two different platforms, but functionality is still WIP.
+Small movie information querying app using info from the IMDB and OMDB / TMDB APIs (OMDB / TMDB info coming soon). Made by Ed Younskevicius (solamen2 AT gmail).
 
 ## Using The App
-If you'd like to see how the app works (though the TMDB / OMDB info still needs to be integrated), please go to [movieinfo.dev](https://movieinfo.dev) and use these credentials:
+If you'd like to see how the app works, please go to [movieinfo.dev](https://movieinfo.dev) and use these credentials:
 
 Username: demo
-Password: moviepass2
+Password: Moviepass2@
 
 This account is heavily rate-limited (60 requests / minute). If it's not working after retrying for a couple of minutes, feel free to send me an email and I'll investigate.
 
