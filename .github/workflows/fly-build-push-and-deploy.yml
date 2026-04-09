@@ -1,12 +1,12 @@
 # See https://fly.io/docs/app-guides/continuous-deployment-with-github-actions/
 # Made with help from https://github.com/PREreview/prereview.org/blob/0864a9beb3ee6d2090b1a294dfff5c6c0fa97701/.github/workflows/ci.yml#L285-L350
 
-name: Fly Build Image, Push, And Deploy
+name: Fly.io Build Image, Push, And Deploy
 on:
-  #[workflow_call]
-  pull_request:  # For testing if something breaks
-    branches:
-      - main
+  [workflow_call]
+  #pull_request:  # For testing if something breaks
+    #branches:
+      #- main
 
 jobs:
   build-and-push-image:
