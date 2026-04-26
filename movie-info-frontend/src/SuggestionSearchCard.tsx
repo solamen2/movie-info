@@ -1,3 +1,5 @@
+import { useRef } from "react";
+
 export interface SuggestionImage {
   height: number;
   imageURL: string;
@@ -25,10 +27,12 @@ const SEARCH_TYPE_LABELS: Record<number, string> = {
 interface SuggestionSearchCardProps {
   item: Suggestion;
   selected: boolean;
+  deselecting?: boolean;
   onClick: () => void;
 }
 
-function SuggestionSearchCard({ item, selected, onClick }: SuggestionSearchCardProps) {
+function SuggestionSearchCard({ item, selected, deselecting, onClick }: SuggestionSearchCardProps) {
+  const cardRef = useRef<HTMLDivElement>(null);
   const searchTypeLabel =
     item.searchType != null
       ? SEARCH_TYPE_LABELS[item.searchType] ?? String(item.searchType)
@@ -39,11 +43,34 @@ function SuggestionSearchCard({ item, selected, onClick }: SuggestionSearchCardP
     !isPerson &&
     (mediaTypeValue === "TV Series" || mediaTypeValue === "TV Mini Series");
 
+  function handleClick() {
+    // When transitioning into the selected state, capture the card's layout
+    // offset so CSS can translate it to the upper-left corner. The results
+    // container is position:relative, so it is the card's offsetParent and
+    // offsetLeft / offsetTop are already measured from its inner edges.
+    // (offsetLeft/offsetTop reflect layout position and ignore any in-flight
+    // transform, so this is safe even mid-animation.)
+    if (!selected) {
+      const card = cardRef.current;
+      if (card) {
+        card.style.setProperty("--orig-x", `${card.offsetLeft}px`);
+        card.style.setProperty("--orig-y", `${card.offsetTop}px`);
+      }
+    }
+    onClick();
+  }
+
+  const className =
+    "result-card" +
+    (selected ? " selected" : "") +
+    (deselecting ? " deselecting" : "");
+
   return (
     <div
+      ref={cardRef}
       id="search-card"
-      className={`result-card${selected ? " selected" : ""}`}
-      onClick={onClick}
+      className={className}
+      onClick={handleClick}
     >
       {item.image ? (
         <img

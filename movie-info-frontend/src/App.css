@@ -78,6 +78,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
+  position: relative;
 }
 
 .result-card {
@@ -87,15 +88,78 @@
   padding: 0.75rem;
   cursor: pointer;
   overflow: hidden;
-  transition: border-color 0.15s;
+  opacity: 1;
+  transform: translate(0, 0);
+  /* `allow-discrete` lets `display` participate in the transition: on the
+     way to display:none it's deferred until the opacity fade ends, on the
+     way back from display:none it's applied at the start so the card has a
+     layout slot to fade back into. */
+  transition: border-color 0.15s, opacity 0.5s ease,
+    display 0.5s allow-discrete;
 }
 
 .result-card:hover {
   border-color: #888;
 }
 
+/* Entry animation: fly the card from its layout slot to the upper-left of
+   the container while the others fade out. The `select-fly` keyframes end
+   on translate(-orig, -orig); when the animation finishes (default
+   animation-fill-mode: none), the transform reverts to the base
+   translate(0, 0). At that exact moment `display: none` removes the
+   unselected cards from layout, so the selected card's natural position
+   collapses to (0, 0) — the layout shift and transform reset cancel out
+   visually, leaving the card glued to the upper-left. */
 .result-card.selected {
   border-color: blue;
+  z-index: 10;
+  animation: select-fly 0.5s ease;
+}
+
+/* Exit animation: the keyframe's `from` value snaps the transform to
+   translate(-orig, -orig) at the start, which (combined with the layout
+   reflow that immediately puts the card back at its natural position)
+   leaves the visual position unchanged at upper-left. The animation then
+   walks the transform back to identity, sliding the card to its layout
+   home. */
+.result-card.deselecting {
+  z-index: 10;
+  animation: deselect-fly 0.5s ease;
+}
+
+@keyframes select-fly {
+  from {
+    transform: translate(0, 0);
+  }
+  to {
+    transform: translate(
+      calc(-1 * var(--orig-x, 0px)),
+      calc(-1 * var(--orig-y, 0px))
+    );
+  }
+}
+
+@keyframes deselect-fly {
+  from {
+    transform: translate(
+      calc(-1 * var(--orig-x, 0px)),
+      calc(-1 * var(--orig-y, 0px))
+    );
+  }
+  to {
+    transform: translate(0, 0);
+  }
+}
+
+/* While a card is selected, every other card fades out and is then pulled
+   from layout entirely. With only the selected card left in flex flow, its
+   natural position is (0, 0) of the container, so resizing the viewport
+   can't shove it around — the upper-left placement is the layout, not a
+   transform. */
+.results-container.has-selection .result-card:not(.selected) {
+  opacity: 0;
+  pointer-events: none;
+  display: none;
 }
 
 .card-image {
@@ -144,4 +208,11 @@
 .no-results {
   margin: 1rem 0;
   font-size: 1rem;
+}
+
+/* For CSS transitions when added back to display, so allow-discrete can work */ 
+@starting-style {
+  .result-card {
+    opacity: 0;
+  }
 }

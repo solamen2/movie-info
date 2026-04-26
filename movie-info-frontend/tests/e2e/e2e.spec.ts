@@ -24,6 +24,7 @@ test.afterEach(async ({ page }) => {
   console.log("Logout finished.")
 });
 
+// TODO: Update happy path with UI changes
 test("Basic happy path: search, check results are valid, and select a search card", async ({ page }) => {
   console.log("Starting basic happy path test...");
   const searchText = process.env.E2E_TEST_USE_MOCK_HTTP_CALLS === "true" ? "1" : "The Shawshank Redemption";

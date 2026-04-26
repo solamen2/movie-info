@@ -4,8 +4,8 @@ Small movie information querying app using info from the IMDB and OMDB / TMDB AP
 ## Using The App
 If you'd like to see how the app works, please go to [movieinfo.dev](https://movieinfo.dev) (it may take a few seconds to spin up if no one has used it for a bit) and use these credentials:
 
-Email: demo@example.com
-Password: Moviepass2@
+- Email: demo@example.com
+- Password: Moviepass2@
 
 This account is heavily rate-limited (60 requests / minute). If it's not working after retrying for a couple of minutes, feel free to send me an email and I'll investigate.
 
