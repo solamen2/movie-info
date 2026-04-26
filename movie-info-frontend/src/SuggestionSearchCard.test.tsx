@@ -212,4 +212,248 @@ describe("SuggestionSearchCard", async () => {
       expect(movieCard.classList.contains('selected')).toBe(false);
     });
   });
+
+  // Selection / deselection animation tests
+
+  describe("When a search card is selected", async () => {
+    it("Should mark the results container with has-selection so other cards fade via CSS", async () => {
+      const { container } = render(<MemoryRouter><SuggestionSearch /></MemoryRouter>);
+      const searchQueryInput = screen.getByRole("textbox", { name: "search-query-input" });
+      fireEvent.change(searchQueryInput, { target: { value: "1" }});
+      const searchButton = screen.getByRole("button", { name: "search" });
+      await fireEvent.click(searchButton);
+
+      const resultsContainer = container.querySelector(".results-container");
+      if (!resultsContainer) {
+        throw new Error("results-container not found");
+      }
+      const personText = await screen.findByText("Example Smith");
+      const personCard = personText.closest("#search-card");
+      if (!personCard) {
+        throw new Error("Person search card not found");
+      }
+
+      expect(resultsContainer.classList.contains("has-selection")).toBe(false);
+      await fireEvent.click(personCard);
+      expect(resultsContainer.classList.contains("has-selection")).toBe(true);
+      expect(personCard.classList.contains("selected")).toBe(true);
+    });
+
+    it("Should set --orig-x and --orig-y CSS variables on the card so CSS can translate it to the upper-left", async () => {
+      render(<MemoryRouter><SuggestionSearch /></MemoryRouter>);
+      const searchQueryInput = screen.getByRole("textbox", { name: "search-query-input" });
+      fireEvent.change(searchQueryInput, { target: { value: "1" }});
+      const searchButton = screen.getByRole("button", { name: "search" });
+      await fireEvent.click(searchButton);
+
+      const personText = await screen.findByText("Example Smith");
+      const personCard = personText.closest<HTMLDivElement>("#search-card");
+      if (!personCard) {
+        throw new Error("Person search card not found");
+      }
+
+      expect(personCard.style.getPropertyValue("--orig-x")).toBe("");
+      expect(personCard.style.getPropertyValue("--orig-y")).toBe("");
+      await fireEvent.click(personCard);
+      // The variables are set unconditionally on selection (values come from
+      // layout offsets, which are 0 in JSDOM but the property must exist).
+      expect(personCard.style.getPropertyValue("--orig-x")).toMatch(/px$/);
+      expect(personCard.style.getPropertyValue("--orig-y")).toMatch(/px$/);
+    });
+  });
+
+  describe("When a selected search card is deselected by clicking it again", async () => {
+    it("Should remove has-selection from the container and selected from the card so CSS reverses the animation", async () => {
+      const { container } = render(<MemoryRouter><SuggestionSearch /></MemoryRouter>);
+      const searchQueryInput = screen.getByRole("textbox", { name: "search-query-input" });
+      fireEvent.change(searchQueryInput, { target: { value: "1" }});
+      const searchButton = screen.getByRole("button", { name: "search" });
+      await fireEvent.click(searchButton);
+
+      const resultsContainer = container.querySelector(".results-container");
+      if (!resultsContainer) {
+        throw new Error("results-container not found");
+      }
+      const personText = await screen.findByText("Example Smith");
+      const personCard = personText.closest("#search-card");
+      if (!personCard) {
+        throw new Error("Person search card not found");
+      }
+
+      await fireEvent.click(personCard);
+      expect(resultsContainer.classList.contains("has-selection")).toBe(true);
+      expect(personCard.classList.contains("selected")).toBe(true);
+      expect(personCard.classList.contains("deselecting")).toBe(false);
+      await fireEvent.click(personCard);
+      expect(resultsContainer.classList.contains("has-selection")).toBe(false);
+      expect(personCard.classList.contains("selected")).toBe(false);
+      expect(personCard.classList.contains("deselecting")).toBe(true);
+    });
+  });
+
+  describe("When a selected search card is deselected via the ESC key", async () => {
+    it("Should clear the selection state so CSS reverses the animation", async () => {
+      const { container } = render(<MemoryRouter><SuggestionSearch /></MemoryRouter>);
+      const searchQueryInput = screen.getByRole("textbox", { name: "search-query-input" });
+      fireEvent.change(searchQueryInput, { target: { value: "1" }});
+      const searchButton = screen.getByRole("button", { name: "search" });
+      await fireEvent.click(searchButton);
+
+      const resultsContainer = container.querySelector(".results-container");
+      if (!resultsContainer) {
+        throw new Error("results-container not found");
+      }
+      const personText = await screen.findByText("Example Smith");
+      const personCard = personText.closest("#search-card");
+      if (!personCard) {
+        throw new Error("Person search card not found");
+      }
+
+      await fireEvent.click(personCard);
+      expect(personCard.classList.contains("selected")).toBe(true);
+      expect(resultsContainer.classList.contains("has-selection")).toBe(true);
+
+      fireEvent.keyDown(window, { key: "Escape" });
+      expect(personCard.classList.contains("selected")).toBe(false);
+      expect(resultsContainer.classList.contains("has-selection")).toBe(false);
+    });
+
+    it("Should be a no-op when ESC is pressed and no card is selected", async () => {
+      const { container } = render(<MemoryRouter><SuggestionSearch /></MemoryRouter>);
+      const searchQueryInput = screen.getByRole("textbox", { name: "search-query-input" });
+      fireEvent.change(searchQueryInput, { target: { value: "1" }});
+      const searchButton = screen.getByRole("button", { name: "search" });
+      await fireEvent.click(searchButton);
+
+      const resultsContainer = container.querySelector(".results-container");
+      if (!resultsContainer) {
+        throw new Error("results-container not found");
+      }
+
+      expect(resultsContainer.classList.contains("has-selection")).toBe(false);
+      fireEvent.keyDown(window, { key: "Escape" });
+      expect(resultsContainer.classList.contains("has-selection")).toBe(false);
+    });
+  });
+
+  describe("When the search button is clicked while a card is selected", async () => {
+    it("Should clear the selection and run the new search", async () => {
+      const { container } = render(<MemoryRouter><SuggestionSearch /></MemoryRouter>);
+      const searchQueryInput = screen.getByRole("textbox", { name: "search-query-input" });
+      fireEvent.change(searchQueryInput, { target: { value: "1" }});
+      const searchButton = screen.getByRole("button", { name: "search" });
+      await fireEvent.click(searchButton);
+
+      const personText = await screen.findByText("Example Smith");
+      const personCard = personText.closest("#search-card");
+      if (!personCard) {
+        throw new Error("Person search card not found");
+      }
+      await fireEvent.click(personCard);
+      expect(personCard.classList.contains("selected")).toBe(true);
+
+      const resultsContainer = container.querySelector(".results-container");
+      if (!resultsContainer) {
+        throw new Error("results-container not found");
+      }
+      expect(resultsContainer.classList.contains("has-selection")).toBe(true);
+
+      fireEvent.change(searchQueryInput, { target: { value: "2" }});
+      await fireEvent.click(searchButton);
+
+      // New results render, and nothing should be selected.
+      const videoGameText = await screen.findByText("Example Video Game");
+      expect(videoGameText).toBeInTheDocument();
+      const resultsContainerAfter = container.querySelector(".results-container");
+      expect(resultsContainerAfter?.classList.contains("has-selection")).toBe(false);
+      const selectedCards = container.querySelectorAll(".result-card.selected");
+      expect(selectedCards.length).toBe(0);
+    });
+  });
+
+  describe("When a card is deselected via the ESC key", async () => {
+    it("Should add a .deselecting class to that card so the exit animation plays", async () => {
+      render(<MemoryRouter><SuggestionSearch /></MemoryRouter>);
+      const searchQueryInput = screen.getByRole("textbox", { name: "search-query-input" });
+      fireEvent.change(searchQueryInput, { target: { value: "1" }});
+      const searchButton = screen.getByRole("button", { name: "search" });
+      await fireEvent.click(searchButton);
+
+      const personText = await screen.findByText("Example Smith");
+      const personCard = personText.closest<HTMLDivElement>("#search-card");
+      if (!personCard) {
+        throw new Error("Person search card not found");
+      }
+
+      await fireEvent.click(personCard);
+      expect(personCard.classList.contains("selected")).toBe(true);
+
+      fireEvent.keyDown(window, { key: "Escape" });
+      expect(personCard.classList.contains("selected")).toBe(false);
+      expect(personCard.classList.contains("deselecting")).toBe(true);
+    });
+  });
+
+  describe("When a card has never been selected", async () => {
+    it("Should not have the .deselecting class", async () => {
+      const { container } = render(<MemoryRouter><SuggestionSearch /></MemoryRouter>);
+      const searchQueryInput = screen.getByRole("textbox", { name: "search-query-input" });
+      fireEvent.change(searchQueryInput, { target: { value: "1" }});
+      const searchButton = screen.getByRole("button", { name: "search" });
+      await fireEvent.click(searchButton);
+
+      await screen.findByText("Example Smith");
+      const deselecting = container.querySelectorAll(".result-card.deselecting");
+      expect(deselecting.length).toBe(0);
+    });
+  });
+
+  describe("When re-selecting a card that was just deselected", async () => {
+    it("Should clear .deselecting and add .selected so the entry animation plays cleanly", async () => {
+      render(<MemoryRouter><SuggestionSearch /></MemoryRouter>);
+      const searchQueryInput = screen.getByRole("textbox", { name: "search-query-input" });
+      fireEvent.change(searchQueryInput, { target: { value: "1" }});
+      const searchButton = screen.getByRole("button", { name: "search" });
+      await fireEvent.click(searchButton);
+
+      const personText = await screen.findByText("Example Smith");
+      const personCard = personText.closest<HTMLDivElement>("#search-card");
+      if (!personCard) {
+        throw new Error("Person search card not found");
+      }
+
+      await fireEvent.click(personCard);    // select
+      await fireEvent.click(personCard);    // deselect
+      expect(personCard.classList.contains("deselecting")).toBe(true);
+
+      await fireEvent.click(personCard);    // re-select
+      expect(personCard.classList.contains("selected")).toBe(true);
+      expect(personCard.classList.contains("deselecting")).toBe(false);
+    });
+  });
+
+  describe("When a new search runs after a card was previously deselected", async () => {
+    it("Should clear the deselect tracking so a re-rendered card with a matching id does not animate", async () => {
+      const { container } = render(<MemoryRouter><SuggestionSearch /></MemoryRouter>);
+      const searchQueryInput = screen.getByRole("textbox", { name: "search-query-input" });
+      fireEvent.change(searchQueryInput, { target: { value: "1" }});
+      const searchButton = screen.getByRole("button", { name: "search" });
+      await fireEvent.click(searchButton);
+
+      const personText = await screen.findByText("Example Smith");
+      const personCard = personText.closest<HTMLDivElement>("#search-card");
+      if (!personCard) {
+        throw new Error("Person search card not found");
+      }
+      await fireEvent.click(personCard);    // select
+      await fireEvent.click(personCard);    // deselect
+      expect(personCard.classList.contains("deselecting")).toBe(true);
+
+      fireEvent.change(searchQueryInput, { target: { value: "1" }});
+      await fireEvent.click(searchButton);
+      await screen.findByText("Example Smith");
+      const deselectingCards = container.querySelectorAll(".result-card.deselecting");
+      expect(deselectingCards.length).toBe(0);
+    });
+  });
 });

@@ -1,4 +1,4 @@
-import { type SubmitEvent, useState } from "react";
+import { type SubmitEvent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SuggestionSearchCard, { type Suggestion } from "./SuggestionSearchCard";
 
@@ -6,9 +6,30 @@ function SuggestionSearch() {
   const [searchQuery, setSearchQuery] = useState("");
   const [results, setResults] = useState<Suggestion[]>([]);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+  // Tracks the card the user just transitioned out of selected. The card
+  // gets a `.deselecting` class which fires the `deselect-fly` keyframe
+  // animation in CSS — required because CSS animations only run on class
+  // addition, not on class removal, so we can't rely on .selected alone to
+  // animate both directions.
+  const [previouslySelectedItemId, setPreviouslySelectedItemId] = useState<
+    string | null
+  >(null);
   const [error, setError] = useState("");
   const [searchMessage, setSearchMessage] = useState("");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        setSelectedItemId((prev) => {
+          setPreviouslySelectedItemId(prev);
+          return null;
+        });
+      }
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
 
   async function handleSearch(e: SubmitEvent) {
     e.preventDefault();
@@ -16,6 +37,11 @@ function SuggestionSearch() {
     setSearchMessage("");
     setResults([]);
     setSelectedItemId(null);
+    // Cards unmount on a new search, so any in-flight deselect animation is
+    // moot — clearing this prevents a card in the next result set that
+    // happens to share an itemID from rendering with `.deselecting` and
+    // playing a phantom exit animation.
+    setPreviouslySelectedItemId(null);
 
     try {
       const response = await fetch(
@@ -40,7 +66,10 @@ function SuggestionSearch() {
   }
 
   function handleCardClick(itemId: string) {
-    setSelectedItemId((prev) => (prev === itemId ? null : itemId));
+    setSelectedItemId((prev) => {
+      setPreviouslySelectedItemId(prev);
+      return prev === itemId ? null : itemId;
+    });
   }
 
   async function handleLogout() {
@@ -82,12 +111,18 @@ function SuggestionSearch() {
       {error && <p className="error-message">{error}</p>}
       {searchMessage && <p className="search-message">{searchMessage}</p>}
 
-      <div className="results-container">
+      <div
+        className={`results-container${selectedItemId ? " has-selection" : ""}`}
+      >
         {results.map((item) => (
           <SuggestionSearchCard
             key={item.id}
             item={item}
             selected={selectedItemId === item.itemID}
+            deselecting={
+              previouslySelectedItemId === item.itemID &&
+              selectedItemId !== item.itemID
+            }
             onClick={() => handleCardClick(item.itemID)}
           />
         ))}
