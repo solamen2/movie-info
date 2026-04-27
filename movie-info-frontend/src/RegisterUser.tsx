@@ -1,6 +1,13 @@
 import { type SubmitEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+export interface RegisterResponse {
+  type: string;
+  title: string;
+  status: number;
+  errors: { error: string[] };
+}
+
 function RegisterUser() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -20,9 +27,9 @@ function RegisterUser() {
 
       if (response.ok) {
         // TODO: Change this to say success message and add a link to go back to login
-        navigate("/login");
+        await navigate("/login");
       } else {
-        const data = await response.json().catch(() => null);
+        const data = await response.json() as RegisterResponse | null;
         if (data?.errors) {
           const messages = Object.values(data.errors as Record<string, string[]>)
             .flat()
@@ -37,8 +44,6 @@ function RegisterUser() {
     }
   }
 
-  // TODO: Hide register button in prod (to not confuse people, not for security)
-
   return (
     <div className="auth-page">
       <h1>Register</h1>
@@ -51,7 +56,7 @@ function RegisterUser() {
             id="email"
             type="text"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => { setEmail(e.target.value); }}
             required
           />
         </div>
@@ -61,7 +66,7 @@ function RegisterUser() {
             id="password"
             type="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => { setPassword(e.target.value); }}
             required
           />
         </div>

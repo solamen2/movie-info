@@ -58,7 +58,7 @@ void AddServices()
                 options.AddDefaultPolicy(
                     policy =>
                     {
-                    policy.WithOrigins("http://localhost:8080", // TODO: Test that all these work!
+                    policy.WithOrigins("http://localhost:8080",
                                        "http://localhost:8081",
                                        "https://movie-info-flyio.fly.dev",
                                        "https://movie-info-stage.*",

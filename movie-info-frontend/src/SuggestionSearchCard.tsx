@@ -53,8 +53,8 @@ function SuggestionSearchCard({ item, selected, deselecting, onClick }: Suggesti
     if (!selected) {
       const card = cardRef.current;
       if (card) {
-        card.style.setProperty("--orig-x", `${card.offsetLeft}px`);
-        card.style.setProperty("--orig-y", `${card.offsetTop}px`);
+        card.style.setProperty("--orig-x", `${String(card.offsetLeft)}px`);
+        card.style.setProperty("--orig-y", `${String(card.offsetTop)}px`);
       }
     }
     onClick();
@@ -91,7 +91,7 @@ function SuggestionSearchCard({ item, selected, deselecting, onClick }: Suggesti
         {!isPerson && (
           <p>
             <strong>Media Type:</strong>{" "}
-            {mediaTypeValue ? mediaTypeValue : "—"}
+            {mediaTypeValue ?? "—"}
           </p>
         )}
         <p><strong>Rank:</strong> {item.rank ?? "—"}</p>

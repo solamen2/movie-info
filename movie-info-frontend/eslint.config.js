@@ -6,20 +6,46 @@ import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  globalIgnores(['dist', "**/mockServiceWorker.js"]),
   {
-    files: ['**/*.{js,jsx,ts,tsx,mts}'],
+    files: ['**/*.{ts,tsx,mts}'],
     extends: [
       js.configs.recommended,
-      tseslint.configs.recommended,
-      reactHooks.configs['recommended-latest'],
+      tseslint.configs.strictTypeChecked,
+      tseslint.configs.stylisticTypeChecked,
+      reactHooks.configs.flat['recommended-latest'],
       reactRefresh.configs.vite,
     ],
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
+      parserOptions: {
+        projectService: true,
+      },
+    },
+    rules: {
+      "@typescript-eslint/no-misused-promises": [2, { // Handles onSubmit gracefully, see https://github.com/orgs/react-hook-form/discussions/8622#discussioncomment-4060570
+        "checksVoidReturn": {
+          "attributes": false
+        }
+      }]
+		},
+  },
+  {
+    files: ['**/*.{js,jsx}'],
+    extends: [
+      js.configs.recommended,
+      reactHooks.configs.flat['recommended-latest'],
+      reactRefresh.configs.vite,
+    ],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: globals.browser,
+      parserOptions: {
+        projectService: true,
+      },
     },
     rules: {
 		},
   },
-])
+]);

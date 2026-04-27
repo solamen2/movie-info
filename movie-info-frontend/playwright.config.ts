@@ -1,5 +1,4 @@
 import { defineConfig, devices } from "@playwright/test";
-import dotenv from 'dotenv';
 
 // NOTE: This is only used for testing dev docker image locally
 //dotenv.config({ path: "../../movie-info-secrets/dev.env" });

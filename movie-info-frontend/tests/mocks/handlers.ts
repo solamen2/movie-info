@@ -2,21 +2,16 @@ import { http, HttpResponse } from "msw"
 import searchDataJson1 from "./data/searchData1.json" with { type: "json" };
 import searchDataJson2 from "./data/searchData2.json" with { type: "json" };
 
-interface LoginPathParams {
-}
+type LoginPathParams = object;
 
 interface LoginRequestBody {
   email: string
   password: string
 }
 
-interface LoginResponseBody {
-  
-}
+type LoginResponseBody = object;
 
-interface RegisterPathParams {
-
-}
+type RegisterPathParams = object
 
 interface RegisterRequestBody {
   email: string

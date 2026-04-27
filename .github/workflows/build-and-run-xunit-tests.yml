@@ -13,8 +13,6 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: read  # For private repos TODO remove me when public
-      issues: read  # For private repos TODO remove me when public
       checks: write
       pull-requests: write
 
