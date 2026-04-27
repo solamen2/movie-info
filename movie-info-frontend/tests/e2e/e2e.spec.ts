@@ -7,11 +7,11 @@ test.beforeEach(async ({ page }) => {
   await page.goto("");
   await expect(page).toHaveTitle("Movie Search");
   const email = page.getByLabel("Email");
-  const emailText = process.env.CI ? process.env.E2E_TEST_USERNAME as string : process.env.E2E_TEST_LOCAL_USERNAME as string;
-  await email.fill(emailText);
+  const emailText = process.env.CI ? process.env.E2E_TEST_USERNAME : process.env.E2E_TEST_LOCAL_USERNAME;
+  await email.fill(emailText ?? "");
   const password = page.getByLabel("Password");
-  const passwordText = process.env.CI ? process.env.E2E_TEST_PASSWORD as string : process.env.E2E_TEST_LOCAL_PASSWORD as string;
-  await password.fill(passwordText);
+  const passwordText = process.env.CI ? process.env.E2E_TEST_PASSWORD : process.env.E2E_TEST_LOCAL_PASSWORD;
+  await password.fill(passwordText ?? "");
   const loginButton = page.getByRole("button", {"name": "Login"});
   await loginButton.click();
   console.log("Login finished.");
@@ -34,7 +34,7 @@ test("Basic happy path: search, check results are valid, and select a search car
   await searchButton.click();
 
   const movieNameTextToSearch = process.env.E2E_TEST_USE_MOCK_HTTP_CALLS === "true" ? "Example Movie" : "The Shawshank Redemption";
-  const movieTextElement = await page.getByText(movieNameTextToSearch, { exact: true });
+  const movieTextElement = page.getByText(movieNameTextToSearch, { exact: true });
   const movieCard = movieTextElement.locator("ancestor=#search-card");
   const movieCardText1 = process.env.E2E_TEST_USE_MOCK_HTTP_CALLS === "true"
     ? "Example MovieSearch Type: MediaMedia Type: MovieRank: "

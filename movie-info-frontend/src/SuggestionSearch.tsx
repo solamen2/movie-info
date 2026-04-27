@@ -28,7 +28,7 @@ function SuggestionSearch() {
       }
     }
     window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+    return () => { window.removeEventListener("keydown", onKeyDown); };
   }, []);
 
   async function handleSearch(e: SubmitEvent) {
@@ -49,15 +49,15 @@ function SuggestionSearch() {
       );
 
       if (!response.ok) {
-        setError(`Search failed with status ${response.status}. Please try again.`);
+        setError(`Search failed with status ${String(response.status)}. Please try again.`);
         return;
       }
 
-      const data: Suggestion[] = await response.json();
-      if (!data || data.length === 0) {
+      const data: Suggestion[] = await response.json() as Suggestion[];  // TODO: Maybe someday make this validation more robust
+      if (data.length === 0) {
         setSearchMessage("No results.");
       } else {
-        setSearchMessage(`${data.length} results.`)
+        setSearchMessage(`${String(data.length)} results.`)
         setResults(data);
       }
     } catch {
@@ -84,7 +84,7 @@ function SuggestionSearch() {
         setError("Logout failed. Redirecting to login page...");
         await new Promise(f => setTimeout(f, 5000));
       }
-      navigate("/login");
+      await navigate("/login");
     } catch {
       setError("An unexpected logout error occurred. Please try again.");
     }
@@ -99,7 +99,7 @@ function SuggestionSearch() {
             type="text"
             placeholder="Search movies, people..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => { setSearchQuery(e.target.value); }}
           />
           <button aria-label="search" type="submit">Search</button>
         </form>
@@ -123,7 +123,7 @@ function SuggestionSearch() {
               previouslySelectedItemId === item.itemID &&
               selectedItemId !== item.itemID
             }
-            onClick={() => handleCardClick(item.itemID)}
+            onClick={() => { handleCardClick(item.itemID); }}
           />
         ))}
       </div>

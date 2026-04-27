@@ -4,7 +4,7 @@ import { defineNetworkFixture, type NetworkFixture } from "@msw/playwright"
 import { handlers } from "./mocks/handlers.ts"
 
 interface Fixtures {
-  handlers: Array<AnyHandler>
+  handlers: AnyHandler[]
   network: NetworkFixture
 }
 

@@ -4,19 +4,19 @@ import { MemoryRouter } from "react-router-dom"
 import SuggestionSearch from './SuggestionSearch';
 
 // screen.logTestingPlaygroundURL();
-describe("SuggestionSearch", async () => {
-  describe("When using search terms with results", async () => {
+describe("SuggestionSearch", () => {
+  describe("When using search terms with results", () => {
     it("Should return search results", async () => {
       render(<MemoryRouter><SuggestionSearch /></MemoryRouter>);  // MemoryRouter required to use navigate()
       const searchQueryInput = screen.getByRole("textbox", { name: "search-query-input" });
       fireEvent.change(searchQueryInput, { target: { value: "1" }});
       const searchButton = screen.getByRole("button", { name: "search" });
-      await fireEvent.click(searchButton);
+      fireEvent.click(searchButton);
       const searchResultsNumber = await screen.findByText("8 results.");
       expect(searchResultsNumber).toBeInTheDocument();
 
       fireEvent.change(searchQueryInput, { target: { value: "2" }});
-      await fireEvent.click(searchButton);
+      fireEvent.click(searchButton);
       const searchResultsNumber2 = await screen.findByText("6 results.");
       expect(searchResultsNumber2).toBeInTheDocument();
     });
@@ -27,7 +27,7 @@ describe("SuggestionSearch", async () => {
       const searchQueryInput = screen.getByRole("textbox", { name: "search-query-input" });
       fireEvent.change(searchQueryInput, { target: { value: "empty" }});
       const searchButton = screen.getByRole("button", { name: "search" });
-      await fireEvent.click(searchButton);
+      fireEvent.click(searchButton);
       const noSearchResults = await screen.findByText("No results.");
       expect(noSearchResults).toBeInTheDocument();
     });
@@ -38,16 +38,16 @@ describe("SuggestionSearch", async () => {
       const searchQueryInput = screen.getByRole("textbox", { name: "search-query-input" });
       fireEvent.change(searchQueryInput, { target: { value: "error" }});
       const searchButton = screen.getByRole("button", { name: "search" });
-      await fireEvent.click(searchButton);
+      fireEvent.click(searchButton);
       const errorSearchResults = await screen.findByText("Search failed with status 404. Please try again.");
       expect(errorSearchResults).toBeInTheDocument();
     });
   });
   describe("When valid user clicks the log out button", () => {
-    it("Should log out user successfully", async () => {
+    it("Should log out user successfully", () => {
       render(<MemoryRouter><SuggestionSearch /></MemoryRouter>);
       const logoutButton = screen.getByRole("button", { name: "logout" });
-      await fireEvent.click(logoutButton);
+      fireEvent.click(logoutButton);
     });
   });
 });

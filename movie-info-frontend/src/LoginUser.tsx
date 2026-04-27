@@ -19,7 +19,7 @@ function LoginUser() {
       });
 
       if (response.ok) {
-        navigate("/search");
+        await navigate("/search");
       } else {
         setError("Login failed. Please check your credentials and try again.");  // TODO: Make this more specific (like when backend is down)
       }
@@ -38,7 +38,7 @@ function LoginUser() {
             id="email"
             type="text"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => { setEmail(e.target.value); }}
             required
           />
         </div>
@@ -48,7 +48,7 @@ function LoginUser() {
             id="password"
             type="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => { setPassword(e.target.value); }}
             required
           />
         </div>

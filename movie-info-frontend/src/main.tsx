@@ -13,10 +13,10 @@ async function enableMocking() {
   }
 }
  
-enableMocking().then(() => {
-  createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+void enableMocking().then(() => {
+  createRoot(document.getElementById("root") ?? new HTMLElement).render(
+    <StrictMode>
+      <App />
+    </StrictMode>,
+  )
 })
