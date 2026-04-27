@@ -181,38 +181,6 @@ describe("SuggestionSearchCard", async () => {
     });
   });
 
-  // Selection test
-
-  describe("When search card is selected and deselected", async () => {
-    it("Should show card appearance as selected and deselected", async () => {
-      render(<MemoryRouter><SuggestionSearch /></MemoryRouter>);
-      const searchQueryInput = screen.getByRole("textbox", { name: "search-query-input" });
-      fireEvent.change(searchQueryInput, { target: { value: "1" }});
-      const searchButton = screen.getByRole("button", { name: "search" });
-      await fireEvent.click(searchButton);
-
-      const personText = await screen.findByText("Example Smith");
-      const personCard = personText.closest("#search-card");
-      if (!personCard) {
-        throw new Error("Person search card not found in selection test");
-      }
-      const movieText = await screen.findByText("Example Movie");
-      const movieCard = movieText.closest("#search-card");
-      if (!movieCard) {
-        throw new Error("Movie search card not found in selection test");
-      }
-
-      expect(personCard.classList.contains('selected')).toBe(false);
-      await fireEvent.click(personCard);
-      expect(personCard.classList.contains('selected')).toBe(true);
-      await fireEvent.click(movieCard);
-      expect(personCard.classList.contains('selected')).toBe(false);
-      expect(movieCard.classList.contains('selected')).toBe(true);
-      await fireEvent.click(movieCard);
-      expect(movieCard.classList.contains('selected')).toBe(false);
-    });
-  });
-
   // Selection / deselection animation tests
 
   describe("When a search card is selected", async () => {
@@ -288,6 +256,10 @@ describe("SuggestionSearchCard", async () => {
       expect(resultsContainer.classList.contains("has-selection")).toBe(false);
       expect(personCard.classList.contains("selected")).toBe(false);
       expect(personCard.classList.contains("deselecting")).toBe(true);
+      await fireEvent.click(personCard);
+      expect(resultsContainer.classList.contains("has-selection")).toBe(true);
+      expect(personCard.classList.contains("selected")).toBe(true);
+      expect(personCard.classList.contains("deselecting")).toBe(false);
     });
   });
 
