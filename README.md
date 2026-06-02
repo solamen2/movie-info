@@ -68,6 +68,9 @@ The CSS and presentation is fairly basic (and does not use Tailwind), and was de
 ### Accessibility
 TODO: Make app more accessible
 
+### Linting / Formatting
+TODO: List TSLint config here, and make sure Prettier is run on everything and documented here
+
 ## Architecture: Environments
 The app has four environments: local, dev, stage, and prod. Local is run on my local machine and features hot-reloading on both the backend and frontend. Dev is automatically built (as a Docker container) and deployed to fly.io after the PR is merged. (The fly.io version has its own Azure SQL Server database.) Stage and prod reuse the built container from fly.io, but are released semi-manually by me as separate Azure Container Apps with their own Azure SQL Server databases. The container used for dev, stage, and prod can also be run locally if required.
 
