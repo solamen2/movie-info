@@ -28,7 +28,9 @@ function SuggestionSearch() {
       }
     }
     window.addEventListener("keydown", onKeyDown);
-    return () => { window.removeEventListener("keydown", onKeyDown); };
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+    };
   }, []);
 
   async function handleSearch(e: SubmitEvent) {
@@ -45,19 +47,21 @@ function SuggestionSearch() {
 
     try {
       const response = await fetch(
-        `/api/search?searchQuery=${encodeURIComponent(searchQuery)}`
+        `/api/search?searchQuery=${encodeURIComponent(searchQuery)}`,
       );
 
       if (!response.ok) {
-        setError(`Search failed with status ${String(response.status)}. Please try again.`);
+        setError(
+          `Search failed with status ${String(response.status)}. Please try again.`,
+        );
         return;
       }
 
-      const data: Suggestion[] = await response.json() as Suggestion[];  // TODO: Maybe someday make this validation more robust
+      const data: Suggestion[] = (await response.json()) as Suggestion[]; // TODO: Maybe someday make this validation more robust
       if (data.length === 0) {
         setSearchMessage("No results.");
       } else {
-        setSearchMessage(`${String(data.length)} results.`)
+        setSearchMessage(`${String(data.length)} results.`);
         setResults(data);
       }
     } catch {
@@ -82,7 +86,7 @@ function SuggestionSearch() {
 
       if (!response.ok) {
         setError("Logout failed. Redirecting to login page...");
-        await new Promise(f => setTimeout(f, 5000));
+        await new Promise((f) => setTimeout(f, 5000));
       }
       await navigate("/login");
     } catch {
@@ -99,11 +103,19 @@ function SuggestionSearch() {
             type="text"
             placeholder="Search movies, people..."
             value={searchQuery}
-            onChange={(e) => { setSearchQuery(e.target.value); }}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+            }}
           />
-          <button aria-label="search" type="submit">Search</button>
+          <button aria-label="search" type="submit">
+            Search
+          </button>
         </form>
-        <button aria-label="logout" className="logout-button" onClick={handleLogout}>
+        <button
+          aria-label="logout"
+          className="logout-button"
+          onClick={handleLogout}
+        >
           Logout
         </button>
       </div>
@@ -123,7 +135,9 @@ function SuggestionSearch() {
               previouslySelectedItemId === item.itemID &&
               selectedItemId !== item.itemID
             }
-            onClick={() => { handleCardClick(item.itemID); }}
+            onClick={() => {
+              handleCardClick(item.itemID);
+            }}
           />
         ))}
       </div>

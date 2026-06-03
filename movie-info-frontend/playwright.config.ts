@@ -17,7 +17,7 @@ import { defineConfig, devices } from "@playwright/test";
 export default defineConfig({
   testDir: "./tests/e2e/",
   // This avoids running Vitest tests on accident
-  testMatch: '*.spec.ts',
+  testMatch: "*.spec.ts",
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -31,7 +31,9 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto("")`. */
-    baseURL: process.env.CI ? process.env.E2E_TEST_BASE_URL : process.env.E2E_TEST_LOCAL_BASE_URL,
+    baseURL: process.env.CI
+      ? process.env.E2E_TEST_BASE_URL
+      : process.env.E2E_TEST_LOCAL_BASE_URL,
     headless: process.env.CI ? true : false,
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "retain-on-failure",
@@ -39,12 +41,12 @@ export default defineConfig({
 
   projects: [
     {
-       name: "Mobile Safari",
-       use: { ...devices["iPhone 12"] },
-     },
-    {
-       name: "Chromium",
-       use: { ...devices["Desktop Chrome"]},
+      name: "Mobile Safari",
+      use: { ...devices["iPhone 12"] },
     },
-  ]
+    {
+      name: "Chromium",
+      use: { ...devices["Desktop Chrome"] },
+    },
+  ],
 });

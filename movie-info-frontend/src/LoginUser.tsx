@@ -21,7 +21,7 @@ function LoginUser() {
       if (response.ok) {
         await navigate("/search");
       } else {
-        setError("Login failed. Please check your credentials and try again.");  // TODO: Make this more specific (like when backend is down)
+        setError("Login failed. Please check your credentials and try again."); // TODO: Make this more specific (like when backend is down)
       }
     } catch {
       setError("An unexpected error occurred. Please try again.");
@@ -38,7 +38,9 @@ function LoginUser() {
             id="email"
             type="text"
             value={email}
-            onChange={(e) => { setEmail(e.target.value); }}
+            onChange={(e) => {
+              setEmail(e.target.value);
+            }}
             required
           />
         </div>
@@ -48,14 +50,22 @@ function LoginUser() {
             id="password"
             type="password"
             value={password}
-            onChange={(e) => { setPassword(e.target.value); }}
+            onChange={(e) => {
+              setPassword(e.target.value);
+            }}
             required
           />
         </div>
         {error && <p className="error-message">{error}</p>}
         <div className="form-actions">
-          <button aria-label="login" id="login" type="submit">Login</button>
-          {import.meta.env.DEV && <button type="button" onClick={() => navigate("/register")}>Register</button>}
+          <button aria-label="login" id="login" type="submit">
+            Login
+          </button>
+          {import.meta.env.DEV && (
+            <button type="button" onClick={() => navigate("/register")}>
+              Register
+            </button>
+          )}
         </div>
       </form>
     </div>

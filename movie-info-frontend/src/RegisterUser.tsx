@@ -29,9 +29,11 @@ function RegisterUser() {
         // TODO: Change this to say success message and add a link to go back to login
         await navigate("/login");
       } else {
-        const data = await response.json() as RegisterResponse | null;
+        const data = (await response.json()) as RegisterResponse | null;
         if (data?.errors) {
-          const messages = Object.values(data.errors as Record<string, string[]>)
+          const messages = Object.values(
+            data.errors as Record<string, string[]>,
+          )
             .flat()
             .join(" ");
           setError(messages);
@@ -47,8 +49,12 @@ function RegisterUser() {
   return (
     <div className="auth-page">
       <h1>Register</h1>
-      <h2>Hey there! This page is technically accessible to the public, and you can make accounts here, but since accounts have to be manually enabled in the database, 
-        it's pointless for anyone but me to make them. It's just a convenience page for me, the admin.</h2>
+      <h2>
+        Hey there! This page is technically accessible to the public, and you
+        can make accounts here, but since accounts have to be manually enabled
+        in the database, it's pointless for anyone but me to make them. It's
+        just a convenience page for me, the admin.
+      </h2>
       <form onSubmit={handleRegister}>
         <div className="form-field">
           <label htmlFor="email">Email</label>
@@ -56,7 +62,9 @@ function RegisterUser() {
             id="email"
             type="text"
             value={email}
-            onChange={(e) => { setEmail(e.target.value); }}
+            onChange={(e) => {
+              setEmail(e.target.value);
+            }}
             required
           />
         </div>
@@ -66,13 +74,17 @@ function RegisterUser() {
             id="password"
             type="password"
             value={password}
-            onChange={(e) => { setPassword(e.target.value); }}
+            onChange={(e) => {
+              setPassword(e.target.value);
+            }}
             required
           />
         </div>
         {error && <p className="error-message">{error}</p>}
         <div className="form-actions">
-          <button aria-label="register" type="submit">Register</button>
+          <button aria-label="register" type="submit">
+            Register
+          </button>
         </div>
       </form>
     </div>
