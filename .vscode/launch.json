@@ -1,76 +1,74 @@
 {
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "Backend MovieInfo debug",
-            "preLaunchTask": "Build backend .NET Core project",
-            "type": "coreclr",
-            "request": "launch",
-            "program": "${workspaceFolder}/MovieInfoBackend/MovieInfoBackend/bin/Debug/net10.0/MovieInfoBackend.dll",
-            "cwd": "${workspaceFolder}/MovieInfoBackend/MovieInfoBackend",
-            "launchSettingsFilePath": "${workspaceFolder}/MovieInfoBackend/MovieInfoBackend/Properties/launchSettings.json",
-            "launchSettingsProfile": "http (dev)",
-            "console": "integratedTerminal",
-            "env": {
-                "CUSTOMCONNSTR_MOVIE_INFO_LOCAL_DB": "Server=localhost,1433;Database=movieinfo;MultipleActiveResultSets=true;User=sa;Password=$QLServerPWSA;Encrypt=false"
-            }
-        },
-        {
-            "name": "Frontend MovieInfo debug",
-            "type": "node",
-            "request": "launch",
-            "cwd": "${workspaceFolder}/movie-info-frontend",
-            "runtimeExecutable": "npm",
-            "runtimeArgs": ["run", "dev"],
-            "env": {
-                // Applies to calls in the app; should always be "false" in checked-in version
-                "VITE_USE_MOCK_HTTP_CALLS": "false",
-            },
-            "serverReadyAction": {
-                "action": "debugWithChrome",
-                "killOnServerStop": true,
-                "pattern": "Local:   http://localhost:([0-9]+)/",
-                "uriFormat": "http://localhost:%s"
-            }
-        },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Frontend Playwright tests debug",
-            "console": "integratedTerminal",
-            "skipFiles": ["<node_internals>/**"],
-            "runtimeExecutable": "npm",
-            "runtimeArgs": ["run-script", "playwright-debug-script"],
-            // PS: Test Explorer version of these lives in Playwright Test for VSCode -> Settings, and Docker version is in .env file
-            "env": {
-                // Applies to calls in Playwright tests; always change along with VITE_USE_MOCK_HTTP_CALLS above
-                "E2E_TEST_USE_MOCK_HTTP_CALLS": "false",
-                "E2E_TEST_LOCAL_BASE_URL": "http://localhost:8081/", // NOTE: Use port 8080 (not 8081) for Docker; comment out to use non-local URL from .env file
-                "E2E_TEST_LOCAL_USERNAME": "localtest@example.com", // NOTE: Comment out to use non-local db, and use .env file
-                "E2E_TEST_LOCAL_PASSWORD": "Pa$sw0rd" // NOTE: Comment out to use non-local db, and use .env file
-            },
-            "cwd": "${workspaceFolder}/movie-info-frontend"
-        },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Frontend Playwright Inspector debug",
-            "console": "integratedTerminal",
-            "skipFiles": ["<node_internals>/**"],
-            "runtimeExecutable": "npm",
-            "runtimeArgs": [
-                "run-script",
-                "playwright-debug-script"
-            ],
-            "env": {
-              // Applies to calls in Playwright Inspector tests; always change along with VITE_USE_MOCK_HTTP_CALLS above
-              "E2E_TEST_USE_MOCK_HTTP_CALLS": "false",
-              "PWDEBUG": "1", // This actually launches the inspector
-              "E2E_TEST_LOCAL_BASE_URL": "http://localhost:8081/", // NOTE: Use port 8080 (not 8081) for Docker; comment out to use non-local URL from .env file
-              "E2E_TEST_LOCAL_USERNAME": "localtest@example.com", // NOTE: Comment out to use non-local db, and use .env file
-              "E2E_TEST_LOCAL_PASSWORD": "Pa$sw0rd" // NOTE: Comment out to use non-local db, and use .env file
-            },
-            "cwd": "${workspaceFolder}/movie-info-frontend"
-        }
-    ]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Backend MovieInfo debug",
+      "preLaunchTask": "Build backend .NET Core project",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "${workspaceFolder}/MovieInfoBackend/MovieInfoBackend/bin/Debug/net10.0/MovieInfoBackend.dll",
+      "cwd": "${workspaceFolder}/MovieInfoBackend/MovieInfoBackend",
+      "launchSettingsFilePath": "${workspaceFolder}/MovieInfoBackend/MovieInfoBackend/Properties/launchSettings.json",
+      "launchSettingsProfile": "http (dev)",
+      "console": "integratedTerminal",
+      "envFile": "${workspaceFolder}/../movie-info-secrets/local.env"
+    },
+    {
+      "name": "Frontend MovieInfo debug",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/movie-info-frontend",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      // TODO: Change this section to use envFile like above, with "local.env" file only
+      "env": {
+        // Applies to calls in the app; should always be "false" in checked-in version
+        "VITE_USE_MOCK_HTTP_CALLS": "false"
+      },
+      "serverReadyAction": {
+        "action": "debugWithChrome",
+        "killOnServerStop": true,
+        "pattern": "Local:   http://localhost:([0-9]+)/",
+        "uriFormat": "http://localhost:%s"
+      }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Frontend Playwright tests debug",
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"],
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run-script", "playwright-debug-script"],
+      // PS: Test Explorer version of these lives in Playwright Test for VSCode -> Settings, and Docker version is in .env file
+      // TODO: Change this section to use envFile like above, with "local.env" file as default (values below) and "dev.env" as alternate
+      "env": {
+        // Applies to calls in Playwright tests; always change along with VITE_USE_MOCK_HTTP_CALLS above
+        "E2E_TEST_USE_MOCK_HTTP_CALLS": "false",
+        "E2E_TEST_LOCAL_BASE_URL": "http://localhost:8081/", // NOTE: Use port 8080 (not 8081) for Docker; comment out to use non-local URL from .env file
+        "E2E_TEST_LOCAL_USERNAME": "localtest@example.com", // NOTE: Comment out to use non-local db, and use .env file
+        "E2E_TEST_LOCAL_PASSWORD": "Pa$sw0rd" // NOTE: Comment out to use non-local db, and use .env file
+      },
+      "cwd": "${workspaceFolder}/movie-info-frontend"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Frontend Playwright Inspector debug",
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"],
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run-script", "playwright-debug-script"],
+      "env": {
+        // Applies to calls in Playwright Inspector tests; always change along with VITE_USE_MOCK_HTTP_CALLS above
+        // TODO: Change this section to use envFile like above, with "local.env" file as default (values below) and "dev.env" as alternate
+        "E2E_TEST_USE_MOCK_HTTP_CALLS": "false",
+        "PWDEBUG": "1", // This actually launches the inspector
+        "E2E_TEST_LOCAL_BASE_URL": "http://localhost:8081/", // NOTE: Use port 8080 (not 8081) for Docker; comment out to use non-local URL from .env file
+        "E2E_TEST_LOCAL_USERNAME": "localtest@example.com", // NOTE: Comment out to use non-local db, and use .env file
+        "E2E_TEST_LOCAL_PASSWORD": "Pa$sw0rd" // NOTE: Comment out to use non-local db, and use .env file
+      },
+      "cwd": "${workspaceFolder}/movie-info-frontend"
+    }
+  ]
 }
