@@ -1,0 +1,24 @@
+meta {
+  name: Details (Person)
+  type: http
+  seq: 4
+}
+
+get {
+  url: https://api.themoviedb.org/3/person/:person_id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  person_id: 15110
+}
+
+headers {
+  Authorization: Bearer longkeygoeshere
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

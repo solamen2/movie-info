@@ -1,0 +1,24 @@
+meta {
+  name: Watch Providers (TV Series)
+  type: http
+  seq: 6
+}
+
+get {
+  url: https://api.themoviedb.org/3/tv/:series_id/watch/providers
+  body: none
+  auth: inherit
+}
+
+params:path {
+  series_id: 95
+}
+
+headers {
+  Authorization: Bearer longkeygoeshere
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

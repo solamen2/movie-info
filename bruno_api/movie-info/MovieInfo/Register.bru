@@ -1,11 +1,11 @@
 meta {
-  name: Logout
+  name: Register
   type: http
-  seq: 5
+  seq: 1
 }
 
 post {
-  url: {{base-url}}/api/logout
+  url: {{base-url}}/api/register
   body: json
   auth: inherit
 }
@@ -15,7 +15,10 @@ headers {
 }
 
 body:json {
-  { }
+  {
+    "email": "example@example.com",
+    "password": "NotARealPassword"
+  }
 }
 
 settings {

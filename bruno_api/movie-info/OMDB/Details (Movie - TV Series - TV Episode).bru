@@ -1,0 +1,21 @@
+meta {
+  name: Details (Movie / TV Series / TV Episode)
+  type: http
+  seq: 1
+}
+
+get {
+  url: https://www.omdbapi.com/?i=tt0111161&apikey=apikeyhere
+  body: none
+  auth: inherit
+}
+
+params:query {
+  i: tt0111161
+  apikey: apikeyhere
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

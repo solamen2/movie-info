@@ -31,11 +31,16 @@ interface SuggestionSearchCardProps {
   onClick: () => void;
 }
 
-function SuggestionSearchCard({ item, selected, deselecting, onClick }: SuggestionSearchCardProps) {
+function SuggestionSearchCard({
+  item,
+  selected,
+  deselecting,
+  onClick,
+}: SuggestionSearchCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const searchTypeLabel =
     item.searchType != null
-      ? SEARCH_TYPE_LABELS[item.searchType] ?? String(item.searchType)
+      ? (SEARCH_TYPE_LABELS[item.searchType] ?? String(item.searchType))
       : "—";
   const isPerson = searchTypeLabel === "Person";
   const mediaTypeValue = item.mediaType?.value;
@@ -90,14 +95,25 @@ function SuggestionSearchCard({ item, selected, deselecting, onClick }: Suggesti
         </p>
         {!isPerson && (
           <p>
-            <strong>Media Type:</strong>{" "}
-            {mediaTypeValue ?? "—"}
+            <strong>Media Type:</strong> {mediaTypeValue ?? "—"}
           </p>
         )}
-        <p><strong>Rank:</strong> {item.rank ?? "—"}</p>
-        <p><strong>Known For:</strong> {item.knownFor}</p>
-        {!isPerson && <p><strong>Year:</strong> {item.year ?? "—"}</p>}
-        {showYears && <p><strong>Years:</strong> {item.years ?? "—"}</p>}
+        <p>
+          <strong>Rank:</strong> {item.rank ?? "—"}
+        </p>
+        <p>
+          <strong>Known For:</strong> {item.knownFor}
+        </p>
+        {!isPerson && (
+          <p>
+            <strong>Year:</strong> {item.year ?? "—"}
+          </p>
+        )}
+        {showYears && (
+          <p>
+            <strong>Years:</strong> {item.years ?? "—"}
+          </p>
+        )}
       </div>
     </div>
   );

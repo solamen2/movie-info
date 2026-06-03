@@ -94,7 +94,9 @@
      way to display:none it's deferred until the opacity fade ends, on the
      way back from display:none it's applied at the start so the card has a
      layout slot to fade back into. */
-  transition: border-color 0.15s, opacity 0.5s ease,
+  transition:
+    border-color 0.15s,
+    opacity 0.5s ease,
     display 0.5s allow-discrete;
 }
 
@@ -210,7 +212,7 @@
   font-size: 1rem;
 }
 
-/* For CSS transitions when added back to display, so allow-discrete can work */ 
+/* For CSS transitions when added back to display, so allow-discrete can work */
 @starting-style {
   .result-card {
     opacity: 0;
