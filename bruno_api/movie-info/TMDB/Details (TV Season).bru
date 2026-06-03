@@ -5,12 +5,13 @@ meta {
 }
 
 get {
-  url: https://api.themoviedb.org/3/tv/:series_id/season/6
+  url: https://api.themoviedb.org/3/tv/:series_id/season/:season
   body: none
   auth: inherit
 }
 
 params:path {
+  season: 6
   series_id: 95
 }
 
