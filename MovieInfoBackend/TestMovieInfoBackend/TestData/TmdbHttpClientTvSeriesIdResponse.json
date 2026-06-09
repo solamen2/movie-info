@@ -1,0 +1,26 @@
+{
+  "movie_results": [],
+  "person_results": [],
+  "tv_results": [
+    {
+      "adult": false,
+      "backdrop_path": "/lBmlLro9ZfY815ZXE5NKhYNxPRQ.jpg",
+      "id": 95,
+      "name": "Example TV Series",
+      "original_name": "Example TV Series",
+      "overview": "This series went on for a while and many exciting events happened in it.",
+      "poster_path": "/y7fVZkyheCEQHDUEHwNmYENGfT2.jpg",
+      "media_type": "tv",
+      "original_language": "en",
+      "genre_ids": [35, 18, 10765],
+      "popularity": 54.4575,
+      "first_air_date": "1997-03-10",
+      "softcore": false,
+      "vote_average": 8.1,
+      "vote_count": 1990,
+      "origin_country": ["US"]
+    }
+  ],
+  "tv_episode_results": [],
+  "tv_season_results": []
+}

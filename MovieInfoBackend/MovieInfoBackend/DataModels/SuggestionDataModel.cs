@@ -7,7 +7,7 @@ public record SuggestionDataModel
     [JsonPropertyName("i")]
     public SuggestionImageDataModel? Image { get; init; }
     [JsonPropertyName("id")]
-    public required string ItemID { get; init;}
+    public required string ItemID { get; init; }
     [JsonPropertyName("l")]
     public required string Name { get; init; }  // name of actor, movie, TV show, etc.
     // "q" input parameter intentionally ignored (redundant with "qid", but sometimes containing a different string)

@@ -1,0 +1,75 @@
+{
+  "movie_results": [],
+  "person_results": [
+    {
+      "adult": false,
+      "id": 11863,
+      "name": "Example Smith",
+      "original_name": "Example Smith",
+      "media_type": "person",
+      "popularity": 2.564,
+      "gender": 1,
+      "known_for_department": "Acting",
+      "profile_path": "/xKe52w4tpv61ohz9iz75wNdzcwZ.jpg",
+      "known_for": [
+        {
+          "adult": false,
+          "backdrop_path": "/m2QvGozzKz5ux74gKocn4kFTGz1.jpg",
+          "id": 796,
+          "title": "Movie Number 1",
+          "original_title": "Movie Number 1",
+          "overview": "Many things happen in this first movie.",
+          "poster_path": "/76cCsRtQ5MJBAqoigojXsLXLJwh.jpg",
+          "media_type": "movie",
+          "original_language": "en",
+          "genre_ids": [18, 10749],
+          "popularity": 29.7672,
+          "release_date": "1999-03-05",
+          "softcore": false,
+          "video": false,
+          "vote_average": 6.816,
+          "vote_count": 3578
+        },
+        {
+          "adult": false,
+          "backdrop_path": "/yefSD6lp3jOBYkBeY5QxRRKTJME.jpg",
+          "id": 1970,
+          "title": "Movie Number 2",
+          "original_title": "Movie Number 2",
+          "overview": "Many other things happen in this second movie.",
+          "poster_path": "/7vPAVPKYexQVmvC578wPLn2CGCL.jpg",
+          "media_type": "movie",
+          "original_language": "en",
+          "genre_ids": [27, 9648, 53],
+          "popularity": 4.6788,
+          "release_date": "2004-10-22",
+          "softcore": false,
+          "video": false,
+          "vote_average": 5.931,
+          "vote_count": 3188
+        },
+        {
+          "adult": false,
+          "backdrop_path": "/1RAxtBxslR4OZCZC1vxIRUxjR7a.jpg",
+          "id": 9637,
+          "title": "Movie Number 3",
+          "original_title": "Movie Number 3",
+          "overview": "Yet more things happen in this third movie.",
+          "poster_path": "/mTAiBJGg8mqEfnYHHbi37ZoRSZm.jpg",
+          "media_type": "movie",
+          "original_language": "en",
+          "genre_ids": [9648, 12, 35],
+          "popularity": 6.6028,
+          "release_date": "2002-06-14",
+          "softcore": false,
+          "video": false,
+          "vote_average": 6.106,
+          "vote_count": 4782
+        }
+      ]
+    }
+  ],
+  "tv_results": [],
+  "tv_episode_results": [],
+  "tv_season_results": []
+}

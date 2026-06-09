@@ -1,0 +1,24 @@
+{
+  "movie_results": [],
+  "person_results": [],
+  "tv_results": [],
+  "tv_episode_results": [
+    {
+      "id": 949534,
+      "name": "Example TV Episode",
+      "overview": "This episode has a lot of interesting things in it, especially music.",
+      "media_type": "tv_episode",
+      "vote_average": 8.8,
+      "vote_count": 44,
+      "air_date": "2001-11-06",
+      "episode_number": 7,
+      "episode_type": "standard",
+      "production_code": "6ABB07",
+      "runtime": 50,
+      "season_number": 6,
+      "show_id": 95,
+      "still_path": "/m6DAoR7I3UAeyjGA5ekLf5KQDfS.jpg"
+    }
+  ],
+  "tv_season_results": []
+}
