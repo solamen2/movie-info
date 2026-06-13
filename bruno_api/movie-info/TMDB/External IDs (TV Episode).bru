@@ -1,11 +1,11 @@
 meta {
-  name: Details (TV Episode)
+  name: External IDs (TV Episode)
   type: http
-  seq: 7
+  seq: 11
 }
 
 get {
-  url: https://api.themoviedb.org/3/tv/:series_id/season/:season_number/episode/:episode_number
+  url: https://api.themoviedb.org/3/tv/:series_id/season/:season_number/episode/:episode_number/external_ids
   body: none
   auth: inherit
 }

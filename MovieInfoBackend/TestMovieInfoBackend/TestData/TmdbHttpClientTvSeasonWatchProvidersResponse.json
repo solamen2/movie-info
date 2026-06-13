@@ -1,0 +1,175 @@
+{
+  "id": 59470,
+  "results": {
+    "AU": {
+      "link": "https://www.themoviedb.org/tv/95-example-tv-series/watch?locale=AU",
+      "buy": [
+        {
+          "logo_path": "/SPnB1qiCkYfirS2it3hZORwGVn.jpg",
+          "provider_id": 2,
+          "provider_name": "Apple TV Store",
+          "display_priority": 13
+        },
+        {
+          "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+          "provider_id": 10,
+          "provider_name": "Amazon Video",
+          "display_priority": 14
+        }
+      ]
+    },
+    "CA": {
+      "link": "https://www.themoviedb.org/tv/95-example-tv-series/watch?locale=CA",
+      "buy": [
+        {
+          "logo_path": "/SPnB1qiCkYfirS2it3hZORwGVn.jpg",
+          "provider_id": 2,
+          "provider_name": "Apple TV Store",
+          "display_priority": 6
+        }
+      ]
+    },
+    "DE": {
+      "link": "https://www.themoviedb.org/tv/95-example-tv-series/watch?locale=DE",
+      "flatrate": [
+        {
+          "logo_path": "/97yvRBw1GzX7fXprcF80er19ot.jpg",
+          "provider_id": 337,
+          "provider_name": "Disney Plus",
+          "display_priority": 3
+        }
+      ]
+    },
+    "FR": {
+      "link": "https://www.themoviedb.org/tv/95-example-tv-series/watch?locale=FR",
+      "flatrate": [
+        {
+          "logo_path": "/vo4tm5HBLpctihoSX6bTIG0VB9d.jpg",
+          "provider_id": 193,
+          "provider_name": "SFR Play",
+          "display_priority": 57
+        }
+      ],
+      "ads": [
+        {
+          "logo_path": "/tmYzlEKeiWStvXwC1QdpXIASpN4.jpg",
+          "provider_id": 147,
+          "provider_name": "M6+",
+          "display_priority": 10
+        }
+      ]
+    },
+    "GB": {
+      "link": "https://www.themoviedb.org/tv/95-example-tv-series/watch?locale=GB",
+      "ads": [
+        {
+          "logo_path": "/1LuvKw01c2KQCt6DqgAgR06H2pT.jpg",
+          "provider_id": 41,
+          "provider_name": "ITVX",
+          "display_priority": 21
+        }
+      ],
+      "buy": [
+        {
+          "logo_path": "/SPnB1qiCkYfirS2it3hZORwGVn.jpg",
+          "provider_id": 2,
+          "provider_name": "Apple TV Store",
+          "display_priority": 4
+        },
+        {
+          "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+          "provider_id": 10,
+          "provider_name": "Amazon Video",
+          "display_priority": 7
+        },
+        {
+          "logo_path": "/59TxOAYcoFaufd6CWm465oPchD.jpg",
+          "provider_id": 130,
+          "provider_name": "Sky Store",
+          "display_priority": 17
+        }
+      ]
+    },
+    "GG": {
+      "link": "https://www.themoviedb.org/tv/95-example-tv-series/watch?locale=GG",
+      "buy": [
+        {
+          "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+          "provider_id": 10,
+          "provider_name": "Amazon Video",
+          "display_priority": 83
+        }
+      ]
+    },
+    "IE": {
+      "link": "https://www.themoviedb.org/tv/95-example-tv-series/watch?locale=IE",
+      "buy": [
+        {
+          "logo_path": "/59TxOAYcoFaufd6CWm465oPchD.jpg",
+          "provider_id": 130,
+          "provider_name": "Sky Store",
+          "display_priority": 9
+        }
+      ]
+    },
+    "SE": {
+      "link": "https://www.themoviedb.org/tv/95-example-tv-series/watch?locale=SE",
+      "flatrate": [
+        {
+          "logo_path": "/jy4yvY3szonb0p6rtMXvF5stuX9.jpg",
+          "provider_id": 497,
+          "provider_name": "Tele2 Play",
+          "display_priority": 19
+        }
+      ]
+    },
+    "TH": {
+      "link": "https://www.themoviedb.org/tv/95-example-tv-series/watch?locale=TH",
+      "flatrate": [
+        {
+          "logo_path": "/tHtNW975SmVydaBULhEaOqPTmo8.jpg",
+          "provider_id": 122,
+          "provider_name": "Disney+",
+          "display_priority": 3
+        }
+      ]
+    },
+    "US": {
+      "link": "https://www.themoviedb.org/tv/95-example-tv-series/watch?locale=US",
+      "flatrate": [
+        {
+          "logo_path": "/bxBlRPEPpMVDc4jMhSrTf2339DW.jpg",
+          "provider_id": 15,
+          "provider_name": "Hulu",
+          "display_priority": 6
+        }
+      ],
+      "buy": [
+        {
+          "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+          "provider_id": 10,
+          "provider_name": "Amazon Video",
+          "display_priority": 7
+        },
+        {
+          "logo_path": "/SPnB1qiCkYfirS2it3hZORwGVn.jpg",
+          "provider_id": 2,
+          "provider_name": "Apple TV Store",
+          "display_priority": 8
+        },
+        {
+          "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+          "provider_id": 3,
+          "provider_name": "Google Play Movies",
+          "display_priority": 17
+        },
+        {
+          "logo_path": "/19fkcOz0xeUgCVW8tO85uOYnYK9.jpg",
+          "provider_id": 7,
+          "provider_name": "Fandango At Home",
+          "display_priority": 35
+        }
+      ]
+    }
+  }
+}

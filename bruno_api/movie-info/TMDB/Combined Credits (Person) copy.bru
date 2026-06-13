@@ -1,17 +1,17 @@
 meta {
-  name: Watch Providers (Movie)
+  name: Combined Credits (Person) copy
   type: http
-  seq: 16
+  seq: 2
 }
 
 get {
-  url: https://api.themoviedb.org/3/movie/:movie_id/watch/providers
+  url: https://api.themoviedb.org/3/person/:person_id/combined_credits
   body: none
   auth: inherit
 }
 
 params:path {
-  movie_id: 278
+  person_id: 11863
 }
 
 headers {
