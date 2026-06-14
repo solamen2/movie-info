@@ -11,7 +11,7 @@ public record TmdbWatchProvidersResponseDataModel
 
     public override string ToString()
     {
-        return $"Id: {Id}\nResults:\n*****\n{Results}\n*****\n";
+        return $"Id: {Id}\nResults:\n*****\n{Results}";
     }
 
 }

@@ -27,11 +27,11 @@ public record TmdbTvSeriesResponseDataModel
     [JsonPropertyName("last_air_date")]
     public string? LastAirDate { get; init; }
     [JsonPropertyName("last_episode_to_air")]
-    public TmdbEpisodeDataModel? LastEpisodeToAir { get; init; }
+    public TmdbTvEpisodeDataModel? LastEpisodeToAir { get; init; }
     [JsonPropertyName("name")]
     public required string Name { get; init; }
     [JsonPropertyName("next_episode_to_air")]
-    public TmdbEpisodeDataModel? NextEpisodeToAir { get; init; }
+    public TmdbTvEpisodeDataModel? NextEpisodeToAir { get; init; }
     [JsonPropertyName("networks")]
     public required TmdbNetworkDataModel[] Networks { get; init; }
     [JsonPropertyName("number_of_episodes")]
@@ -55,7 +55,7 @@ public record TmdbTvSeriesResponseDataModel
     [JsonPropertyName("production_countries")]
     public required TmdbProductionCountryDataModel[] ProductionCountries { get; init; }
     [JsonPropertyName("seasons")]
-    public required TmdbSeasonDataModel[] Seasons { get; init; }
+    public required TmdbTvSeasonDataModel[] Seasons { get; init; }
     [JsonPropertyName("softcore")]
     public required bool Softcore { get; init; }
     [JsonPropertyName("spoken_languages")]

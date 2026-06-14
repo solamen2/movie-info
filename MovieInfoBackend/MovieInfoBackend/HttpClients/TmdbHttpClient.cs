@@ -38,6 +38,14 @@ public class TmdbHttpClient
         //return GetModelFromResponse(responseJsonString);
     //}
 
+    public static TmdbMovieCreditsResponseDataModel? GetMovieCreditsModelFromResponse(string responseJsonString)
+    {
+        return JsonSerializer.Deserialize<TmdbMovieCreditsResponseDataModel>(responseJsonString);
+    }
+    public static TmdbGenresResponseDataModel? GetGenresModelFromResponse(string responseJsonString)
+    {
+        return JsonSerializer.Deserialize<TmdbGenresResponseDataModel>(responseJsonString);
+    }
     public static TmdbIdResponseDataModel? GetIdModelFromResponse(string responseJsonString)
     {
         return JsonSerializer.Deserialize<TmdbIdResponseDataModel>(responseJsonString);
@@ -46,9 +54,41 @@ public class TmdbHttpClient
     {
         return JsonSerializer.Deserialize<TmdbMovieResponseDataModel>(responseJsonString);
     }
+    public static TmdbPersonExternalIdsResponseDataModel? GetPersonExternalIdsModelFromResponse(string responseJsonString)
+    {
+        return JsonSerializer.Deserialize<TmdbPersonExternalIdsResponseDataModel>(responseJsonString);
+    }
+    public static TmdbPersonImagesResponseDataModel? GetPersonImagesModelFromResponse(string responseJsonString)
+    {
+        return JsonSerializer.Deserialize<TmdbPersonImagesResponseDataModel>(responseJsonString);
+    }
+    public static TmdbPersonMovieCreditsResponseDataModel? GetPersonMovieCreditsModelFromResponse(string responseJsonString)
+    {
+        return JsonSerializer.Deserialize<TmdbPersonMovieCreditsResponseDataModel>(responseJsonString);
+    }
     public static TmdbPersonResponseDataModel? GetPersonModelFromResponse(string responseJsonString)
     {
         return JsonSerializer.Deserialize<TmdbPersonResponseDataModel>(responseJsonString);
+    }
+    public static TmdbPersonTvSeriesCreditsResponseDataModel? GetPersonTvSeriesCreditsModelFromResponse(string responseJsonString)
+    {
+        return JsonSerializer.Deserialize<TmdbPersonTvSeriesCreditsResponseDataModel>(responseJsonString);
+    }
+    public static TmdbTvEpisodeCreditsResponseDataModel? GetTvEpisodeCreditsModelFromResponse(string responseJsonString)
+    {
+        return JsonSerializer.Deserialize<TmdbTvEpisodeCreditsResponseDataModel>(responseJsonString);
+    }
+    public static TmdbTvEpisodeExternalIdsResponseDataModel? GetTvEpisodeExternalIdsModelFromResponse(string responseJsonString)
+    {
+        return JsonSerializer.Deserialize<TmdbTvEpisodeExternalIdsResponseDataModel>(responseJsonString);
+    }
+    public static TmdbTvSeasonResponseDataModel? GetTvSeasonModelFromResponse(string responseJsonString)
+    {
+        return JsonSerializer.Deserialize<TmdbTvSeasonResponseDataModel>(responseJsonString);
+    }
+    public static TmdbTvSeriesAggregateCreditsResponseDataModel? GetTvSeriesAggregateCreditsModelFromResponse(string responseJsonString)
+    {
+        return JsonSerializer.Deserialize<TmdbTvSeriesAggregateCreditsResponseDataModel>(responseJsonString);
     }
     public static TmdbTvSeriesResponseDataModel? GetTvSeriesModelFromResponse(string responseJsonString)
     {

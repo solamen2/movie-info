@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace MovieInfoBackend.DataModels;
 
-public record TmdbSeasonDataModel
+public record TmdbTvSeasonDataModel
 {
     [JsonPropertyName("air_date")]
     public string? AirDate { get; init; }

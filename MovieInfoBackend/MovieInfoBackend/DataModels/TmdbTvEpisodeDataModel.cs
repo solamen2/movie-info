@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace MovieInfoBackend.DataModels;
 
-public record TmdbTvEpisodeIdDataModel
+public record TmdbTvEpisodeDataModel
 {
     [JsonPropertyName("id")]
     public required int Id { get; init; }
@@ -11,7 +11,7 @@ public record TmdbTvEpisodeIdDataModel
     [JsonPropertyName("overview")]
     public required string Overview { get; init; }
     [JsonPropertyName("media_type")]
-    public required string MediaType { get; init; }
+    public string? MediaType { get; init; }
     [JsonPropertyName("vote_average")]
     public required double VoteAverage { get; init; }
     [JsonPropertyName("vote_count")]
@@ -37,4 +37,5 @@ public record TmdbTvEpisodeIdDataModel
     {
         return $"Id: {Id}\nName: {Name}\nOverview: {Overview}\nMediaType: {MediaType}\nVoteAverage: {VoteAverage}\nVoteCount: {VoteCount}\nAirDate: {AirDate}\nEpisodeNumber: {EpisodeNumber}\nEpisodeType: {EpisodeType}\nProductionCode: {ProductionCode}\nRuntime: {Runtime}\nSeasonNumber: {SeasonNumber}\nShowId: {ShowId}\nStillPath: {StillPath}";
     }
+
 }

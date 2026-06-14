@@ -251,7 +251,7 @@ public record TmdbWatchProvidersResultsDataModel
     
     public override string ToString()
     {
-        return $"US:\n*****\n{US}\n*****\n";
+        return $"US:\n*****\n{US}";
     }
 
 }

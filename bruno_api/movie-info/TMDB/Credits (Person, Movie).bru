@@ -1,11 +1,11 @@
 meta {
-  name: Details (Person)
+  name: Credits (Person, Movie)
   type: http
-  seq: 8
+  seq: 4
 }
 
 get {
-  url: https://api.themoviedb.org/3/person/:person_id
+  url: https://api.themoviedb.org/3/person/:person_id/movie_credits
   body: none
   auth: inherit
 }

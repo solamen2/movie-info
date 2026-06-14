@@ -1,4 +1,4 @@
-// NOTE: Yeah, not technically an enum, but I wanted the string mapping to the IMDB API and it's very similar
+// NOTE: Yeah, not technically an enum, but I wanted the string mapping to the IMDB API and it's very similar; if the mapped values didn't have spaces, it would work fine as enum
 
 using Serilog;
 
