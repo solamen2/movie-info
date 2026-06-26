@@ -16,6 +16,12 @@ public record OmdbResponseDataModel
     [JsonPropertyName("Released")]
     public required string Released { get; init; }
 
+    [JsonPropertyName("Season")]
+    public string? Season { get; init; }  // Note for ViewModel: this is an int
+
+    [JsonPropertyName("Episode")]
+    public string? Episode { get; init; }  // Note for ViewModel: this is an int
+
     [JsonPropertyName("Runtime")]
     public required string Runtime { get; init; }
 
@@ -53,39 +59,42 @@ public record OmdbResponseDataModel
     public required string Metascore { get; init; }
 
     [JsonPropertyName("imdbRating")]
-    public required string ImdbRating { get; init; }
+    public required string ImdbRating { get; init; }  // Note for ViewModel: this is a double (but sometimes "N/A")
 
     [JsonPropertyName("imdbVotes")]
-    public required string ImdbVotes { get; init; }  // TODO: Note for ViewModel: this is an int
+    public required string ImdbVotes { get; init; }  // Note for ViewModel: this is an int (but with commas, and sometimes "N/A")
 
     [JsonPropertyName("imdbID")]
     public required string ImdbId { get; init; }
+    
+    [JsonPropertyName("seriesID")]
+    public string? SeriesId { get; init; }
 
     [JsonPropertyName("Type")]
     public required string Type { get; init; }
 
     [JsonPropertyName("DVD")]
-    public string? DVD { get; init; }
+    public string? DVD { get; init; }  // Note for ViewModel: I think this used to be a date, but now always seems to be "N/A"
 
     [JsonPropertyName("totalSeasons")]
-    public string? TotalSeasons { get; init; }  // TODO: Note for ViewModel: this is an int
+    public string? TotalSeasons { get; init; }  // Note for ViewModel: this is an int
 
     [JsonPropertyName("BoxOffice")]
     public string? BoxOffice { get; init; }
 
     // TODO: Adjusted box office for current year
 
-    [JsonPropertyName("Production")]
+    [JsonPropertyName("Production")]  // Note for ViewModel: this used to be a production company list, but now always seems to be "N/A"
     public string? Production { get; init; }
 
-    [JsonPropertyName("Website")]
+    [JsonPropertyName("Website")]  // Note for ViewModel: this used to be a website URL, but now always seems to be "N/A"
     public string? Website { get; init; }
 
     [JsonPropertyName("Response")]
-    public required string Response { get; init; }  // TODO: Note for ViewModel: this is a bool
+    public required string Response { get; init; }  // Note for ViewModel: this is a bool
 
     public override string ToString()
     {
-        return $"Title: {Title}\nYear: {Year}\nRated: {Rated}\nReleased: {Released}\nRuntime: {Runtime}\nGenre: {Genre}\nDirector: {Director}\nWriter: {Writer}\nActors: {Actors}\nPlot: {Plot}\nLanguage: {Language}\nCountry: {Country}\nAwards: {Awards}\nPoster: {Poster}\nRatings:\n*****\n{string.Join("\n\n", Ratings)}\n*****\nMetascore: {Metascore}\nImdbRating: {ImdbRating}\nImdbVotes: {ImdbVotes}\nImdbId: {ImdbId}\nType: {Type}\nDVD: {DVD}\nTotal Seasons: {TotalSeasons}\nBoxOffice: {BoxOffice}\nProduction: {Production}\nWebsite: {Website}\nResponse: {Response}\n";
+        return $"Title: {Title}\nYear: {Year}\nRated: {Rated}\nReleased: {Released}\nSeason: {Season}\nEpisode: {Episode}\nRuntime: {Runtime}\nGenre: {Genre}\nDirector: {Director}\nWriter: {Writer}\nActors: {Actors}\nPlot: {Plot}\nLanguage: {Language}\nCountry: {Country}\nAwards: {Awards}\nPoster: {Poster}\nRatings:\n*****\n{string.Join("\n\n", Ratings)}\n*****\nMetascore: {Metascore}\nImdbRating: {ImdbRating}\nImdbVotes: {ImdbVotes}\nImdbId: {ImdbId}\nSeriesId: {SeriesId}\nType: {Type}\nDVD: {DVD}\nTotal Seasons: {TotalSeasons}\nBoxOffice: {BoxOffice}\nProduction: {Production}\nWebsite: {Website}\nResponse: {Response}\n";
     }
 }

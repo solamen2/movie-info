@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Text.Json;
 using System.Web;
 using Microsoft.Net.Http.Headers;
@@ -7,6 +8,8 @@ public class TmdbHttpClient
 {
     private readonly HttpClient _httpClient;
     public static string CachePrefix = "tmdb-";
+    public static FrozenDictionary<string, string>? Iso31661ToEnglishCountryNameDictionaryCached { get; private set; }
+    public static FrozenDictionary<string, string>? Iso6391ToEnglishLanguageNameDictionaryCached { get; private set; }
 
     public TmdbHttpClient(HttpClient httpClient)
     {
@@ -97,5 +100,29 @@ public class TmdbHttpClient
     public static TmdbWatchProvidersResponseDataModel? GetWatchProvidersModelFromResponse(string responseJsonString)
     {
         return JsonSerializer.Deserialize<TmdbWatchProvidersResponseDataModel>(responseJsonString);
+    }
+    public static TmdbConfigurationCountriesResponseDataModel? GetConfigurationCountriesModelFromResponse(string responseJsonString)
+    {
+        TmdbConfigurationCountryDataModel[]? configurationCountries = JsonSerializer.Deserialize<TmdbConfigurationCountryDataModel[]>(responseJsonString);
+        if (configurationCountries == null)
+        {
+            return null;
+        }
+        TmdbConfigurationCountriesResponseDataModel countriesResponse = new TmdbConfigurationCountriesResponseDataModel { Countries = configurationCountries };
+        Iso31661ToEnglishCountryNameDictionaryCached = countriesResponse.GetConfigurationCountriesDictionary()?.iso31661ToEnglishCountryNameDictionary;
+        
+        return countriesResponse;
+    }
+    public static TmdbConfigurationLanguagesResponseDataModel? GetConfigurationLanguagesModelFromResponse(string responseJsonString)
+    {
+        TmdbConfigurationLanguageDataModel[]? configurationLanguages = JsonSerializer.Deserialize<TmdbConfigurationLanguageDataModel[]>(responseJsonString);
+        if (configurationLanguages == null)
+        {
+            return null;
+        }
+        TmdbConfigurationLanguagesResponseDataModel languagesResponse = new TmdbConfigurationLanguagesResponseDataModel { Languages = configurationLanguages };
+        Iso6391ToEnglishLanguageNameDictionaryCached = languagesResponse.GetConfigurationLanguagesDictionary()?.iso6391ToEnglishLanguageNameDictionary;
+
+        return languagesResponse;
     }
 }

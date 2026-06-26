@@ -32,6 +32,8 @@ public class TmdbEndpointsTests
     private string tmdbHttpClientTvSeriesIdResponse;
     private string tmdbHttpClientTvSeriesResponse;
     private string tmdbHttpClientTvSeriesWatchProvidersResponse;
+    private string tmdbHttpClientConfigurationCountriesResponse;
+    private string tmdbHttpClientConfigurationLanguagesResponse;
 
     public TmdbEndpointsTests(ITestOutputHelper output)
     {   
@@ -61,6 +63,8 @@ public class TmdbEndpointsTests
         string testTvSeriesIdDataFilename = "TmdbHttpClientTvSeriesIdResponse.json";
         string testTvSeriesDataFilename = "TmdbHttpClientTvSeriesResponse.json";
         string testTvSeriesWatchProvidersDataFilename = "TmdbHttpClientTvSeriesWatchProvidersResponse.json";
+        string testConfigurationCountriesDataFilename = "TmdbHttpClientConfigurationCountriesResponse.json";
+        string testConfigurationLanguagesDataFilename = "TmdbHttpClientConfigurationLanguagesResponse.json";
 
         using (StreamReader sr = File.OpenText($"../../../TestData/{testMovieCreditsDataFilename}"))
         {
@@ -259,6 +263,24 @@ public class TmdbEndpointsTests
         {
             throw new ArgumentException($"{testTvSeriesWatchProvidersDataFilename} is not valid test data.");
         }
+
+        using (StreamReader sr = File.OpenText($"../../../TestData/{testConfigurationCountriesDataFilename}"))
+        {
+            tmdbHttpClientConfigurationCountriesResponse = sr.ReadToEnd();
+        }
+        if (String.IsNullOrWhiteSpace(tmdbHttpClientConfigurationCountriesResponse))
+        {
+            throw new ArgumentException($"{testConfigurationCountriesDataFilename} is not valid test data.");
+        }
+
+        using (StreamReader sr = File.OpenText($"../../../TestData/{testConfigurationLanguagesDataFilename}"))
+        {
+            tmdbHttpClientConfigurationLanguagesResponse = sr.ReadToEnd();
+        }
+        if (String.IsNullOrWhiteSpace(tmdbHttpClientConfigurationLanguagesResponse))
+        {
+            throw new ArgumentException($"{testConfigurationLanguagesDataFilename} is not valid test data.");
+        }
     }
 
     [Fact]
@@ -311,6 +333,10 @@ public class TmdbEndpointsTests
         Assert.NotNull(tvSeriesResponse);
         TmdbWatchProvidersResponseDataModel? tvSeriesWatchProvidersResponse = TmdbHttpClient.GetWatchProvidersModelFromResponse(tmdbHttpClientTvSeriesWatchProvidersResponse);
         Assert.NotNull(tvSeriesWatchProvidersResponse);
+        TmdbConfigurationCountriesResponseDataModel? tvConfigurationCountriesResponse = TmdbHttpClient.GetConfigurationCountriesModelFromResponse(tmdbHttpClientConfigurationCountriesResponse);
+        Assert.NotNull(tvConfigurationCountriesResponse);
+        TmdbConfigurationLanguagesResponseDataModel? tvConfigurationLanguagesResponse = TmdbHttpClient.GetConfigurationLanguagesModelFromResponse(tmdbHttpClientConfigurationLanguagesResponse);
+        Assert.NotNull(tvConfigurationCountriesResponse);
 
         //_testOutputHelper.WriteLine("movieCreditsResponse: " + movieCreditsResponse);  // TODO: Remove me
         //_testOutputHelper.WriteLine("movieGenresResponse: " + movieGenresResponse);  // TODO: Remove me
@@ -334,6 +360,8 @@ public class TmdbEndpointsTests
         //_testOutputHelper.WriteLine("tvSeriesIdResponse: " + tvSeriesIdResponse);  // TODO: Remove me
         //_testOutputHelper.WriteLine("tvSeriesResponse: " + tvSeriesResponse);  // TODO: Remove me
         //_testOutputHelper.WriteLine("tvSeriesWatchProvidersResponse: " + tvSeriesWatchProvidersResponse);  // TODO: Remove me
+        //_testOutputHelper.WriteLine("tvConfigurationCountriesResponse: " + tvConfigurationCountriesResponse);  // TODO: Remove me
+        //_testOutputHelper.WriteLine("tvConfigurationLanguagesResponse: " + tvConfigurationLanguagesResponse);  // TODO: Remove me
 
         /*Assert.NotNull(suggestionsResponse1);
         Assert.NotNull(suggestionsResponse2);

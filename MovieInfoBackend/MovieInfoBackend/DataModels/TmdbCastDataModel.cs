@@ -19,7 +19,7 @@ public record TmdbCastDataModel
     [JsonPropertyName("popularity")]
     public required double Popularity { get; init; }
     [JsonPropertyName("profile_path")]
-    public required string ProfilePath { get; init; }
+    public string? ProfilePath { get; init; }
     [JsonPropertyName("cast_id")]  // Only in MovieCreditsResponse, not TvEpisodeCreditsResponse
     public int? CastId { get; init; }
     [JsonPropertyName("character")]

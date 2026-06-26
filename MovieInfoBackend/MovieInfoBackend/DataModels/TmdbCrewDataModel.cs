@@ -19,7 +19,7 @@ public record TmdbCrewDataModel
     [JsonPropertyName("popularity")]
     public required double Popularity { get; init; }
     [JsonPropertyName("profile_path")]
-    public required string ProfilePath { get; init; }
+    public string? ProfilePath { get; init; }
     [JsonPropertyName("credit_id")]
     public required string CreditId { get; init; }
     [JsonPropertyName("department")]

@@ -1,17 +1,13 @@
 meta {
-  name: Combined Credits (Person) copy
+  name: Countries
   type: http
-  seq: 2
+  seq: 3
 }
 
 get {
-  url: https://api.themoviedb.org/3/person/:person_id/combined_credits
+  url: https://api.themoviedb.org/3/configuration/countries
   body: none
   auth: inherit
-}
-
-params:path {
-  person_id: 11863
 }
 
 headers {

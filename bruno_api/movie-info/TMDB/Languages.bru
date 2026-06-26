@@ -1,17 +1,13 @@
 meta {
-  name: External IDs (Person)
+  name: Languages
   type: http
-  seq: 13
+  seq: 19
 }
 
 get {
-  url: https://api.themoviedb.org/3/person/:person_id/external_ids
+  url: https://api.themoviedb.org/3/configuration/languages
   body: none
   auth: inherit
-}
-
-params:path {
-  person_id: 11863
 }
 
 headers {

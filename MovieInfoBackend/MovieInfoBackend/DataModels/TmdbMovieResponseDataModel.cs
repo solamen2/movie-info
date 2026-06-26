@@ -15,7 +15,7 @@ public record TmdbMovieResponseDataModel
     [JsonPropertyName("genres")]
     public required TmdbGenreDataModel[]? Genres { get; init; }
     [JsonPropertyName("homepage")]
-    public string? Homepage { get; init; }
+    public required string Homepage { get; init; }
     [JsonPropertyName("id")]
     public required int Id { get; init; }
     [JsonPropertyName("imdb_id")]

@@ -1,0 +1,31 @@
+{
+  "Title": "Example TV Episode",
+  "Year": "2001",
+  "Rated": "13+",
+  "Released": "06 Nov 2001",
+  "Season": "6",
+  "Episode": "7",
+  "Runtime": "50 min",
+  "Genre": "Action, Drama, Fantasy",
+  "Director": "Example Creator Martinez",
+  "Writer": "Example Creator Martinez, Rebecca Kirshner, Steven S. DeKnight",
+  "Actors": "Example Smith, Example Actor 2, Emma Caulfield Ford",
+  "Plot": "Tons of interesting stuff happens, including lots of music.",
+  "Language": "English",
+  "Country": "United States",
+  "Awards": "N/A",
+  "Poster": "https://m.media-amazon.com/images/M/MV5BZTVkOWEzNzUtMjVkOS00Y2QzLTk2MGQtN2VkOGE3NTBjODI5XkEyXkFqcGdeQXVyMDM2NDM2MQ@@._V1_SX300.jpg",
+  "Ratings": [
+    {
+      "Source": "Internet Movie Database",
+      "Value": "9.7/10"
+    }
+  ],
+  "Metascore": "N/A",
+  "imdbRating": "9.7",
+  "imdbVotes": "11006",
+  "imdbID": "tt0533466",
+  "seriesID": "tt0118276",
+  "Type": "episode",
+  "Response": "True"
+}

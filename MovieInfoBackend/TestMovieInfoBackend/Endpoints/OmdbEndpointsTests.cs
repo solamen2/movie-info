@@ -13,6 +13,7 @@ public class OmdbEndpointsTests
 {
     private string omdbHttpClientMovieResponse;
     private string omdbHttpClientTvSeriesResponse;
+    private string omdbHttpClientTvEpisodeResponse;
 
     public OmdbEndpointsTests(ITestOutputHelper output)
     {        
@@ -22,6 +23,7 @@ public class OmdbEndpointsTests
 
         string testMovieDataFilename = "OmdbHttpClientMovieResponse.json";
         string testTvSeriesDataFilename = "OmdbHttpClientTvSeriesResponse.json";
+        string testTvEpisodeDataFilename = "OmdbHttpClientTvEpisodeResponse.json";
 
         using (StreamReader sr = File.OpenText($"../../../TestData/{testMovieDataFilename}"))
         {
@@ -40,6 +42,15 @@ public class OmdbEndpointsTests
         {
             throw new ArgumentException($"{testTvSeriesDataFilename} is not valid test data.");
         }
+
+        using (StreamReader sr = File.OpenText($"../../../TestData/{testTvEpisodeDataFilename}"))
+        {
+            omdbHttpClientTvEpisodeResponse = sr.ReadToEnd();
+        }
+        if (String.IsNullOrWhiteSpace(omdbHttpClientTvEpisodeResponse))
+        {
+            throw new ArgumentException($"{testTvEpisodeDataFilename} is not valid test data.");
+        }
     }
 
     [Fact]
@@ -52,9 +63,12 @@ public class OmdbEndpointsTests
         Assert.NotNull(movieResponse);
         OmdbResponseDataModel? tvSeriesResponse = OmdbHttpClient.GetModelFromResponse(omdbHttpClientTvSeriesResponse);
         Assert.NotNull(tvSeriesResponse);
+        OmdbResponseDataModel? tvEpisodeResponse = OmdbHttpClient.GetModelFromResponse(omdbHttpClientTvEpisodeResponse);
+        Assert.NotNull(tvEpisodeResponse);
 
         //_testOutputHelper.WriteLine("movieResponse:" + movieResponse.ToString());  // TODO: Remove me
         //_testOutputHelper.WriteLine("tvSeriesResponse: " + tvSeriesResponse.ToString());  // TODO: Remove me
+        //_testOutputHelper.WriteLine("tvEpisodeResponse: " + tvEpisodeResponse.ToString());  // TODO: Remove me
 
         /*Assert.NotNull(suggestionsResponse1);
         Assert.NotNull(suggestionsResponse2);
