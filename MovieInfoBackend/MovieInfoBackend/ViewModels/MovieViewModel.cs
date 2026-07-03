@@ -44,6 +44,7 @@ public record MovieViewModel
             this.TmdbGenres = String.Join(", ", tmdbMovieDataModel.Genres.Select(g => g.Name));
         }
         this.Homepage = tmdbMovieDataModel.Homepage;
+        this.TmdbId = tmdbMovieDataModel.Id;
         this.OriginCountries = null;
         FrozenDictionary<string, string>? iso31661ToEnglishCountryNameDictionary = configurationCountriesDictionary.iso31661ToEnglishCountryNameDictionary;
         if (tmdbMovieDataModel.OriginCountry != null && iso31661ToEnglishCountryNameDictionary != null)
@@ -98,6 +99,7 @@ public record MovieViewModel
     public long Budget { get; init; }
     public string? TmdbGenres { get; init; }
     public string Homepage { get; init; }
+    public int TmdbId { get; init; }
     public string? OriginCountries { get; init; }
     public string? OriginLanguage { get; init; }
     public string OriginalTitle { get; init; }
@@ -116,6 +118,6 @@ public record MovieViewModel
 
     public override string ToString()
     {
-        return $"ID: {ID}\nImage:\n*****\n{Image}\n*****\nImdbId: {ImdbId}\nName: {Name}\nImdbRank: {ImdbRank}\nKnownForActors: {KnownForActors}\nYear: {Year}\nRated: {Rated}\nOmdbGenres: {OmdbGenres}\nOmdbPlot: {OmdbPlot}\nAwards: {Awards}\nImdbRating: {ImdbRating}\nImdbVotes: {ImdbVotes}\nBoxOfficeString: {BoxOfficeString}\nBoxOfficeNumber: {BoxOfficeNumber}\nBudget: {Budget}\nTmdbGenres: {TmdbGenres}\nHomepage: {Homepage}OriginCountries: {OriginCountries}\nOriginLanguage: {OriginLanguage}\nOriginalTitle: {OriginalTitle}\nTmdbPlot: {TmdbPlot}\nProductionCompanies: {ProductionCompanies}\nProductionCountries: {ProductionCountries}\nReleaseDate: {ReleaseDate}\nRevenue: {Revenue}\nRuntime: {Runtime}\nSpokenLanguages: {SpokenLanguages}\nStatus: {Status}\nTagline: {Tagline}Cast:\n*****\n{string.Join("\n\n", Cast)}\n*****\nDirectors:\n*****\n{string.Join("\n\n", Directors)}\n*****\nWriters:\n*****\n{string.Join("\n\n", Writers)}";
+        return $"ID: {ID}\nImage:\n*****\n{Image}\n*****\nImdbId: {ImdbId}\nName: {Name}\nImdbRank: {ImdbRank}\nKnownForActors: {KnownForActors}\nYear: {Year}\nRated: {Rated}\nOmdbGenres: {OmdbGenres}\nOmdbPlot: {OmdbPlot}\nAwards: {Awards}\nImdbRating: {ImdbRating}\nImdbVotes: {ImdbVotes}\nBoxOfficeString: {BoxOfficeString}\nBoxOfficeNumber: {BoxOfficeNumber}\nBudget: {Budget}\nTmdbGenres: {TmdbGenres}\nHomepage: {Homepage}\nTmdbId: {TmdbId}\nOriginCountries: {OriginCountries}\nOriginLanguage: {OriginLanguage}\nOriginalTitle: {OriginalTitle}\nTmdbPlot: {TmdbPlot}\nProductionCompanies: {ProductionCompanies}\nProductionCountries: {ProductionCountries}\nReleaseDate: {ReleaseDate}\nRevenue: {Revenue}\nRuntime: {Runtime}\nSpokenLanguages: {SpokenLanguages}\nStatus: {Status}\nTagline: {Tagline}\nCast:\n*****\n{string.Join("\n\n", Cast)}\n*****\nDirectors:\n*****\n{string.Join("\n\n", Directors)}\n*****\nWriters:\n*****\n{string.Join("\n\n", Writers)}";
     }
 }
