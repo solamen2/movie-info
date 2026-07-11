@@ -12,10 +12,10 @@ public record PersonProfileImageViewModel
         this.Width = tmdbProfileDataModel.Width;
     }
 
-    public Guid ID { get; init; }
-    public int Height { get; init; }
-    public string FilePath { get; init;}
-    public int Width { get; init; }
+    public Guid ID { get; }
+    public int Height { get; }
+    public string FilePath { get; }
+    public int Width { get; }
 
     public override string ToString()
     {

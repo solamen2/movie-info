@@ -7,9 +7,9 @@ public record TmdbMovieCreditsResponseDataModel
     [JsonPropertyName("id")]
     public required int Id { get; init; }
     [JsonPropertyName("cast")]
-    public required TmdbCastDataModel[] Cast { get; init; }
+    public required TmdbMovieCastDataModel[] Cast { get; init; }
     [JsonPropertyName("crew")]
-    public required TmdbCrewDataModel[] Crew { get; init; }
+    public required TmdbMovieCrewDataModel[] Crew { get; init; }
 
 
     public override string ToString()

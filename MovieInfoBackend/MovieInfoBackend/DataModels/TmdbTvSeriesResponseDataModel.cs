@@ -65,7 +65,7 @@ public record TmdbTvSeriesResponseDataModel
     [JsonPropertyName("tagline")]
     public required string Tagline { get; init; }
     [JsonPropertyName("type")]
-    public required string Type { get; init; }
+    public required string Type { get; init; }  // NOTE: Currently one of: Documentary, News, Miniseries, Reality, Scripted, Talk Show, Video
     [JsonPropertyName("vote_average")]
     public required double VoteAverage { get; init; }
     [JsonPropertyName("vote_count")]

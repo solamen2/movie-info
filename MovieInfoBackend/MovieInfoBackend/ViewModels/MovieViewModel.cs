@@ -12,13 +12,14 @@ public record MovieViewModel
                           OmdbResponseDataModel omdbDataModel,
                           TmdbMovieResponseDataModel tmdbMovieDataModel, 
                           TmdbMovieCreditsResponseDataModel tmdbMovieCreditsDataModel,
+                          TmdbWatchProvidersResponseDataModel tmdbWatchProvidersDataModel,
                           ConfigurationCountriesDictionary configurationCountriesDictionary,
                           ConfigurationLanguagesDictionary configurationLanguagesDictionary)
     {
         this.ID = Guid.NewGuid();
         this.Image = suggestionViewModel.Image;
         this.ImdbId = suggestionViewModel.ItemID;
-        this.Name = suggestionViewModel.Name;
+        this.Title = suggestionViewModel.Name;
         this.ImdbRank = suggestionViewModel.Rank;
         this.KnownForActors = suggestionViewModel.KnownFor;
         this.Year = suggestionViewModel.Year;
@@ -68,56 +69,90 @@ public record MovieViewModel
         this.SpokenLanguages = String.Join(", ", tmdbMovieDataModel.SpokenLanguages.Select(sl => sl.EnglishName));
         this.Status = tmdbMovieDataModel.Status;
         this.Tagline = tmdbMovieDataModel.Tagline;
-        this.Cast = tmdbMovieCreditsDataModel.Cast.ToList()
-                        .Select(tcdm => new TmdbCastViewModel(tcdm))
+        this.Cast = tmdbMovieCreditsDataModel.Cast
+                        .Select(tcdm => new MovieCastViewModel(tcdm))
                         .ToList();
-        this.Directors = tmdbMovieCreditsDataModel.Crew.ToList()
+        this.Directors = tmdbMovieCreditsDataModel.Crew
                             .Where(tcdm => tcdm.Job == "Director")
-                            .Select(tcdm => new TmdbCrewViewModel(tcdm))
+                            .Select(tcdm => new MovieCrewViewModel(tcdm))
                             .ToList();
-        this.Writers = tmdbMovieCreditsDataModel.Crew.ToList()
+        this.Writers = tmdbMovieCreditsDataModel.Crew
                             .Where(tcdm => tcdm.Department == "Writing")
-                            .Select(tcdm => new TmdbCrewViewModel(tcdm))
+                            .Select(tcdm => new MovieCrewViewModel(tcdm))
                             .ToList();
+        TmdbWatchProviderCountryDataModel? tmdbWatchProviderCountryDataModel = tmdbWatchProvidersDataModel?.Results?.US;
+        if (tmdbWatchProviderCountryDataModel?.Buy != null)
+        {
+            this.WatchProvidersBuy = tmdbWatchProviderCountryDataModel.Buy
+                                        .Select(twpdm => new WatchProviderViewModel(twpdm))
+                                        .ToList();
+        }
+        else
+        {
+            this.WatchProvidersBuy = new List<WatchProviderViewModel>();
+        }
+        if (tmdbWatchProviderCountryDataModel?.Flatrate != null)
+        {
+            this.WatchProvidersFlatrate = tmdbWatchProviderCountryDataModel.Flatrate
+                                        .Select(twpdm => new WatchProviderViewModel(twpdm))
+                                        .ToList();
+        }
+        else
+        {
+            this.WatchProvidersFlatrate = new List<WatchProviderViewModel>();
+        }
+        if (tmdbWatchProviderCountryDataModel?.Rent != null)
+        {
+            this.WatchProvidersRent = tmdbWatchProviderCountryDataModel.Rent
+                                        .Select(twpdm => new WatchProviderViewModel(twpdm))
+                                        .ToList();
+        }
+        else
+        {
+            this.WatchProvidersRent = new List<WatchProviderViewModel>();
+        }
     }
 
-    public Guid ID { get; init; }
-    public SuggestionImageViewModel? Image { get; init; }
-    public string ImdbId { get; init; }
-    public string Name { get; init; }
-    public int? ImdbRank { get; init; }
-    public string KnownForActors { get; init; }
-    public int? Year { get; init; }
-    public string Rated { get; init; }
-    public string OmdbGenres { get; init; }
-    public string OmdbPlot { get; init; }
-    public string Awards { get; init; }
-    public string ImdbRating { get; init; }
-    public string ImdbVotes { get; init; }
-    public string? BoxOfficeString { get; init; }
-    public long BoxOfficeNumber { get; init; }
-    public long Budget { get; init; }
-    public string? TmdbGenres { get; init; }
-    public string Homepage { get; init; }
-    public int TmdbId { get; init; }
-    public string? OriginCountries { get; init; }
-    public string? OriginLanguage { get; init; }
-    public string OriginalTitle { get; init; }
-    public string TmdbPlot { get; init; }
-    public string ProductionCompanies { get; init; }
-    public string ProductionCountries { get; init; }
-    public string ReleaseDate { get; init; }  // NOTE: Actually a date, of course
-    public long Revenue { get; init; }
-    public int Runtime { get; init; }
-    public string SpokenLanguages { get; init; }
-    public string Status { get; init; }
-    public string Tagline { get; init; }
-    public List<TmdbCastViewModel> Cast { get; init; }
-    public List<TmdbCrewViewModel> Directors { get; init; }
-    public List<TmdbCrewViewModel> Writers { get; init; }
+    public Guid ID { get; }
+    public SuggestionImageViewModel? Image { get; }
+    public string ImdbId { get; }
+    public string Title { get; }
+    public int? ImdbRank { get; }
+    public string KnownForActors { get; }
+    public int? Year { get; }
+    public string Rated { get; }
+    public string OmdbGenres { get; }
+    public string OmdbPlot { get; }
+    public string Awards { get; }
+    public string ImdbRating { get; }
+    public string ImdbVotes { get; }
+    public string? BoxOfficeString { get; }
+    public long BoxOfficeNumber { get; }
+    public long Budget { get; }
+    public string? TmdbGenres { get; }
+    public string Homepage { get; }
+    public int TmdbId { get; }
+    public string? OriginCountries { get; }
+    public string? OriginLanguage { get; }
+    public string OriginalTitle { get; }
+    public string TmdbPlot { get; }
+    public string ProductionCompanies { get; }
+    public string ProductionCountries { get; }
+    public string ReleaseDate { get; }  // NOTE: Actually a date, of course
+    public long Revenue { get; }
+    public int Runtime { get; }
+    public string SpokenLanguages { get; }
+    public string Status { get; }
+    public string Tagline { get; }
+    public List<MovieCastViewModel> Cast { get; }
+    public List<MovieCrewViewModel> Directors { get; }
+    public List<MovieCrewViewModel> Writers { get; }
+    public List<WatchProviderViewModel> WatchProvidersBuy { get; }
+    public List<WatchProviderViewModel> WatchProvidersFlatrate { get; }
+    public List<WatchProviderViewModel> WatchProvidersRent { get; }
 
     public override string ToString()
     {
-        return $"ID: {ID}\nImage:\n*****\n{Image}\n*****\nImdbId: {ImdbId}\nName: {Name}\nImdbRank: {ImdbRank}\nKnownForActors: {KnownForActors}\nYear: {Year}\nRated: {Rated}\nOmdbGenres: {OmdbGenres}\nOmdbPlot: {OmdbPlot}\nAwards: {Awards}\nImdbRating: {ImdbRating}\nImdbVotes: {ImdbVotes}\nBoxOfficeString: {BoxOfficeString}\nBoxOfficeNumber: {BoxOfficeNumber}\nBudget: {Budget}\nTmdbGenres: {TmdbGenres}\nHomepage: {Homepage}\nTmdbId: {TmdbId}\nOriginCountries: {OriginCountries}\nOriginLanguage: {OriginLanguage}\nOriginalTitle: {OriginalTitle}\nTmdbPlot: {TmdbPlot}\nProductionCompanies: {ProductionCompanies}\nProductionCountries: {ProductionCountries}\nReleaseDate: {ReleaseDate}\nRevenue: {Revenue}\nRuntime: {Runtime}\nSpokenLanguages: {SpokenLanguages}\nStatus: {Status}\nTagline: {Tagline}\nCast:\n*****\n{string.Join("\n\n", Cast)}\n*****\nDirectors:\n*****\n{string.Join("\n\n", Directors)}\n*****\nWriters:\n*****\n{string.Join("\n\n", Writers)}";
+        return $"ID: {ID}\nImage:\n*****\n{Image}\n*****\nImdbId: {ImdbId}\nTitle: {Title}\nImdbRank: {ImdbRank}\nKnownForActors: {KnownForActors}\nYear: {Year}\nRated: {Rated}\nOmdbGenres: {OmdbGenres}\nOmdbPlot: {OmdbPlot}\nAwards: {Awards}\nImdbRating: {ImdbRating}\nImdbVotes: {ImdbVotes}\nBoxOfficeString: {BoxOfficeString}\nBoxOfficeNumber: {BoxOfficeNumber}\nBudget: {Budget}\nTmdbGenres: {TmdbGenres}\nHomepage: {Homepage}\nTmdbId: {TmdbId}\nOriginCountries: {OriginCountries}\nOriginLanguage: {OriginLanguage}\nOriginalTitle: {OriginalTitle}\nTmdbPlot: {TmdbPlot}\nProductionCompanies: {ProductionCompanies}\nProductionCountries: {ProductionCountries}\nReleaseDate: {ReleaseDate}\nRevenue: {Revenue}\nRuntime: {Runtime}\nSpokenLanguages: {SpokenLanguages}\nStatus: {Status}\nTagline: {Tagline}\nCast:\n*****\n{string.Join("\n\n", Cast)}\n*****\nDirectors:\n*****\n{string.Join("\n\n", Directors)}\n*****\nWriters:\n*****\n{string.Join("\n\n", Writers)}\n*****\nWatchProvidersBuy:\n*****\n{string.Join("\n\n", WatchProvidersBuy)}\n*****\nWatchProvidersFlatrate:\n*****\n{string.Join("\n\n", WatchProvidersFlatrate)}\n*****\nWatchProvidersRent:\n*****\n{string.Join("\n\n", WatchProvidersRent)}";
     }
 }

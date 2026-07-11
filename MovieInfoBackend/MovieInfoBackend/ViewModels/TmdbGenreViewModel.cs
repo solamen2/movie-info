@@ -4,14 +4,20 @@ namespace MovieInfoBackend.DataModels;
 
 public record TmdbGenreViewModel
 {
-    [JsonPropertyName("id")]
-    public required int Id { get; init; }
-    [JsonPropertyName("name")]
-    public required string Name { get; init; }
+    public TmdbGenreViewModel(TmdbGenreDataModel tmdbGenreDataModel)
+    {
+        this.ID = Guid.NewGuid();
+        this.TmdbId = tmdbGenreDataModel.Id;
+        this.Name = tmdbGenreDataModel.Name;
+    }
+    
+    public Guid ID { get; }
+    public int TmdbId { get; }
+    public string Name { get; }
 
     public override string ToString()
     {
-        return $"Id: {Id}\nName: {Name}";
+        return $"ID: {ID}\nTmdbId: {TmdbId}\nName: {Name}";
     }
 
 }

@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace MovieInfoBackend.DataModels;
 
-public record TmdbTvSeriesAggregateCastCreditRoleDataModel
+public record TmdbTvSeriesAggregateCastRoleDataModel
 {
     [JsonPropertyName("credit_id")]
     public required string CreditId { get; init; }

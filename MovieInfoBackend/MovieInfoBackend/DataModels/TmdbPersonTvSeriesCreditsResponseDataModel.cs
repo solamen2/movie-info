@@ -5,9 +5,9 @@ namespace MovieInfoBackend.DataModels;
 public record TmdbPersonTvSeriesCreditsResponseDataModel
 {
     [JsonPropertyName("cast")]
-    public required TmdbPersonTvSeriesCastCreditDataModel[] Cast { get; init; }
+    public required TmdbPersonTvSeriesCastDataModel[] Cast { get; init; }
     [JsonPropertyName("crew")]
-    public required TmdbPersonTvSeriesCrewCreditDataModel[] Crew { get; init; }
+    public required TmdbPersonTvSeriesCrewDataModel[] Crew { get; init; }
     [JsonPropertyName("id")]
     public required int Id { get; init; }
 

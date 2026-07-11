@@ -19,9 +19,9 @@ public record SuggestionImageViewModel
         }
     }
     
-    public int Height { get; init; }
-    public string ImageURL { get; init; }
-    public int Width { get; init; }
+    public int Height { get; }
+    public string ImageURL { get; }
+    public int Width { get; }
 
     public override string ToString()
     {

@@ -26,44 +26,44 @@ public record PersonViewModel
         this.KnownForDepartment = tmdbPersonDataModel.KnownForDepartment;
         this.PlaceOfBirth = tmdbPersonDataModel.PlaceOfBirth;
         this.ProfilePath = tmdbPersonDataModel.ProfilePath;
-        this.MovieCastCredits = tmdbPersonMovieCreditsDataModel.Cast.ToList()
-                                    .Select(tpmcdm => new PersonMovieCastCreditViewModel(tpmcdm))
+        this.MovieCastCredits = tmdbPersonMovieCreditsDataModel.Cast
+                                    .Select(tpmcdm => new PersonMovieCastViewModel(tpmcdm))
                                     .ToList();
-        this.MovieCrewCredits = tmdbPersonMovieCreditsDataModel.Crew.ToList()
-                                    .Select(tpmcdm => new PersonMovieCrewCreditViewModel(tpmcdm))
+        this.MovieCrewCredits = tmdbPersonMovieCreditsDataModel.Crew
+                                    .Select(tpmcdm => new PersonMovieCrewViewModel(tpmcdm))
                                     .ToList();
-        this.TvSeriesCastCredits = tmdbPersonTvSeriesCreditsDataModel.Cast.ToList()
-                                        .Select(tptscdm => new PersonTvSeriesCastCreditViewModel(tptscdm))
+        this.TvSeriesCastCredits = tmdbPersonTvSeriesCreditsDataModel.Cast
+                                        .Select(tptscdm => new PersonTvSeriesCastViewModel(tptscdm))
                                         .ToList();
-        this.TvSeriesCrewCredits = tmdbPersonTvSeriesCreditsDataModel.Crew.ToList()
-                                        .Select(tptscdm => new PersonTvSeriesCrewCreditViewModel(tptscdm))
+        this.TvSeriesCrewCredits = tmdbPersonTvSeriesCreditsDataModel.Crew
+                                        .Select(tptscdm => new PersonTvSeriesCrewViewModel(tptscdm))
                                         .ToList();
-        this.ProfileImages = tmdbPersonImagesDataModel.Profiles.ToList()
+        this.ProfileImages = tmdbPersonImagesDataModel.Profiles
                                 .Select(tpidm => new PersonProfileImageViewModel(tpidm))
                                 .ToList();
     }
 
-    public Guid ID { get; init; }
-    public SuggestionImageViewModel? Image { get; init; }
-    public string ImdbId { get; init; }
-    public string Name { get; init; }
-    public int? ImdbRank { get; init; }
-    public string KnownForMovies { get; init; }
-    public List<string> AlsoKnownAs { get; init; }
-    public string Biography { get; init; }
-    public string Birthday { get; init; }  // Actually a date, of course
-    public string Deathday { get; init; }  // Actually a date, of course
-    public TmdbGenderType Gender { get; init; }
-    public string Homepage { get; init; }
-    public int TmdbId { get; init; }
-    public string KnownForDepartment { get; init; }
-    public string PlaceOfBirth { get; init; }
-    public string ProfilePath { get; init; }
-    public List<PersonMovieCastCreditViewModel> MovieCastCredits { get; init; }
-    public List<PersonMovieCrewCreditViewModel> MovieCrewCredits { get; init; }
-    public List<PersonTvSeriesCastCreditViewModel> TvSeriesCastCredits { get; init; }
-    public List<PersonTvSeriesCrewCreditViewModel> TvSeriesCrewCredits { get; init; }
-    public List<PersonProfileImageViewModel> ProfileImages { get; init; }
+    public Guid ID { get; }
+    public SuggestionImageViewModel? Image { get; }
+    public string ImdbId { get; }
+    public string Name { get; }
+    public int? ImdbRank { get; }
+    public string KnownForMovies { get; }
+    public List<string> AlsoKnownAs { get; }
+    public string Biography { get; }
+    public string Birthday { get; }  // Actually a date, of course
+    public string Deathday { get; }  // Actually a date, of course
+    public TmdbGenderType Gender { get; }
+    public string Homepage { get; }
+    public int TmdbId { get; }
+    public string KnownForDepartment { get; }
+    public string PlaceOfBirth { get; }
+    public string ProfilePath { get; }
+    public List<PersonMovieCastViewModel> MovieCastCredits { get; }
+    public List<PersonMovieCrewViewModel> MovieCrewCredits { get; }
+    public List<PersonTvSeriesCastViewModel> TvSeriesCastCredits { get; }
+    public List<PersonTvSeriesCrewViewModel> TvSeriesCrewCredits { get; }
+    public List<PersonProfileImageViewModel> ProfileImages { get; }
 
     public override string ToString()
     {

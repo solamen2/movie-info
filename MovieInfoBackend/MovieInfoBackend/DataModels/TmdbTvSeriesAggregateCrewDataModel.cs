@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace MovieInfoBackend.DataModels;
 
-public record TmdbTvSeriesAggregateCastCreditDataModel
+public record TmdbTvSeriesAggregateCrewDataModel
 {
     [JsonPropertyName("adult")]
     public required bool Adult { get; init; }
@@ -20,15 +20,15 @@ public record TmdbTvSeriesAggregateCastCreditDataModel
     public required double Popularity { get; init; }
     [JsonPropertyName("profile_path")]
     public required string ProfilePath { get; init; }
-    [JsonPropertyName("roles")]
-    public required TmdbTvSeriesAggregateCastCreditRoleDataModel[] Roles { get; init; }
+    [JsonPropertyName("jobs")]
+    public required TmdbTvSeriesAggregateCrewJobDataModel[] Jobs { get; init; }
+    [JsonPropertyName("department")]
+    public required string Department { get; init; }
     [JsonPropertyName("total_episode_count")]
     public required int TotalEpisodeCount { get; init; }
-    [JsonPropertyName("order")]
-    public required int Order { get; init; }
 
     public override string ToString()
     {
-        return $"Adult: {Adult}\nGender: {Gender}\nId: {Id}\nKnownForDepartment: {KnownForDepartment}\nName: {Name}\nOriginalName: {OriginalName}\nPopularity: {Popularity}\nProfilePath: {ProfilePath}\nRoles:\n*****\n{string.Join("\n\n", Roles)}\n*****\nTotalEpisodeCount: {TotalEpisodeCount}\nOrder: {Order}";
+        return $"Adult: {Adult}\nGender: {Gender}\nId: {Id}\nKnownForDepartment: {KnownForDepartment}\nName: {Name}\nOriginalName: {OriginalName}\nPopularity: {Popularity}\nProfilePath: {ProfilePath}\nJobs:\n*****\n{string.Join("\n\n", Jobs)}\n*****\nDepartment: {Department}\nTotalEpisodeCount: {TotalEpisodeCount}";
     }
 }
