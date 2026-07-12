@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace MovieInfoBackend.DataModels;
 
-public record TmdbTvSeriesEpisodeDataModel
+public record TmdbTvSeasonEpisodeDataModel
 {
     [JsonPropertyName("air_date")]
     public string? AirDate { get; init; }
@@ -31,9 +31,9 @@ public record TmdbTvSeriesEpisodeDataModel
     [JsonPropertyName("vote_count")]
     public required int VoteCount { get; init; }
     [JsonPropertyName("crew")]
-    public required TmdbTvSeriesEpisodeCrewDataModel[] Crew { get; init; }
+    public required TmdbTvSeasonEpisodeCrewDataModel[] Crew { get; init; }
     [JsonPropertyName("guest_stars")]
-    public required TmdbGuestStarDataModel[] GuestStars { get; init; }
+    public required TmdbTvSeasonEpisodeGuestStarDataModel[] GuestStars { get; init; }
 
     public override string ToString()
     {

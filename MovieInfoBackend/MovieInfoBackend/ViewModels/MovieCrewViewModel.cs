@@ -9,6 +9,7 @@ public record MovieCrewViewModel
         this.ID = Guid.NewGuid();
         this.Gender = (TmdbGenderType)movieCrewDataModel.Gender;
         this.TmdbId = movieCrewDataModel.Id;
+        this.KnownForDepartment = movieCrewDataModel.KnownForDepartment;
         this.Name = movieCrewDataModel.Name;
         this.OriginalName = movieCrewDataModel.OriginalName;
         this.Popularity = movieCrewDataModel.Popularity;
@@ -20,6 +21,7 @@ public record MovieCrewViewModel
     public Guid ID { get; }
     public TmdbGenderType Gender { get; }
     public int TmdbId { get; }
+    public string KnownForDepartment { get; }
     public string Name { get; }
     public string OriginalName { get; }
     public double Popularity { get; }
@@ -29,6 +31,6 @@ public record MovieCrewViewModel
 
     public override string ToString()
     {
-        return $"ID: {ID}\nGender: {Gender}\nTmdbId: {TmdbId}\nName: {Name}\nOriginalName: {OriginalName}\nPopularity: {Popularity}\nProfilePath: {ProfilePath}\nDepartment: {Department}\nJob: {Job}";
+        return $"ID: {ID}\nGender: {Gender}\nTmdbId: {TmdbId}\nKnownForDepartment: {KnownForDepartment}\nName: {Name}\nOriginalName: {OriginalName}\nPopularity: {Popularity}\nProfilePath: {ProfilePath}\nDepartment: {Department}\nJob: {Job}";
     }
 }

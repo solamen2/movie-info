@@ -27,11 +27,11 @@ public record TmdbTvSeriesResponseDataModel
     [JsonPropertyName("last_air_date")]
     public string? LastAirDate { get; init; }
     [JsonPropertyName("last_episode_to_air")]
-    public TmdbTvEpisodeDataModel? LastEpisodeToAir { get; init; }
+    public TmdbIndividualTvEpisodeDataModel? LastEpisodeToAir { get; init; }
     [JsonPropertyName("name")]
     public required string Name { get; init; }
     [JsonPropertyName("next_episode_to_air")]
-    public TmdbTvEpisodeDataModel? NextEpisodeToAir { get; init; }
+    public TmdbIndividualTvEpisodeDataModel? NextEpisodeToAir { get; init; }
     [JsonPropertyName("networks")]
     public required TmdbNetworkDataModel[] Networks { get; init; }
     [JsonPropertyName("number_of_episodes")]

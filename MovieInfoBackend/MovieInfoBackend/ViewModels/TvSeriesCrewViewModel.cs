@@ -4,23 +4,25 @@ namespace MovieInfoBackend.ViewModels;
 
 public record TvSeriesCrewViewModel
 {
-    public TvSeriesCrewViewModel(TmdbTvSeriesAggregateCrewDataModel crewDataModel)
+    public TvSeriesCrewViewModel(TmdbTvSeriesAggregateCrewDataModel tmdbTvSeriesAggregateCrewDataModel)
     {
         this.ID = Guid.NewGuid();
-        this.Gender = (TmdbGenderType)crewDataModel.Gender;
-        this.TmdbId = crewDataModel.Id;
-        this.Name = crewDataModel.Name;
-        this.OriginalName = crewDataModel.OriginalName;
-        this.Popularity = crewDataModel.Popularity;
-        this.ProfilePath = crewDataModel.ProfilePath;
-        this.Jobs = crewDataModel.Jobs.Select(ttsacjdm => ttsacjdm.Job).ToList();
-        this.Department = crewDataModel.Department;
-        this.TotalEpisodeCount = crewDataModel.TotalEpisodeCount;
+        this.Gender = (TmdbGenderType)tmdbTvSeriesAggregateCrewDataModel.Gender;
+        this.TmdbId = tmdbTvSeriesAggregateCrewDataModel.Id;
+        this.KnownForDepartment = tmdbTvSeriesAggregateCrewDataModel.KnownForDepartment;
+        this.Name = tmdbTvSeriesAggregateCrewDataModel.Name;
+        this.OriginalName = tmdbTvSeriesAggregateCrewDataModel.OriginalName;
+        this.Popularity = tmdbTvSeriesAggregateCrewDataModel.Popularity;
+        this.ProfilePath = tmdbTvSeriesAggregateCrewDataModel.ProfilePath;
+        this.Jobs = tmdbTvSeriesAggregateCrewDataModel.Jobs.Select(ttsacjdm => ttsacjdm.Job).ToList();
+        this.Department = tmdbTvSeriesAggregateCrewDataModel.Department;
+        this.TotalEpisodeCount = tmdbTvSeriesAggregateCrewDataModel.TotalEpisodeCount;
     }
 
     public Guid ID { get; }
     public TmdbGenderType Gender { get; }
     public int TmdbId { get; }
+    public string KnownForDepartment { get; }
     public string Name { get; }
     public string OriginalName { get; }
     public double Popularity { get; }
@@ -31,6 +33,6 @@ public record TvSeriesCrewViewModel
 
     public override string ToString()
     {
-        return $"ID: {ID}\nGender: {Gender}\nTmdbId: {TmdbId}\nName: {Name}\nOriginalName: {OriginalName}\nPopularity: {Popularity}\nProfilePath: {ProfilePath}\nJobs:{string.Join(",", Jobs)}\nDepartment: {Department}\nTotalEpisodeCount: {TotalEpisodeCount}";
+        return $"ID: {ID}\nGender: {Gender}\nTmdbId: {TmdbId}\nKnownForDepartment: {KnownForDepartment}\nName: {Name}\nOriginalName: {OriginalName}\nPopularity: {Popularity}\nProfilePath: {ProfilePath}\nJobs:{string.Join(",", Jobs)}\nDepartment: {Department}\nTotalEpisodeCount: {TotalEpisodeCount}";
     }
 }

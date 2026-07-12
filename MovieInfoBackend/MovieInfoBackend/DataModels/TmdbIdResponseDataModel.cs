@@ -11,7 +11,7 @@ public record TmdbIdResponseDataModel
     [JsonPropertyName("tv_results")]
     public TmdbTvSeriesIdDataModel[]? TvResults { get; init; }
     [JsonPropertyName("tv_episode_results")]
-    public TmdbTvEpisodeDataModel[]? TvEpisodeResults { get; init; }
+    public TmdbIndividualTvEpisodeDataModel[]? TvEpisodeResults { get; init; }
     [JsonPropertyName("tv_season_results")]
     public TmdbTvSeasonIdDataModel[]? TvSeasonResults { get; init; }
 

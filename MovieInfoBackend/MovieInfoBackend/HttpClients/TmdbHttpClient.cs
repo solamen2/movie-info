@@ -77,6 +77,10 @@ public class TmdbHttpClient
     {
         return JsonSerializer.Deserialize<TmdbPersonTvSeriesCreditsResponseDataModel>(responseJsonString);
     }
+    public static TmdbTvEpisodeResponseDataModel? GetTvEpisodeModelFromResponse(string responseJsonString)
+    {
+        return JsonSerializer.Deserialize<TmdbTvEpisodeResponseDataModel>(responseJsonString);
+    }
     public static TmdbTvEpisodeCreditsResponseDataModel? GetTvEpisodeCreditsModelFromResponse(string responseJsonString)
     {
         return JsonSerializer.Deserialize<TmdbTvEpisodeCreditsResponseDataModel>(responseJsonString);

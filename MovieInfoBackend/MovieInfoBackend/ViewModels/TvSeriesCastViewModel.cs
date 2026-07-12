@@ -4,18 +4,18 @@ namespace MovieInfoBackend.ViewModels;
 
 public record TvSeriesCastViewModel
 {    
-    public TvSeriesCastViewModel(TmdbTvSeriesAggregateCastDataModel castDataModel)
+    public TvSeriesCastViewModel(TmdbTvSeriesAggregateCastDataModel tmdbTvSeriesAggregateCastDataModel)
     {
         this.ID = Guid.NewGuid();
-        this.Gender = (TmdbGenderType)castDataModel.Gender;
-        this.TmdbId = castDataModel.Id;
-        this.Name = castDataModel.Name;
-        this.OriginalName = castDataModel.OriginalName;
-        this.Popularity = castDataModel.Popularity;
-        this.ProfilePath = castDataModel.ProfilePath;
-        this.Characters = castDataModel.Roles.Select(ttsacrdm => ttsacrdm.Character).ToList();
-        this.TotalEpisodeCount = castDataModel.TotalEpisodeCount;
-        this.BilledOrder = castDataModel.Order;
+        this.Gender = (TmdbGenderType)tmdbTvSeriesAggregateCastDataModel.Gender;
+        this.TmdbId = tmdbTvSeriesAggregateCastDataModel.Id;
+        this.Name = tmdbTvSeriesAggregateCastDataModel.Name;
+        this.OriginalName = tmdbTvSeriesAggregateCastDataModel.OriginalName;
+        this.Popularity = tmdbTvSeriesAggregateCastDataModel.Popularity;
+        this.ProfilePath = tmdbTvSeriesAggregateCastDataModel.ProfilePath;
+        this.Characters = tmdbTvSeriesAggregateCastDataModel.Roles.Select(ttsacrdm => ttsacrdm.Character).ToList();
+        this.TotalEpisodeCount = tmdbTvSeriesAggregateCastDataModel.TotalEpisodeCount;
+        this.BilledOrder = tmdbTvSeriesAggregateCastDataModel.Order;
     }
 
     public Guid ID { get; }

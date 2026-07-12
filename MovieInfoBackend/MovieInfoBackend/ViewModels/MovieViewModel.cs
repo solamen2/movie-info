@@ -42,7 +42,7 @@ public record MovieViewModel
         this.TmdbGenres = null;
         if (tmdbMovieDataModel.Genres != null)
         {
-            this.TmdbGenres = String.Join(", ", tmdbMovieDataModel.Genres.Select(g => g.Name));
+            this.TmdbGenres = String.Join(", ", tmdbMovieDataModel.Genres.Select(tgdm => tgdm.Name));
         }
         this.Homepage = tmdbMovieDataModel.Homepage;
         this.TmdbId = tmdbMovieDataModel.Id;
@@ -61,24 +61,24 @@ public record MovieViewModel
         }
         this.OriginalTitle = tmdbMovieDataModel.OriginalTitle;
         this.TmdbPlot = tmdbMovieDataModel.Overview;
-        this.ProductionCompanies = String.Join("; ", tmdbMovieDataModel.ProductionCompanies.Select(pc => pc.Name));
-        this.ProductionCountries = String.Join(", ", tmdbMovieDataModel.ProductionCountries.Select(pc => pc.Name));
+        this.ProductionCompanies = String.Join("; ", tmdbMovieDataModel.ProductionCompanies.Select(tpcdm => tpcdm.Name));
+        this.ProductionCountries = String.Join(", ", tmdbMovieDataModel.ProductionCountries.Select(tpcdm => tpcdm.Name));
         this.ReleaseDate = tmdbMovieDataModel.ReleaseDate;
         this.Revenue = tmdbMovieDataModel.Revenue;
         this.Runtime = tmdbMovieDataModel.Runtime;
-        this.SpokenLanguages = String.Join(", ", tmdbMovieDataModel.SpokenLanguages.Select(sl => sl.EnglishName));
+        this.SpokenLanguages = String.Join(", ", tmdbMovieDataModel.SpokenLanguages.Select(tsldm => tsldm.EnglishName));
         this.Status = tmdbMovieDataModel.Status;
         this.Tagline = tmdbMovieDataModel.Tagline;
         this.Cast = tmdbMovieCreditsDataModel.Cast
-                        .Select(tcdm => new MovieCastViewModel(tcdm))
+                        .Select(tmcdm => new MovieCastViewModel(tmcdm))
                         .ToList();
         this.Directors = tmdbMovieCreditsDataModel.Crew
-                            .Where(tcdm => tcdm.Job == "Director")
-                            .Select(tcdm => new MovieCrewViewModel(tcdm))
+                            .Where(tmcdm => tmcdm.Job == "Director")
+                            .Select(tmcdm => new MovieCrewViewModel(tmcdm))
                             .ToList();
         this.Writers = tmdbMovieCreditsDataModel.Crew
-                            .Where(tcdm => tcdm.Department == "Writing")
-                            .Select(tcdm => new MovieCrewViewModel(tcdm))
+                            .Where(tmcdm => tmcdm.Department == "Writing")
+                            .Select(tmcdm => new MovieCrewViewModel(tmcdm))
                             .ToList();
         TmdbWatchProviderCountryDataModel? tmdbWatchProviderCountryDataModel = tmdbWatchProvidersDataModel?.Results?.US;
         if (tmdbWatchProviderCountryDataModel?.Buy != null)

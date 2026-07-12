@@ -5,10 +5,10 @@ namespace MovieInfoBackend.ViewModels;
 public record PersonViewModel
 {
     public PersonViewModel(SuggestionViewModel suggestionViewModel, 
-                          TmdbPersonResponseDataModel tmdbPersonDataModel, 
-                          TmdbPersonMovieCreditsResponseDataModel tmdbPersonMovieCreditsDataModel,
-                          TmdbPersonTvSeriesCreditsResponseDataModel tmdbPersonTvSeriesCreditsDataModel,
-                          TmdbPersonImagesResponseDataModel tmdbPersonImagesDataModel)
+                           TmdbPersonResponseDataModel tmdbPersonDataModel, 
+                           TmdbPersonMovieCreditsResponseDataModel tmdbPersonMovieCreditsDataModel,
+                           TmdbPersonTvSeriesCreditsResponseDataModel tmdbPersonTvSeriesCreditsDataModel,
+                           TmdbPersonImagesResponseDataModel tmdbPersonImagesDataModel)
     {
         this.ID = Guid.NewGuid();
         this.Image = suggestionViewModel.Image;
@@ -39,7 +39,7 @@ public record PersonViewModel
                                         .Select(tptscdm => new PersonTvSeriesCrewViewModel(tptscdm))
                                         .ToList();
         this.ProfileImages = tmdbPersonImagesDataModel.Profiles
-                                .Select(tpidm => new PersonProfileImageViewModel(tpidm))
+                                .Select(tpdm => new PersonProfileImageViewModel(tpdm))
                                 .ToList();
     }
 

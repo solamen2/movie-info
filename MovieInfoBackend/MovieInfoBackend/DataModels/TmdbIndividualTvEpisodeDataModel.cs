@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace MovieInfoBackend.DataModels;
 
-public record TmdbTvEpisodeDataModel
+public record TmdbIndividualTvEpisodeDataModel
 {
     [JsonPropertyName("id")]
     public required int Id { get; init; }

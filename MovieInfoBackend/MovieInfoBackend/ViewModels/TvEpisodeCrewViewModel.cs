@@ -4,22 +4,24 @@ namespace MovieInfoBackend.ViewModels;
 
 public record TvEpisodeCrewViewModel
 {
-    public TvEpisodeCrewViewModel(TmdbTvEpisodeCrewDataModel tvEpisodeCrewDataModel)
+    public TvEpisodeCrewViewModel(TmdbTvEpisodeCreditsCrewDataModel tmdbTvEpisodeCreditsCrewDataModel)
     {
         this.ID = Guid.NewGuid();
-        this.Gender = (TmdbGenderType)tvEpisodeCrewDataModel.Gender;
-        this.TmdbId = tvEpisodeCrewDataModel.Id;
-        this.Name = tvEpisodeCrewDataModel.Name;
-        this.OriginalName = tvEpisodeCrewDataModel.OriginalName;
-        this.Popularity = tvEpisodeCrewDataModel.Popularity;
-        this.ProfilePath = tvEpisodeCrewDataModel.ProfilePath;
-        this.Department = tvEpisodeCrewDataModel.Department;
-        this.Job = tvEpisodeCrewDataModel.Job;
+        this.Gender = (TmdbGenderType)tmdbTvEpisodeCreditsCrewDataModel.Gender;
+        this.TmdbId = tmdbTvEpisodeCreditsCrewDataModel.Id;
+        this.KnownForDepartment = tmdbTvEpisodeCreditsCrewDataModel.KnownForDepartment;
+        this.Name = tmdbTvEpisodeCreditsCrewDataModel.Name;
+        this.OriginalName = tmdbTvEpisodeCreditsCrewDataModel.OriginalName;
+        this.Popularity = tmdbTvEpisodeCreditsCrewDataModel.Popularity;
+        this.ProfilePath = tmdbTvEpisodeCreditsCrewDataModel.ProfilePath;
+        this.Department = tmdbTvEpisodeCreditsCrewDataModel.Department;
+        this.Job = tmdbTvEpisodeCreditsCrewDataModel.Job;
     }
 
     public Guid ID { get; }
     public TmdbGenderType Gender { get; }
     public int TmdbId { get; }
+    public string KnownForDepartment { get; }
     public string Name { get; }
     public string OriginalName { get; }
     public double Popularity { get; }
@@ -29,6 +31,6 @@ public record TvEpisodeCrewViewModel
 
     public override string ToString()
     {
-        return $"ID: {ID}\nGender: {Gender}\nTmdbId: {TmdbId}\nName: {Name}\nOriginalName: {OriginalName}\nPopularity: {Popularity}\nProfilePath: {ProfilePath}\nDepartment: {Department}\nJob: {Job}";
+        return $"ID: {ID}\nGender: {Gender}\nTmdbId: {TmdbId}\nKnownForDepartment: {KnownForDepartment}\nName: {Name}\nOriginalName: {OriginalName}\nPopularity: {Popularity}\nProfilePath: {ProfilePath}\nDepartment: {Department}\nJob: {Job}";
     }
 }

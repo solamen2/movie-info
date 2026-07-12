@@ -4,17 +4,17 @@ namespace MovieInfoBackend.ViewModels;
 
 public record TvEpisodeCastViewModel
 {    
-    public TvEpisodeCastViewModel(TmdbTvEpisodeCastDataModel tvEpisodeCastDataModel)
+    public TvEpisodeCastViewModel(TmdbTvEpisodeCreditsCastDataModel tmdbTvEpisodeCreditsCastDataModel)
     {
         this.ID = Guid.NewGuid();
-        this.Gender = (TmdbGenderType)tvEpisodeCastDataModel.Gender;
-        this.TmdbId = tvEpisodeCastDataModel.Id;
-        this.Name = tvEpisodeCastDataModel.Name;
-        this.OriginalName = tvEpisodeCastDataModel.OriginalName;
-        this.Popularity = tvEpisodeCastDataModel.Popularity;
-        this.ProfilePath = tvEpisodeCastDataModel.ProfilePath;
-        this.Character = tvEpisodeCastDataModel.Character;
-        this.BilledOrder = tvEpisodeCastDataModel.Order;
+        this.Gender = (TmdbGenderType)tmdbTvEpisodeCreditsCastDataModel.Gender;
+        this.TmdbId = tmdbTvEpisodeCreditsCastDataModel.Id;
+        this.Name = tmdbTvEpisodeCreditsCastDataModel.Name;
+        this.OriginalName = tmdbTvEpisodeCreditsCastDataModel.OriginalName;
+        this.Popularity = tmdbTvEpisodeCreditsCastDataModel.Popularity;
+        this.ProfilePath = tmdbTvEpisodeCreditsCastDataModel.ProfilePath;
+        this.Character = tmdbTvEpisodeCreditsCastDataModel.Character;
+        this.BilledOrder = tmdbTvEpisodeCreditsCastDataModel.Order;
     }
 
     public Guid ID { get; }

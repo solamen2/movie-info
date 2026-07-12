@@ -10,12 +10,12 @@ public record TvSeriesViewModel
 {
     // TODO: Don't forget to only download all episodes when searching for an episode title in a TV show
     public TvSeriesViewModel(SuggestionViewModel suggestionViewModel, 
-                          OmdbResponseDataModel omdbDataModel,
-                          TmdbTvSeriesResponseDataModel tmdbTvSeriesDataModel, 
-                          TmdbTvSeriesAggregateCreditsResponseDataModel tmdbTvSeriesAggregateCreditsDataModel,
-                          TmdbWatchProvidersResponseDataModel tmdbWatchProvidersDataModel,
-                          ConfigurationCountriesDictionary configurationCountriesDictionary,
-                          ConfigurationLanguagesDictionary configurationLanguagesDictionary)
+                             OmdbResponseDataModel omdbDataModel,
+                             TmdbTvSeriesResponseDataModel tmdbTvSeriesDataModel, 
+                             TmdbTvSeriesAggregateCreditsResponseDataModel tmdbTvSeriesAggregateCreditsDataModel,
+                             TmdbWatchProvidersResponseDataModel tmdbWatchProvidersDataModel,
+                             ConfigurationCountriesDictionary configurationCountriesDictionary,
+                             ConfigurationLanguagesDictionary configurationLanguagesDictionary)
     {
         this.ID = Guid.NewGuid();
         this.Image = suggestionViewModel.Image;
@@ -57,7 +57,7 @@ public record TvSeriesViewModel
         this.TmdbGenres = null;
         if (tmdbTvSeriesDataModel.Genres != null)
         {
-            this.TmdbGenres = String.Join(", ", tmdbTvSeriesDataModel.Genres.Select(g => g.Name));
+            this.TmdbGenres = String.Join(", ", tmdbTvSeriesDataModel.Genres.Select(tgdm => tgdm.Name));
         }
         this.Homepage = tmdbTvSeriesDataModel.Homepage;
         this.TmdbId = tmdbTvSeriesDataModel.Id;
@@ -90,7 +90,7 @@ public record TvSeriesViewModel
             this.NextAirDate = DateOnly.ParseExact(NextAirDateString, "yyyy-MM-dd", CultureInfo.InvariantCulture);
         }
         this.Networks = tmdbTvSeriesDataModel.Networks
-                            .Select(n => new NetworkViewModel(n))
+                            .Select(tndm => new NetworkViewModel(tndm))
                             .ToList();
         this.NumberOfEpisodes = tmdbTvSeriesDataModel.NumberOfEpisodes;
         this.NumberOfSeasons = tmdbTvSeriesDataModel.NumberOfSeasons;
@@ -108,12 +108,12 @@ public record TvSeriesViewModel
         }
         this.OriginalName = tmdbTvSeriesDataModel.OriginalName;
         this.TmdbOverview = tmdbTvSeriesDataModel.Overview;
-        this.ProductionCompanies = String.Join("; ", tmdbTvSeriesDataModel.ProductionCompanies.Select(pc => pc.Name));
-        this.ProductionCountries = String.Join(", ", tmdbTvSeriesDataModel.ProductionCountries.Select(pc => pc.Name));
+        this.ProductionCompanies = String.Join("; ", tmdbTvSeriesDataModel.ProductionCompanies.Select(tpcdm => tpcdm.Name));
+        this.ProductionCountries = String.Join(", ", tmdbTvSeriesDataModel.ProductionCountries.Select(tpcdm => tpcdm.Name));
         this.Seasons = tmdbTvSeriesDataModel.Seasons
                             .Select(ttsdm => new TvSeriesSeasonViewModel(ttsdm))
                             .ToList();
-        this.SpokenLanguages = String.Join(", ", tmdbTvSeriesDataModel.SpokenLanguages.Select(sl => sl.EnglishName));
+        this.SpokenLanguages = String.Join(", ", tmdbTvSeriesDataModel.SpokenLanguages.Select(tsldm => tsldm.EnglishName));
         this.Status = tmdbTvSeriesDataModel.Status;
         this.Tagline = tmdbTvSeriesDataModel.Tagline;
         this.TvSeriesType = tmdbTvSeriesDataModel.Type;

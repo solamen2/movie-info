@@ -21,6 +21,7 @@ public class TmdbEndpointsTests
     private string tmdbHttpClientPersonMovieCreditsResponse;
     private string tmdbHttpClientPersonResponse;
     private string tmdbHttpClientPersonTvSeriesCreditsResponse;
+    private string tmdbHttpClientTvEpisodeResponse;
     private string tmdbHttpClientTvEpisodeCreditsResponse;
     private string tmdbHttpClientTvEpisodeExternalIdsResponse;
     private string tmdbHttpClientTvEpisodeIdResponse;
@@ -52,6 +53,7 @@ public class TmdbEndpointsTests
         string testPersonMovieCreditsDataFilename = "TmdbHttpClientPersonMovieCreditsResponse.json";
         string testPersonDataFilename = "TmdbHttpClientPersonResponse.json";
         string testPersonTvSeriesCreditsDataFilename = "TmdbHttpClientPersonTvSeriesCreditsResponse.json";
+        string testTvEpisodeDataFilename = "TmdbHttpClientTvEpisodeResponse.json";
         string testTvEpisodeCreditsDataFilename = "TmdbHttpClientTvEpisodeCreditsResponse.json";
         string testTvEpisodeExternalIdsDataFilename = "TmdbHttpClientTvEpisodeExternalIdsResponse.json";
         string testTvEpisodeIdDataFilename = "TmdbHttpClientTvEpisodeIdResponse.json";
@@ -163,6 +165,15 @@ public class TmdbEndpointsTests
         if (String.IsNullOrWhiteSpace(tmdbHttpClientPersonTvSeriesCreditsResponse))
         {
             throw new ArgumentException($"{testPersonTvSeriesCreditsDataFilename} is not valid test data.");
+        }
+
+        using (StreamReader sr = File.OpenText($"../../../TestData/{testTvEpisodeDataFilename}"))
+        {
+            tmdbHttpClientTvEpisodeResponse = sr.ReadToEnd();
+        }
+        if (String.IsNullOrWhiteSpace(tmdbHttpClientTvEpisodeResponse))
+        {
+            throw new ArgumentException($"{testTvEpisodeDataFilename} is not valid test data.");
         }
 
         using (StreamReader sr = File.OpenText($"../../../TestData/{testTvEpisodeCreditsDataFilename}"))
@@ -311,6 +322,8 @@ public class TmdbEndpointsTests
         Assert.NotNull(personResponse);
         TmdbPersonTvSeriesCreditsResponseDataModel? personTvSeriesCreditsResponse = TmdbHttpClient.GetPersonTvSeriesCreditsModelFromResponse(tmdbHttpClientPersonTvSeriesCreditsResponse);
         Assert.NotNull(personTvSeriesCreditsResponse);
+        TmdbTvEpisodeResponseDataModel? tvEpisodeResponse = TmdbHttpClient.GetTvEpisodeModelFromResponse(tmdbHttpClientTvEpisodeResponse);
+        Assert.NotNull(tvEpisodeResponse);
         TmdbTvEpisodeCreditsResponseDataModel? tvEpisodeCreditsResponse = TmdbHttpClient.GetTvEpisodeCreditsModelFromResponse(tmdbHttpClientTvEpisodeCreditsResponse);
         Assert.NotNull(tvEpisodeCreditsResponse);
         TmdbTvEpisodeExternalIdsResponseDataModel? tvEpisodeExternalIdsResponse = TmdbHttpClient.GetTvEpisodeExternalIdsModelFromResponse(tmdbHttpClientTvEpisodeExternalIdsResponse);
@@ -349,6 +362,7 @@ public class TmdbEndpointsTests
         //_testOutputHelper.WriteLine("personMovieCreditsResponse: " + personMovieCreditsResponse);  // TODO: Remove me
         //_testOutputHelper.WriteLine("personResponse: " + personResponse);  // TODO: Remove me
         //_testOutputHelper.WriteLine("personTvSeriesCreditsResponse: " + personTvSeriesCreditsResponse);  // TODO: Remove me
+        //_testOutputHelper.WriteLine("tvEpisodeResponse: " + tvEpisodeResponse);  // TODO: Remove me
         //_testOutputHelper.WriteLine("tvEpisodeCreditsResponse: " + tvEpisodeCreditsResponse);  // TODO: Remove me
         //_testOutputHelper.WriteLine("tvEpisodeExternalIdsResponse: " + tvEpisodeExternalIdsResponse);  // TODO: Remove me
         //_testOutputHelper.WriteLine("tvEpisodeIdResponse: " + tvEpisodeIdResponse);  // TODO: Remove me

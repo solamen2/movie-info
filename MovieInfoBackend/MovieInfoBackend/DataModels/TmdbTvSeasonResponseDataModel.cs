@@ -9,7 +9,7 @@ public record TmdbTvSeasonResponseDataModel
     [JsonPropertyName("air_date")]
     public required string AirDate { get; init; }
     [JsonPropertyName("episodes")]
-    public required TmdbTvSeriesEpisodeDataModel[] Episodes { get; init; }
+    public required TmdbTvSeasonEpisodeDataModel[] Episodes { get; init; }
     [JsonPropertyName("name")]
     public required string Name { get; init; }
     [JsonPropertyName("networks")]
