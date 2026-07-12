@@ -11,6 +11,7 @@ namespace TestMovieInfoBackend.Endpoints;
 public class TmdbEndpointsTests
 {
     private string tmdbHttpClientMovieCreditsResponse;
+    private string tmdbHttpClientMovieExternalIdsResponse;
     private string tmdbHttpClientMovieGenresResponse;
     private string tmdbHttpClientMovieIdResponse;
     private string tmdbHttpClientMovieResponse;
@@ -29,6 +30,7 @@ public class TmdbEndpointsTests
     private string tmdbHttpClientTvSeasonIdResponse;
     private string tmdbHttpClientTvSeasonWatchProvidersResponse;
     private string tmdbHttpClientTvSeriesAggregateCreditsResponse;
+    private string tmdbHttpClientTvSeriesExternalIdsResponse;
     private string tmdbHttpClientTvSeriesGenresResponse;
     private string tmdbHttpClientTvSeriesIdResponse;
     private string tmdbHttpClientTvSeriesResponse;
@@ -43,6 +45,7 @@ public class TmdbEndpointsTests
         // Arrange
 
         string testMovieCreditsDataFilename = "TmdbHttpClientMovieCreditsResponse.json";
+        string testMovieExternalIdsDataFilename = "TmdbHttpClientMovieExternalIdsResponse.json";
         string testMovieGenresDataFilename = "TmdbHttpClientMovieGenresResponse.json";
         string testMovieIdDataFilename = "TmdbHttpClientMovieIdResponse.json";
         string testMovieDataFilename = "TmdbHttpClientMovieResponse.json";
@@ -61,6 +64,7 @@ public class TmdbEndpointsTests
         string testTvSeasonIdDataFilename = "TmdbHttpClientTvSeasonIdResponse.json";
         string testTvSeasonWatchProvidersDataFilename = "TmdbHttpClientTvSeasonWatchProvidersResponse.json";
         string testTvSeriesAggregateCreditsDataFilename = "TmdbHttpClientTvSeriesAggregateCreditsResponse.json";
+        string testTvSeriesExternalIdsDataFilename = "TmdbHttpClientTvSeriesExternalIdsResponse.json";
         string testTvSeriesGenresDataFilename = "TmdbHttpClientTvSeriesGenresResponse.json";
         string testTvSeriesIdDataFilename = "TmdbHttpClientTvSeriesIdResponse.json";
         string testTvSeriesDataFilename = "TmdbHttpClientTvSeriesResponse.json";
@@ -75,6 +79,15 @@ public class TmdbEndpointsTests
         if (String.IsNullOrWhiteSpace(tmdbHttpClientMovieCreditsResponse))
         {
             throw new ArgumentException($"{testMovieCreditsDataFilename} is not valid test data.");
+        }
+
+        using (StreamReader sr = File.OpenText($"../../../TestData/{testMovieExternalIdsDataFilename}"))
+        {
+            tmdbHttpClientMovieExternalIdsResponse = sr.ReadToEnd();
+        }
+        if (String.IsNullOrWhiteSpace(tmdbHttpClientMovieExternalIdsResponse))
+        {
+            throw new ArgumentException($"{testMovieExternalIdsDataFilename} is not valid test data.");
         }
 
         using (StreamReader sr = File.OpenText($"../../../TestData/{testMovieGenresDataFilename}"))
@@ -239,6 +252,15 @@ public class TmdbEndpointsTests
             throw new ArgumentException($"{testTvSeriesAggregateCreditsDataFilename} is not valid test data.");
         }
 
+        using (StreamReader sr = File.OpenText($"../../../TestData/{testTvSeriesExternalIdsDataFilename}"))
+        {
+            tmdbHttpClientTvSeriesExternalIdsResponse = sr.ReadToEnd();
+        }
+        if (String.IsNullOrWhiteSpace(tmdbHttpClientTvSeriesExternalIdsResponse))
+        {
+            throw new ArgumentException($"{testTvSeriesExternalIdsDataFilename} is not valid test data.");
+        }
+
         using (StreamReader sr = File.OpenText($"../../../TestData/{testTvSeriesGenresDataFilename}"))
         {
             tmdbHttpClientTvSeriesGenresResponse = sr.ReadToEnd();
@@ -302,6 +324,8 @@ public class TmdbEndpointsTests
         // Act
         TmdbMovieCreditsResponseDataModel? movieCreditsResponse = TmdbHttpClient.GetMovieCreditsModelFromResponse(tmdbHttpClientMovieCreditsResponse);
         Assert.NotNull(movieCreditsResponse);
+        TmdbMovieExternalIdsResponseDataModel? movieExternalIdsResponse = TmdbHttpClient.GetMovieExternalIdsModelFromResponse(tmdbHttpClientMovieExternalIdsResponse);
+        Assert.NotNull(tmdbHttpClientMovieExternalIdsResponse);
         TmdbGenresResponseDataModel? movieGenresResponse = TmdbHttpClient.GetGenresModelFromResponse(tmdbHttpClientMovieGenresResponse);
         Assert.NotNull(movieGenresResponse);
         TmdbIdResponseDataModel? movieIdResponse = TmdbHttpClient.GetIdModelFromResponse(tmdbHttpClientMovieIdResponse);
@@ -338,6 +362,8 @@ public class TmdbEndpointsTests
         Assert.NotNull(tvSeasonIdResponse);
         TmdbTvSeriesAggregateCreditsResponseDataModel? tvSeriesAggregateCreditsResponse = TmdbHttpClient.GetTvSeriesAggregateCreditsModelFromResponse(tmdbHttpClientTvSeriesAggregateCreditsResponse);
         Assert.NotNull(tvSeriesAggregateCreditsResponse);
+        TmdbTvSeriesExternalIdsResponseDataModel? tvSeriesExternalIdsResponse = TmdbHttpClient.GetTvSeriesExternalIdsModelFromResponse(tmdbHttpClientTvSeriesExternalIdsResponse);
+        Assert.NotNull(tmdbHttpClientTvSeriesExternalIdsResponse);
         TmdbGenresResponseDataModel? tvSeriesGenresResponse = TmdbHttpClient.GetGenresModelFromResponse(tmdbHttpClientTvSeriesGenresResponse);
         Assert.NotNull(tvSeriesGenresResponse);
         TmdbIdResponseDataModel? tvSeriesIdResponse = TmdbHttpClient.GetIdModelFromResponse(tmdbHttpClientTvSeriesIdResponse);
@@ -349,9 +375,10 @@ public class TmdbEndpointsTests
         TmdbConfigurationCountriesResponseDataModel? tvConfigurationCountriesResponse = TmdbHttpClient.GetConfigurationCountriesModelFromResponse(tmdbHttpClientConfigurationCountriesResponse);
         Assert.NotNull(tvConfigurationCountriesResponse);
         TmdbConfigurationLanguagesResponseDataModel? tvConfigurationLanguagesResponse = TmdbHttpClient.GetConfigurationLanguagesModelFromResponse(tmdbHttpClientConfigurationLanguagesResponse);
-        Assert.NotNull(tvConfigurationCountriesResponse);
+        Assert.NotNull(tvConfigurationLanguagesResponse);
 
         //_testOutputHelper.WriteLine("movieCreditsResponse: " + movieCreditsResponse);  // TODO: Remove me
+        //_testOutputHelper.WriteLine("movieExternalIdsResponse: " + movieExternalIdsResponse);  // TODO: Remove me
         //_testOutputHelper.WriteLine("movieGenresResponse: " + movieGenresResponse);  // TODO: Remove me
         //_testOutputHelper.WriteLine("movieIdResponse: " + movieIdResponse);  // TODO: Remove me
         //_testOutputHelper.WriteLine("movieResponse: " + movieResponse);  // TODO: Remove me
@@ -370,6 +397,7 @@ public class TmdbEndpointsTests
         //_testOutputHelper.WriteLine("tvSeasonWatchProvidersResponse: " + tvSeasonWatchProvidersResponse);  // TODO: Remove me
         //_testOutputHelper.WriteLine("tvSeasonIdResponse: " + tvSeasonIdResponse);  // TODO: Remove me
         //_testOutputHelper.WriteLine("tvSeriesAggregateCreditsResponse: " + tvSeriesAggregateCreditsResponse);  // TODO: Remove me
+        //_testOutputHelper.WriteLine("tvSeriesExternalIdsResponse: " + tvSeriesExternalIdsResponse);  // TODO: Remove me
         //_testOutputHelper.WriteLine("tvSeriesGenresResponse: " + tvSeriesGenresResponse);  // TODO: Remove me
         //_testOutputHelper.WriteLine("tvSeriesIdResponse: " + tvSeriesIdResponse);  // TODO: Remove me
         //_testOutputHelper.WriteLine("tvSeriesResponse: " + tvSeriesResponse);  // TODO: Remove me

@@ -35,6 +35,10 @@ public record TvSeasonEpisodeViewModel
                             .Where(ttscdm => ttscdm.Department == "Writing")
                             .Select(ttscdm => new TvSeasonEpisodeCrewViewModel(ttscdm))
                             .ToList();
+        this.Producers = tmdbTvSeasonEpisodeDataModel.Crew
+                            .Where(ttscdm => ttscdm.Job == "Producer")
+                            .Select(ttscdm => new TvSeasonEpisodeCrewViewModel(ttscdm))
+                            .ToList();
         this.GuestStars = tmdbTvSeasonEpisodeDataModel.GuestStars
                             .Select(ttsegsdm => new TvSeasonEpisodeGuestStarViewModel(ttsegsdm))
                             .ToList();
@@ -55,10 +59,11 @@ public record TvSeasonEpisodeViewModel
     // NOTE: Yes, there is no Cast here, because the season HTTP request does not provide it. The episode must be selected, triggering another call to the TMDB, to get it
     public List<TvSeasonEpisodeCrewViewModel> Directors { get; }
     public List<TvSeasonEpisodeCrewViewModel> Writers { get; }
+    public List<TvSeasonEpisodeCrewViewModel> Producers { get; }
     public List<TvSeasonEpisodeGuestStarViewModel> GuestStars { get; }
 
     public override string ToString()
     {
-        return $"ID: {ID}\nAirDateString: {AirDateString}\nAirDate: {AirDate}\nEpisodeNumber: {EpisodeNumber}\nEpisodeType: {EpisodeType}\nTmdbId: {TmdbId}\nTitle: {Title}\nTmdbOverview: {TmdbOverview}\nRuntime: {Runtime}\nSeasonNumber: {SeasonNumber}\nTmdbTvSeriesId: {TmdbTvSeriesId}\nStillPath: {StillPath}\nDirectors:\n*****\n{string.Join("\n\n", Directors)}\n*****\nWriters:\n*****\n{string.Join("\n\n", Writers)}\n*****\nGuestStars:\n*****\n{string.Join("\n\n", GuestStars)}";
+        return $"ID: {ID}\nAirDateString: {AirDateString}\nAirDate: {AirDate}\nEpisodeNumber: {EpisodeNumber}\nEpisodeType: {EpisodeType}\nTmdbId: {TmdbId}\nTitle: {Title}\nTmdbOverview: {TmdbOverview}\nRuntime: {Runtime}\nSeasonNumber: {SeasonNumber}\nTmdbTvSeriesId: {TmdbTvSeriesId}\nStillPath: {StillPath}\nDirectors:\n*****\n{string.Join("\n\n", Directors)}\n*****\nWriters:\n*****\n{string.Join("\n\n", Writers)}\n*****\nProducers:\n*****\n{string.Join("\n\n", Producers)}\n*****\nGuestStars:\n*****\n{string.Join("\n\n", GuestStars)}";
     }
 }

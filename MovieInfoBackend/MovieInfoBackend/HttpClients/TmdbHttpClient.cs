@@ -45,6 +45,10 @@ public class TmdbHttpClient
     {
         return JsonSerializer.Deserialize<TmdbMovieCreditsResponseDataModel>(responseJsonString);
     }
+    public static TmdbMovieExternalIdsResponseDataModel? GetMovieExternalIdsModelFromResponse(string responseJsonString)
+    {
+        return JsonSerializer.Deserialize<TmdbMovieExternalIdsResponseDataModel>(responseJsonString);
+    }
     public static TmdbGenresResponseDataModel? GetGenresModelFromResponse(string responseJsonString)
     {
         return JsonSerializer.Deserialize<TmdbGenresResponseDataModel>(responseJsonString);
@@ -96,6 +100,10 @@ public class TmdbHttpClient
     public static TmdbTvSeriesAggregateCreditsResponseDataModel? GetTvSeriesAggregateCreditsModelFromResponse(string responseJsonString)
     {
         return JsonSerializer.Deserialize<TmdbTvSeriesAggregateCreditsResponseDataModel>(responseJsonString);
+    }
+    public static TmdbTvSeriesExternalIdsResponseDataModel? GetTvSeriesExternalIdsModelFromResponse(string responseJsonString)
+    {
+        return JsonSerializer.Deserialize<TmdbTvSeriesExternalIdsResponseDataModel>(responseJsonString);
     }
     public static TmdbTvSeriesResponseDataModel? GetTvSeriesModelFromResponse(string responseJsonString)
     {

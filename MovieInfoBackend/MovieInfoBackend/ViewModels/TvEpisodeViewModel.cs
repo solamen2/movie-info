@@ -6,6 +6,7 @@ namespace MovieInfoBackend.ViewModels;
 public record TvEpisodeViewModel
 {
     // NOTE: This exists at the episode level, after an episode is selected; TvSeasonEpisodeViewModel is shown at the season level, when no episode is selected
+    // TODO: No way to get omdbDataModel without knowing the IMDB ID! So there will have to be a call to the TMDB External IDs API to get it in the HTTP Client
     public TvEpisodeViewModel(OmdbResponseDataModel omdbDataModel,
                               TmdbTvEpisodeResponseDataModel tmdbTvEpisodeDataModel,
                               TmdbTvEpisodeCreditsResponseDataModel tmdbTvEpisodeCreditsDataModel)
@@ -64,6 +65,10 @@ public record TvEpisodeViewModel
                             .Where(tteccdm => tteccdm.Department == "Writing")
                             .Select(tteccdm => new TvEpisodeCrewViewModel(tteccdm))
                             .ToList();
+        this.Producers = tmdbTvEpisodeCreditsDataModel.Crew
+                            .Where(tteccdm => tteccdm.Job == "Producer")
+                            .Select(tteccdm => new TvEpisodeCrewViewModel(tteccdm))
+                            .ToList();
         this.GuestStars = tmdbTvEpisodeCreditsDataModel.GuestStars
                             .Select(ttecgsdm => new TvEpisodeGuestStarViewModel(ttecgsdm))
                             .ToList();
@@ -94,10 +99,11 @@ public record TvEpisodeViewModel
     public List<TvEpisodeCastViewModel> Cast { get; }
     public List<TvEpisodeCrewViewModel> Directors { get; }
     public List<TvEpisodeCrewViewModel> Writers { get; }
+    public List<TvEpisodeCrewViewModel> Producers { get; }
     public List<TvEpisodeGuestStarViewModel> GuestStars { get; }
 
     public override string ToString()
     {
-        return $"ID: {ID}\nYear: {Year}\nRated: {Rated}\nOmdbAverageEpisodeRuntimeString: {OmdbAverageEpisodeRuntimeString}\nOmdbAverageEpisodeRuntimeNumber: {OmdbAverageEpisodeRuntimeNumber}\nOmdbGenres: {OmdbGenres}\nKnownForActors: {KnownForActors}\nOmdbOverview: {OmdbOverview}\nAwards: {Awards}\nImdbRating: {ImdbRating}\nImdbVotes: {ImdbVotes}\nImdbId: {ImdbId}\nAirDateString: {AirDateString}\nAirDate: {AirDate}\nEpisodeNumber: {EpisodeNumber}\nEpisodeType: {EpisodeType}\nTitle: {Title}\nTmdbOverview: {TmdbOverview}\nTmdbId: {TmdbId}\nRuntime: {Runtime}\nSeasonNumber: {SeasonNumber}\nStillPath: {StillPath}\nCast:\n*****\n{string.Join("\n\n", Cast)}\n*****\nDirectors:\n*****\n{string.Join("\n\n", Directors)}\n*****\nWriters:\n*****\n{string.Join("\n\n", Writers)}\n*****\nGuestStars:\n*****\n{string.Join("\n\n", GuestStars)}";
+        return $"ID: {ID}\nYear: {Year}\nRated: {Rated}\nOmdbAverageEpisodeRuntimeString: {OmdbAverageEpisodeRuntimeString}\nOmdbAverageEpisodeRuntimeNumber: {OmdbAverageEpisodeRuntimeNumber}\nOmdbGenres: {OmdbGenres}\nKnownForActors: {KnownForActors}\nOmdbOverview: {OmdbOverview}\nAwards: {Awards}\nImdbRating: {ImdbRating}\nImdbVotes: {ImdbVotes}\nImdbId: {ImdbId}\nAirDateString: {AirDateString}\nAirDate: {AirDate}\nEpisodeNumber: {EpisodeNumber}\nEpisodeType: {EpisodeType}\nTitle: {Title}\nTmdbOverview: {TmdbOverview}\nTmdbId: {TmdbId}\nRuntime: {Runtime}\nSeasonNumber: {SeasonNumber}\nStillPath: {StillPath}\nCast:\n*****\n{string.Join("\n\n", Cast)}\n*****\nDirectors:\n*****\n{string.Join("\n\n", Directors)}\n*****\nWriters:\n*****\n{string.Join("\n\n", Writers)}\n*****\nProducers:\n*****\n{string.Join("\n\n", Producers)}\n*****\nGuestStars:\n*****\n{string.Join("\n\n", GuestStars)}";
     }
 }
