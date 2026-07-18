@@ -31,6 +31,6 @@ public record TvSeriesCastViewModel
 
     public override string ToString()
     {
-        return $"ID: {ID}\nGender: {Gender}\nTmdbId: {TmdbId}\nName: {Name}\nOriginalName: {OriginalName}\nPopularity: {Popularity}\nProfilePath: {ProfilePath}\nCharacters:{string.Join(",", Characters)}\nTotalEpisodeCount: {TotalEpisodeCount}\nBilledOrder: {BilledOrder}";
+        return $"ID: {ID}\nGender: {Gender}\nTmdbId: {TmdbId}\nName: {Name}\nOriginalName: {OriginalName}\nPopularity: {Popularity}\nProfilePath: {ProfilePath}\nCharacters: {string.Join(", ", Characters)}\nTotalEpisodeCount: {TotalEpisodeCount}\nBilledOrder: {BilledOrder}";
     }
 }

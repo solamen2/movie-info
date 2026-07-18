@@ -48,6 +48,6 @@ public record TmdbPersonTvSeriesCrewDataModel
 
     public override string ToString()
     {
-        return $"Adult: {Adult}\nBackdropPath: {BackdropPath}\nGenreIds: {string.Join(",", GenreIds)}\nId: {Id}\nOriginCountry: {string.Join(",", OriginCountry)}\nOriginalLanguage: {OriginalLanguage}\nOriginalName: {OriginalName}\nOverview: {Overview}\nPopularity: {Popularity}\nPosterPath: {PosterPath}\nFirstAirDate: {FirstAirDate}\nSoftcore: {Softcore}\nName: {Name}\nVoteAverage: {VoteAverage}\nVoteCount: {VoteCount}\nCreditId: {CreditId}\nDepartment: {Department}\nEpisodeCount: {EpisodeCount}\nFirstCreditAirDate: {FirstCreditAirDate}\nJob: {Job}";
+        return $"Adult: {Adult}\nBackdropPath: {BackdropPath}\nGenreIds: {string.Join(", ", GenreIds)}\nId: {Id}\nOriginCountry: {string.Join(", ", OriginCountry)}\nOriginalLanguage: {OriginalLanguage}\nOriginalName: {OriginalName}\nOverview: {Overview}\nPopularity: {Popularity}\nPosterPath: {PosterPath}\nFirstAirDate: {FirstAirDate}\nSoftcore: {Softcore}\nName: {Name}\nVoteAverage: {VoteAverage}\nVoteCount: {VoteCount}\nCreditId: {CreditId}\nDepartment: {Department}\nEpisodeCount: {EpisodeCount}\nFirstCreditAirDate: {FirstCreditAirDate}\nJob: {Job}";
     }
 }

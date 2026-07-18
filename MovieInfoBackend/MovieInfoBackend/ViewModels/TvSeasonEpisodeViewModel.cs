@@ -36,7 +36,7 @@ public record TvSeasonEpisodeViewModel
                             .Select(ttscdm => new TvSeasonEpisodeCrewViewModel(ttscdm))
                             .ToList();
         this.Producers = tmdbTvSeasonEpisodeDataModel.Crew
-                            .Where(ttscdm => ttscdm.Job == "Producer")
+                            .Where(ttscdm => ttscdm.Job.EndsWith("Producer"))
                             .Select(ttscdm => new TvSeasonEpisodeCrewViewModel(ttscdm))
                             .ToList();
         this.GuestStars = tmdbTvSeasonEpisodeDataModel.GuestStars

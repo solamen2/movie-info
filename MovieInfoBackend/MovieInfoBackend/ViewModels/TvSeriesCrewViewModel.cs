@@ -33,6 +33,6 @@ public record TvSeriesCrewViewModel
 
     public override string ToString()
     {
-        return $"ID: {ID}\nGender: {Gender}\nTmdbId: {TmdbId}\nKnownForDepartment: {KnownForDepartment}\nName: {Name}\nOriginalName: {OriginalName}\nPopularity: {Popularity}\nProfilePath: {ProfilePath}\nJobs:{string.Join(",", Jobs)}\nDepartment: {Department}\nTotalEpisodeCount: {TotalEpisodeCount}";
+        return $"ID: {ID}\nGender: {Gender}\nTmdbId: {TmdbId}\nKnownForDepartment: {KnownForDepartment}\nName: {Name}\nOriginalName: {OriginalName}\nPopularity: {Popularity}\nProfilePath: {ProfilePath}\nJobs: {string.Join(", ", Jobs)}\nDepartment: {Department}\nTotalEpisodeCount: {TotalEpisodeCount}";
     }
 }

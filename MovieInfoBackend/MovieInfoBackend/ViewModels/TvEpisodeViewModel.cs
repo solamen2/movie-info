@@ -66,7 +66,7 @@ public record TvEpisodeViewModel
                             .Select(tteccdm => new TvEpisodeCrewViewModel(tteccdm))
                             .ToList();
         this.Producers = tmdbTvEpisodeCreditsDataModel.Crew
-                            .Where(tteccdm => tteccdm.Job == "Producer")
+                            .Where(tteccdm => tteccdm.Job.EndsWith("Producer"))
                             .Select(tteccdm => new TvEpisodeCrewViewModel(tteccdm))
                             .ToList();
         this.GuestStars = tmdbTvEpisodeCreditsDataModel.GuestStars

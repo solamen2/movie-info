@@ -39,6 +39,6 @@ public record TmdbMovieIdDataModel
 
     public override string ToString()
     {
-        return $"Adult: {Adult}\nBackdropPath: {BackdropPath}\nId: {Id}\nTitle: {Title}\nOriginalTitle: {OriginalTitle}\nOverview: {Overview}\nPosterPath: {PosterPath}\nMediaType: {MediaType}\nOriginalLanguage: {OriginalLanguage}\nGenreIds: {string.Join(",", GenreIds)}\nPopularity: {Popularity}\nReleaseDate: {ReleaseDate}\nSoftcore: {Softcore}\nVideo: {Video}\nVoteAverage: {VoteAverage}\nVoteCount: {VoteCount}";
+        return $"Adult: {Adult}\nBackdropPath: {BackdropPath}\nId: {Id}\nTitle: {Title}\nOriginalTitle: {OriginalTitle}\nOverview: {Overview}\nPosterPath: {PosterPath}\nMediaType: {MediaType}\nOriginalLanguage: {OriginalLanguage}\nGenreIds: {string.Join(", ", GenreIds)}\nPopularity: {Popularity}\nReleaseDate: {ReleaseDate}\nSoftcore: {Softcore}\nVideo: {Video}\nVoteAverage: {VoteAverage}\nVoteCount: {VoteCount}";
     }
 }

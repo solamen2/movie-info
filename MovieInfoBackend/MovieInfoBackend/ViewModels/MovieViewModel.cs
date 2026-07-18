@@ -81,7 +81,7 @@ public record MovieViewModel
                             .Select(tmcdm => new MovieCrewViewModel(tmcdm))
                             .ToList();
         this.Producers = tmdbMovieCreditsDataModel.Crew
-                            .Where(tmcdm => tmcdm.Job == "Producer")
+                            .Where(tmcdm => tmcdm.Job.EndsWith("Producer"))
                             .Select(tmcdm => new MovieCrewViewModel(tmcdm))
                             .ToList();
         TmdbWatchProviderCountryDataModel? tmdbWatchProviderCountryDataModel = tmdbWatchProvidersDataModel?.Results?.US;

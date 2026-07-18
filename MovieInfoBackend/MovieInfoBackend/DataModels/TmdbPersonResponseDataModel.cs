@@ -35,7 +35,7 @@ public record TmdbPersonResponseDataModel
 
     public override string ToString()
     {
-        return $"Adult: {Adult}\nAlsoKnownAs: {string.Join(",", AlsoKnownAs)}\nBiography: {Biography}\nBirthday: {Birthday}\nDeathday: {Deathday}\nGender: {Gender}\nHomepage: {Homepage}\nId: {Id}\nImdbId: {ImdbId}\nKnownForDepartment: {KnownForDepartment}\nName: {Name}\nPlaceOfBirth: {PlaceOfBirth}\nPopularity: {Popularity}\nProfilePath: {ProfilePath}";
+        return $"Adult: {Adult}\nAlsoKnownAs: {string.Join(", ", AlsoKnownAs)}\nBiography: {Biography}\nBirthday: {Birthday}\nDeathday: {Deathday}\nGender: {Gender}\nHomepage: {Homepage}\nId: {Id}\nImdbId: {ImdbId}\nKnownForDepartment: {KnownForDepartment}\nName: {Name}\nPlaceOfBirth: {PlaceOfBirth}\nPopularity: {Popularity}\nProfilePath: {ProfilePath}";
     }
 
 }

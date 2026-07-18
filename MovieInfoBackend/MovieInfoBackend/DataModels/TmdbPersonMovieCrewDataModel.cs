@@ -43,6 +43,6 @@ public record TmdbPersonMovieCrewDataModel
 
     public override string ToString()
     {
-        return $"Adult: {Adult}\nBackdropPath: {BackdropPath}\nGenreIds: {string.Join(",", GenreIds)}\nId: {Id}\nTitle: {Title}\nOriginalLanguage: {OriginalLanguage}\nOriginalTitle: {OriginalTitle}\nOverview: {Overview}\nPopularity: {Popularity}\nPosterPath: {PosterPath}\nReleaseDate: {ReleaseDate}\nSoftcore: {Softcore}\nVideo: {Video}\nVoteAverage: {VoteAverage}\nVoteCount: {VoteCount}\nCreditId: {CreditId}\nDepartment: {Department}\nJob: {Job}";
+        return $"Adult: {Adult}\nBackdropPath: {BackdropPath}\nGenreIds: {string.Join(", ", GenreIds)}\nId: {Id}\nTitle: {Title}\nOriginalLanguage: {OriginalLanguage}\nOriginalTitle: {OriginalTitle}\nOverview: {Overview}\nPopularity: {Popularity}\nPosterPath: {PosterPath}\nReleaseDate: {ReleaseDate}\nSoftcore: {Softcore}\nVideo: {Video}\nVoteAverage: {VoteAverage}\nVoteCount: {VoteCount}\nCreditId: {CreditId}\nDepartment: {Department}\nJob: {Job}";
     }
 }

@@ -39,6 +39,6 @@ public record TmdbTvSeriesIdDataModel
 
     public override string ToString()
     {
-        return $"Adult: {Adult}\nBackdropPath: {BackdropPath}\nId: {Id}\nName: {Name}\nOriginalName: {OriginalName}\nOverview: {Overview}\nPosterPath: {PosterPath}\nMediaType: {MediaType}\nOriginalLanguage: {OriginalLanguage}\nGenreIds: {string.Join(",", GenreIds)}\nPopularity: {Popularity}\nFirstAirDate: {FirstAirDate}\nSoftcore: {Softcore}\nVoteAverage: {VoteAverage}\nVoteCount: {VoteCount}\nOriginCountry: {string.Join(",", OriginCountry)}";
+        return $"Adult: {Adult}\nBackdropPath: {BackdropPath}\nId: {Id}\nName: {Name}\nOriginalName: {OriginalName}\nOverview: {Overview}\nPosterPath: {PosterPath}\nMediaType: {MediaType}\nOriginalLanguage: {OriginalLanguage}\nGenreIds: {string.Join(", ", GenreIds)}\nPopularity: {Popularity}\nFirstAirDate: {FirstAirDate}\nSoftcore: {Softcore}\nVoteAverage: {VoteAverage}\nVoteCount: {VoteCount}\nOriginCountry: {string.Join(", ", OriginCountry)}";
     }
 }
