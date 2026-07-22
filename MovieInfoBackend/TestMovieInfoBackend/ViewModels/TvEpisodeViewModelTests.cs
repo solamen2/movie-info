@@ -76,14 +76,17 @@ public class TvEpisodeViewModelTests
         TmdbTvEpisodeCreditsResponseDataModel? tvEpisodeCreditsResponse = TmdbHttpClient.GetTvEpisodeCreditsModelFromResponse(tmdbHttpClientTvEpisodeCreditsResponse);
         Assert.NotNull(tvEpisodeCreditsResponse);
 
+        // Act
+
         TvEpisodeViewModel tvEpisodeViewModel = new(omdbTvEpisodeResponse, 
                                                     tmdbTvEpisodeResponse,
                                                     tvEpisodeCreditsResponse);
+        
+        // Assert
+        
         Assert.NotNull(tvEpisodeViewModel);
 
         // TODO: Check all fields of view model
-
-        // Act
 
         _testOutputHelper.WriteLine(tvEpisodeViewModel.ToString());
         Assert.Fail();

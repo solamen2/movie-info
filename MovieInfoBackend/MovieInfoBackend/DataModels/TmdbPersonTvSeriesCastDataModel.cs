@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace MovieInfoBackend.DataModels;
 
-public record TmdbPersonTvSeriesCastDataModel
+public record TmdbPersonTvSeriesCastDataModel  // NOTE: More of a TV series description than a person description 
 {
     [JsonPropertyName("adult")]
     public required bool Adult { get; init; }

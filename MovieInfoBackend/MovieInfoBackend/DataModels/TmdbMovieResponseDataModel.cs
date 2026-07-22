@@ -9,15 +9,15 @@ public record TmdbMovieResponseDataModel
     [JsonPropertyName("backdrop_path")]
     public required string BackdropPath { get; init; }
     [JsonPropertyName("belongs_to_collection")]
-    public required string BelongsToCollection { get; init; }
+    public string? BelongsToCollection { get; init; }
     [JsonPropertyName("budget")]
     public required long Budget { get; init; }
     [JsonPropertyName("genres")]
-    public required TmdbGenreDataModel[]? Genres { get; init; }
+    public required TmdbGenreDataModel[] Genres { get; init; }
     [JsonPropertyName("homepage")]
-    public required string Homepage { get; init; }
+    public string? Homepage { get; init; }
     [JsonPropertyName("id")]
-    public required int Id { get; init; }
+    public required int TmdbId { get; init; }
     [JsonPropertyName("imdb_id")]
     public required string ImdbId { get; init; }
     [JsonPropertyName("origin_country")]
@@ -33,7 +33,7 @@ public record TmdbMovieResponseDataModel
     [JsonPropertyName("poster_path")]
     public required string PosterPath { get; init; }
     [JsonPropertyName("production_companies")]
-    public required TmdbProductionCompanyDataModel[] ProductionCompanies { get; init; }
+    public TmdbProductionCompanyDataModel[]? ProductionCompanies { get; init; }
     [JsonPropertyName("production_countries")]
     public required TmdbProductionCountryDataModel[] ProductionCountries { get; init; }
     [JsonPropertyName("release_date")]
@@ -49,7 +49,7 @@ public record TmdbMovieResponseDataModel
     [JsonPropertyName("status")]
     public required string Status { get; init; }
     [JsonPropertyName("tagline")]
-    public required string Tagline { get; init; }
+    public string? Tagline { get; init; }
     [JsonPropertyName("title")]
     public required string Title { get; init; }
     [JsonPropertyName("video")]
@@ -61,7 +61,7 @@ public record TmdbMovieResponseDataModel
 
     public override string ToString()
     {
-        return $"Adult: {Adult}\nBackdropPath: {BackdropPath}\nBelongsToCollection: {BelongsToCollection}\nBudget: {Budget}\nGenres:\n*****\n{string.Join("\n\n", Genres)}\n*****\nHomepage: {Homepage}\nId: {Id}\nImdbId: {ImdbId}\nOriginCountry: {string.Join(", ", OriginCountry)}\nOriginalLanguage: {OriginalLanguage}\nOriginalTitle: {OriginalTitle}\nOverview: {Overview}\nPopularity: {Popularity}\nPosterPath: {PosterPath}\nProductionCompanies:\n*****\n{string.Join("\n\n", ProductionCompanies)}\n*****\nProductionCountries:\n*****\n{string.Join("\n\n", ProductionCountries)}\n*****\nReleaseDate: {ReleaseDate}\nRevenue: {Revenue}\nRuntime: {Runtime}\nSoftcore: {Softcore}\nSpokenLanguages:\n*****\n{string.Join("\n\n", SpokenLanguages)}\n*****\nStatus: {Status}\nTagline: {Tagline}\nTitle: {Title}\nVideo: {Video}\nVoteAverage: {VoteAverage}\nVoteCount: {VoteCount}";
+        return $"Adult: {Adult}\nBackdropPath: {BackdropPath}\nBelongsToCollection: {BelongsToCollection}\nBudget: {Budget}\nGenres:\n*****\n{string.Join("\n\n", Genres)}\n*****\nHomepage: {Homepage}\nTmdbId: {TmdbId}\nImdbId: {ImdbId}\nOriginCountry: {string.Join(", ", OriginCountry)}\nOriginalLanguage: {OriginalLanguage}\nOriginalTitle: {OriginalTitle}\nOverview: {Overview}\nPopularity: {Popularity}\nPosterPath: {PosterPath}\nProductionCompanies:\n*****\n{string.Join("\n\n", ProductionCompanies)}\n*****\nProductionCountries:\n*****\n{string.Join("\n\n", ProductionCountries)}\n*****\nReleaseDate: {ReleaseDate}\nRevenue: {Revenue}\nRuntime: {Runtime}\nSoftcore: {Softcore}\nSpokenLanguages:\n*****\n{string.Join("\n\n", SpokenLanguages)}\n*****\nStatus: {Status}\nTagline: {Tagline}\nTitle: {Title}\nVideo: {Video}\nVoteAverage: {VoteAverage}\nVoteCount: {VoteCount}";
     }
 
 }

@@ -2,16 +2,16 @@ using System.Text.Json.Serialization;
 
 namespace MovieInfoBackend.DataModels;
 
-public record TmdbIndividualTvEpisodeDataModel
+public record TmdbIndividualTvEpisodeIdDataModel
 {
     [JsonPropertyName("id")]
-    public required int Id { get; init; }
+    public required int TmdbId { get; init; }
     [JsonPropertyName("name")]
     public required string Name { get; init; }
     [JsonPropertyName("overview")]
     public required string Overview { get; init; }
     [JsonPropertyName("media_type")]
-    public string? MediaType { get; init; }
+    public required string MediaType { get; init; }
     [JsonPropertyName("vote_average")]
     public required double VoteAverage { get; init; }
     [JsonPropertyName("vote_count")]
@@ -35,7 +35,7 @@ public record TmdbIndividualTvEpisodeDataModel
 
     public override string ToString()
     {
-        return $"Id: {Id}\nName: {Name}\nOverview: {Overview}\nMediaType: {MediaType}\nVoteAverage: {VoteAverage}\nVoteCount: {VoteCount}\nAirDate: {AirDate}\nEpisodeNumber: {EpisodeNumber}\nEpisodeType: {EpisodeType}\nProductionCode: {ProductionCode}\nRuntime: {Runtime}\nSeasonNumber: {SeasonNumber}\nShowId: {ShowId}\nStillPath: {StillPath}";
+        return $"Tmdbd: {TmdbId}\nName: {Name}\nOverview: {Overview}\nMediaType: {MediaType}\nVoteAverage: {VoteAverage}\nVoteCount: {VoteCount}\nAirDate: {AirDate}\nEpisodeNumber: {EpisodeNumber}\nEpisodeType: {EpisodeType}\nProductionCode: {ProductionCode}\nRuntime: {Runtime}\nSeasonNumber: {SeasonNumber}\nShowId: {ShowId}\nStillPath: {StillPath}";
     }
 
 }

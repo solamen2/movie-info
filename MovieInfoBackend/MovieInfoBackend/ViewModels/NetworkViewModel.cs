@@ -15,7 +15,7 @@ public record NetworkViewModel
     
     public Guid ID { get; }    [JsonPropertyName("id")]
     public int TmdbId { get; }
-    public string LogoPath { get; }
+    public string? LogoPath { get; }
     public string Name { get; }
     public string OriginCountry { get; }
 

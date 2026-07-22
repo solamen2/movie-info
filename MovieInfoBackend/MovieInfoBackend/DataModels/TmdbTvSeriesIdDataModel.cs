@@ -9,7 +9,7 @@ public record TmdbTvSeriesIdDataModel
     [JsonPropertyName("backdrop_path")]
     public required string BackdropPath { get; init; }
     [JsonPropertyName("id")]
-    public required int Id { get; init; }
+    public required int TmdbId { get; init; }
     [JsonPropertyName("name")]
     public required string Name { get; init; }
     [JsonPropertyName("original_name")]
@@ -39,6 +39,6 @@ public record TmdbTvSeriesIdDataModel
 
     public override string ToString()
     {
-        return $"Adult: {Adult}\nBackdropPath: {BackdropPath}\nId: {Id}\nName: {Name}\nOriginalName: {OriginalName}\nOverview: {Overview}\nPosterPath: {PosterPath}\nMediaType: {MediaType}\nOriginalLanguage: {OriginalLanguage}\nGenreIds: {string.Join(", ", GenreIds)}\nPopularity: {Popularity}\nFirstAirDate: {FirstAirDate}\nSoftcore: {Softcore}\nVoteAverage: {VoteAverage}\nVoteCount: {VoteCount}\nOriginCountry: {string.Join(", ", OriginCountry)}";
+        return $"Adult: {Adult}\nBackdropPath: {BackdropPath}\nTmdbd: {TmdbId}\nName: {Name}\nOriginalName: {OriginalName}\nOverview: {Overview}\nPosterPath: {PosterPath}\nMediaType: {MediaType}\nOriginalLanguage: {OriginalLanguage}\nGenreIds: {string.Join(", ", GenreIds)}\nPopularity: {Popularity}\nFirstAirDate: {FirstAirDate}\nSoftcore: {Softcore}\nVoteAverage: {VoteAverage}\nVoteCount: {VoteCount}\nOriginCountry: {string.Join(", ", OriginCountry)}";
     }
 }

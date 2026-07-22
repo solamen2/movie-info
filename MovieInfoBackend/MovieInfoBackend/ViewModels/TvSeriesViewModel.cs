@@ -54,11 +54,8 @@ public record TvSeriesViewModel
         {
             this.FirstAirDate = DateOnly.ParseExact(FirstAirDateString, "yyyy-MM-dd", CultureInfo.InvariantCulture);
         }
-        this.TmdbGenres = null;
-        if (tmdbTvSeriesDataModel.Genres != null)
-        {
-            this.TmdbGenres = String.Join(", ", tmdbTvSeriesDataModel.Genres.Select(tgdm => tgdm.Name));
-        }
+        this.TmdbGenres = String.Join(", ", tmdbTvSeriesDataModel.Genres.Select(tgdm => tgdm.Name));
+        
         this.Homepage = tmdbTvSeriesDataModel.Homepage;
         this.TmdbId = tmdbTvSeriesDataModel.Id;
         this.IsInProduction = tmdbTvSeriesDataModel.InProduction;
@@ -94,14 +91,14 @@ public record TvSeriesViewModel
                             .ToList();
         this.NumberOfEpisodes = tmdbTvSeriesDataModel.NumberOfEpisodes;
         this.NumberOfSeasons = tmdbTvSeriesDataModel.NumberOfSeasons;
-        this.OriginCountries = null;
+        this.OriginCountries = "";
         FrozenDictionary<string, string>? iso31661ToEnglishCountryNameDictionary = configurationCountriesDictionary.iso31661ToEnglishCountryNameDictionary;
-        if (tmdbTvSeriesDataModel.OriginCountry != null && iso31661ToEnglishCountryNameDictionary != null)
+        if (iso31661ToEnglishCountryNameDictionary != null)
         {            
             this.OriginCountries = String.Join(", ", tmdbTvSeriesDataModel.OriginCountry.Select(oc => iso31661ToEnglishCountryNameDictionary[oc]));
         }
-        this.OriginLanguage = null;
-        if (tmdbTvSeriesDataModel.OriginalLanguage != null && iso6391ToEnglishLanguageNameDictionary != null)
+        this.OriginLanguage = "";
+        if (iso6391ToEnglishLanguageNameDictionary != null)
         {            
             string iso6391LanguageCode = tmdbTvSeriesDataModel.OriginalLanguage;
             this.OriginLanguage = iso6391ToEnglishLanguageNameDictionary[iso6391LanguageCode];
@@ -186,8 +183,8 @@ public record TvSeriesViewModel
     public List<int> TmdbEpisodeRunTimes { get; }
     public string? FirstAirDateString { get; }
     public DateOnly? FirstAirDate { get; }
-    public string? TmdbGenres { get; }
-    public string Homepage { get; }
+    public string TmdbGenres { get; }
+    public string? Homepage { get; }
     public int TmdbId { get; }
     public bool IsInProduction { get; }
     public string Languages { get; }
@@ -198,8 +195,8 @@ public record TvSeriesViewModel
     public List<NetworkViewModel> Networks { get; }
     public int NumberOfEpisodes { get; }
     public int NumberOfSeasons { get; }
-    public string? OriginCountries { get; }
-    public string? OriginLanguage { get; }
+    public string OriginCountries { get; }
+    public string OriginLanguage { get; }
     public string OriginalName { get; }
     public string TmdbOverview { get; }
     public string ProductionCompanies { get; }

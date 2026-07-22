@@ -95,6 +95,6 @@ public record OmdbResponseDataModel
 
     public override string ToString()
     {
-        return $"Title: {Title}\nYear: {Year}\nRated: {Rated}\nReleased: {Released}\nSeason: {Season}\nEpisode: {Episode}\nRuntime: {Runtime}\nGenre: {Genre}\nDirector: {Director}\nWriter: {Writer}\nActors: {Actors}\nPlot: {Plot}\nLanguage: {Language}\nCountry: {Country}\nAwards: {Awards}\nPoster: {Poster}\nRatings:\n*****\n{string.Join("\n\n", Ratings)}\n*****\nMetascore: {Metascore}\nImdbRating: {ImdbRating}\nImdbVotes: {ImdbVotes}\nImdbId: {ImdbId}\nSeriesId: {SeriesId}\nType: {Type}\nDVD: {DVD}\nTotal Seasons: {TotalSeasons}\nBoxOffice: {BoxOffice}\nProduction: {Production}\nWebsite: {Website}\nResponse: {Response}\n";
+        return $"Title: {Title}\nYear: {Year}\nRated: {Rated}\nReleased: {Released}\nSeason: {Season}\nEpisode: {Episode}\nRuntime: {Runtime}\nGenre: {Genre}\nDirector: {Director}\nWriter: {Writer}\nActors: {Actors}\nPlot: {Plot}\nLanguage: {Language}\nCountry: {Country}\nAwards: {Awards}\nPoster: {Poster}\nRatings:\n*****\n{string.Join("\n\n", Ratings)}\n*****\nMetascore: {Metascore}\nImdbRating: {ImdbRating}\nImdbVotes: {ImdbVotes}\nImdbId: {ImdbId}\nSeriesId: {SeriesId}\nType: {Type}\nDVD: {DVD}\nTotal Seasons: {TotalSeasons}\nBoxOffice: {BoxOffice}\nProduction: {Production}\nWebsite: {Website}\nResponse: {Response}";
     }
 }

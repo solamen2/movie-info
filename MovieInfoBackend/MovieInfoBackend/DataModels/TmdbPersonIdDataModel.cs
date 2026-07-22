@@ -7,7 +7,7 @@ public record TmdbPersonIdDataModel
     [JsonPropertyName("adult")]
     public required bool Adult { get; init; }
     [JsonPropertyName("id")]
-    public required int Id { get; init; }
+    public required int TmdbId { get; init; }
     [JsonPropertyName("name")]
     public required string Name { get; init; }
     [JsonPropertyName("original_name")]
@@ -27,6 +27,6 @@ public record TmdbPersonIdDataModel
 
     public override string ToString()
     {
-        return $"Adult: {Adult}\nId: {Id}\nName: {Name}\nOriginalName: {OriginalName}\nMediaType: {MediaType}\nPopularity: {Popularity}\nGender: {Gender}\nKnownForDepartment: {KnownForDepartment}\nProfilePath: {ProfilePath}\nKnownFor:\n*****\n{string.Join("\n\n", KnownFor)}";
+        return $"Adult: {Adult}\nTmdbd: {TmdbId}\nName: {Name}\nOriginalName: {OriginalName}\nMediaType: {MediaType}\nPopularity: {Popularity}\nGender: {Gender}\nKnownForDepartment: {KnownForDepartment}\nProfilePath: {ProfilePath}\nKnownFor:\n*****\n{string.Join("\n\n", KnownFor)}";
     }
 }

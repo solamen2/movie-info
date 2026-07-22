@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace MovieInfoBackend.DataModels;
 
-public record TmdbTvEpisodeCrewDataModel
+public record TmdbTvEpisodeCrewDataModel  // NOTE: More of a person description than a TV episode description
 {
     [JsonPropertyName("department")]
     public required string Department { get; init; }

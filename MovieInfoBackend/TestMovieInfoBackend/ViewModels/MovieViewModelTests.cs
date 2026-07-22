@@ -129,6 +129,8 @@ public class MovieViewModelTests
         TmdbConfigurationLanguagesResponseDataModel.ConfigurationLanguagesDictionary? tvConfigurationLanguagesDictionary = tvConfigurationLanguagesResponse.GetConfigurationLanguagesDictionary();
         Assert.NotNull(tvConfigurationLanguagesDictionary);
 
+        // Act
+
         MovieViewModel movieViewModel = new(suggestionMovieViewModel, 
                                             omdbMovieResponse,
                                             tmdbMovieResponse,
@@ -136,11 +138,12 @@ public class MovieViewModelTests
                                             movieWatchProvidersResponse,
                                             tvConfigurationCountriesDictionary,
                                             tvConfigurationLanguagesDictionary);
+        
+        // Assert
+        
         Assert.NotNull(movieViewModel);
 
         // TODO: Check all fields of view model
-
-        // Act
 
         _testOutputHelper.WriteLine(movieViewModel.ToString());
         Assert.Fail();

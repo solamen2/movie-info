@@ -7,19 +7,19 @@ public record TmdbPersonResponseDataModel
     [JsonPropertyName("adult")]
     public required bool Adult { get; init; }
     [JsonPropertyName("also_known_as")]
-    public required string[] AlsoKnownAs { get; init; }
+    public required string[] AlsoKnownAs { get; init; }  // NOTE: Can be empty array, but leaving as required to avoid null warning in ToString()
     [JsonPropertyName("biography")]
-    public required string Biography { get; init; }
+    public string? Biography { get; init; }
     [JsonPropertyName("birthday")]
     public required string Birthday { get; init; }
     [JsonPropertyName("deathday")]
-    public required string Deathday { get; init; }
+    public string? Deathday { get; init; }
     [JsonPropertyName("gender")]
     public required int Gender { get; init; }
     [JsonPropertyName("homepage")]
-    public required string Homepage { get; init; }
+    public string? Homepage { get; init; }
     [JsonPropertyName("id")]
-    public required int Id { get; init; }
+    public required int TmdbId { get; init; }
     [JsonPropertyName("imdb_id")]
     public required string ImdbId { get; init; }
     [JsonPropertyName("known_for_department")]
@@ -35,7 +35,7 @@ public record TmdbPersonResponseDataModel
 
     public override string ToString()
     {
-        return $"Adult: {Adult}\nAlsoKnownAs: {string.Join(", ", AlsoKnownAs)}\nBiography: {Biography}\nBirthday: {Birthday}\nDeathday: {Deathday}\nGender: {Gender}\nHomepage: {Homepage}\nId: {Id}\nImdbId: {ImdbId}\nKnownForDepartment: {KnownForDepartment}\nName: {Name}\nPlaceOfBirth: {PlaceOfBirth}\nPopularity: {Popularity}\nProfilePath: {ProfilePath}";
+        return $"Adult: {Adult}\nAlsoKnownAs: {string.Join(", ", AlsoKnownAs)}\nBiography: {Biography}\nBirthday: {Birthday}\nDeathday: {Deathday}\nGender: {Gender}\nHomepage: {Homepage}\nTmdbId: {TmdbId}\nImdbId: {ImdbId}\nKnownForDepartment: {KnownForDepartment}\nName: {Name}\nPlaceOfBirth: {PlaceOfBirth}\nPopularity: {Popularity}\nProfilePath: {ProfilePath}";
     }
 
 }

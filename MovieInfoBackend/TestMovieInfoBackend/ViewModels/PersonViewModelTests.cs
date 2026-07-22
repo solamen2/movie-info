@@ -97,16 +97,19 @@ public class PersonViewModelTests
         TmdbPersonImagesResponseDataModel? personImagesResponse = TmdbHttpClient.GetPersonImagesModelFromResponse(tmdbHttpClientPersonImagesResponse);
         Assert.NotNull(personImagesResponse);
 
+        // Act
+
         PersonViewModel personViewModel = new(suggestionPersonViewModel, 
                                               personResponse,
                                               personMovieCreditsResponse,
                                               personTvSeriesCreditsResponse,
                                               personImagesResponse);
+        
+        // Assert
+        
         Assert.NotNull(personViewModel);
 
         // TODO: Check all fields of view model
-
-        // Act
 
         _testOutputHelper.WriteLine(personViewModel.ToString());
         Assert.Fail();

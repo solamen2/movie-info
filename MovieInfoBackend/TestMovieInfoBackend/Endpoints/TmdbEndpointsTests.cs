@@ -325,7 +325,7 @@ public class TmdbEndpointsTests
         TmdbMovieCreditsResponseDataModel? movieCreditsResponse = TmdbHttpClient.GetMovieCreditsModelFromResponse(tmdbHttpClientMovieCreditsResponse);
         Assert.NotNull(movieCreditsResponse);
         TmdbMovieExternalIdsResponseDataModel? movieExternalIdsResponse = TmdbHttpClient.GetMovieExternalIdsModelFromResponse(tmdbHttpClientMovieExternalIdsResponse);
-        Assert.NotNull(tmdbHttpClientMovieExternalIdsResponse);
+        Assert.NotNull(movieExternalIdsResponse);
         TmdbGenresResponseDataModel? movieGenresResponse = TmdbHttpClient.GetGenresModelFromResponse(tmdbHttpClientMovieGenresResponse);
         Assert.NotNull(movieGenresResponse);
         TmdbIdResponseDataModel? movieIdResponse = TmdbHttpClient.GetIdModelFromResponse(tmdbHttpClientMovieIdResponse);
@@ -363,7 +363,7 @@ public class TmdbEndpointsTests
         TmdbTvSeriesAggregateCreditsResponseDataModel? tvSeriesAggregateCreditsResponse = TmdbHttpClient.GetTvSeriesAggregateCreditsModelFromResponse(tmdbHttpClientTvSeriesAggregateCreditsResponse);
         Assert.NotNull(tvSeriesAggregateCreditsResponse);
         TmdbTvSeriesExternalIdsResponseDataModel? tvSeriesExternalIdsResponse = TmdbHttpClient.GetTvSeriesExternalIdsModelFromResponse(tmdbHttpClientTvSeriesExternalIdsResponse);
-        Assert.NotNull(tmdbHttpClientTvSeriesExternalIdsResponse);
+        Assert.NotNull(tvSeriesExternalIdsResponse);
         TmdbGenresResponseDataModel? tvSeriesGenresResponse = TmdbHttpClient.GetGenresModelFromResponse(tmdbHttpClientTvSeriesGenresResponse);
         Assert.NotNull(tvSeriesGenresResponse);
         TmdbIdResponseDataModel? tvSeriesIdResponse = TmdbHttpClient.GetIdModelFromResponse(tmdbHttpClientTvSeriesIdResponse);

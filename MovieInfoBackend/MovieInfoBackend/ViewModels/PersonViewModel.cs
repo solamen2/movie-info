@@ -22,7 +22,7 @@ public record PersonViewModel
         this.Deathday = tmdbPersonDataModel.Deathday;
         this.Gender = (TmdbGenderType)tmdbPersonDataModel.Gender;
         this.Homepage = tmdbPersonDataModel.Homepage;
-        this.TmdbId = tmdbPersonDataModel.Id;
+        this.TmdbId = tmdbPersonDataModel.TmdbId;
         this.KnownForDepartment = tmdbPersonDataModel.KnownForDepartment;
         this.PlaceOfBirth = tmdbPersonDataModel.PlaceOfBirth;
         this.ProfilePath = tmdbPersonDataModel.ProfilePath;
@@ -50,11 +50,11 @@ public record PersonViewModel
     public int? ImdbRank { get; }
     public string KnownForMovies { get; }
     public List<string> AlsoKnownAs { get; }
-    public string Biography { get; }
+    public string? Biography { get; }
     public string Birthday { get; }  // Actually a date, of course
-    public string Deathday { get; }  // Actually a date, of course
+    public string? Deathday { get; }  // Actually a date, of course
     public TmdbGenderType Gender { get; }
-    public string Homepage { get; }
+    public string? Homepage { get; }
     public int TmdbId { get; }
     public string KnownForDepartment { get; }
     public string PlaceOfBirth { get; }

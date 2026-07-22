@@ -11,7 +11,7 @@ public record WatchProviderViewModel
     }
     
     public Guid ID { get; }
-    public string LogoPath { get; }
+    public string? LogoPath { get; }
     public string ProviderName { get; }
     public int DisplayPriority { get; }
 

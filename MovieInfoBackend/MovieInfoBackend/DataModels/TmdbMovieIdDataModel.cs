@@ -9,7 +9,7 @@ public record TmdbMovieIdDataModel
     [JsonPropertyName("backdrop_path")]
     public required string BackdropPath { get; init; }
     [JsonPropertyName("id")]
-    public required int Id { get; init; }
+    public required int TmdbId { get; init; }
     [JsonPropertyName("title")]
     public required string Title { get; init; }
     [JsonPropertyName("original_title")]
@@ -27,7 +27,7 @@ public record TmdbMovieIdDataModel
     [JsonPropertyName("popularity")]
     public required double Popularity { get; init; }
     [JsonPropertyName("release_date")]
-    public required string ReleaseDate { get; init; }
+    public string? ReleaseDate { get; init; }
     [JsonPropertyName("softcore")]
     public required bool Softcore { get; init; }
     [JsonPropertyName("video")]
@@ -39,6 +39,6 @@ public record TmdbMovieIdDataModel
 
     public override string ToString()
     {
-        return $"Adult: {Adult}\nBackdropPath: {BackdropPath}\nId: {Id}\nTitle: {Title}\nOriginalTitle: {OriginalTitle}\nOverview: {Overview}\nPosterPath: {PosterPath}\nMediaType: {MediaType}\nOriginalLanguage: {OriginalLanguage}\nGenreIds: {string.Join(", ", GenreIds)}\nPopularity: {Popularity}\nReleaseDate: {ReleaseDate}\nSoftcore: {Softcore}\nVideo: {Video}\nVoteAverage: {VoteAverage}\nVoteCount: {VoteCount}";
+        return $"Adult: {Adult}\nBackdropPath: {BackdropPath}\nTmdbd: {TmdbId}\nTitle: {Title}\nOriginalTitle: {OriginalTitle}\nOverview: {Overview}\nPosterPath: {PosterPath}\nMediaType: {MediaType}\nOriginalLanguage: {OriginalLanguage}\nGenreIds: {string.Join(", ", GenreIds)}\nPopularity: {Popularity}\nReleaseDate: {ReleaseDate}\nSoftcore: {Softcore}\nVideo: {Video}\nVoteAverage: {VoteAverage}\nVoteCount: {VoteCount}";
     }
 }

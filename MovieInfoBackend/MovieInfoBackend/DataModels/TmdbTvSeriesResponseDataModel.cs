@@ -15,9 +15,9 @@ public record TmdbTvSeriesResponseDataModel
     [JsonPropertyName("first_air_date")]
     public string? FirstAirDate { get; init; }
     [JsonPropertyName("genres")]
-    public required TmdbGenreDataModel[]? Genres { get; init; }
+    public required TmdbGenreDataModel[] Genres { get; init; }
     [JsonPropertyName("homepage")]
-    public required string Homepage { get; init; }
+    public string? Homepage { get; init; }
     [JsonPropertyName("id")]
     public required int Id { get; init; }
     [JsonPropertyName("in_production")]
@@ -27,11 +27,11 @@ public record TmdbTvSeriesResponseDataModel
     [JsonPropertyName("last_air_date")]
     public string? LastAirDate { get; init; }
     [JsonPropertyName("last_episode_to_air")]
-    public TmdbIndividualTvEpisodeDataModel? LastEpisodeToAir { get; init; }
+    public TmdbIndividualTvEpisodeIdDataModel? LastEpisodeToAir { get; init; }
     [JsonPropertyName("name")]
     public required string Name { get; init; }
     [JsonPropertyName("next_episode_to_air")]
-    public TmdbIndividualTvEpisodeDataModel? NextEpisodeToAir { get; init; }
+    public TmdbIndividualTvEpisodeIdDataModel? NextEpisodeToAir { get; init; }
     [JsonPropertyName("networks")]
     public required TmdbNetworkDataModel[] Networks { get; init; }
     [JsonPropertyName("number_of_episodes")]

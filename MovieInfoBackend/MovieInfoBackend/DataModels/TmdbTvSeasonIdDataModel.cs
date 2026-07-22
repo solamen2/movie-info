@@ -5,7 +5,7 @@ namespace MovieInfoBackend.DataModels;
 public record TmdbTvSeasonIdDataModel
 {
     [JsonPropertyName("id")]
-    public required int Id { get; init; }
+    public required int TmdbId { get; init; }
     [JsonPropertyName("name")]
     public required string Name { get; init; }
     [JsonPropertyName("overview")]
@@ -27,6 +27,6 @@ public record TmdbTvSeasonIdDataModel
 
     public override string ToString()
     {
-        return $"Id: {Id}\nName: {Name}\nOverview: {Overview}\nPosterPath: {PosterPath}\nMediaType: {MediaType}\nVoteAverage: {VoteAverage}\nAirDate: {AirDate}\nSeasonNumber: {SeasonNumber}\nShowId: {ShowId}\nEpisodeCount: {EpisodeCount}";
+        return $"Tmdbd: {TmdbId}\nName: {Name}\nOverview: {Overview}\nPosterPath: {PosterPath}\nMediaType: {MediaType}\nVoteAverage: {VoteAverage}\nAirDate: {AirDate}\nSeasonNumber: {SeasonNumber}\nShowId: {ShowId}\nEpisodeCount: {EpisodeCount}";
     }
 }

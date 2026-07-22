@@ -39,29 +39,29 @@ public record MovieViewModel
             this.BoxOfficeNumber = long.Parse(omdbDataModel.BoxOffice, NumberStyles.AllowThousands | NumberStyles.AllowCurrencySymbol);
         }
         this.Budget = tmdbMovieDataModel.Budget;
-        this.TmdbGenres = null;
-        if (tmdbMovieDataModel.Genres != null)
-        {
-            this.TmdbGenres = String.Join(", ", tmdbMovieDataModel.Genres.Select(tgdm => tgdm.Name));
-        }
+        this.TmdbGenres = String.Join(", ", tmdbMovieDataModel.Genres.Select(tgdm => tgdm.Name));
+        
         this.Homepage = tmdbMovieDataModel.Homepage;
-        this.TmdbId = tmdbMovieDataModel.Id;
-        this.OriginCountries = null;
+        this.TmdbId = tmdbMovieDataModel.TmdbId;
+        this.OriginCountries = "";
         FrozenDictionary<string, string>? iso31661ToEnglishCountryNameDictionary = configurationCountriesDictionary.iso31661ToEnglishCountryNameDictionary;
-        if (tmdbMovieDataModel.OriginCountry != null && iso31661ToEnglishCountryNameDictionary != null)
+        if (iso31661ToEnglishCountryNameDictionary != null)
         {            
             this.OriginCountries = String.Join(", ", tmdbMovieDataModel.OriginCountry.Select(oc => iso31661ToEnglishCountryNameDictionary[oc]));
         }
-        this.OriginLanguage = null;
+        this.OriginLanguage = "";
         FrozenDictionary<string, string>? iso6391ToEnglishLanguageNameDictionary = configurationLanguagesDictionary.iso6391ToEnglishLanguageNameDictionary;
-        if (tmdbMovieDataModel.OriginalLanguage != null && iso6391ToEnglishLanguageNameDictionary != null)
+        if (iso6391ToEnglishLanguageNameDictionary != null)
         {            
             string iso6391LanguageCode = tmdbMovieDataModel.OriginalLanguage;
             this.OriginLanguage = iso6391ToEnglishLanguageNameDictionary[iso6391LanguageCode];
         }
         this.OriginalTitle = tmdbMovieDataModel.OriginalTitle;
         this.TmdbPlot = tmdbMovieDataModel.Overview;
-        this.ProductionCompanies = String.Join("; ", tmdbMovieDataModel.ProductionCompanies.Select(tpcdm => tpcdm.Name));
+        if (tmdbMovieDataModel.ProductionCompanies != null)
+        {
+            this.ProductionCompanies = String.Join("; ", tmdbMovieDataModel.ProductionCompanies.Select(tpcdm => tpcdm.Name));
+        }
         this.ProductionCountries = String.Join(", ", tmdbMovieDataModel.ProductionCountries.Select(tpcdm => tpcdm.Name));
         this.ReleaseDate = tmdbMovieDataModel.ReleaseDate;
         this.Revenue = tmdbMovieDataModel.Revenue;
@@ -133,21 +133,21 @@ public record MovieViewModel
     public string? BoxOfficeString { get; }
     public long BoxOfficeNumber { get; }
     public long Budget { get; }
-    public string? TmdbGenres { get; }
-    public string Homepage { get; }
+    public string TmdbGenres { get; }
+    public string? Homepage { get; }
     public int TmdbId { get; }
-    public string? OriginCountries { get; }
-    public string? OriginLanguage { get; }
+    public string OriginCountries { get; }
+    public string OriginLanguage { get; }
     public string OriginalTitle { get; }
     public string TmdbPlot { get; }
-    public string ProductionCompanies { get; }
+    public string? ProductionCompanies { get; }
     public string ProductionCountries { get; }
     public string ReleaseDate { get; }  // NOTE: Actually a date, of course
     public long Revenue { get; }
     public int Runtime { get; }
     public string SpokenLanguages { get; }
     public string Status { get; }
-    public string Tagline { get; }
+    public string? Tagline { get; }
     public List<MovieCastViewModel> Cast { get; }
     public List<MovieCrewViewModel> Directors { get; }
     public List<MovieCrewViewModel> Writers { get; }

@@ -5,7 +5,7 @@ namespace MovieInfoBackend.DataModels;
 public record TmdbWatchProviderDataModel
 {
     [JsonPropertyName("logo_path")]
-    public required string LogoPath { get; init; }
+    public string? LogoPath { get; init; }
     [JsonPropertyName("provider_id")]
     public required int ProviderId { get; init; }
     [JsonPropertyName("provider_name")]

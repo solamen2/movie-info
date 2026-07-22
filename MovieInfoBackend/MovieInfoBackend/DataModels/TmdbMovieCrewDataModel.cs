@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace MovieInfoBackend.DataModels;
 
-public record TmdbMovieCrewDataModel
+public record TmdbMovieCrewDataModel  // NOTE: More of a person description than a movie description
 {
     [JsonPropertyName("adult")]
     public required bool Adult { get; init; }

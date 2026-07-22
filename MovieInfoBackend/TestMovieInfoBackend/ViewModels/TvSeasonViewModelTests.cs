@@ -51,13 +51,16 @@ public class TvSeasonViewModelTests
         TmdbWatchProvidersResponseDataModel? tvSeasonWatchProvidersResponse = TmdbHttpClient.GetWatchProvidersModelFromResponse(tmdbHttpClientTvSeasonWatchProvidersResponse);
         Assert.NotNull(tvSeasonWatchProvidersResponse);
 
+        // Act
+
         TvSeasonViewModel tvSeasonViewModel = new(tvSeasonResponse, 
                                                   tvSeasonWatchProvidersResponse);
+        
+        // Assert
+        
         Assert.NotNull(tvSeasonViewModel);
 
         // TODO: Check all fields of view model
-
-        // Act
 
         _testOutputHelper.WriteLine(tvSeasonViewModel.ToString());
         Assert.Fail();

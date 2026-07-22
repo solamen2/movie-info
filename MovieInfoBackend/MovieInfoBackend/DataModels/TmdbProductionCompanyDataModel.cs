@@ -7,7 +7,7 @@ public record TmdbProductionCompanyDataModel
     [JsonPropertyName("id")]
     public required int Id { get; init; }
     [JsonPropertyName("logo_path")]
-    public required string LogoPath { get; init; }
+    public string? LogoPath { get; init; }
     [JsonPropertyName("name")]
     public required string Name { get; init; }
     [JsonPropertyName("origin_country")]

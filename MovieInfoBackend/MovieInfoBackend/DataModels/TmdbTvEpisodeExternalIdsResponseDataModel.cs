@@ -5,7 +5,7 @@ namespace MovieInfoBackend.DataModels;
 public record TmdbTvEpisodeExternalIdsResponseDataModel
 {
     [JsonPropertyName("id")]
-    public required int Id { get; init; }
+    public required int TmdbId { get; init; }
     [JsonPropertyName("imdb_id")]
     public required string ImdbId { get; init; }
     [JsonPropertyName("freebase_mid")]
@@ -21,7 +21,7 @@ public record TmdbTvEpisodeExternalIdsResponseDataModel
 
     public override string ToString()
     {
-        return $"Id: {Id}\nImdbId: {ImdbId}\nFreebaseMid: {FreebaseMid}\nFreebaseId: {FreebaseId}\nTvdbId: {TvdbId}\nTvRageId: {TvRageId}\nWikidataId: {WikidataId}";
+        return $"TmdbId: {TmdbId}\nImdbId: {ImdbId}\nFreebaseMid: {FreebaseMid}\nFreebaseId: {FreebaseId}\nTvdbId: {TvdbId}\nTvRageId: {TvRageId}\nWikidataId: {WikidataId}";
     }
 
 }

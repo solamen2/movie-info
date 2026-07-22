@@ -5,7 +5,7 @@ namespace MovieInfoBackend.DataModels;
 public record TmdbTvSeriesExternalIdsResponseDataModel
 {
     [JsonPropertyName("id")]
-    public required int Id { get; init; }
+    public required int TmdbId { get; init; }
     [JsonPropertyName("imdb_id")]
     public required string ImdbId { get; init; }
     [JsonPropertyName("freebase_mid")]
@@ -19,15 +19,15 @@ public record TmdbTvSeriesExternalIdsResponseDataModel
     [JsonPropertyName("wikidata_id")]
     public required string WikidataId { get; init; }
     [JsonPropertyName("facebook_id")]
-    public required string FacebookId { get; init; }
+    public string? FacebookId { get; init; }
     [JsonPropertyName("instagram_id")]
-    public required string InstagramId { get; init; }
+    public string? InstagramId { get; init; }
     [JsonPropertyName("twitter_id")]
-    public required string TwitterId { get; init; }
+    public string? TwitterId { get; init; }
 
     public override string ToString()
     {
-        return $"Id: {Id}\nImdbId: {ImdbId}\nFreebaseMid: {FreebaseMid}\nFreebaseId: {FreebaseId}\nTvdbId: {TvdbId}\nTvRageId: {TvRageId}\nWikidataId: {WikidataId}\nFacebookId: {FacebookId}\nInstagramId: {InstagramId}\nTwitterId: {TwitterId}";
+        return $"TmdbId: {TmdbId}\nImdbId: {ImdbId}\nFreebaseMid: {FreebaseMid}\nFreebaseId: {FreebaseId}\nTvdbId: {TvdbId}\nTvRageId: {TvRageId}\nWikidataId: {WikidataId}\nFacebookId: {FacebookId}\nInstagramId: {InstagramId}\nTwitterId: {TwitterId}";
     }
 
 }

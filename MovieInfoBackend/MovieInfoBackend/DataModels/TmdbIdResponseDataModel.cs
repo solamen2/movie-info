@@ -11,12 +11,12 @@ public record TmdbIdResponseDataModel
     [JsonPropertyName("tv_results")]
     public TmdbTvSeriesIdDataModel[]? TvResults { get; init; }
     [JsonPropertyName("tv_episode_results")]
-    public TmdbIndividualTvEpisodeDataModel[]? TvEpisodeResults { get; init; }
+    public TmdbIndividualTvEpisodeIdDataModel[]? TvEpisodeResults { get; init; }
     [JsonPropertyName("tv_season_results")]
     public TmdbTvSeasonIdDataModel[]? TvSeasonResults { get; init; }
 
     public override string ToString()
     {
-        return $"MovieResults:\n*****\n{string.Join("\n\n", MovieResults)}\n*****\nPersonResults:\n*****\n{string.Join("\n\n", PersonResults)}\n*****\nTvResults:\n*****\n{string.Join("\n\n", TvResults)}\n*****\nTvEpisodeResults:\n*****\n{string.Join("\n\n", TvEpisodeResults)}\n*****\nTvSeasonResults:\n*****\n{string.Join("\n\n", TvSeasonResults)}\n*****\n";
+        return $"MovieResults:\n*****\n{string.Join("\n\n", MovieResults)}\n*****\nPersonResults:\n*****\n{string.Join("\n\n", PersonResults)}\n*****\nTvResults:\n*****\n{string.Join("\n\n", TvResults)}\n*****\nTvEpisodeResults:\n*****\n{string.Join("\n\n", TvEpisodeResults)}\n*****\nTvSeasonResults:\n*****\n{string.Join("\n\n", TvSeasonResults)}";
     }
 }

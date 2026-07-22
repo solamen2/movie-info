@@ -9,9 +9,9 @@ public record TmdbProfileDataModel
     [JsonPropertyName("height")]
     public required int Height { get; init; }
     [JsonPropertyName("iso_3166_1")]
-    public required string Iso31661 { get; init; }
+    public string? Iso31661 { get; init; }
     [JsonPropertyName("iso_639_1")]
-    public required string Iso6391 { get; init; }
+    public string? Iso6391 { get; init; }
     [JsonPropertyName("file_path")]
     public required string FilePath { get; init; }
     [JsonPropertyName("vote_average")]
