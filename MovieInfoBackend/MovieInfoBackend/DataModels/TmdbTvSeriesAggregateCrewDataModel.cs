@@ -19,7 +19,7 @@ public record TmdbTvSeriesAggregateCrewDataModel  // NOTE: More of a person desc
     [JsonPropertyName("popularity")]
     public required double Popularity { get; init; }
     [JsonPropertyName("profile_path")]
-    public required string ProfilePath { get; init; }
+    public string? ProfilePath { get; init; }
     [JsonPropertyName("jobs")]
     public required TmdbTvSeriesAggregateCrewJobDataModel[] Jobs { get; init; }
     [JsonPropertyName("department")]

@@ -58,7 +58,7 @@ public record PersonViewModel
     public int TmdbId { get; }
     public string KnownForDepartment { get; }
     public string PlaceOfBirth { get; }
-    public string ProfilePath { get; }
+    public string? ProfilePath { get; }
     public List<PersonMovieCastViewModel> MovieCastCredits { get; }
     public List<PersonMovieCrewViewModel> MovieCrewCredits { get; }
     public List<PersonTvSeriesCastViewModel> TvSeriesCastCredits { get; }

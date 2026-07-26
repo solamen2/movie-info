@@ -21,7 +21,7 @@ public record TmdbPersonIdDataModel
     [JsonPropertyName("known_for_department")]
     public required string KnownForDepartment { get; init; }
     [JsonPropertyName("profile_path")]
-    public required string ProfilePath { get; init; }
+    public string? ProfilePath { get; init; }
     [JsonPropertyName("known_for")]
     public TmdbMovieIdDataModel[]? KnownFor { get; init; }
 

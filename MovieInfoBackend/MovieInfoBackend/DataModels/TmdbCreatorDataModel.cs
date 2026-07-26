@@ -15,7 +15,7 @@ public record TmdbCreatorDataModel
     [JsonPropertyName("gender")]
     public required int Gender { get; init; }
     [JsonPropertyName("profile_path")]
-    public required string ProfilePath { get; init; }
+    public string? ProfilePath { get; init; }
 
     public override string ToString()
     {

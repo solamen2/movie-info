@@ -19,7 +19,7 @@ public record TmdbTvSeriesAggregateCastDataModel  // NOTE: More of a person desc
     [JsonPropertyName("popularity")]
     public required double Popularity { get; init; }
     [JsonPropertyName("profile_path")]
-    public required string ProfilePath { get; init; }
+    public string? ProfilePath { get; init; }
     [JsonPropertyName("roles")]
     public required TmdbTvSeriesAggregateCastRoleDataModel[] Roles { get; init; }
     [JsonPropertyName("total_episode_count")]

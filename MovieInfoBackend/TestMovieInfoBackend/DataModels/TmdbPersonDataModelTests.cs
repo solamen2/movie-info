@@ -127,7 +127,6 @@ public class TmdbPersonDataModelTests
         Assert.False(String.IsNullOrWhiteSpace(personResponse.Name), "Person Name must not be empty");
         Assert.False(String.IsNullOrWhiteSpace(personResponse.PlaceOfBirth), "Person PlaceOfBirth must not be empty");
         Assert.True(personResponse.Popularity >= 0.0, "Person Popularity must not be a negative decimal number");
-        Assert.False(String.IsNullOrWhiteSpace(personResponse.ProfilePath), "Person ProfilePath must not be empty");
 
         // Person TV series credits
         Assert.NotNull(personTvSeriesCreditsResponse);

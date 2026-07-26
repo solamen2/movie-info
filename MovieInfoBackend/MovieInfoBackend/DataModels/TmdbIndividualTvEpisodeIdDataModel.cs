@@ -11,7 +11,7 @@ public record TmdbIndividualTvEpisodeIdDataModel
     [JsonPropertyName("overview")]
     public required string Overview { get; init; }
     [JsonPropertyName("media_type")]
-    public required string MediaType { get; init; }
+    public string? MediaType { get; init; }  // NOTE: Not present in LastEpisodeToAir / NextEpisodeToAir
     [JsonPropertyName("vote_average")]
     public required double VoteAverage { get; init; }
     [JsonPropertyName("vote_count")]

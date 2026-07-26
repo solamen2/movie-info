@@ -5,9 +5,9 @@ namespace MovieInfoBackend.DataModels;
 public record TmdbTvSeasonResponseDataModel
 {
     [JsonPropertyName("_id")]
-    public required string Id1 { get; init; }
+    public required string Id1 { get; init; }  // NOTE: Text ID (for internal Mongo use?) Probably will never need
     [JsonPropertyName("air_date")]
-    public required string AirDate { get; init; }
+    public string? AirDate { get; init; }
     [JsonPropertyName("episodes")]
     public required TmdbTvSeasonEpisodeDataModel[] Episodes { get; init; }
     [JsonPropertyName("name")]
@@ -24,8 +24,6 @@ public record TmdbTvSeasonResponseDataModel
     public required int SeasonNumber { get; init; }
     [JsonPropertyName("vote_average")]
     public required double VoteAverage { get; init; }
-
-    
 
     public override string ToString()
     {

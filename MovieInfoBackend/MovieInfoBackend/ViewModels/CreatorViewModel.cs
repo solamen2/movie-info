@@ -19,7 +19,7 @@ public record TmdbCreatorViewModel
     public string Name { get; }
     public string OriginalName { get; }
     public TmdbGenderType Gender { get; }
-    public string ProfilePath { get; }
+    public string? ProfilePath { get; }
 
     public override string ToString()
     {

@@ -25,7 +25,7 @@ public record TmdbTvEpisodeGuestStarDataModel  // NOTE: More of a person descrip
     [JsonPropertyName("popularity")]
     public required double Popularity { get; init; }
     [JsonPropertyName("profile_path")]
-    public required string ProfilePath { get; init; }
+    public string? ProfilePath { get; init; }
 
     public override string ToString()
     {
