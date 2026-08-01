@@ -4,9 +4,10 @@ namespace MovieInfoBackend.ViewModels;
 
 public record PersonMovieCrewViewModel
 {
-    public PersonMovieCrewViewModel(TmdbPersonMovieCrewDataModel tmdbPersonMovieCrewDataModel)
+    public PersonMovieCrewViewModel(TmdbPersonMovieCrewDataModel tmdbPersonMovieCrewDataModel,
+                                    Guid? testGuid = null)
     {
-        this.ID = Guid.NewGuid();
+        this.ID = testGuid ?? Guid.NewGuid();
         this.StillPath = tmdbPersonMovieCrewDataModel.BackdropPath;
         this.TmdbId = tmdbPersonMovieCrewDataModel.Id;
         this.Title = tmdbPersonMovieCrewDataModel.Title;

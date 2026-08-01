@@ -4,9 +4,10 @@ namespace MovieInfoBackend.ViewModels;
 
 public record PersonTvSeriesCrewViewModel
 {
-    public PersonTvSeriesCrewViewModel(TmdbPersonTvSeriesCrewDataModel tmdbPersonTvSeriesCrewDataModel)
+    public PersonTvSeriesCrewViewModel(TmdbPersonTvSeriesCrewDataModel tmdbPersonTvSeriesCrewDataModel,
+                                       Guid? testGuid = null)
     {
-        this.ID = Guid.NewGuid();
+        this.ID = testGuid ?? Guid.NewGuid();
         this.BackdropPath = tmdbPersonTvSeriesCrewDataModel.BackdropPath;
         this.TmdbId = tmdbPersonTvSeriesCrewDataModel.Id;
         this.OriginalName = tmdbPersonTvSeriesCrewDataModel.OriginalName;

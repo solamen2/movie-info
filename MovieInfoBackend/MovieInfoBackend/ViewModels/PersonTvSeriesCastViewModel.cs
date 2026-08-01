@@ -4,9 +4,10 @@ namespace MovieInfoBackend.ViewModels;
 
 public record PersonTvSeriesCastViewModel
 {
-    public PersonTvSeriesCastViewModel(TmdbPersonTvSeriesCastDataModel tmdbPersonTvSeriesCastDataModel)
+    public PersonTvSeriesCastViewModel(TmdbPersonTvSeriesCastDataModel tmdbPersonTvSeriesCastDataModel,
+                                       Guid? testGuid = null)
     {
-        this.ID = Guid.NewGuid();
+        this.ID = testGuid ?? Guid.NewGuid();
         this.BackdropPath = tmdbPersonTvSeriesCastDataModel.BackdropPath;
         this.TmdbId = tmdbPersonTvSeriesCastDataModel.Id;
         this.OriginalName = tmdbPersonTvSeriesCastDataModel.OriginalName;

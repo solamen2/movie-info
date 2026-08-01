@@ -6,9 +6,10 @@ namespace MovieInfoBackend.ViewModels;
 public record TvSeasonEpisodeViewModel
 {
     // NOTE: This exists at the season level; TvEpisodeViewModel is shown after selecting a single episode
-    public TvSeasonEpisodeViewModel(TmdbTvSeasonEpisodeDataModel tmdbTvSeasonEpisodeDataModel)
+    public TvSeasonEpisodeViewModel(TmdbTvSeasonEpisodeDataModel tmdbTvSeasonEpisodeDataModel,
+                                    Guid? testGuid = null)
     {
-        this.ID = Guid.NewGuid();
+        this.ID = testGuid ?? Guid.NewGuid();
         this.AirDateString = tmdbTvSeasonEpisodeDataModel.AirDate;
         if (String.IsNullOrWhiteSpace(AirDateString) || this.AirDateString == "N/A")
         {

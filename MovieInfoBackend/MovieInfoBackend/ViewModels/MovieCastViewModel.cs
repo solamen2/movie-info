@@ -5,9 +5,10 @@ namespace MovieInfoBackend.ViewModels;
 public record MovieCastViewModel
 {    
     // TODO: It would be nice to have a link out to the IMDB for all cast, crew (director / producer / writer), and guest star models. Need to call TMDB External IDs API for that (but only call when a button is pressed in UI! Or the person is somehow selected...)
-    public MovieCastViewModel(TmdbMovieCastDataModel movieCastDataModel)
+    public MovieCastViewModel(TmdbMovieCastDataModel movieCastDataModel,
+                              Guid? testGuid = null)
     {
-        this.ID = Guid.NewGuid();
+        this.ID = testGuid ?? Guid.NewGuid();
         this.Gender = (TmdbGenderType)movieCastDataModel.Gender;
         this.TmdbId = movieCastDataModel.Id;
         this.Name = movieCastDataModel.Name;

@@ -515,4 +515,26 @@ public class SuggestionViewModelTests
         Assert.Equal(0, viewModel.Year);
         Assert.Equal("", viewModel.Years);
     }
+
+    [Fact]
+    public void SuggestionViewModel_ValidModelToString_ReturnsCorrectValue()
+    {
+        // Arrange
+
+        MovieSuggestionsResponseDataModel? actual1 = MovieHttpClient.GetModelFromResponse(movieHttpClientResponse1);
+
+        SuggestionDataModel[]? suggestions1 = actual1?.Suggestions;
+        Assert.Equal(8, suggestions1?.Length);
+        
+        SuggestionDataModel? suggestionTvSeriesDataModel = suggestions1?[2];
+        Assert.NotNull(suggestionTvSeriesDataModel);
+
+        // Act
+        SuggestionViewModel suggestionTvSeriesViewModel = new(suggestionTvSeriesDataModel, default(Guid));
+
+        // Assert
+        Assert.Equal(
+            "ID: 00000000-0000-0000-0000-000000000000\nImage:\n*****\nHeight: 400\nImageURL: https://example.com/example3.jpg\nWidth: 313\n*****\nItemID: tt10000002\nName: Example TV Series\nSearchType: Media\nMediaType: TV Series\nRank: 4444\nKnownFor: John Smith, James Johnson\nYear: 2001\nYears: 2001-2003"
+                , suggestionTvSeriesViewModel.ToString());
+    }
 }

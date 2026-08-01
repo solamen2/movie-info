@@ -4,9 +4,10 @@ namespace MovieInfoBackend.ViewModels;
 
 public record TmdbCreatorViewModel
 {
-    public TmdbCreatorViewModel(TmdbCreatorDataModel tmdbCreatorDataModel)
+    public TmdbCreatorViewModel(TmdbCreatorDataModel tmdbCreatorDataModel,
+                                Guid? testGuid = null)
     {
-        this.ID = Guid.NewGuid();
+        this.ID = testGuid ?? Guid.NewGuid();
         this.TmdbId = tmdbCreatorDataModel.Id;
         this.Name = tmdbCreatorDataModel.Name;
         this.OriginalName = tmdbCreatorDataModel.OriginalName;

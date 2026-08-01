@@ -4,16 +4,17 @@ namespace MovieInfoBackend.ViewModels;
 
 public record SuggestionViewModel
 {
-    public SuggestionViewModel(SuggestionDataModel suggestionDataModel)
+    public SuggestionViewModel(SuggestionDataModel suggestionDataModel,
+                               Guid? testGuid = null)
     {
-        this.ID = Guid.NewGuid();
+        this.ID = testGuid ?? Guid.NewGuid();
         if (suggestionDataModel.Image == null)
         {
             this.Image = null;
         }
         else
         {
-            this.Image = new SuggestionImageViewModel(suggestionDataModel.Image);
+            this.Image = new SuggestionImageViewModel(suggestionDataModel.Image, testGuid);
         }
         this.ItemID = suggestionDataModel.ItemID;
         this.Name = suggestionDataModel.Name;

@@ -8,9 +8,10 @@ public record PersonViewModel
                            TmdbPersonResponseDataModel tmdbPersonDataModel, 
                            TmdbPersonMovieCreditsResponseDataModel tmdbPersonMovieCreditsDataModel,
                            TmdbPersonTvSeriesCreditsResponseDataModel tmdbPersonTvSeriesCreditsDataModel,
-                           TmdbPersonImagesResponseDataModel tmdbPersonImagesDataModel)
+                           TmdbPersonImagesResponseDataModel tmdbPersonImagesDataModel,
+                           Guid? testGuid = null)
     {
-        this.ID = Guid.NewGuid();
+        this.ID = testGuid ?? Guid.NewGuid();
         this.Image = suggestionViewModel.Image;
         this.ImdbId = suggestionViewModel.ItemID;
         this.Name = suggestionViewModel.Name;

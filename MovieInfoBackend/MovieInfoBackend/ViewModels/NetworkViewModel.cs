@@ -4,9 +4,10 @@ namespace MovieInfoBackend.DataModels;
 
 public record NetworkViewModel
 {
-    public NetworkViewModel(TmdbNetworkDataModel tmdbNetworkDataModel)
+    public NetworkViewModel(TmdbNetworkDataModel tmdbNetworkDataModel,
+                            Guid? testGuid = null)
     {
-        this.ID = Guid.NewGuid();
+        this.ID = testGuid ?? Guid.NewGuid();
         this.TmdbId = tmdbNetworkDataModel.Id;
         this.LogoPath = tmdbNetworkDataModel.LogoPath;
         this.Name = tmdbNetworkDataModel.Name;

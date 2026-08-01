@@ -4,8 +4,10 @@ namespace MovieInfoBackend.DataModels;
 
 public record TvSeriesSeasonViewModel
 {
-    public TvSeriesSeasonViewModel(TmdbTvSeasonDataModel tmdbTvSeasonDataModel)
+    public TvSeriesSeasonViewModel(TmdbTvSeasonDataModel tmdbTvSeasonDataModel,
+                                   Guid? testGuid = null)
     {
+        this.ID = testGuid ?? Guid.NewGuid();
         this.FirstAirDateString = tmdbTvSeasonDataModel.AirDate;
         if (String.IsNullOrWhiteSpace(FirstAirDateString) || this.FirstAirDateString == "N/A")
         {
@@ -23,6 +25,7 @@ public record TvSeriesSeasonViewModel
         this.SeasonNumber = tmdbTvSeasonDataModel.SeasonNumber;
     }
     
+    public Guid ID { get; }
     public string? FirstAirDateString { get; }
     public DateOnly? FirstAirDate { get; }
     public int EpisodeCount { get; }
@@ -34,7 +37,7 @@ public record TvSeriesSeasonViewModel
 
     public override string ToString()
     {
-        return $"FirstAirDateString: {FirstAirDateString}\nFirstAirDate: {FirstAirDate}\nEpisodeCount: {EpisodeCount}\nTmdbId: {TmdbId}\nName: {Name}\nOverview: {Overview}\nPosterPath: {PosterPath}\nSeasonNumber: {SeasonNumber}";
+        return $"ID: {ID}\nFirstAirDateString: {FirstAirDateString}\nFirstAirDate: {FirstAirDate}\nEpisodeCount: {EpisodeCount}\nTmdbId: {TmdbId}\nName: {Name}\nOverview: {Overview}\nPosterPath: {PosterPath}\nSeasonNumber: {SeasonNumber}";
     }
 
 }

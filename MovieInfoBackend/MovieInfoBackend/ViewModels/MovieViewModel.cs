@@ -14,9 +14,10 @@ public record MovieViewModel
                           TmdbMovieCreditsResponseDataModel tmdbMovieCreditsDataModel,
                           TmdbWatchProvidersResponseDataModel tmdbWatchProvidersDataModel,
                           ConfigurationCountriesDictionary configurationCountriesDictionary,
-                          ConfigurationLanguagesDictionary configurationLanguagesDictionary)
+                          ConfigurationLanguagesDictionary configurationLanguagesDictionary,
+                          Guid? testGuid = null)
     {
-        this.ID = Guid.NewGuid();
+        this.ID = testGuid ?? Guid.NewGuid();
         this.Image = suggestionViewModel.Image;
         this.ImdbId = suggestionViewModel.ItemID;
         this.Title = suggestionViewModel.Name;
@@ -70,25 +71,25 @@ public record MovieViewModel
         this.Status = tmdbMovieDataModel.Status;
         this.Tagline = tmdbMovieDataModel.Tagline;
         this.Cast = tmdbMovieCreditsDataModel.Cast
-                        .Select(tmcdm => new MovieCastViewModel(tmcdm))
+                        .Select(tmcdm => new MovieCastViewModel(tmcdm, testGuid))
                         .ToList();
         this.Directors = tmdbMovieCreditsDataModel.Crew
                             .Where(tmcdm => tmcdm.Job == "Director")
-                            .Select(tmcdm => new MovieCrewViewModel(tmcdm))
+                            .Select(tmcdm => new MovieCrewViewModel(tmcdm, testGuid))
                             .ToList();
         this.Writers = tmdbMovieCreditsDataModel.Crew
                             .Where(tmcdm => tmcdm.Department == "Writing")
-                            .Select(tmcdm => new MovieCrewViewModel(tmcdm))
+                            .Select(tmcdm => new MovieCrewViewModel(tmcdm, testGuid))
                             .ToList();
         this.Producers = tmdbMovieCreditsDataModel.Crew
                             .Where(tmcdm => tmcdm.Job.EndsWith("Producer"))
-                            .Select(tmcdm => new MovieCrewViewModel(tmcdm))
+                            .Select(tmcdm => new MovieCrewViewModel(tmcdm, testGuid))
                             .ToList();
         TmdbWatchProviderCountryDataModel? tmdbWatchProviderCountryDataModel = tmdbWatchProvidersDataModel?.Results?.US;
         if (tmdbWatchProviderCountryDataModel?.Buy != null)
         {
             this.WatchProvidersBuy = tmdbWatchProviderCountryDataModel.Buy
-                                        .Select(twpdm => new WatchProviderViewModel(twpdm))
+                                        .Select(twpdm => new WatchProviderViewModel(twpdm, testGuid))
                                         .ToList();
         }
         else
@@ -98,7 +99,7 @@ public record MovieViewModel
         if (tmdbWatchProviderCountryDataModel?.Flatrate != null)
         {
             this.WatchProvidersFlatrate = tmdbWatchProviderCountryDataModel.Flatrate
-                                        .Select(twpdm => new WatchProviderViewModel(twpdm))
+                                        .Select(twpdm => new WatchProviderViewModel(twpdm, testGuid))
                                         .ToList();
         }
         else
@@ -108,7 +109,7 @@ public record MovieViewModel
         if (tmdbWatchProviderCountryDataModel?.Rent != null)
         {
             this.WatchProvidersRent = tmdbWatchProviderCountryDataModel.Rent
-                                        .Select(twpdm => new WatchProviderViewModel(twpdm))
+                                        .Select(twpdm => new WatchProviderViewModel(twpdm, testGuid))
                                         .ToList();
         }
         else

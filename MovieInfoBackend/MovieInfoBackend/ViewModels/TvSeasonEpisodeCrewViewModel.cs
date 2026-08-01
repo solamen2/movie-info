@@ -4,9 +4,10 @@ namespace MovieInfoBackend.ViewModels;
 
 public record TvSeasonEpisodeCrewViewModel
 {
-    public TvSeasonEpisodeCrewViewModel(TmdbTvSeasonEpisodeCrewDataModel tmdbTvSeasonEpisodeCrewDataModel)
+    public TvSeasonEpisodeCrewViewModel(TmdbTvSeasonEpisodeCrewDataModel tmdbTvSeasonEpisodeCrewDataModel,
+                                        Guid? testGuid = null)
     {
-        this.ID = Guid.NewGuid();
+        this.ID = testGuid ?? Guid.NewGuid();
         this.Department = tmdbTvSeasonEpisodeCrewDataModel.Department;
         this.Job = tmdbTvSeasonEpisodeCrewDataModel.Job;
         this.Gender = (TmdbGenderType)tmdbTvSeasonEpisodeCrewDataModel.Gender;

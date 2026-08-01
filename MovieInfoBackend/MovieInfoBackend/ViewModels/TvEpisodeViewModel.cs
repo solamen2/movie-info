@@ -9,9 +9,10 @@ public record TvEpisodeViewModel
     // TODO: No way to get omdbDataModel without knowing the IMDB ID! So there will have to be a call to the TMDB External IDs API to get it in the HTTP Client
     public TvEpisodeViewModel(OmdbResponseDataModel omdbDataModel,
                               TmdbTvEpisodeResponseDataModel tmdbTvEpisodeDataModel,
-                              TmdbTvEpisodeCreditsResponseDataModel tmdbTvEpisodeCreditsDataModel)
+                              TmdbTvEpisodeCreditsResponseDataModel tmdbTvEpisodeCreditsDataModel,
+                              Guid? testGuid = null)
     {
-        this.ID = Guid.NewGuid();
+        this.ID = testGuid ?? Guid.NewGuid();
         if (String.IsNullOrWhiteSpace(omdbDataModel.Year) || omdbDataModel.Year == "N/A")
         {
             this.Year = 0;

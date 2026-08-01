@@ -4,8 +4,10 @@ namespace MovieInfoBackend.ViewModels;
 
 public record SuggestionImageViewModel
 {
-    public SuggestionImageViewModel(SuggestionImageDataModel suggestionImageDataModel)
+    public SuggestionImageViewModel(SuggestionImageDataModel suggestionImageDataModel,
+                                    Guid? testGuid = null)
     {
+        this.ID = testGuid ?? Guid.NewGuid();
         if (suggestionImageDataModel.Height < 0)
         {
             throw new ArgumentException("Image height must be a number greater than 0!");
@@ -19,12 +21,13 @@ public record SuggestionImageViewModel
         }
     }
     
+    public Guid ID { get; }
     public int Height { get; }
     public string ImageURL { get; }
     public int Width { get; }
 
     public override string ToString()
     {
-        return $"Height: {Height}\nImageURL: {ImageURL}\nWidth: {Width}";
+        return $"ID: {ID}\nHeight: {Height}\nImageURL: {ImageURL}\nWidth: {Width}";
     }
 }

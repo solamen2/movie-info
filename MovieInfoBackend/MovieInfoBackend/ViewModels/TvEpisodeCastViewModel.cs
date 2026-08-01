@@ -4,9 +4,10 @@ namespace MovieInfoBackend.ViewModels;
 
 public record TvEpisodeCastViewModel
 {    
-    public TvEpisodeCastViewModel(TmdbTvEpisodeCreditsCastDataModel tmdbTvEpisodeCreditsCastDataModel)
+    public TvEpisodeCastViewModel(TmdbTvEpisodeCreditsCastDataModel tmdbTvEpisodeCreditsCastDataModel,
+                                  Guid? testGuid = null)
     {
-        this.ID = Guid.NewGuid();
+        this.ID = testGuid ?? Guid.NewGuid();
         this.Gender = (TmdbGenderType)tmdbTvEpisodeCreditsCastDataModel.Gender;
         this.TmdbId = tmdbTvEpisodeCreditsCastDataModel.Id;
         this.Name = tmdbTvEpisodeCreditsCastDataModel.Name;

@@ -15,9 +15,10 @@ public record TvSeriesViewModel
                              TmdbTvSeriesAggregateCreditsResponseDataModel tmdbTvSeriesAggregateCreditsDataModel,
                              TmdbWatchProvidersResponseDataModel tmdbWatchProvidersDataModel,
                              ConfigurationCountriesDictionary configurationCountriesDictionary,
-                             ConfigurationLanguagesDictionary configurationLanguagesDictionary)
+                             ConfigurationLanguagesDictionary configurationLanguagesDictionary,
+                             Guid? testGuid = null)
     {
-        this.ID = Guid.NewGuid();
+        this.ID = testGuid ?? Guid.NewGuid();
         this.Image = suggestionViewModel.Image;
         this.ImdbId = suggestionViewModel.ItemID;
         this.Name = suggestionViewModel.Name;

@@ -6,9 +6,10 @@ namespace MovieInfoBackend.ViewModels;
 public record TvSeasonViewModel
 {
     public TvSeasonViewModel(TmdbTvSeasonResponseDataModel tmdbTvSeasonDataModel, 
-                             TmdbWatchProvidersResponseDataModel tmdbWatchProvidersDataModel)
+                             TmdbWatchProvidersResponseDataModel tmdbWatchProvidersDataModel,
+                             Guid? testGuid = null)
     {
-        this.ID = Guid.NewGuid();
+        this.ID = testGuid ?? Guid.NewGuid();
         this.FirstAirDateString = tmdbTvSeasonDataModel.AirDate;
         if (String.IsNullOrWhiteSpace(FirstAirDateString) || this.FirstAirDateString == "N/A")
         {

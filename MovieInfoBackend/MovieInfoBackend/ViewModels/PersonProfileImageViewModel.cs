@@ -4,9 +4,10 @@ namespace MovieInfoBackend.ViewModels;
 
 public record PersonProfileImageViewModel
 {
-    public PersonProfileImageViewModel(TmdbProfileDataModel tmdbProfileDataModel)
+    public PersonProfileImageViewModel(TmdbProfileDataModel tmdbProfileDataModel,
+                                       Guid? testGuid = null)
     {
-        this.ID = Guid.NewGuid();
+        this.ID = testGuid ?? Guid.NewGuid();
         this.Height = tmdbProfileDataModel.Height;
         this.FilePath = tmdbProfileDataModel.FilePath;
         this.Width = tmdbProfileDataModel.Width;

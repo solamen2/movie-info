@@ -2,9 +2,10 @@ namespace MovieInfoBackend.DataModels;
 
 public record WatchProviderViewModel
 {
-    public WatchProviderViewModel(TmdbWatchProviderDataModel tmdbWatchProviderDataModel)
+    public WatchProviderViewModel(TmdbWatchProviderDataModel tmdbWatchProviderDataModel,
+                                  Guid? testGuid = null)
     {
-        this.ID = Guid.NewGuid();
+        this.ID = testGuid ?? Guid.NewGuid();
         this.LogoPath = tmdbWatchProviderDataModel.LogoPath;
         this.ProviderName = tmdbWatchProviderDataModel.ProviderName;
         this.DisplayPriority = tmdbWatchProviderDataModel.DisplayPriority;

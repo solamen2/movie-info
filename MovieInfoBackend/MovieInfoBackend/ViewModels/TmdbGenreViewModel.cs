@@ -2,9 +2,10 @@ namespace MovieInfoBackend.DataModels;
 
 public record TmdbGenreViewModel
 {
-    public TmdbGenreViewModel(TmdbGenreDataModel tmdbGenreDataModel)
+    public TmdbGenreViewModel(TmdbGenreDataModel tmdbGenreDataModel,
+                              Guid? testGuid = null)
     {
-        this.ID = Guid.NewGuid();
+        this.ID = testGuid ?? Guid.NewGuid();
         this.TmdbId = tmdbGenreDataModel.Id;
         this.Name = tmdbGenreDataModel.Name;
     }
