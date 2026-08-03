@@ -1,11 +1,8 @@
-using Moq;
-using Moq.Protected;
+
 using MovieInfoBackend.DataModels;
-using MovieInfoBackend.ViewModels;
-using System.Diagnostics;
-using System.Net;
+
 using Xunit.Abstractions;
-using Xunit.Sdk;
+
 
 namespace TestMovieInfoBackend.Endpoints;
 
@@ -65,10 +62,6 @@ public class OmdbEndpointsTests
         Assert.NotNull(tvSeriesResponse);
         OmdbResponseDataModel? tvEpisodeResponse = OmdbHttpClient.GetModelFromResponse(omdbHttpClientTvEpisodeResponse);
         Assert.NotNull(tvEpisodeResponse);
-
-        //_testOutputHelper.WriteLine("movieResponse:" + movieResponse.ToString());  // TODO: Remove me
-        //_testOutputHelper.WriteLine("tvSeriesResponse: " + tvSeriesResponse.ToString());  // TODO: Remove me
-        //_testOutputHelper.WriteLine("tvEpisodeResponse: " + tvEpisodeResponse.ToString());  // TODO: Remove me
 
         /*Assert.NotNull(suggestionsResponse1);
         Assert.NotNull(suggestionsResponse2);

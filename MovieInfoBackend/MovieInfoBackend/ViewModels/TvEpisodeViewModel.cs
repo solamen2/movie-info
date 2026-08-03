@@ -56,22 +56,22 @@ public record TvEpisodeViewModel
         this.SeasonNumber = tmdbTvEpisodeDataModel.SeasonNumber;
         this.StillPath = tmdbTvEpisodeDataModel.StillPath;
         this.Cast = tmdbTvEpisodeCreditsDataModel.Cast
-                        .Select(tteccdm => new TvEpisodeCastViewModel(tteccdm))
+                        .Select(tteccdm => new TvEpisodeCastViewModel(tteccdm, testGuid))
                         .ToList();
         this.Directors = tmdbTvEpisodeCreditsDataModel.Crew
                             .Where(tteccdm => tteccdm.Job == "Director")
-                            .Select(tteccdm => new TvEpisodeCrewViewModel(tteccdm))
+                            .Select(tteccdm => new TvEpisodeCrewViewModel(tteccdm, testGuid))
                             .ToList();
         this.Writers = tmdbTvEpisodeCreditsDataModel.Crew
                             .Where(tteccdm => tteccdm.Department == "Writing")
-                            .Select(tteccdm => new TvEpisodeCrewViewModel(tteccdm))
+                            .Select(tteccdm => new TvEpisodeCrewViewModel(tteccdm, testGuid))
                             .ToList();
         this.Producers = tmdbTvEpisodeCreditsDataModel.Crew
                             .Where(tteccdm => tteccdm.Job.EndsWith("Producer"))
-                            .Select(tteccdm => new TvEpisodeCrewViewModel(tteccdm))
+                            .Select(tteccdm => new TvEpisodeCrewViewModel(tteccdm, testGuid))
                             .ToList();
         this.GuestStars = tmdbTvEpisodeCreditsDataModel.GuestStars
-                            .Select(ttecgsdm => new TvEpisodeGuestStarViewModel(ttecgsdm))
+                            .Select(ttecgsdm => new TvEpisodeGuestStarViewModel(ttecgsdm, testGuid))
                             .ToList();
     }
 

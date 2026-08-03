@@ -20,11 +20,11 @@ public record TvSeasonViewModel
             this.FirstAirDate = DateOnly.ParseExact(FirstAirDateString, "yyyy-MM-dd", CultureInfo.InvariantCulture);
         }
         this.Episodes = tmdbTvSeasonDataModel.Episodes
-                            .Select(ttsedm => new TvSeasonEpisodeViewModel(ttsedm))
+                            .Select(ttsedm => new TvSeasonEpisodeViewModel(ttsedm, testGuid))
                             .ToList();
         this.Name = tmdbTvSeasonDataModel.Name;
         this.Networks = tmdbTvSeasonDataModel.Networks
-                            .Select(tndm => new NetworkViewModel(tndm))
+                            .Select(tndm => new NetworkViewModel(tndm, testGuid))
                             .ToList();
         this.TmdbOverview = tmdbTvSeasonDataModel.Overview;
         this.TmdbId = tmdbTvSeasonDataModel.Id2;
@@ -34,7 +34,7 @@ public record TvSeasonViewModel
         if (tmdbWatchProviderCountryDataModel?.Buy != null)
         {
             this.WatchProvidersBuy = tmdbWatchProviderCountryDataModel.Buy
-                                        .Select(twpdm => new WatchProviderViewModel(twpdm))
+                                        .Select(twpdm => new WatchProviderViewModel(twpdm, testGuid))
                                         .ToList();
         }
         else
@@ -44,7 +44,7 @@ public record TvSeasonViewModel
         if (tmdbWatchProviderCountryDataModel?.Flatrate != null)
         {
             this.WatchProvidersFlatrate = tmdbWatchProviderCountryDataModel.Flatrate
-                                        .Select(twpdm => new WatchProviderViewModel(twpdm))
+                                        .Select(twpdm => new WatchProviderViewModel(twpdm, testGuid))
                                         .ToList();
         }
         else
@@ -54,7 +54,7 @@ public record TvSeasonViewModel
         if (tmdbWatchProviderCountryDataModel?.Rent != null)
         {
             this.WatchProvidersRent = tmdbWatchProviderCountryDataModel.Rent
-                                        .Select(twpdm => new WatchProviderViewModel(twpdm))
+                                        .Select(twpdm => new WatchProviderViewModel(twpdm, testGuid))
                                         .ToList();
         }
         else

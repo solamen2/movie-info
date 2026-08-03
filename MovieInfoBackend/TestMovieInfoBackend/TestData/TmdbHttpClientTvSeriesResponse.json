@@ -30,7 +30,7 @@
   "homepage": "",
   "id": 95,
   "in_production": false,
-  "languages": ["en"],
+  "languages": ["en", "ja"],
   "last_air_date": "2003-05-20",
   "last_episode_to_air": {
     "id": 949556,
@@ -65,7 +65,7 @@
   ],
   "number_of_episodes": 144,
   "number_of_seasons": 7,
-  "origin_country": ["US"],
+  "origin_country": ["US", "JP"],
   "original_language": "en",
   "original_name": "Example TV Series",
   "overview": "This series went on for a while and many exciting events happened in it.",
@@ -101,6 +101,10 @@
     {
       "iso_3166_1": "US",
       "name": "United States of America"
+    },
+    {
+      "iso_3166_1": "JP",
+      "name": "Japan"
     }
   ],
   "seasons": [
@@ -191,6 +195,11 @@
       "english_name": "English",
       "iso_639_1": "en",
       "name": "English"
+    },
+    {
+      "english_name": "Japanese",
+      "iso_639_1": "ja",
+      "name": "日本語"
     }
   ],
   "status": "Ended",

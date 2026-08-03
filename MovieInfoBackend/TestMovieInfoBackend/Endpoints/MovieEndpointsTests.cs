@@ -1,8 +1,5 @@
-using Moq;
-using Moq.Protected;
 using MovieInfoBackend.DataModels;
 using MovieInfoBackend.ViewModels;
-using System.Net;
 using Xunit.Abstractions;
 
 namespace TestMovieInfoBackend.Endpoints;

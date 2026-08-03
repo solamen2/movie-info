@@ -14,12 +14,8 @@ public class MovieViewModelTests
     private string tmdbHttpClientConfigurationCountriesResponse;
     private string tmdbHttpClientConfigurationLanguagesResponse;
 
-    ITestOutputHelper _testOutputHelper;
-
     public MovieViewModelTests(ITestOutputHelper output)
-    {
-        _testOutputHelper = output;
-        
+    {   
         // Arrange
 
         string testSuggestionDataFilename1 = "MovieHttpClientResponse1.json";
@@ -149,6 +145,7 @@ public class MovieViewModelTests
         Assert.Equal("United States of America, Japan", movieViewModel.OriginCountries);
         Assert.Equal("English", movieViewModel.OriginLanguage);
         Assert.Equal("Castle Rock Entertainment; Nippon Herald Films", movieViewModel.ProductionCompanies);
+        Assert.Equal("United States of America, Japan", movieViewModel.ProductionCountries);
         Assert.Equal("English, Japanese", movieViewModel.SpokenLanguages);
         Assert.Equal("Example Director", movieViewModel.Directors[0].Name);
         Assert.Equal("Example Director", movieViewModel.Writers[0].Name);
@@ -163,7 +160,7 @@ public class MovieViewModelTests
     [Fact]
     public void MovieViewModel_EmptyDataFields_ReturnEmptyValues()
     {
-        // Arrange
+        // Arrange (continued)
 
         MovieSuggestionsResponseDataModel? actual1 = MovieHttpClient.GetModelFromResponse(suggestionHttpClientResponse1);
         SuggestionDataModel[]? suggestions1 = actual1?.Suggestions;

@@ -1,10 +1,8 @@
-using Moq;
-using Moq.Protected;
+
 using MovieInfoBackend.DataModels;
-using MovieInfoBackend.ViewModels;
-using System.Net;
+
 using Xunit.Abstractions;
-using Xunit.Sdk;
+
 
 namespace TestMovieInfoBackend.Endpoints;
 
@@ -376,34 +374,6 @@ public class TmdbEndpointsTests
         Assert.NotNull(tvConfigurationCountriesResponse);
         TmdbConfigurationLanguagesResponseDataModel? tvConfigurationLanguagesResponse = TmdbHttpClient.GetConfigurationLanguagesModelFromResponse(tmdbHttpClientConfigurationLanguagesResponse);
         Assert.NotNull(tvConfigurationLanguagesResponse);
-
-        //_testOutputHelper.WriteLine("movieCreditsResponse: " + movieCreditsResponse);  // TODO: Remove me
-        //_testOutputHelper.WriteLine("movieExternalIdsResponse: " + movieExternalIdsResponse);  // TODO: Remove me
-        //_testOutputHelper.WriteLine("movieGenresResponse: " + movieGenresResponse);  // TODO: Remove me
-        //_testOutputHelper.WriteLine("movieIdResponse: " + movieIdResponse);  // TODO: Remove me
-        //_testOutputHelper.WriteLine("movieResponse: " + movieResponse);  // TODO: Remove me
-        //_testOutputHelper.WriteLine("movieWatchProvidersResponse: " + movieWatchProvidersResponse);  // TODO: Remove me
-        //_testOutputHelper.WriteLine("personExternalIdsResponse: " + personExternalIdsResponse);  // TODO: Remove me
-        //_testOutputHelper.WriteLine("personIdResponse: " + personIdResponse);  // TODO: Remove me
-        //_testOutputHelper.WriteLine("personImagesResponse: " + personImagesResponse);  // TODO: Remove me
-        //_testOutputHelper.WriteLine("personMovieCreditsResponse: " + personMovieCreditsResponse);  // TODO: Remove me
-        //_testOutputHelper.WriteLine("personResponse: " + personResponse);  // TODO: Remove me
-        //_testOutputHelper.WriteLine("personTvSeriesCreditsResponse: " + personTvSeriesCreditsResponse);  // TODO: Remove me
-        //_testOutputHelper.WriteLine("tvEpisodeResponse: " + tvEpisodeResponse);  // TODO: Remove me
-        //_testOutputHelper.WriteLine("tvEpisodeCreditsResponse: " + tvEpisodeCreditsResponse);  // TODO: Remove me
-        //_testOutputHelper.WriteLine("tvEpisodeExternalIdsResponse: " + tvEpisodeExternalIdsResponse);  // TODO: Remove me
-        //_testOutputHelper.WriteLine("tvEpisodeIdResponse: " + tvEpisodeIdResponse);  // TODO: Remove me
-        //_testOutputHelper.WriteLine("tvSeasonResponse: " + tvSeasonResponse);  // TODO: Remove me
-        //_testOutputHelper.WriteLine("tvSeasonWatchProvidersResponse: " + tvSeasonWatchProvidersResponse);  // TODO: Remove me
-        //_testOutputHelper.WriteLine("tvSeasonIdResponse: " + tvSeasonIdResponse);  // TODO: Remove me
-        //_testOutputHelper.WriteLine("tvSeriesAggregateCreditsResponse: " + tvSeriesAggregateCreditsResponse);  // TODO: Remove me
-        //_testOutputHelper.WriteLine("tvSeriesExternalIdsResponse: " + tvSeriesExternalIdsResponse);  // TODO: Remove me
-        //_testOutputHelper.WriteLine("tvSeriesGenresResponse: " + tvSeriesGenresResponse);  // TODO: Remove me
-        //_testOutputHelper.WriteLine("tvSeriesIdResponse: " + tvSeriesIdResponse);  // TODO: Remove me
-        //_testOutputHelper.WriteLine("tvSeriesResponse: " + tvSeriesResponse);  // TODO: Remove me
-        //_testOutputHelper.WriteLine("tvSeriesWatchProvidersResponse: " + tvSeriesWatchProvidersResponse);  // TODO: Remove me
-        //_testOutputHelper.WriteLine("tvConfigurationCountriesResponse: " + tvConfigurationCountriesResponse);  // TODO: Remove me
-        //_testOutputHelper.WriteLine("tvConfigurationLanguagesResponse: " + tvConfigurationLanguagesResponse);  // TODO: Remove me
 
         /*Assert.NotNull(suggestionsResponse1);
         Assert.NotNull(suggestionsResponse2);

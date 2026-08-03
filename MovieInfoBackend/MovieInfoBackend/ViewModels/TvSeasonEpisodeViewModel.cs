@@ -30,18 +30,18 @@ public record TvSeasonEpisodeViewModel
         this.StillPath = tmdbTvSeasonEpisodeDataModel.StillPath;
         this.Directors = tmdbTvSeasonEpisodeDataModel.Crew
                             .Where(ttscdm => ttscdm.Job == "Director")
-                            .Select(ttscdm => new TvSeasonEpisodeCrewViewModel(ttscdm))
+                            .Select(ttscdm => new TvSeasonEpisodeCrewViewModel(ttscdm, testGuid))
                             .ToList();
         this.Writers = tmdbTvSeasonEpisodeDataModel.Crew
                             .Where(ttscdm => ttscdm.Department == "Writing")
-                            .Select(ttscdm => new TvSeasonEpisodeCrewViewModel(ttscdm))
+                            .Select(ttscdm => new TvSeasonEpisodeCrewViewModel(ttscdm, testGuid))
                             .ToList();
         this.Producers = tmdbTvSeasonEpisodeDataModel.Crew
                             .Where(ttscdm => ttscdm.Job.EndsWith("Producer"))
-                            .Select(ttscdm => new TvSeasonEpisodeCrewViewModel(ttscdm))
+                            .Select(ttscdm => new TvSeasonEpisodeCrewViewModel(ttscdm, testGuid))
                             .ToList();
         this.GuestStars = tmdbTvSeasonEpisodeDataModel.GuestStars
-                            .Select(ttsegsdm => new TvSeasonEpisodeGuestStarViewModel(ttsegsdm))
+                            .Select(ttsegsdm => new TvSeasonEpisodeGuestStarViewModel(ttsegsdm, testGuid))
                             .ToList();
     }
 

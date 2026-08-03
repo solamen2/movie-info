@@ -28,19 +28,19 @@ public record PersonViewModel
         this.PlaceOfBirth = tmdbPersonDataModel.PlaceOfBirth;
         this.ProfilePath = tmdbPersonDataModel.ProfilePath;
         this.MovieCastCredits = tmdbPersonMovieCreditsDataModel.Cast
-                                    .Select(tpmcdm => new PersonMovieCastViewModel(tpmcdm))
+                                    .Select(tpmcdm => new PersonMovieCastViewModel(tpmcdm, testGuid))
                                     .ToList();
         this.MovieCrewCredits = tmdbPersonMovieCreditsDataModel.Crew
-                                    .Select(tpmcdm => new PersonMovieCrewViewModel(tpmcdm))
+                                    .Select(tpmcdm => new PersonMovieCrewViewModel(tpmcdm, testGuid))
                                     .ToList();
         this.TvSeriesCastCredits = tmdbPersonTvSeriesCreditsDataModel.Cast
-                                        .Select(tptscdm => new PersonTvSeriesCastViewModel(tptscdm))
+                                        .Select(tptscdm => new PersonTvSeriesCastViewModel(tptscdm, testGuid))
                                         .ToList();
         this.TvSeriesCrewCredits = tmdbPersonTvSeriesCreditsDataModel.Crew
-                                        .Select(tptscdm => new PersonTvSeriesCrewViewModel(tptscdm))
+                                        .Select(tptscdm => new PersonTvSeriesCrewViewModel(tptscdm, testGuid))
                                         .ToList();
         this.ProfileImages = tmdbPersonImagesDataModel.Profiles
-                                .Select(tpdm => new PersonProfileImageViewModel(tpdm))
+                                .Select(tpdm => new PersonProfileImageViewModel(tpdm, testGuid))
                                 .ToList();
     }
 

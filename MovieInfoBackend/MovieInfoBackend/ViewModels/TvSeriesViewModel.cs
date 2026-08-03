@@ -43,7 +43,7 @@ public record TvSeriesViewModel
         this.ImdbVotes = omdbDataModel.ImdbVotes;
         this.BackdropPath = tmdbTvSeriesDataModel.BackdropPath;
         this.Creators = tmdbTvSeriesDataModel.CreatedBy
-                            .Select(tcdm => new TmdbCreatorViewModel(tcdm))
+                            .Select(tcdm => new TmdbCreatorViewModel(tcdm, testGuid))
                             .ToList();
         this.TmdbEpisodeRunTimes = tmdbTvSeriesDataModel.EpisodeRunTime.ToList();
         this.FirstAirDateString = tmdbTvSeriesDataModel.FirstAirDate;
@@ -88,7 +88,7 @@ public record TvSeriesViewModel
             this.NextAirDate = DateOnly.ParseExact(NextAirDateString, "yyyy-MM-dd", CultureInfo.InvariantCulture);
         }
         this.Networks = tmdbTvSeriesDataModel.Networks
-                            .Select(tndm => new NetworkViewModel(tndm))
+                            .Select(tndm => new NetworkViewModel(tndm, testGuid))
                             .ToList();
         this.NumberOfEpisodes = tmdbTvSeriesDataModel.NumberOfEpisodes;
         this.NumberOfSeasons = tmdbTvSeriesDataModel.NumberOfSeasons;
@@ -109,32 +109,32 @@ public record TvSeriesViewModel
         this.ProductionCompanies = String.Join("; ", tmdbTvSeriesDataModel.ProductionCompanies.Select(tpcdm => tpcdm.Name));
         this.ProductionCountries = String.Join(", ", tmdbTvSeriesDataModel.ProductionCountries.Select(tpcdm => tpcdm.Name));
         this.Seasons = tmdbTvSeriesDataModel.Seasons
-                            .Select(ttsdm => new TvSeriesSeasonViewModel(ttsdm))
+                            .Select(ttsdm => new TvSeriesSeasonViewModel(ttsdm, testGuid))
                             .ToList();
         this.SpokenLanguages = String.Join(", ", tmdbTvSeriesDataModel.SpokenLanguages.Select(tsldm => tsldm.EnglishName));
         this.Status = tmdbTvSeriesDataModel.Status;
         this.Tagline = tmdbTvSeriesDataModel.Tagline;
         this.TvSeriesType = tmdbTvSeriesDataModel.Type;
         this.Cast = tmdbTvSeriesAggregateCreditsDataModel.Cast
-                        .Select(ttsacdm => new TvSeriesCastViewModel(ttsacdm))
+                        .Select(ttsacdm => new TvSeriesCastViewModel(ttsacdm, testGuid))
                         .ToList();
         this.Directors = tmdbTvSeriesAggregateCreditsDataModel.Crew
                             .Where(ttsacdm => ttsacdm.Jobs.Any(j => j.Job == "Director"))
-                            .Select(ttsacdm => new TvSeriesCrewViewModel(ttsacdm))
+                            .Select(ttsacdm => new TvSeriesCrewViewModel(ttsacdm, testGuid))
                             .ToList();
         this.Writers = tmdbTvSeriesAggregateCreditsDataModel.Crew
                             .Where(ttsacdm => ttsacdm.Department == "Writing")
-                            .Select(ttsacdm => new TvSeriesCrewViewModel(ttsacdm))
+                            .Select(ttsacdm => new TvSeriesCrewViewModel(ttsacdm, testGuid))
                             .ToList();
         this.Producers = tmdbTvSeriesAggregateCreditsDataModel.Crew
                             .Where(ttsacdm => ttsacdm.Jobs.Any(j => j.Job.EndsWith("Producer")))
-                            .Select(ttsacdm => new TvSeriesCrewViewModel(ttsacdm))
+                            .Select(ttsacdm => new TvSeriesCrewViewModel(ttsacdm, testGuid))
                             .ToList();
         TmdbWatchProviderCountryDataModel? tmdbWatchProviderCountryDataModel = tmdbWatchProvidersDataModel?.Results?.US;
         if (tmdbWatchProviderCountryDataModel?.Buy != null)
         {
             this.WatchProvidersBuy = tmdbWatchProviderCountryDataModel.Buy
-                                        .Select(twpdm => new WatchProviderViewModel(twpdm))
+                                        .Select(twpdm => new WatchProviderViewModel(twpdm, testGuid))
                                         .ToList();
         }
         else
@@ -144,7 +144,7 @@ public record TvSeriesViewModel
         if (tmdbWatchProviderCountryDataModel?.Flatrate != null)
         {
             this.WatchProvidersFlatrate = tmdbWatchProviderCountryDataModel.Flatrate
-                                        .Select(twpdm => new WatchProviderViewModel(twpdm))
+                                        .Select(twpdm => new WatchProviderViewModel(twpdm, testGuid))
                                         .ToList();
         }
         else
@@ -154,7 +154,7 @@ public record TvSeriesViewModel
         if (tmdbWatchProviderCountryDataModel?.Rent != null)
         {
             this.WatchProvidersRent = tmdbWatchProviderCountryDataModel.Rent
-                                        .Select(twpdm => new WatchProviderViewModel(twpdm))
+                                        .Select(twpdm => new WatchProviderViewModel(twpdm, testGuid))
                                         .ToList();
         }
         else
