@@ -1,3 +1,4 @@
+using System.Globalization;
 using MovieInfoBackend.DataModels;
 using MovieInfoBackend.ViewModels;
 using Xunit.Abstractions;
@@ -84,7 +85,9 @@ public class TvEpisodeViewModelTests
         // NOTE: Only checking fields which are transformed by the view model. Other fields have been covered by data model tests or ToString() test below
         Assert.Equal(2001, tvEpisodeViewModel.Year);
         Assert.Equal(50, tvEpisodeViewModel.Runtime);
-        Assert.Equal("11/6/2001", tvEpisodeViewModel.AirDate.ToString());
+        Assert.NotNull(tvEpisodeViewModel.AirDate);
+        DateOnly AirDateNotNull = (DateOnly)tvEpisodeViewModel.AirDate;
+        Assert.Equal("11/06/2001", AirDateNotNull.ToString("MM/dd/yyy"));
         Assert.Equal("Example Creator Martinez", tvEpisodeViewModel.Directors[0].Name);
         Assert.Equal("Example Creator Martinez", tvEpisodeViewModel.Writers[0].Name);
         Assert.Equal("Douglas Petrie", tvEpisodeViewModel.Producers[0].Name);

@@ -56,8 +56,16 @@ public class TvSeasonViewModelTests
         Assert.NotNull(tvSeasonViewModel);
 
         // NOTE: Only checking fields which are transformed by the view model. Other fields have been covered by data model tests or ToString() test below
-        Assert.Equal("10/2/2001", tvSeasonViewModel.FirstAirDate.ToString());
-        Assert.Equal("10/2/2001", tvSeasonViewModel.Episodes[0].AirDate.ToString());
+        Assert.NotNull(tvSeasonViewModel.FirstAirDate);
+        DateOnly FirstAirDateNotNull = (DateOnly)tvSeasonViewModel.FirstAirDate;
+        Assert.Equal("10/02/2001", FirstAirDateNotNull.ToString("MM/dd/yyy"));
+        Assert.NotNull(tvSeasonViewModel.Episodes);
+        List<TvSeasonEpisodeViewModel> episodes = tvSeasonViewModel.Episodes;
+        Assert.NotNull(episodes[0]);
+        TvSeasonEpisodeViewModel firstEpisode = episodes[0];
+        Assert.NotNull(firstEpisode.AirDate);
+        DateOnly AirDateNotNull = (DateOnly)firstEpisode.AirDate;
+        Assert.Equal("10/02/2001", AirDateNotNull.ToString("MM/dd/yyy"));
     }
 
     [Fact]

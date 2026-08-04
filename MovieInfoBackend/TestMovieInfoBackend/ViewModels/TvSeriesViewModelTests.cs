@@ -140,16 +140,26 @@ public class TvSeriesViewModelTests
 
         // NOTE: Only checking fields which are transformed by the view model. Other fields have been covered by data model tests or ToString() test below
         Assert.Equal(44, tvSeriesViewModel.OmdbAverageEpisodeRuntimeNumber);
-        Assert.Equal("3/10/1997", tvSeriesViewModel.FirstAirDate.ToString());
+        Assert.NotNull(tvSeriesViewModel.FirstAirDate);
+        DateOnly FirstAirDateNotNull = (DateOnly)tvSeriesViewModel.FirstAirDate;
+        Assert.Equal("03/10/1997", FirstAirDateNotNull.ToString("MM/dd/yyy"));
         Assert.Equal("Comedy, Drama, Sci-Fi & Fantasy", tvSeriesViewModel.TmdbGenres);
         Assert.Equal("English, Japanese", tvSeriesViewModel.Languages);
-        Assert.Equal("5/20/2003", tvSeriesViewModel.LastAirDate.ToString());
+        Assert.NotNull(tvSeriesViewModel.LastAirDate);
+        DateOnly LastAirDateNotNull = (DateOnly)tvSeriesViewModel.LastAirDate;
+        Assert.Equal("05/20/2003", LastAirDateNotNull.ToString("MM/dd/yyy"));
         Assert.Null(tvSeriesViewModel.NextAirDate);
         Assert.Equal("United States of America, Japan", tvSeriesViewModel.OriginCountries);
         Assert.Equal("English", tvSeriesViewModel.OriginLanguage);
         Assert.Equal("Example Productions; Example Enterprises; Example Television Company; Example Television Company 2", tvSeriesViewModel.ProductionCompanies);
         Assert.Equal("United States of America, Japan", tvSeriesViewModel.ProductionCountries);
-        Assert.Equal("3/10/1997", tvSeriesViewModel.Seasons[1].FirstAirDate.ToString());
+        Assert.NotNull(tvSeriesViewModel.Seasons);
+        List<TvSeriesSeasonViewModel> seasons = tvSeriesViewModel.Seasons;
+        Assert.NotNull(seasons[1]);
+        TvSeriesSeasonViewModel firstSeason = seasons[1];  // NOTE: seasons[0] is not a real aired season
+        Assert.NotNull(firstSeason.FirstAirDate);
+        DateOnly FirstAirDateSeasonNotNull = (DateOnly)firstSeason.FirstAirDate;
+        Assert.Equal("03/10/1997", FirstAirDateSeasonNotNull.ToString("MM/dd/yyy"));
         Assert.Equal("English, Japanese", tvSeriesViewModel.SpokenLanguages);
         Assert.Equal("Example Character 3", tvSeriesViewModel.Cast[0].Characters[0]);
         Assert.Equal("Example Creator Martinez", tvSeriesViewModel.Directors[0].Name);
@@ -523,7 +533,9 @@ public class TvSeriesViewModelTests
         Assert.Equal(0, tvSeriesViewModel.OmdbAverageEpisodeRuntimeNumber);
         Assert.Null(tvSeriesViewModel.FirstAirDate);
         Assert.Null(tvSeriesViewModel.LastAirDate);
-        Assert.Equal("5/1/2004", tvSeriesViewModel.NextAirDate.ToString());
+        Assert.NotNull(tvSeriesViewModel.NextAirDate);
+        DateOnly NextAirDateNotNull = (DateOnly)tvSeriesViewModel.NextAirDate;
+        Assert.Equal("05/01/2004", NextAirDateNotNull.ToString("MM/dd/yyy"));
         Assert.Null(tvSeriesViewModel.Seasons[0].FirstAirDate);
 
         Assert.NotNull(tvSeriesViewModel2);
@@ -531,7 +543,9 @@ public class TvSeriesViewModelTests
         Assert.Equal(0, tvSeriesViewModel2.OmdbAverageEpisodeRuntimeNumber);
         Assert.Null(tvSeriesViewModel2.FirstAirDate);
         Assert.Null(tvSeriesViewModel2.LastAirDate);
-        Assert.Equal("9/2/2002", tvSeriesViewModel2.NextAirDate.ToString());
+        Assert.NotNull(tvSeriesViewModel2.NextAirDate);
+        DateOnly NextAirDate2NotNull = (DateOnly)tvSeriesViewModel2.NextAirDate;
+        Assert.Equal("09/02/2002", NextAirDate2NotNull.ToString("MM/dd/yyy"));
         Assert.Null(tvSeriesViewModel2.Seasons[0].FirstAirDate);
     }
 
