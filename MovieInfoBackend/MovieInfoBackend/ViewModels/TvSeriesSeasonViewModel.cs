@@ -37,7 +37,7 @@ public record TvSeriesSeasonViewModel
 
     public override string ToString()
     {
-        return $"ID: {ID}\nFirstAirDateString: {FirstAirDateString}\nFirstAirDate: {FirstAirDate}\nEpisodeCount: {EpisodeCount}\nTmdbId: {TmdbId}\nName: {Name}\nOverview: {Overview}\nPosterPath: {PosterPath}\nSeasonNumber: {SeasonNumber}";
+        return $"ID: {ID}\nFirstAirDateString: {FirstAirDateString}\nFirstAirDate: {FirstAirDate:MM/dd/yyy}\nEpisodeCount: {EpisodeCount}\nTmdbId: {TmdbId}\nName: {Name}\nOverview: {Overview}\nPosterPath: {PosterPath}\nSeasonNumber: {SeasonNumber}";
     }
 
 }

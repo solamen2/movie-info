@@ -65,6 +65,6 @@ public record TvSeasonEpisodeViewModel
 
     public override string ToString()
     {
-        return $"ID: {ID}\nAirDateString: {AirDateString}\nAirDate: {AirDate}\nEpisodeNumber: {EpisodeNumber}\nEpisodeType: {EpisodeType}\nTmdbId: {TmdbId}\nTitle: {Title}\nTmdbOverview: {TmdbOverview}\nRuntime: {Runtime}\nSeasonNumber: {SeasonNumber}\nTmdbTvSeriesId: {TmdbTvSeriesId}\nStillPath: {StillPath}\nDirectors:\n*****\n{string.Join("\n\n", Directors)}\n*****\nWriters:\n*****\n{string.Join("\n\n", Writers)}\n*****\nProducers:\n*****\n{string.Join("\n\n", Producers)}\n*****\nGuestStars:\n*****\n{string.Join("\n\n", GuestStars)}";
+        return $"ID: {ID}\nAirDateString: {AirDateString}\nAirDate: {AirDate:MM/dd/yyy}\nEpisodeNumber: {EpisodeNumber}\nEpisodeType: {EpisodeType}\nTmdbId: {TmdbId}\nTitle: {Title}\nTmdbOverview: {TmdbOverview}\nRuntime: {Runtime}\nSeasonNumber: {SeasonNumber}\nTmdbTvSeriesId: {TmdbTvSeriesId}\nStillPath: {StillPath}\nDirectors:\n*****\n{string.Join("\n\n", Directors)}\n*****\nWriters:\n*****\n{string.Join("\n\n", Writers)}\n*****\nProducers:\n*****\n{string.Join("\n\n", Producers)}\n*****\nGuestStars:\n*****\n{string.Join("\n\n", GuestStars)}";
     }
 }

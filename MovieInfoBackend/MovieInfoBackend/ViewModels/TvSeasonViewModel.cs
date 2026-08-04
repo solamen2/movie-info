@@ -81,6 +81,6 @@ public record TvSeasonViewModel
 
     public override string ToString()
     {
-        return $"ID: {ID}\nFirstAirDateString: {FirstAirDateString}\nFirstAirDate: {FirstAirDate}\nEpisodes:\n*****\n{string.Join("\n\n", Episodes)}\n*****\nName: {Name}\nNetworks:\n*****\n{string.Join("\n\n", Networks)}\n*****\nTmdbOverview: {TmdbOverview}\nTmdbId: {TmdbId}\nPosterPath: {PosterPath}\nSeasonNumber: {SeasonNumber}\nWatchProvidersBuy:\n*****\n{string.Join("\n\n", WatchProvidersBuy)}\n*****\nWatchProvidersFlatrate:\n*****\n{string.Join("\n\n", WatchProvidersFlatrate)}\n*****\nWatchProvidersRent:\n*****\n{string.Join("\n\n", WatchProvidersRent)}\n*****\nNumberOfEpisodes: {NumberOfEpisodes}";
+        return $"ID: {ID}\nFirstAirDateString: {FirstAirDateString}\nFirstAirDate: {FirstAirDate:MM/dd/yyy}\nEpisodes:\n*****\n{string.Join("\n\n", Episodes)}\n*****\nName: {Name}\nNetworks:\n*****\n{string.Join("\n\n", Networks)}\n*****\nTmdbOverview: {TmdbOverview}\nTmdbId: {TmdbId}\nPosterPath: {PosterPath}\nSeasonNumber: {SeasonNumber}\nWatchProvidersBuy:\n*****\n{string.Join("\n\n", WatchProvidersBuy)}\n*****\nWatchProvidersFlatrate:\n*****\n{string.Join("\n\n", WatchProvidersFlatrate)}\n*****\nWatchProvidersRent:\n*****\n{string.Join("\n\n", WatchProvidersRent)}\n*****\nNumberOfEpisodes: {NumberOfEpisodes}";
     }
 }

@@ -376,12 +376,12 @@ public class SuggestionViewModelTests
         SuggestionDataModel[]? suggestions1 = actual1?.Suggestions;
         Assert.NotNull(suggestions1);
         Assert.NotEmpty(suggestions1);
-        SuggestionViewModel tvMiniSeriesViewModel = new(suggestions1[3]);
+        SuggestionViewModel tvMiniSeriesViewModel = new(suggestions1[3], default(Guid));
         string tvMiniSeriesViewModelString = tvMiniSeriesViewModel.ToString();
 
         // Assert
 
-        Assert.Contains("Image:\n*****\nHeight: 300\nImageURL: https://example.com/example4.jpg\nWidth: 209\n*****\nItemID: tt0100005\nName: Example TV Mini Series\nSearchType: Media\nMediaType: TV Mini Series\nRank: 4444\nKnownFor: Maria Garcia, James Smith\nYear: 1982\nYears: 1982-1982"
+        Assert.Contains("ID: 00000000-0000-0000-0000-000000000000\nImage:\n*****\nID: 00000000-0000-0000-0000-000000000000\nHeight: 300\nImageURL: https://example.com/example4.jpg\nWidth: 209\n*****\nItemID: tt0100005\nName: Example TV Mini Series\nSearchType: Media\nMediaType: TV Mini Series\nRank: 4444\nKnownFor: Maria Garcia, James Smith\nYear: 1982\nYears: 1982-1982"
             , tvMiniSeriesViewModelString);
     }
 
@@ -534,7 +534,7 @@ public class SuggestionViewModelTests
 
         // Assert
         Assert.Equal(
-            "ID: 00000000-0000-0000-0000-000000000000\nImage:\n*****\nHeight: 400\nImageURL: https://example.com/example3.jpg\nWidth: 313\n*****\nItemID: tt10000002\nName: Example TV Series\nSearchType: Media\nMediaType: TV Series\nRank: 4444\nKnownFor: John Smith, James Johnson\nYear: 2001\nYears: 2001-2003"
+            "ID: 00000000-0000-0000-0000-000000000000\nImage:\n*****\nID: 00000000-0000-0000-0000-000000000000\nHeight: 400\nImageURL: https://example.com/example3.jpg\nWidth: 313\n*****\nItemID: tt10000002\nName: Example TV Series\nSearchType: Media\nMediaType: TV Series\nRank: 4444\nKnownFor: John Smith, James Johnson\nYear: 2001\nYears: 2001-2003"
                 , suggestionTvSeriesViewModel.ToString());
     }
 }
