@@ -1,0 +1,34 @@
+using System.Text.Json.Serialization;
+
+namespace MovieInfoBackend.DataModels;
+
+public record TmdbTvEpisodeCrewDataModel  // NOTE: More of a person description than a TV episode description
+{
+    [JsonPropertyName("department")]
+    public required string Department { get; init; }
+    [JsonPropertyName("job")]
+    public required string Job { get; init; }
+    [JsonPropertyName("credit_id")]
+    public required string CreditId { get; init; }
+    [JsonPropertyName("adult")]
+    public required bool Adult { get; init; }
+    [JsonPropertyName("gender")]
+    public required int Gender { get; init; }
+    [JsonPropertyName("id")]
+    public required int Id { get; init; }
+    [JsonPropertyName("known_for_department")]
+    public required string KnownForDepartment { get; init; }
+    [JsonPropertyName("name")]
+    public required string Name { get; init; }
+    [JsonPropertyName("original_name")]
+    public required string OriginalName { get; init; }
+    [JsonPropertyName("popularity")]
+    public required double Popularity { get; init; }
+    [JsonPropertyName("profile_path")]
+    public string? ProfilePath { get; init; }
+
+    public override string ToString()
+    {
+        return $"Department: {Department}\nJob: {Job}\nCreditId: {CreditId}\nAdult: {Adult}\nGender: {Gender}\nId: {Id}\nKnownForDepartment: {KnownForDepartment}\nName: {Name}\nOriginalName: {OriginalName}\nPopularity: {Popularity}\nProfilePath: {ProfilePath}";
+    }
+}

@@ -1,0 +1,20 @@
+{
+  "movie_results": [],
+  "person_results": [],
+  "tv_results": [],
+  "tv_episode_results": [],
+  "tv_season_results": [
+    {
+      "id": 59470,
+      "name": "Season 6",
+      "overview": "This was the sixth season of the show. Flo Welch is a big fan of this one.",
+      "poster_path": "/aAJLnT7nSD5JaZcyUElyp4dYpmq.jpg",
+      "media_type": "tv_season",
+      "vote_average": 7.7,
+      "air_date": "2001-10-02",
+      "season_number": 6,
+      "show_id": 95,
+      "episode_count": 22
+    }
+  ]
+}

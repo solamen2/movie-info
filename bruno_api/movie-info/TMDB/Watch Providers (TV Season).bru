@@ -1,0 +1,25 @@
+meta {
+  name: Watch Providers (TV Season)
+  type: http
+  seq: 23
+}
+
+get {
+  url: https://api.themoviedb.org/3/tv/:series_id/season/:season/watch/providers
+  body: none
+  auth: inherit
+}
+
+params:path {
+  season: 6
+  series_id: 95
+}
+
+headers {
+  Authorization: Bearer longkeygoeshere
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -46,6 +46,8 @@ function SuggestionSearch() {
     setPreviouslySelectedItemId(null);
 
     try {
+      // TODO: Add a pending indicator while the search is running
+
       const response = await fetch(
         `/api/search?searchQuery=${encodeURIComponent(searchQuery)}`,
       );

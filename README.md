@@ -59,7 +59,11 @@ Backend unit testing is done using [xUnit.net](https://xunit.net/?tabs=cs) with 
 
 ### Data Sources
 
-Right now this app displays a bit of movie info from the [IMDB](https://www.imdb.com/). Soon it will display a lot of supplementary movie information from the [TMDB](https://www.themoviedb.org/) and [OMDB](https://www.omdbapi.com/).
+This app displays info from the following sources:
+
+- [IMDB](https://www.imdb.com/): Movie, TV, and people info
+- [TMDB](https://www.themoviedb.org/): Movie, TV, and people info, and also watch provider information via [JustWatch](https://www.justwatch.com/)
+- [OMDB](https://www.omdbapi.com/): Movie and TV info
 
 ## Architecture: Frontend
 

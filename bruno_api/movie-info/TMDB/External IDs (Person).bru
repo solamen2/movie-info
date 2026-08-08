@@ -1,0 +1,24 @@
+meta {
+  name: External IDs (Person)
+  type: http
+  seq: 14
+}
+
+get {
+  url: https://api.themoviedb.org/3/person/:person_id/external_ids
+  body: none
+  auth: inherit
+}
+
+params:path {
+  person_id: 11863
+}
+
+headers {
+  Authorization: Bearer longkeygoeshere
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

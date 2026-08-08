@@ -1,0 +1,29 @@
+{
+  "Title": "Example TV Series",
+  "Year": "1997–2003",
+  "Rated": "TV-14",
+  "Released": "10 Mar 1997",
+  "Runtime": "44 min",
+  "Genre": "Action, Adventure, Drama",
+  "Director": "N/A",
+  "Writer": "Example Creator Martinez",
+  "Actors": "Example Smith, Example Actor 2, Example Actress 4",
+  "Plot": "This TV show has an awful lot of story in it.",
+  "Language": "English",
+  "Country": "United States, Japan",
+  "Awards": "Won 2 Primetime Emmys. 55 wins & 136 nominations total",
+  "Poster": "https://m.media-amazon.com/images/M/MV5BMDk4MGVkNDAtZjQwZi00MDc3LWE4MmEtY2YyODQ2NDQyMjgxXkEyXkFqcGc@._V1_SX300.jpg",
+  "Ratings": [
+    {
+      "Source": "Internet Movie Database",
+      "Value": "8.3/10"
+    }
+  ],
+  "Metascore": "N/A",
+  "imdbRating": "8.3",
+  "imdbVotes": "172,659",
+  "imdbID": "tt0118276",
+  "Type": "series",
+  "totalSeasons": "7",
+  "Response": "True"
+}

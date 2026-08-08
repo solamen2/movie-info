@@ -309,17 +309,17 @@ public class SuggestionDataModelTests
         // Arrange & Act
         var imageDataModel = new SuggestionImageDataModel
         {
-            Height = 0,
-            Width = 0,
+            Height = 1,
+            Width = 1,
             ImageURL = ""
         };
 
         // Assert
         Assert.NotNull(imageDataModel);
-        Assert.Equal(0, imageDataModel.Height);
-        Assert.Equal(0, imageDataModel.Width);
+        Assert.Equal(1, imageDataModel.Height);
+        Assert.Equal(1, imageDataModel.Width);
         Assert.Equal("", imageDataModel.ImageURL);
-        Assert.Equal("Height: 0\nImageURL: \nWidth: 0", imageDataModel.ToString());
+        Assert.Equal("Height: 1\nImageURL: \nWidth: 1", imageDataModel.ToString());
     }
 
     [Fact]

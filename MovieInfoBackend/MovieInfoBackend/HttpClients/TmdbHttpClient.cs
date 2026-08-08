@@ -1,0 +1,140 @@
+using System.Collections.Frozen;
+using System.Text.Json;
+using System.Web;
+using Microsoft.Net.Http.Headers;
+using MovieInfoBackend.DataModels;
+
+public class TmdbHttpClient
+{
+    private readonly HttpClient _httpClient;
+    public static string CachePrefix = "tmdb-";
+    public static FrozenDictionary<string, string>? Iso31661ToEnglishCountryNameDictionaryCached { get; private set; }
+    public static FrozenDictionary<string, string>? Iso6391ToEnglishLanguageNameDictionaryCached { get; private set; }
+
+    public TmdbHttpClient(HttpClient httpClient)
+    {
+        _httpClient = httpClient;
+
+        // TODO Add real headers later
+        // All below info copied from https://github.com/pavan412kalyan/imdb-movie-scraper/blob/main/ImdbDataExtraction/search_by_string/search_by_string.py
+        //_httpClient.BaseAddress = new Uri("https://v3.sg.media-imdb.com");
+        //_httpClient.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json, text/plain, */*");
+        //_httpClient.DefaultRequestHeaders.Add(HeaderNames.AcceptLanguage, "en-US,en;q=0.9");
+        //_httpClient.DefaultRequestHeaders.Add(HeaderNames.Origin, "https://m.imdb.com");
+        //_httpClient.DefaultRequestHeaders.Add("Priority", "u=1, i");
+        //_httpClient.DefaultRequestHeaders.Add(HeaderNames.Referer, "https://m.imdb.com/");
+        //_httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, 
+        //    "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Mobile Safari/537.36");
+    }
+
+    // TODO Implement actual methods later
+    //public async Task<MovieSuggestionsResponseDataModel?> GetSuggestions(string searchQuery)
+    //{
+        //using HttpResponseMessage response = await _httpClient.GetAsync($"suggestion/a/{HttpUtility.HtmlEncode(searchQuery)}.json");
+        //if (response.StatusCode != System.Net.HttpStatusCode.OK)
+        //{
+        //    return null;
+        //}
+        //
+        //string responseJsonString = await response.Content.ReadAsStringAsync();
+        //
+        //return GetModelFromResponse(responseJsonString);
+    //}
+
+    public static TmdbMovieCreditsResponseDataModel? GetMovieCreditsModelFromResponse(string responseJsonString)
+    {
+        return JsonSerializer.Deserialize<TmdbMovieCreditsResponseDataModel>(responseJsonString);
+    }
+    public static TmdbMovieExternalIdsResponseDataModel? GetMovieExternalIdsModelFromResponse(string responseJsonString)
+    {
+        return JsonSerializer.Deserialize<TmdbMovieExternalIdsResponseDataModel>(responseJsonString);
+    }
+    public static TmdbGenresResponseDataModel? GetGenresModelFromResponse(string responseJsonString)
+    {
+        return JsonSerializer.Deserialize<TmdbGenresResponseDataModel>(responseJsonString);
+    }
+    public static TmdbIdResponseDataModel? GetIdModelFromResponse(string responseJsonString)
+    {
+        return JsonSerializer.Deserialize<TmdbIdResponseDataModel>(responseJsonString);
+    }
+    public static TmdbMovieResponseDataModel? GetMovieModelFromResponse(string responseJsonString)
+    {
+        return JsonSerializer.Deserialize<TmdbMovieResponseDataModel>(responseJsonString);
+    }
+    public static TmdbPersonExternalIdsResponseDataModel? GetPersonExternalIdsModelFromResponse(string responseJsonString)
+    {
+        return JsonSerializer.Deserialize<TmdbPersonExternalIdsResponseDataModel>(responseJsonString);
+    }
+    public static TmdbPersonImagesResponseDataModel? GetPersonImagesModelFromResponse(string responseJsonString)
+    {
+        return JsonSerializer.Deserialize<TmdbPersonImagesResponseDataModel>(responseJsonString);
+    }
+    public static TmdbPersonMovieCreditsResponseDataModel? GetPersonMovieCreditsModelFromResponse(string responseJsonString)
+    {
+        return JsonSerializer.Deserialize<TmdbPersonMovieCreditsResponseDataModel>(responseJsonString);
+    }
+    public static TmdbPersonResponseDataModel? GetPersonModelFromResponse(string responseJsonString)
+    {
+        return JsonSerializer.Deserialize<TmdbPersonResponseDataModel>(responseJsonString);
+    }
+    public static TmdbPersonTvSeriesCreditsResponseDataModel? GetPersonTvSeriesCreditsModelFromResponse(string responseJsonString)
+    {
+        return JsonSerializer.Deserialize<TmdbPersonTvSeriesCreditsResponseDataModel>(responseJsonString);
+    }
+    public static TmdbTvEpisodeResponseDataModel? GetTvEpisodeModelFromResponse(string responseJsonString)
+    {
+        return JsonSerializer.Deserialize<TmdbTvEpisodeResponseDataModel>(responseJsonString);
+    }
+    public static TmdbTvEpisodeCreditsResponseDataModel? GetTvEpisodeCreditsModelFromResponse(string responseJsonString)
+    {
+        return JsonSerializer.Deserialize<TmdbTvEpisodeCreditsResponseDataModel>(responseJsonString);
+    }
+    public static TmdbTvEpisodeExternalIdsResponseDataModel? GetTvEpisodeExternalIdsModelFromResponse(string responseJsonString)
+    {
+        return JsonSerializer.Deserialize<TmdbTvEpisodeExternalIdsResponseDataModel>(responseJsonString);
+    }
+    public static TmdbTvSeasonResponseDataModel? GetTvSeasonModelFromResponse(string responseJsonString)
+    {
+        return JsonSerializer.Deserialize<TmdbTvSeasonResponseDataModel>(responseJsonString);
+    }
+    public static TmdbTvSeriesAggregateCreditsResponseDataModel? GetTvSeriesAggregateCreditsModelFromResponse(string responseJsonString)
+    {
+        return JsonSerializer.Deserialize<TmdbTvSeriesAggregateCreditsResponseDataModel>(responseJsonString);
+    }
+    public static TmdbTvSeriesExternalIdsResponseDataModel? GetTvSeriesExternalIdsModelFromResponse(string responseJsonString)
+    {
+        return JsonSerializer.Deserialize<TmdbTvSeriesExternalIdsResponseDataModel>(responseJsonString);
+    }
+    public static TmdbTvSeriesResponseDataModel? GetTvSeriesModelFromResponse(string responseJsonString)
+    {
+        return JsonSerializer.Deserialize<TmdbTvSeriesResponseDataModel>(responseJsonString);
+    }
+    public static TmdbWatchProvidersResponseDataModel? GetWatchProvidersModelFromResponse(string responseJsonString)
+    {
+        return JsonSerializer.Deserialize<TmdbWatchProvidersResponseDataModel>(responseJsonString);
+    }
+    public static TmdbConfigurationCountriesResponseDataModel? GetConfigurationCountriesModelFromResponse(string responseJsonString)
+    {
+        TmdbConfigurationCountryDataModel[]? configurationCountries = JsonSerializer.Deserialize<TmdbConfigurationCountryDataModel[]>(responseJsonString);
+        if (configurationCountries == null)
+        {
+            return null;
+        }
+        TmdbConfigurationCountriesResponseDataModel countriesResponse = new TmdbConfigurationCountriesResponseDataModel { Countries = configurationCountries };
+        Iso31661ToEnglishCountryNameDictionaryCached = countriesResponse.GetConfigurationCountriesDictionary()?.iso31661ToEnglishCountryNameDictionary;
+        
+        return countriesResponse;
+    }
+    public static TmdbConfigurationLanguagesResponseDataModel? GetConfigurationLanguagesModelFromResponse(string responseJsonString)
+    {
+        TmdbConfigurationLanguageDataModel[]? configurationLanguages = JsonSerializer.Deserialize<TmdbConfigurationLanguageDataModel[]>(responseJsonString);
+        if (configurationLanguages == null)
+        {
+            return null;
+        }
+        TmdbConfigurationLanguagesResponseDataModel languagesResponse = new TmdbConfigurationLanguagesResponseDataModel { Languages = configurationLanguages };
+        Iso6391ToEnglishLanguageNameDictionaryCached = languagesResponse.GetConfigurationLanguagesDictionary()?.iso6391ToEnglishLanguageNameDictionary;
+
+        return languagesResponse;
+    }
+}

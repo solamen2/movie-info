@@ -1,0 +1,24 @@
+meta {
+  name: External IDs (TV Series)
+  type: http
+  seq: 16
+}
+
+get {
+  url: https://api.themoviedb.org/3/tv/:series_id/external_ids
+  body: none
+  auth: inherit
+}
+
+params:path {
+  series_id: 95
+}
+
+headers {
+  Authorization: Bearer longkeygoeshere
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

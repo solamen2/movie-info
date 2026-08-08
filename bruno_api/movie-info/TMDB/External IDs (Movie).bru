@@ -1,0 +1,24 @@
+meta {
+  name: External IDs (Movie)
+  type: http
+  seq: 13
+}
+
+get {
+  url: https://api.themoviedb.org/3/movie/:movie_id/external_ids
+  body: none
+  auth: inherit
+}
+
+params:path {
+  movie_id: 278
+}
+
+headers {
+  Authorization: Bearer longkeygoeshere
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

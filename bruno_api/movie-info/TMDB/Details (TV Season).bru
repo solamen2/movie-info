@@ -1,16 +1,17 @@
 meta {
   name: Details (TV Season)
   type: http
-  seq: 7
+  seq: 11
 }
 
 get {
-  url: https://api.themoviedb.org/3/tv/:series_id
+  url: https://api.themoviedb.org/3/tv/:series_id/season/:season
   body: none
   auth: inherit
 }
 
 params:path {
+  season: 1
   series_id: 95
 }
 

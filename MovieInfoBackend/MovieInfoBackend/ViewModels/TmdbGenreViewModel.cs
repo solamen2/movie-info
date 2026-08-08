@@ -1,0 +1,22 @@
+namespace MovieInfoBackend.DataModels;
+
+public record TmdbGenreViewModel
+{
+    public TmdbGenreViewModel(TmdbGenreDataModel tmdbGenreDataModel,
+                              Guid? testGuid = null)
+    {
+        this.ID = testGuid ?? Guid.NewGuid();
+        this.TmdbId = tmdbGenreDataModel.Id;
+        this.Name = tmdbGenreDataModel.Name;
+    }
+    
+    public Guid ID { get; }
+    public int TmdbId { get; }
+    public string Name { get; }
+
+    public override string ToString()
+    {
+        return $"ID: {ID}\nTmdbId: {TmdbId}\nName: {Name}";
+    }
+
+}

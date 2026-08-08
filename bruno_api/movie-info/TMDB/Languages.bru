@@ -1,0 +1,20 @@
+meta {
+  name: Languages
+  type: http
+  seq: 21
+}
+
+get {
+  url: https://api.themoviedb.org/3/configuration/languages
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer longkeygoeshere
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

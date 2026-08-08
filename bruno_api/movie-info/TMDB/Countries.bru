@@ -1,0 +1,20 @@
+meta {
+  name: Countries
+  type: http
+  seq: 3
+}
+
+get {
+  url: https://api.themoviedb.org/3/configuration/countries
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer longkeygoeshere
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

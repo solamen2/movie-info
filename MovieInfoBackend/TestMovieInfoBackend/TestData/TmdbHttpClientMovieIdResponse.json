@@ -1,0 +1,26 @@
+{
+  "movie_results": [
+    {
+      "adult": false,
+      "backdrop_path": "/zfbjgQE1uSd9wiPTX4VzsLi0rGG.jpg",
+      "id": 278,
+      "title": "Example Movie",
+      "original_title": "Example Movie",
+      "overview": "Things happen in this movie.",
+      "poster_path": "/9cqNxx0GxF0bflZmeSMuL5tnGzr.jpg",
+      "media_type": "movie",
+      "original_language": "en",
+      "genre_ids": [18, 80],
+      "popularity": 67.3993,
+      "release_date": "2016-09-23",
+      "softcore": false,
+      "video": false,
+      "vote_average": 8.722,
+      "vote_count": 30473
+    }
+  ],
+  "person_results": [],
+  "tv_results": [],
+  "tv_episode_results": [],
+  "tv_season_results": []
+}

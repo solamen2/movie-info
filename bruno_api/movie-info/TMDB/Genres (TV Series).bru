@@ -1,0 +1,20 @@
+meta {
+  name: Genres (TV Series)
+  type: http
+  seq: 19
+}
+
+get {
+  url: https://api.themoviedb.org/3/genre/tv/list
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer longkeygoeshere
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,20 @@
+meta {
+  name: Genres (Movie)
+  type: http
+  seq: 18
+}
+
+get {
+  url: https://api.themoviedb.org/3/genre/movie/list
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer longkeygoeshere
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
