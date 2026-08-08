@@ -37,7 +37,7 @@ public record MovieViewModel
         }
         else
         {
-            this.BoxOfficeNumber = long.Parse(omdbDataModel.BoxOffice, NumberStyles.AllowCurrencySymbol | NumberStyles.Number);
+            this.BoxOfficeNumber = long.Parse(omdbDataModel.BoxOffice, NumberStyles.Currency);
         }
         this.Budget = tmdbMovieDataModel.Budget;
         this.TmdbGenres = String.Join(", ", tmdbMovieDataModel.Genres.Select(tgdm => tgdm.Name));
