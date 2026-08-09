@@ -1,13 +1,12 @@
-
 # Made with help from https://playwright.dev/docs/ci#via-containers
-name: 'CI - Run Playwright End-To-End Tests On Fly.Io Dev Instance'
+name: "CI - Run Playwright End-To-End Tests On Fly.Io Dev Instance"
 on:
   push:
     branches:
       - main
   #pull_request:  # For testing if something breaks
-    #branches:
-      #- main
+  #branches:
+  #- main
 
 jobs:
   deploy-dev:
@@ -17,7 +16,7 @@ jobs:
     needs: deploy-dev
     runs-on: ubuntu-latest
     container:
-      image: mcr.microsoft.com/playwright:v1.58.2-noble  # NOTE: Update this when updating Playwright! Much faster than installing each time
+      image: mcr.microsoft.com/playwright:v1.62.1-noble # NOTE: Update this when updating Playwright! Much faster than installing each time
       options: --user 1001
 
     steps:
@@ -68,4 +67,3 @@ jobs:
           name: playwright-real-report
           path: ./movie-info-frontend/real-report/
           retention-days: 7
-
