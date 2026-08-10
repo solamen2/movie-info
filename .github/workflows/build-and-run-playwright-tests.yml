@@ -16,7 +16,7 @@ jobs:
     needs: deploy-dev
     runs-on: ubuntu-latest
     container:
-      image: mcr.microsoft.com/playwright:v1.62.1-noble # NOTE: Update this when updating Playwright! Much faster than installing each time
+      image: mcr.microsoft.com/playwright:v1.61.1-noble # NOTE: Update this when updating Playwright! Much faster than installing each time
       options: --user 1001
 
     steps:
