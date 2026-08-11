@@ -18,7 +18,7 @@ public class TvSeriesViewModelTests
     {   
         // Arrange
 
-        string testDataFilename1 = "MovieHttpClientResponse1.json";
+        string testDataFilename1 = "SuggestionHttpClientResponse1.json";
         string testOmdbTvSeriesDataFilename = "OmdbHttpClientTvSeriesResponse.json";
         string testTvSeriesDataFilename = "TmdbHttpClientTvSeriesResponse.json";
         string testTvSeriesAggregateCreditsDataFilename = "TmdbHttpClientTvSeriesAggregateCreditsResponse.json";
@@ -95,7 +95,7 @@ public class TvSeriesViewModelTests
     {
         // Arrange (continued)
         
-        MovieSuggestionsResponseDataModel? actual1 = MovieHttpClient.GetModelFromResponse(suggestionHttpClientResponse1);
+        SuggestionsResponseDataModel? actual1 = SuggestionHttpClient.GetModelFromResponse(suggestionHttpClientResponse1);
         SuggestionDataModel[]? suggestions1 = actual1?.Suggestions;
         Assert.Equal(8, suggestions1?.Length);
         SuggestionDataModel? suggestionTvSeriesDataModel = suggestions1?[2];  // TV series suggestion = index 2
@@ -175,7 +175,7 @@ public class TvSeriesViewModelTests
     {
         // Arrange (continued)
         
-        MovieSuggestionsResponseDataModel? actual1 = MovieHttpClient.GetModelFromResponse(suggestionHttpClientResponse1);
+        SuggestionsResponseDataModel? actual1 = SuggestionHttpClient.GetModelFromResponse(suggestionHttpClientResponse1);
         SuggestionDataModel[]? suggestions1 = actual1?.Suggestions;
         Assert.Equal(8, suggestions1?.Length);
         SuggestionDataModel? suggestionTvSeriesDataModel = suggestions1?[2];  // TV series suggestion = index 2
@@ -554,7 +554,7 @@ public class TvSeriesViewModelTests
     {
         // Arrange (continued)
         
-        MovieSuggestionsResponseDataModel? actual1 = MovieHttpClient.GetModelFromResponse(suggestionHttpClientResponse1);
+        SuggestionsResponseDataModel? actual1 = SuggestionHttpClient.GetModelFromResponse(suggestionHttpClientResponse1);
         SuggestionDataModel[]? suggestions1 = actual1?.Suggestions;
         Assert.Equal(8, suggestions1?.Length);
         SuggestionDataModel? suggestionTvSeriesDataModel = suggestions1?[2];  // TV series suggestion = index 2

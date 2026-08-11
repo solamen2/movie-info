@@ -16,7 +16,7 @@ public class PersonViewModelTests
     {        
         // Arrange
 
-        string testDataFilename1 = "MovieHttpClientResponse1.json";
+        string testDataFilename1 = "SuggestionHttpClientResponse1.json";
         string testPersonDataFilename = "TmdbHttpClientPersonResponse.json";
         string testPersonMovieCreditsDataFilename = "TmdbHttpClientPersonMovieCreditsResponse.json";
         string testPersonTvSeriesCreditsDataFilename = "TmdbHttpClientPersonTvSeriesCreditsResponse.json";
@@ -73,7 +73,7 @@ public class PersonViewModelTests
     {
         // Arrange (continued)
         
-        MovieSuggestionsResponseDataModel? actual1 = MovieHttpClient.GetModelFromResponse(suggestionHttpClientResponse1);
+        SuggestionsResponseDataModel? actual1 = SuggestionHttpClient.GetModelFromResponse(suggestionHttpClientResponse1);
         SuggestionDataModel[]? suggestions1 = actual1?.Suggestions;
         Assert.Equal(8, suggestions1?.Length);
         SuggestionDataModel? suggestionPersonDataModel = suggestions1?[0];  // Person suggestion = index 0
@@ -113,7 +113,7 @@ public class PersonViewModelTests
     {
         // Arrange (continued)
         
-        MovieSuggestionsResponseDataModel? actual1 = MovieHttpClient.GetModelFromResponse(suggestionHttpClientResponse1);
+        SuggestionsResponseDataModel? actual1 = SuggestionHttpClient.GetModelFromResponse(suggestionHttpClientResponse1);
         SuggestionDataModel[]? suggestions1 = actual1?.Suggestions;
         Assert.Equal(8, suggestions1?.Length);
         SuggestionDataModel? suggestionPersonDataModel = suggestions1?[0];  // Person suggestion = index 0

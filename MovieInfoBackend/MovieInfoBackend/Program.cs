@@ -33,7 +33,7 @@ try
 
     Log.Information("Mapping endpoints...");
     AuthEndpoints.Map(app);
-    MovieEndpoints.Map(app);
+    SuggestionEndpoints.Map(app);
 
     Log.Information("Starting app...");
     app.Run();
@@ -84,7 +84,7 @@ void AddServices()
                     tbOptions.AutoReplenishment = true;
                 });
             })
-            .AddHttpClient<MovieHttpClient>()
+            .AddHttpClient<SuggestionHttpClient>()
                 .AddTransientHttpErrorPolicy(policyBuilder =>
                     policyBuilder.WaitAndRetryAsync(3, retryNumber => TimeSpan.FromMilliseconds(600)))
                 .AddTransientHttpErrorPolicy(policyBuilder =>

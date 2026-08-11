@@ -16,7 +16,7 @@ public class TvEpisodeViewModelTests
     {        
         // Arrange
 
-        string testDataFilename1 = "MovieHttpClientResponse1.json";
+        string testDataFilename1 = "SuggestionHttpClientResponse1.json";
         string testOmdbTvEpisodeDataFilename = "OmdbHttpClientTvEpisodeResponse.json";
         string testTmdbTvEpisodeDataFilename = "TmdbHttpClientTvEpisodeResponse.json";
         string testTvEpisodeCreditsDataFilename = "TmdbHttpClientTvEpisodeCreditsResponse.json";

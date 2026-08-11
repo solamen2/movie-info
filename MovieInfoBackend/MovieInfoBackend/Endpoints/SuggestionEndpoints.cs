@@ -13,29 +13,36 @@ using System.Diagnostics.CodeAnalysis;
 namespace MovieInfoBackend.Endpoints;
 
 [ExcludeFromCodeCoverage]
-public class MovieEndpoints
+public class SuggestionEndpoints
 {
+    static SuggestionHttpClient _suggestionHttpClient;
+    
+    static SuggestionEndpoints()
+    {
+        SocketsHttpHandler handler = new SocketsHttpHandler
+        {
+            PooledConnectionLifetime = TimeSpan.FromMinutes(15) // Recreate every 15 minutes
+        };
+
+        _suggestionHttpClient = new SuggestionHttpClient(new HttpClient(handler));
+    }
+    
     public static void Map(WebApplication app)
     {
         app.MapGet($"{ApiRoutePrefix}/search", [Authorize]
             async (
                 string searchQuery,
                 ClaimsPrincipal user,
-                [FromServices] IMemoryCache cache,
-                [FromServices] IHttpClientFactory clientFactory,
-                [FromServices] ITypedHttpClientFactory <MovieHttpClient> typedHttpClientFactory) =>
+                [FromServices] IMemoryCache cache) =>
             {
                 try
                 {
-                    HttpClient httpClient = clientFactory.CreateClient(nameof(MovieHttpClient));
-                    MovieHttpClient movieHttpClient = typedHttpClientFactory.CreateClient(httpClient);
+                    SuggestionsResponseDataModel? suggestionsResponse;
 
-                    MovieSuggestionsResponseDataModel? suggestionsResponse;
-
-                    string suggestionsCacheKey = MovieHttpClient.CachePrefix + searchQuery;
+                    string suggestionsCacheKey = SuggestionHttpClient.CachePrefix + searchQuery;
                     if (!cache.TryGetValue(suggestionsCacheKey, out suggestionsResponse))
                     {
-                        suggestionsResponse = await movieHttpClient.GetSuggestions(searchQuery);
+                        suggestionsResponse = await _suggestionHttpClient.GetSuggestions(searchQuery);
 
                         var cacheEntryOptions = new MemoryCacheEntryOptions()
                             .SetAbsoluteExpiration(TimeSpan.FromDays(1))
@@ -80,23 +87,23 @@ public class MovieEndpoints
 
     // WARNING: This function should only ever be used in local development to generate test case data
     [ExcludeFromCodeCoverage]
-    private class MovieEndpointsHelpers
+    private class SuggestionEndpointsHelpers
     {
-        private static MovieSuggestionsResponseDataModel? LoadMockData()
+        private static SuggestionsResponseDataModel? LoadMockData()
         {
-            string movieHttpClientResponse;
-            string testDataFilename = "MovieHttpClientResponse2.json";
+            string suggestionHttpClientResponse;
+            string testDataFilename = "SuggestionHttpClientResponse2.json";
 
             using (StreamReader sr = File.OpenText($"../TestMovieInfoBackend/TestData/{testDataFilename}"))
             {
-                movieHttpClientResponse = sr.ReadToEnd();
+                suggestionHttpClientResponse = sr.ReadToEnd();
             }
-            if (String.IsNullOrWhiteSpace(movieHttpClientResponse))
+            if (String.IsNullOrWhiteSpace(suggestionHttpClientResponse))
             {
                 throw new ArgumentException($"{testDataFilename} is not valid test data.");
             }
 
-            return MovieHttpClient.GetModelFromResponse(movieHttpClientResponse);
+            return SuggestionHttpClient.GetModelFromResponse(suggestionHttpClientResponse);
         }
     }
 }
