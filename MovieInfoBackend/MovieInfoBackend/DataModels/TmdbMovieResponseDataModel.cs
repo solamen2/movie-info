@@ -9,7 +9,7 @@ public record TmdbMovieResponseDataModel
     [JsonPropertyName("backdrop_path")]
     public required string BackdropPath { get; init; }
     [JsonPropertyName("belongs_to_collection")]
-    public string? BelongsToCollection { get; init; }
+    public TmdbMovieBelongsToCollectionDataModel? BelongsToCollection { get; init; }
     [JsonPropertyName("budget")]
     public required long Budget { get; init; }
     [JsonPropertyName("genres")]

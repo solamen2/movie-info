@@ -37,7 +37,7 @@ jobs:
         working-directory: ./movie-info-frontend
         env:
           CI: 1
-          E2E_TEST_USE_MOCK_HTTP_CALLS: true
+          VITE_USE_MOCK_HTTP_CALLS: true
           PLAYWRIGHT_HTML_OUTPUT_DIR: ./mock-report/
           E2E_TEST_BASE_URL: https://movie-info-flyio.fly.dev/
           E2E_TEST_USERNAME: ${{ secrets.E2E_TEST_USERNAME }}
@@ -55,7 +55,7 @@ jobs:
         working-directory: ./movie-info-frontend
         env:
           CI: 1
-          E2E_TEST_USE_MOCK_HTTP_CALLS: false
+          VITE_USE_MOCK_HTTP_CALLS: false
           PLAYWRIGHT_HTML_OUTPUT_DIR: ./real-report/
           E2E_TEST_BASE_URL: https://movie-info-flyio.fly.dev/
           E2E_TEST_USERNAME: ${{ secrets.E2E_TEST_USERNAME }}

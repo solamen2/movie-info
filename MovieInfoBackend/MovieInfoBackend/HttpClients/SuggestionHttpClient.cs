@@ -6,7 +6,6 @@ using MovieInfoBackend.DataModels;
 public class SuggestionHttpClient
 {
     private readonly HttpClient _httpClient;
-    public static string CachePrefix = "imdb-";
 
     public SuggestionHttpClient(HttpClient httpClient)
     {
@@ -30,10 +29,10 @@ public class SuggestionHttpClient
         {
             return null;
         }
-
+        
         string responseJsonString = await response.Content.ReadAsStringAsync();
-
-        return GetModelFromResponse(responseJsonString);
+        
+        return GetModelFromResponse(responseJsonString);;
     }
 
     public static SuggestionsResponseDataModel? GetModelFromResponse(string responseJsonString)

@@ -1,0 +1,20 @@
+meta {
+  name: Movie
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{base-url}}/api/movie?imdbId=tt0111161
+  body: none
+  auth: inherit
+}
+
+params:query {
+  imdbId: tt0111161
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -32,8 +32,9 @@ try
     SetUpApp();
 
     Log.Information("Mapping endpoints...");
-    AuthEndpoints.Map(app);
-    SuggestionEndpoints.Map(app);
+    AuthEndpoint.Map(app);
+    SuggestionEndpoint.Map(app);
+    MovieEndpoint.Map(app);
 
     Log.Information("Starting app...");
     app.Run();
@@ -83,13 +84,26 @@ void AddServices()
                     tbOptions.TokensPerPeriod = 6;
                     tbOptions.AutoReplenishment = true;
                 });
-            })
-            .AddHttpClient<SuggestionHttpClient>()
-                .AddTransientHttpErrorPolicy(policyBuilder =>
-                    policyBuilder.WaitAndRetryAsync(3, retryNumber => TimeSpan.FromMilliseconds(600)))
-                .AddTransientHttpErrorPolicy(policyBuilder =>
-                    policyBuilder.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)))
-                .SetHandlerLifetime(TimeSpan.FromMinutes(2));  // NOTE: This is the default, but reminds me how to change if needed
+            });
+
+    builder.Services.AddHttpClient<SuggestionHttpClient>()
+                        .AddTransientHttpErrorPolicy(policyBuilder =>
+                            policyBuilder.WaitAndRetryAsync(3, retryNumber => TimeSpan.FromMilliseconds(600)))  // Retry 3 times with 0.6 second delay
+                        .AddTransientHttpErrorPolicy(policyBuilder =>
+                            policyBuilder.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)))  // If more than 5 exceptions happen, break for 30 seconds
+                        .SetHandlerLifetime(TimeSpan.FromMinutes(15));  // Dispose every 15 minutes so DNS updates can work (on that timeframe)
+    builder.Services.AddHttpClient<OmdbHttpClient>()
+                        .AddTransientHttpErrorPolicy(policyBuilder =>
+                            policyBuilder.WaitAndRetryAsync(3, retryNumber => TimeSpan.FromMilliseconds(600)))
+                        .AddTransientHttpErrorPolicy(policyBuilder =>
+                            policyBuilder.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)))
+                        .SetHandlerLifetime(TimeSpan.FromMinutes(15));
+    builder.Services.AddHttpClient<TmdbHttpClient>()
+                        .AddTransientHttpErrorPolicy(policyBuilder =>
+                            policyBuilder.WaitAndRetryAsync(3, retryNumber => TimeSpan.FromMilliseconds(600)))
+                        .AddTransientHttpErrorPolicy(policyBuilder =>
+                            policyBuilder.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)))
+                        .SetHandlerLifetime(TimeSpan.FromMinutes(15));
 
     if (builder.Environment.IsDevelopment())
     {
@@ -209,6 +223,6 @@ void SetUpApp()
     // CORS
     app.UseCors();
 
-    // Rate limiting (only used for search API call currently)
+    // Rate limiting (used by non-auth APIs)
     app.UseRateLimiter();
 }

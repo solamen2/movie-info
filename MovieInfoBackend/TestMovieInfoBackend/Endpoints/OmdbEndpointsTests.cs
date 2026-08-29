@@ -15,6 +15,7 @@ public class OmdbEndpointsTests
     public OmdbEndpointsTests(ITestOutputHelper output)
     {        
         // TODO: Implement HttpClientTests too
+        // TODO: Merge with TmdbEndpointsTests to make MediaEndpointsTests
 
         // Arrange
 

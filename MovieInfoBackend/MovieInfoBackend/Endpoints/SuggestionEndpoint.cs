@@ -2,7 +2,6 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Http;
 using MovieInfoBackend.DataModels;
 using MovieInfoBackend.Helpers;
 using static MovieInfoBackend.Helpers.ProgramConstants;  // for ApiRoutePrefix
@@ -13,59 +12,51 @@ using System.Diagnostics.CodeAnalysis;
 namespace MovieInfoBackend.Endpoints;
 
 [ExcludeFromCodeCoverage]
-public class SuggestionEndpoints
+public class SuggestionEndpoint
 {
-    static SuggestionHttpClient _suggestionHttpClient;
-    
-    static SuggestionEndpoints()
-    {
-        SocketsHttpHandler handler = new SocketsHttpHandler
-        {
-            PooledConnectionLifetime = TimeSpan.FromMinutes(15) // Recreate every 15 minutes
-        };
+    public static string CachePrefix = "suggestions-";
 
-        _suggestionHttpClient = new SuggestionHttpClient(new HttpClient(handler));
-    }
-    
     public static void Map(WebApplication app)
     {
         app.MapGet($"{ApiRoutePrefix}/search", [Authorize]
             async (
                 string searchQuery,
                 ClaimsPrincipal user,
+                [FromServices] SuggestionHttpClient suggestionHttpClient,
                 [FromServices] IMemoryCache cache) =>
             {
                 try
                 {
-                    SuggestionsResponseDataModel? suggestionsResponse;
+                    IResult? suggestionViewModelsJson;
+                    string suggestionsCacheKey = CachePrefix + searchQuery;  // NOTE: We may not hit the cache that often for suggestions, but being a bit paranoid here to minimize impact
 
-                    string suggestionsCacheKey = SuggestionHttpClient.CachePrefix + searchQuery;
-                    if (!cache.TryGetValue(suggestionsCacheKey, out suggestionsResponse))
+                    if (!cache.TryGetValue(suggestionsCacheKey, out suggestionViewModelsJson))
                     {
-                        suggestionsResponse = await _suggestionHttpClient.GetSuggestions(searchQuery);
+                        SuggestionsResponseDataModel? suggestionsResponse = await suggestionHttpClient.GetSuggestions(searchQuery);
 
+                        List<SuggestionViewModel> suggestionViewModels = new List<SuggestionViewModel>();
+                        if (suggestionsResponse == null || suggestionsResponse.Suggestions == null || suggestionsResponse.Suggestions.Length <= 0)
+                            return null;  // TODO: return proper HTML error codes
+                        foreach (SuggestionDataModel suggestionDataModel in suggestionsResponse.Suggestions)
+                        {
+                            suggestionViewModels.Add(new SuggestionViewModel(suggestionDataModel));
+                        }
+
+                        string username = user?.Identity?.Name ?? "<no username found>";
+                        Log.Debug($"Username: {username}");
+                        Log.Debug($"Suggestions:\n\n{suggestionsResponse}\n\n");   // NOTE: Not destructuring using @ operator because Serilog doesn't let you configure output easily
+                                                                                   // (and Seq doesn't support Azure Container Apps, so it's not used in this app)
+
+
+                        suggestionViewModelsJson = Results.Json(suggestionViewModels);
+                        
                         var cacheEntryOptions = new MemoryCacheEntryOptions()
                             .SetAbsoluteExpiration(TimeSpan.FromDays(1))
                             .SetSlidingExpiration(TimeSpan.FromHours(1));
-
-                        cache.Set(suggestionsCacheKey, suggestionsResponse, cacheEntryOptions);
+                        cache.Set(suggestionsCacheKey, suggestionViewModelsJson, cacheEntryOptions);
                     }
 
-                    string username = user?.Identity?.Name ?? "<no username found>";
-
-                    Log.Debug($"Username: {username}");
-                    Log.Debug($"Suggestions:\n\n{suggestionsResponse}\n\n");   // NOTE: Not destructuring using @ operator because Serilog doesn't let you configure output easily
-                                                                               // (and Seq doesn't support Azure Container Apps, so it's not used in this app)
-
-                    List<SuggestionViewModel> suggestionViewModels = new List<SuggestionViewModel>();
-                    if (suggestionsResponse == null || suggestionsResponse.Suggestions == null)
-                        return null;  // TODO: return proper HTML error codes
-                    foreach (SuggestionDataModel suggestionDataModel in suggestionsResponse.Suggestions)
-                    {
-                        suggestionViewModels.Add(new SuggestionViewModel(suggestionDataModel));
-                    }
-
-                    return Results.Json(suggestionViewModels);
+                    return suggestionViewModelsJson;
                 }
                 catch (Exception e)
                 {
@@ -80,14 +71,14 @@ public class SuggestionEndpoints
         )
         .WithSummary("Search")
         .WithDescription("Searches IMDB for people, movies, and many other media types, and returns basic information on them.")
-        .RequireAuthorization(ProgramConstants.LoggedInUsersOnlyPolicyName)  // TODO: Check that this returns appropropriate error on frontend
-        .RequireAuthorization(ProgramConstants.SearchUsersOnlyPolicyName)  // TODO: Check that this returns appropropriate error on frontend
+        .RequireAuthorization(ProgramConstants.LoggedInUsersOnlyPolicyName)  // TODO: Check that this returns appropriate error on frontend
+        .RequireAuthorization(ProgramConstants.SearchUsersOnlyPolicyName)  // TODO: Check that this returns appropriate error on frontend
         .RequireRateLimiting(ProgramConstants.TokenRateLimiterPolicyName);
     }
 
     // WARNING: This function should only ever be used in local development to generate test case data
     [ExcludeFromCodeCoverage]
-    private class SuggestionEndpointsHelpers
+    private class SuggestionEndpointHelper
     {
         private static SuggestionsResponseDataModel? LoadMockData()
         {

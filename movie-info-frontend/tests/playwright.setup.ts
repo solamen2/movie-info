@@ -9,7 +9,7 @@ interface Fixtures {
 }
 
 export const test =
-  process.env.E2E_TEST_USE_MOCK_HTTP_CALLS === "true"
+  process.env.VITE_USE_MOCK_HTTP_CALLS === "true"
     ? testBase.extend<Fixtures>({
         // Initial list of the network handlers.
         handlers: [handlers, { option: true }],
