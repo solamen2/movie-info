@@ -3,12 +3,11 @@ using System.Web;
 using Microsoft.Net.Http.Headers;
 using MovieInfoBackend.DataModels;
 
-public class MovieHttpClient
+public class SuggestionHttpClient
 {
     private readonly HttpClient _httpClient;
-    public static string CachePrefix = "imdb-";
 
-    public MovieHttpClient(HttpClient httpClient)
+    public SuggestionHttpClient(HttpClient httpClient)
     {
         _httpClient = httpClient;
 
@@ -23,21 +22,21 @@ public class MovieHttpClient
             "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Mobile Safari/537.36");
     }
 
-    public async Task<MovieSuggestionsResponseDataModel?> GetSuggestions(string searchQuery)
+    public async Task<SuggestionsResponseDataModel?> GetSuggestions(string searchQuery)
     {
         using HttpResponseMessage response = await _httpClient.GetAsync($"suggestion/a/{HttpUtility.HtmlEncode(searchQuery)}.json");
         if (response.StatusCode != System.Net.HttpStatusCode.OK)
         {
             return null;
         }
-
+        
         string responseJsonString = await response.Content.ReadAsStringAsync();
-
-        return GetModelFromResponse(responseJsonString);
+        
+        return GetModelFromResponse(responseJsonString);;
     }
 
-    public static MovieSuggestionsResponseDataModel? GetModelFromResponse(string responseJsonString)
+    public static SuggestionsResponseDataModel? GetModelFromResponse(string responseJsonString)
     {
-        return JsonSerializer.Deserialize<MovieSuggestionsResponseDataModel>(responseJsonString);
+        return JsonSerializer.Deserialize<SuggestionsResponseDataModel>(responseJsonString);
     }
 }

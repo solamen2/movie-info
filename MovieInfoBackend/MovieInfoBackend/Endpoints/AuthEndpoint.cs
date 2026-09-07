@@ -9,7 +9,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace MovieInfoBackend.Endpoints;
 
 [ExcludeFromCodeCoverage]
-public class AuthEndpoints
+public class AuthEndpoint
 {
     public static void Map(WebApplication app)
     {

@@ -6,8 +6,8 @@ namespace TestMovieInfoBackend.DataModels;
 
 public class SuggestionViewModelTests
 {
-    private string movieHttpClientResponse1;
-    private string movieHttpClientResponse2;
+    private string suggestionHttpClientResponse1;
+    private string suggestionHttpClientResponse2;
     private string noSuggestionsErrorResponse;
     private string badDataErrorResponse;
 
@@ -15,25 +15,25 @@ public class SuggestionViewModelTests
     {
         // Arrange
 
-        string testDataFilename1 = "MovieHttpClientResponse1.json";
-        string testDataFilename2 = "MovieHttpClientResponse2.json";
-        string noSuggestionsDataFilename = "MovieHttpClientErrorResponse1.json";
-        string badDataFilename = "MovieHttpClientErrorResponse2.json";
+        string testDataFilename1 = "SuggestionHttpClientResponse1.json";
+        string testDataFilename2 = "SuggestionHttpClientResponse2.json";
+        string noSuggestionsDataFilename = "SuggestionHttpClientErrorResponse1.json";
+        string badDataFilename = "SuggestionHttpClientErrorResponse2.json";
 
         using (StreamReader sr = File.OpenText($"../../../TestData/{testDataFilename1}"))
         {
-            movieHttpClientResponse1 = sr.ReadToEnd();
+            suggestionHttpClientResponse1 = sr.ReadToEnd();
         }
-        if (String.IsNullOrWhiteSpace(movieHttpClientResponse1))
+        if (String.IsNullOrWhiteSpace(suggestionHttpClientResponse1))
         {
             throw new ArgumentException($"{testDataFilename1} is not valid test data.");
         }
 
         using (StreamReader sr = File.OpenText($"../../../TestData/{testDataFilename2}"))
         {
-            movieHttpClientResponse2 = sr.ReadToEnd();
+            suggestionHttpClientResponse2 = sr.ReadToEnd();
         }
-        if (String.IsNullOrWhiteSpace(movieHttpClientResponse2))
+        if (String.IsNullOrWhiteSpace(suggestionHttpClientResponse2))
         {
             throw new ArgumentException($"{testDataFilename2} is not valid test data.");
         }
@@ -62,8 +62,8 @@ public class SuggestionViewModelTests
     {
         // Act
 
-        MovieSuggestionsResponseDataModel? actual1 = MovieHttpClient.GetModelFromResponse(movieHttpClientResponse1);
-        MovieSuggestionsResponseDataModel? actual2 = MovieHttpClient.GetModelFromResponse(movieHttpClientResponse2);
+        SuggestionsResponseDataModel? actual1 = SuggestionHttpClient.GetModelFromResponse(suggestionHttpClientResponse1);
+        SuggestionsResponseDataModel? actual2 = SuggestionHttpClient.GetModelFromResponse(suggestionHttpClientResponse2);
 
         // Assert
 
@@ -372,7 +372,7 @@ public class SuggestionViewModelTests
     public void SuggestionViewModel_ValidViewModelToString_ReturnsFormattedString()
     {
         // Act
-        MovieSuggestionsResponseDataModel? actual1 = MovieHttpClient.GetModelFromResponse(movieHttpClientResponse1);
+        SuggestionsResponseDataModel? actual1 = SuggestionHttpClient.GetModelFromResponse(suggestionHttpClientResponse1);
         SuggestionDataModel[]? suggestions1 = actual1?.Suggestions;
         Assert.NotNull(suggestions1);
         Assert.NotEmpty(suggestions1);
@@ -390,28 +390,28 @@ public class SuggestionViewModelTests
     {
         // Arrange
         
-        MovieSuggestionsResponseDataModel? actual1 = MovieHttpClient.GetModelFromResponse(movieHttpClientResponse1);
+        SuggestionsResponseDataModel? actual1 = SuggestionHttpClient.GetModelFromResponse(suggestionHttpClientResponse1);
         SuggestionDataModel[]? suggestions1 = actual1?.Suggestions;
         Assert.NotNull(suggestions1);
         Assert.NotEmpty(suggestions1);
 
         // Act
 
-        SuggestionViewModel movieViewModel1 = new(suggestions1[1]);
-        SuggestionViewModel movieViewModel2 = new(suggestions1[1]);
+        SuggestionViewModel suggestionViewModel1 = new(suggestions1[1]);
+        SuggestionViewModel suggestionViewModel2 = new(suggestions1[1]);
 
         // Assert
 
-        Assert.NotEqual(Guid.Empty, movieViewModel1.ID);
-        Assert.NotEqual(Guid.Empty, movieViewModel2.ID);
-        Assert.NotEqual(movieViewModel1.ID, movieViewModel2.ID);
+        Assert.NotEqual(Guid.Empty, suggestionViewModel1.ID);
+        Assert.NotEqual(Guid.Empty, suggestionViewModel2.ID);
+        Assert.NotEqual(suggestionViewModel1.ID, suggestionViewModel2.ID);
     }
 
     [Fact]
     public void GetModelFromResponse_EmptyResponse_ReturnsEmptyModel()
     {
         // Act
-        MovieSuggestionsResponseDataModel? actual = MovieHttpClient.GetModelFromResponse(noSuggestionsErrorResponse);
+        SuggestionsResponseDataModel? actual = SuggestionHttpClient.GetModelFromResponse(noSuggestionsErrorResponse);
 
         // Assert
         Assert.NotNull(actual);
@@ -423,7 +423,7 @@ public class SuggestionViewModelTests
     public void GetModelFromResponse_ErrorResponse_GeneratesNullFieldsAndThrowsExceptions()
     {
         // Act
-        MovieSuggestionsResponseDataModel? actual = MovieHttpClient.GetModelFromResponse(badDataErrorResponse);
+        SuggestionsResponseDataModel? actual = SuggestionHttpClient.GetModelFromResponse(badDataErrorResponse);
 
         // Assert
         Assert.NotNull(actual);
@@ -521,7 +521,7 @@ public class SuggestionViewModelTests
     {
         // Arrange
 
-        MovieSuggestionsResponseDataModel? actual1 = MovieHttpClient.GetModelFromResponse(movieHttpClientResponse1);
+        SuggestionsResponseDataModel? actual1 = SuggestionHttpClient.GetModelFromResponse(suggestionHttpClientResponse1);
 
         SuggestionDataModel[]? suggestions1 = actual1?.Suggestions;
         Assert.Equal(8, suggestions1?.Length);

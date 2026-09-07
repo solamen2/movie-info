@@ -34,7 +34,7 @@ test("Basic happy path: search, check results are valid, and select a search car
 }) => {
   console.log("Starting basic happy path test...");
   const searchText =
-    process.env.E2E_TEST_USE_MOCK_HTTP_CALLS === "true"
+    process.env.VITE_USE_MOCK_HTTP_CALLS === "true"
       ? "1"
       : "The Shawshank Redemption";
   const searchQueryInput = page.getByRole("textbox", {
@@ -45,7 +45,7 @@ test("Basic happy path: search, check results are valid, and select a search car
   await searchButton.click();
 
   const movieNameTextToSearch =
-    process.env.E2E_TEST_USE_MOCK_HTTP_CALLS === "true"
+    process.env.VITE_USE_MOCK_HTTP_CALLS === "true"
       ? "Example Movie"
       : "The Shawshank Redemption";
   const movieTextElement = page.getByText(movieNameTextToSearch, {
@@ -53,11 +53,11 @@ test("Basic happy path: search, check results are valid, and select a search car
   });
   const movieCard = movieTextElement.locator("ancestor=#search-card");
   const movieCardText1 =
-    process.env.E2E_TEST_USE_MOCK_HTTP_CALLS === "true"
+    process.env.VITE_USE_MOCK_HTTP_CALLS === "true"
       ? "Example MovieSearch Type: MediaMedia Type: MovieRank: "
       : "The Shawshank RedemptionSearch Type: MediaMedia Type: MovieRank: ";
   const movieCardText2 =
-    process.env.E2E_TEST_USE_MOCK_HTTP_CALLS === "true"
+    process.env.VITE_USE_MOCK_HTTP_CALLS === "true"
       ? "4444Known For: Example Jones, Example BrownYear: 2016"
       : "Known For: Tim Robbins, Morgan FreemanYear: 1994"; // remove rank from Shawshank because it changes over time
   expect(await movieCard.textContent()).toContain(movieCardText1);

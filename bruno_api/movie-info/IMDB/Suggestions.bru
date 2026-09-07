@@ -1,0 +1,29 @@
+meta {
+  name: Suggestions
+  type: http
+  seq: 1
+}
+
+get {
+  url: https://v3.sg.media-imdb.com/suggestion/a/{{search_query}}.json
+  body: none
+  auth: inherit
+}
+
+headers {
+  Accept: application/json, text/plain, */*
+  Accept-Language: en-US,en;q=0.9
+  Origin: https://m.imdb.com
+  Priority: u=1, i
+  Referer: https://m.imdb.com/
+  User-Agent: Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Mobile Safari/537.36
+}
+
+vars:pre-request {
+  search_query: Leonardo DiCaprio
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

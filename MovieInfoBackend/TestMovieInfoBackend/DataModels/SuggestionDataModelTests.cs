@@ -3,30 +3,30 @@ using Xunit.Abstractions;
 
 public class SuggestionDataModelTests
 {
-    private string movieHttpClientResponse1;
-    private string movieHttpClientResponse2;
+    private string suggestionHttpClientResponse1;
+    private string suggestionHttpClientResponse2;
 
     public SuggestionDataModelTests(ITestOutputHelper output)
     {
         // Arrange
 
-        string testDataFilename1 = "MovieHttpClientResponse1.json";
-        string testDataFilename2 = "MovieHttpClientResponse2.json";
+        string testDataFilename1 = "SuggestionHttpClientResponse1.json";
+        string testDataFilename2 = "SuggestionHttpClientResponse2.json";
 
         using (StreamReader sr = File.OpenText($"../../../TestData/{testDataFilename1}"))
         {
-            movieHttpClientResponse1 = sr.ReadToEnd();
+            suggestionHttpClientResponse1 = sr.ReadToEnd();
         }
-        if (String.IsNullOrWhiteSpace(movieHttpClientResponse1))
+        if (String.IsNullOrWhiteSpace(suggestionHttpClientResponse1))
         {
             throw new ArgumentException($"{testDataFilename1} is not valid test data.");
         }
 
         using (StreamReader sr = File.OpenText($"../../../TestData/{testDataFilename2}"))
         {
-            movieHttpClientResponse2 = sr.ReadToEnd();
+            suggestionHttpClientResponse2 = sr.ReadToEnd();
         }
-        if (String.IsNullOrWhiteSpace(movieHttpClientResponse2))
+        if (String.IsNullOrWhiteSpace(suggestionHttpClientResponse2))
         {
             throw new ArgumentException($"{testDataFilename2} is not valid test data.");
         }
@@ -37,9 +37,9 @@ public class SuggestionDataModelTests
     {
         // Act
 
-        MovieSuggestionsResponseDataModel? actual1 = MovieHttpClient.GetModelFromResponse(movieHttpClientResponse1);
+        SuggestionsResponseDataModel? actual1 = SuggestionHttpClient.GetModelFromResponse(suggestionHttpClientResponse1);
         Assert.NotNull(actual1);
-        MovieSuggestionsResponseDataModel? actual2 = MovieHttpClient.GetModelFromResponse(movieHttpClientResponse2);
+        SuggestionsResponseDataModel? actual2 = SuggestionHttpClient.GetModelFromResponse(suggestionHttpClientResponse2);
         Assert.NotNull(actual2);
 
         // Assert
@@ -357,7 +357,7 @@ public class SuggestionDataModelTests
     {
         // Act
 
-        MovieSuggestionsResponseDataModel? actual1 = MovieHttpClient.GetModelFromResponse(movieHttpClientResponse1);
+        SuggestionsResponseDataModel? actual1 = SuggestionHttpClient.GetModelFromResponse(suggestionHttpClientResponse1);
         Assert.NotNull(actual1);
         SuggestionDataModel[]? suggestions1 = actual1.Suggestions;
         Assert.NotNull(suggestions1);
@@ -370,10 +370,10 @@ public class SuggestionDataModelTests
     }
 
     [Fact]
-    public void MovieSuggestionsResponseDataModel_NullSuggestions_HandlesCorrectly()
+    public void SuggestionsResponseDataModel_NullSuggestions_HandlesCorrectly()
     {
         // Arrange & Act
-        var responseModel = new MovieSuggestionsResponseDataModel
+        var responseModel = new SuggestionsResponseDataModel
         {
             Suggestions = null
         };
@@ -387,10 +387,10 @@ public class SuggestionDataModelTests
     }
 
     [Fact]
-    public void MovieSuggestionsResponseDataModel_EmptySuggestions_HandlesCorrectly()
+    public void SuggestionsResponseDataModel_EmptySuggestions_HandlesCorrectly()
     {
         // Arrange & Act
-        var responseModel = new MovieSuggestionsResponseDataModel
+        var responseModel = new SuggestionsResponseDataModel
         {
             Suggestions = []
         };

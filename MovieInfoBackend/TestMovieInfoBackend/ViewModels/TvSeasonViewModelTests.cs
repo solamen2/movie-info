@@ -40,16 +40,16 @@ public class TvSeasonViewModelTests
     {
         // Arrange (continued)
 
-        TmdbTvSeasonResponseDataModel? tvSeasonResponse = TmdbHttpClient.GetTvSeasonModelFromResponse(tmdbHttpClientTvSeasonResponse);
-        Assert.NotNull(tvSeasonResponse);
+        TmdbTvSeasonResponseDataModel? tmdbTvSeasonResponse = TmdbHttpClient.GetTvSeasonModelFromResponse(tmdbHttpClientTvSeasonResponse);
+        Assert.NotNull(tmdbTvSeasonResponse);
 
-        TmdbWatchProvidersResponseDataModel? tvSeasonWatchProvidersResponse = TmdbHttpClient.GetWatchProvidersModelFromResponse(tmdbHttpClientTvSeasonWatchProvidersResponse);
-        Assert.NotNull(tvSeasonWatchProvidersResponse);
+        TmdbWatchProvidersResponseDataModel? tmdbTvSeasonWatchProvidersResponse = TmdbHttpClient.GetWatchProvidersModelFromResponse(tmdbHttpClientTvSeasonWatchProvidersResponse);
+        Assert.NotNull(tmdbTvSeasonWatchProvidersResponse);
 
         // Act
 
-        TvSeasonViewModel tvSeasonViewModel = new(tvSeasonResponse, 
-                                                  tvSeasonWatchProvidersResponse);
+        TvSeasonViewModel tvSeasonViewModel = new(tmdbTvSeasonResponse, 
+                                                  tmdbTvSeasonWatchProvidersResponse);
         
         // Assert
         
@@ -73,8 +73,8 @@ public class TvSeasonViewModelTests
     {
         // Arrange (continued)
 
-        TmdbWatchProvidersResponseDataModel? tvSeasonWatchProvidersResponse = TmdbHttpClient.GetWatchProvidersModelFromResponse(tmdbHttpClientTvSeasonWatchProvidersResponse);
-        Assert.NotNull(tvSeasonWatchProvidersResponse);
+        TmdbWatchProvidersResponseDataModel? tmdbTvSeasonWatchProvidersResponse = TmdbHttpClient.GetWatchProvidersModelFromResponse(tmdbHttpClientTvSeasonWatchProvidersResponse);
+        Assert.NotNull(tmdbTvSeasonWatchProvidersResponse);
         
         var tmdbTvSeasonResponseDataModel = new TmdbTvSeasonResponseDataModel
         {
@@ -191,9 +191,9 @@ public class TvSeasonViewModelTests
         // Act
 
         TvSeasonViewModel tvSeasonViewModel = new(tmdbTvSeasonResponseDataModel, 
-                                                  tvSeasonWatchProvidersResponse);
+                                                  tmdbTvSeasonWatchProvidersResponse);
         TvSeasonViewModel tvSeasonViewModel2 = new(tmdbTvSeasonResponseDataModel2, 
-                                                  tvSeasonWatchProvidersResponse);
+                                                  tmdbTvSeasonWatchProvidersResponse);
         
         // Assert
 
@@ -213,16 +213,16 @@ public class TvSeasonViewModelTests
     {
         // Arrange (continued)
 
-        TmdbTvSeasonResponseDataModel? tvSeasonResponse = TmdbHttpClient.GetTvSeasonModelFromResponse(tmdbHttpClientTvSeasonResponse);
-        Assert.NotNull(tvSeasonResponse);
+        TmdbTvSeasonResponseDataModel? tmdbTvSeasonResponse = TmdbHttpClient.GetTvSeasonModelFromResponse(tmdbHttpClientTvSeasonResponse);
+        Assert.NotNull(tmdbTvSeasonResponse);
 
-        TmdbWatchProvidersResponseDataModel? tvSeasonWatchProvidersResponse = TmdbHttpClient.GetWatchProvidersModelFromResponse(tmdbHttpClientTvSeasonWatchProvidersResponse);
-        Assert.NotNull(tvSeasonWatchProvidersResponse);
+        TmdbWatchProvidersResponseDataModel? tmdbTvSeasonWatchProvidersResponse = TmdbHttpClient.GetWatchProvidersModelFromResponse(tmdbHttpClientTvSeasonWatchProvidersResponse);
+        Assert.NotNull(tmdbTvSeasonWatchProvidersResponse);
 
         // Act
 
-        TvSeasonViewModel tvSeasonViewModel = new(tvSeasonResponse, 
-                                                  tvSeasonWatchProvidersResponse,
+        TvSeasonViewModel tvSeasonViewModel = new(tmdbTvSeasonResponse, 
+                                                  tmdbTvSeasonWatchProvidersResponse,
                                                   default(Guid));
         
         // Assert

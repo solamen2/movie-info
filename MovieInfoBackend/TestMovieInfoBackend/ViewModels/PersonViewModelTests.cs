@@ -16,7 +16,7 @@ public class PersonViewModelTests
     {        
         // Arrange
 
-        string testDataFilename1 = "MovieHttpClientResponse1.json";
+        string testDataFilename1 = "SuggestionHttpClientResponse1.json";
         string testPersonDataFilename = "TmdbHttpClientPersonResponse.json";
         string testPersonMovieCreditsDataFilename = "TmdbHttpClientPersonMovieCreditsResponse.json";
         string testPersonTvSeriesCreditsDataFilename = "TmdbHttpClientPersonTvSeriesCreditsResponse.json";
@@ -73,32 +73,32 @@ public class PersonViewModelTests
     {
         // Arrange (continued)
         
-        MovieSuggestionsResponseDataModel? actual1 = MovieHttpClient.GetModelFromResponse(suggestionHttpClientResponse1);
+        SuggestionsResponseDataModel? actual1 = SuggestionHttpClient.GetModelFromResponse(suggestionHttpClientResponse1);
         SuggestionDataModel[]? suggestions1 = actual1?.Suggestions;
         Assert.Equal(8, suggestions1?.Length);
         SuggestionDataModel? suggestionPersonDataModel = suggestions1?[0];  // Person suggestion = index 0
         Assert.NotNull(suggestionPersonDataModel);
         SuggestionViewModel suggestionPersonViewModel = new(suggestionPersonDataModel);
 
-        TmdbPersonResponseDataModel? personResponse = TmdbHttpClient.GetPersonModelFromResponse(tmdbHttpClientPersonResponse);
-        Assert.NotNull(personResponse);
+        TmdbPersonResponseDataModel? tmdbPersonResponse = TmdbHttpClient.GetPersonModelFromResponse(tmdbHttpClientPersonResponse);
+        Assert.NotNull(tmdbPersonResponse);
 
-        TmdbPersonMovieCreditsResponseDataModel? personMovieCreditsResponse = TmdbHttpClient.GetPersonMovieCreditsModelFromResponse(tmdbHttpClientPersonMovieCreditsResponse);
-        Assert.NotNull(personMovieCreditsResponse);
+        TmdbPersonMovieCreditsResponseDataModel? tmdbPersonMovieCreditsResponse = TmdbHttpClient.GetPersonMovieCreditsModelFromResponse(tmdbHttpClientPersonMovieCreditsResponse);
+        Assert.NotNull(tmdbPersonMovieCreditsResponse);
 
-        TmdbPersonTvSeriesCreditsResponseDataModel? personTvSeriesCreditsResponse = TmdbHttpClient.GetPersonTvSeriesCreditsModelFromResponse(tmdbHttpClientPersonTvSeriesCreditsResponse);
-        Assert.NotNull(personTvSeriesCreditsResponse);
+        TmdbPersonTvSeriesCreditsResponseDataModel? tmdbPersonTvSeriesCreditsResponse = TmdbHttpClient.GetPersonTvSeriesCreditsModelFromResponse(tmdbHttpClientPersonTvSeriesCreditsResponse);
+        Assert.NotNull(tmdbPersonTvSeriesCreditsResponse);
 
-        TmdbPersonImagesResponseDataModel? personImagesResponse = TmdbHttpClient.GetPersonImagesModelFromResponse(tmdbHttpClientPersonImagesResponse);
-        Assert.NotNull(personImagesResponse);
+        TmdbPersonImagesResponseDataModel? tmdbPersonImagesResponse = TmdbHttpClient.GetPersonImagesModelFromResponse(tmdbHttpClientPersonImagesResponse);
+        Assert.NotNull(tmdbPersonImagesResponse);
 
         // Act
 
         PersonViewModel personViewModel = new(suggestionPersonViewModel, 
-                                              personResponse,
-                                              personMovieCreditsResponse,
-                                              personTvSeriesCreditsResponse,
-                                              personImagesResponse);
+                                              tmdbPersonResponse,
+                                              tmdbPersonMovieCreditsResponse,
+                                              tmdbPersonTvSeriesCreditsResponse,
+                                              tmdbPersonImagesResponse);
         
         // Assert
         
@@ -113,32 +113,32 @@ public class PersonViewModelTests
     {
         // Arrange (continued)
         
-        MovieSuggestionsResponseDataModel? actual1 = MovieHttpClient.GetModelFromResponse(suggestionHttpClientResponse1);
+        SuggestionsResponseDataModel? actual1 = SuggestionHttpClient.GetModelFromResponse(suggestionHttpClientResponse1);
         SuggestionDataModel[]? suggestions1 = actual1?.Suggestions;
         Assert.Equal(8, suggestions1?.Length);
         SuggestionDataModel? suggestionPersonDataModel = suggestions1?[0];  // Person suggestion = index 0
         Assert.NotNull(suggestionPersonDataModel);
         SuggestionViewModel suggestionPersonViewModel = new(suggestionPersonDataModel, default(Guid));
 
-        TmdbPersonResponseDataModel? personResponse = TmdbHttpClient.GetPersonModelFromResponse(tmdbHttpClientPersonResponse);
-        Assert.NotNull(personResponse);
+        TmdbPersonResponseDataModel? tmdbPersonResponse = TmdbHttpClient.GetPersonModelFromResponse(tmdbHttpClientPersonResponse);
+        Assert.NotNull(tmdbPersonResponse);
 
-        TmdbPersonMovieCreditsResponseDataModel? personMovieCreditsResponse = TmdbHttpClient.GetPersonMovieCreditsModelFromResponse(tmdbHttpClientPersonMovieCreditsResponse);
-        Assert.NotNull(personMovieCreditsResponse);
+        TmdbPersonMovieCreditsResponseDataModel? tmdbPersonMovieCreditsResponse = TmdbHttpClient.GetPersonMovieCreditsModelFromResponse(tmdbHttpClientPersonMovieCreditsResponse);
+        Assert.NotNull(tmdbPersonMovieCreditsResponse);
 
-        TmdbPersonTvSeriesCreditsResponseDataModel? personTvSeriesCreditsResponse = TmdbHttpClient.GetPersonTvSeriesCreditsModelFromResponse(tmdbHttpClientPersonTvSeriesCreditsResponse);
-        Assert.NotNull(personTvSeriesCreditsResponse);
+        TmdbPersonTvSeriesCreditsResponseDataModel? tmdbPersonTvSeriesCreditsResponse = TmdbHttpClient.GetPersonTvSeriesCreditsModelFromResponse(tmdbHttpClientPersonTvSeriesCreditsResponse);
+        Assert.NotNull(tmdbPersonTvSeriesCreditsResponse);
 
-        TmdbPersonImagesResponseDataModel? personImagesResponse = TmdbHttpClient.GetPersonImagesModelFromResponse(tmdbHttpClientPersonImagesResponse);
-        Assert.NotNull(personImagesResponse);
+        TmdbPersonImagesResponseDataModel? tmdbPersonImagesResponse = TmdbHttpClient.GetPersonImagesModelFromResponse(tmdbHttpClientPersonImagesResponse);
+        Assert.NotNull(tmdbPersonImagesResponse);
 
         // Act
 
         PersonViewModel personViewModel = new(suggestionPersonViewModel, 
-                                              personResponse,
-                                              personMovieCreditsResponse,
-                                              personTvSeriesCreditsResponse,
-                                              personImagesResponse,
+                                              tmdbPersonResponse,
+                                              tmdbPersonMovieCreditsResponse,
+                                              tmdbPersonTvSeriesCreditsResponse,
+                                              tmdbPersonImagesResponse,
                                               default(Guid));
         
         // Assert

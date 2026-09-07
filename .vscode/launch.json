@@ -11,7 +11,7 @@
       "launchSettingsFilePath": "${workspaceFolder}/MovieInfoBackend/MovieInfoBackend/Properties/launchSettings.json",
       "launchSettingsProfile": "http (dev)",
       "console": "integratedTerminal",
-      "envFile": "${workspaceFolder}/../movie-info-secrets/local.env"
+      "envFile": "${workspaceFolder}/../movie-info-secrets/local.env" // Can change to "dev.env", "stage.env", or "prod.env"
     },
     {
       "name": "Frontend MovieInfo debug",
@@ -20,11 +20,7 @@
       "cwd": "${workspaceFolder}/movie-info-frontend",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
-      // TODO: Change this section to use envFile like above, with "local.env" file only
-      "env": {
-        // Applies to calls in the app; should always be "false" in checked-in version
-        "VITE_USE_MOCK_HTTP_CALLS": "false"
-      },
+      "envFile": "${workspaceFolder}/../movie-info-secrets/local.env",
       "serverReadyAction": {
         "action": "debugWithChrome",
         "killOnServerStop": true,
@@ -40,15 +36,7 @@
       "skipFiles": ["<node_internals>/**"],
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run-script", "playwright-debug-script"],
-      // PS: Test Explorer version of these lives in Playwright Test for VSCode -> Settings, and Docker version is in .env file
-      // TODO: Change this section to use envFile like above, with "local.env" file as default (values below) and "dev.env" as alternate
-      "env": {
-        // Applies to calls in Playwright tests; always change along with VITE_USE_MOCK_HTTP_CALLS above
-        "E2E_TEST_USE_MOCK_HTTP_CALLS": "false",
-        "E2E_TEST_LOCAL_BASE_URL": "http://localhost:8081/", // NOTE: Use port 8080 (not 8081) for Docker; comment out to use non-local URL from .env file
-        "E2E_TEST_LOCAL_USERNAME": "localtest@example.com", // NOTE: Comment out to use non-local db, and use .env file
-        "E2E_TEST_LOCAL_PASSWORD": "Pa$sw0rd" // NOTE: Comment out to use non-local db, and use .env file
-      },
+      "envFile": "${workspaceFolder}/../movie-info-secrets/local.env",
       "cwd": "${workspaceFolder}/movie-info-frontend"
     },
     {
@@ -59,14 +47,10 @@
       "skipFiles": ["<node_internals>/**"],
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run-script", "playwright-debug-script"],
+      "envFile": "${workspaceFolder}/../movie-info-secrets/local.env",
       "env": {
-        // Applies to calls in Playwright Inspector tests; always change along with VITE_USE_MOCK_HTTP_CALLS above
-        // TODO: Change this section to use envFile like above, with "local.env" file as default (values below) and "dev.env" as alternate
-        "E2E_TEST_USE_MOCK_HTTP_CALLS": "false",
-        "PWDEBUG": "1", // This actually launches the inspector
-        "E2E_TEST_LOCAL_BASE_URL": "http://localhost:8081/", // NOTE: Use port 8080 (not 8081) for Docker; comment out to use non-local URL from .env file
-        "E2E_TEST_LOCAL_USERNAME": "localtest@example.com", // NOTE: Comment out to use non-local db, and use .env file
-        "E2E_TEST_LOCAL_PASSWORD": "Pa$sw0rd" // NOTE: Comment out to use non-local db, and use .env file
+        // Other environment variables are set in the envFile
+        "PWDEBUG": "1" // This actually launches the inspector
       },
       "cwd": "${workspaceFolder}/movie-info-frontend"
     }

@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace MovieInfoBackend.DataModels;
 
-public class MovieSuggestionsResponseDataModel
+public class SuggestionsResponseDataModel
 {
     [JsonPropertyName("d")]
     public SuggestionDataModel[]? Suggestions { get; set; }

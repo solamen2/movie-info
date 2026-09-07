@@ -13,8 +13,8 @@ public record MovieViewModel
                           TmdbMovieResponseDataModel tmdbMovieDataModel, 
                           TmdbMovieCreditsResponseDataModel tmdbMovieCreditsDataModel,
                           TmdbWatchProvidersResponseDataModel tmdbWatchProvidersDataModel,
-                          ConfigurationCountriesDictionary configurationCountriesDictionary,
-                          ConfigurationLanguagesDictionary configurationLanguagesDictionary,
+                          ConfigurationCountriesDictionary tmdbConfigurationCountriesDictionary,
+                          ConfigurationLanguagesDictionary tmdbConfigurationLanguagesDictionary,
                           Guid? testGuid = null)
     {
         this.ID = testGuid ?? Guid.NewGuid();
@@ -45,13 +45,13 @@ public record MovieViewModel
         this.Homepage = tmdbMovieDataModel.Homepage;
         this.TmdbId = tmdbMovieDataModel.TmdbId;
         this.OriginCountries = "";
-        FrozenDictionary<string, string>? iso31661ToEnglishCountryNameDictionary = configurationCountriesDictionary.iso31661ToEnglishCountryNameDictionary;
+        FrozenDictionary<string, string>? iso31661ToEnglishCountryNameDictionary = tmdbConfigurationCountriesDictionary.iso31661ToEnglishCountryNameDictionary;
         if (iso31661ToEnglishCountryNameDictionary != null)
         {            
             this.OriginCountries = String.Join(", ", tmdbMovieDataModel.OriginCountry.Select(oc => iso31661ToEnglishCountryNameDictionary[oc]));
         }
         this.OriginLanguage = "";
-        FrozenDictionary<string, string>? iso6391ToEnglishLanguageNameDictionary = configurationLanguagesDictionary.iso6391ToEnglishLanguageNameDictionary;
+        FrozenDictionary<string, string>? iso6391ToEnglishLanguageNameDictionary = tmdbConfigurationLanguagesDictionary.iso6391ToEnglishLanguageNameDictionary;
         if (iso6391ToEnglishLanguageNameDictionary != null)
         {            
             string iso6391LanguageCode = tmdbMovieDataModel.OriginalLanguage;

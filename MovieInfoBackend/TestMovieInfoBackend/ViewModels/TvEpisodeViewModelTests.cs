@@ -16,7 +16,7 @@ public class TvEpisodeViewModelTests
     {        
         // Arrange
 
-        string testDataFilename1 = "MovieHttpClientResponse1.json";
+        string testDataFilename1 = "SuggestionHttpClientResponse1.json";
         string testOmdbTvEpisodeDataFilename = "OmdbHttpClientTvEpisodeResponse.json";
         string testTmdbTvEpisodeDataFilename = "TmdbHttpClientTvEpisodeResponse.json";
         string testTvEpisodeCreditsDataFilename = "TmdbHttpClientTvEpisodeCreditsResponse.json";
@@ -69,14 +69,14 @@ public class TvEpisodeViewModelTests
         TmdbTvEpisodeResponseDataModel? tmdbTvEpisodeResponse = TmdbHttpClient.GetTvEpisodeModelFromResponse(tmdbHttpClientTvEpisodeResponse);
         Assert.NotNull(tmdbTvEpisodeResponse);
 
-        TmdbTvEpisodeCreditsResponseDataModel? tvEpisodeCreditsResponse = TmdbHttpClient.GetTvEpisodeCreditsModelFromResponse(tmdbHttpClientTvEpisodeCreditsResponse);
-        Assert.NotNull(tvEpisodeCreditsResponse);
+        TmdbTvEpisodeCreditsResponseDataModel? tmdbTvEpisodeCreditsResponse = TmdbHttpClient.GetTvEpisodeCreditsModelFromResponse(tmdbHttpClientTvEpisodeCreditsResponse);
+        Assert.NotNull(tmdbTvEpisodeCreditsResponse);
 
         // Act
 
         TvEpisodeViewModel tvEpisodeViewModel = new(omdbTvEpisodeResponse, 
                                                     tmdbTvEpisodeResponse,
-                                                    tvEpisodeCreditsResponse);
+                                                    tmdbTvEpisodeCreditsResponse);
         
         // Assert
         
@@ -95,49 +95,14 @@ public class TvEpisodeViewModelTests
     }
 
     [Fact]
-    public void MovieViewModel_EmptyDataFields_ReturnEmptyValues()
+    public void TvEpisodeViewModel_EmptyDataFields_ReturnEmptyValues()
     {
         // Arrange (continued)
 
         TmdbTvEpisodeCreditsResponseDataModel? tvEpisodeCreditsResponse = TmdbHttpClient.GetTvEpisodeCreditsModelFromResponse(tmdbHttpClientTvEpisodeCreditsResponse);
         Assert.NotNull(tvEpisodeCreditsResponse);
-
-        var omdbTvEpisodeResponseDataModel = new OmdbResponseDataModel
-        {
-            Title = "Example TV Episode 2",
-            Year = "",  // Testing this value
-            Rated = "13+",
-            Released = "N/A",
-            Season = "6",
-            Episode = "30",
-            Runtime = "",  // Testing this value
-            Genre = "Action, Drama, Fantasy",
-            Director = "Example Creator Martinez",
-            Writer = "Example Creator Martinez, Rebecca Kirshner, Steven S. DeKnight",
-            Actors = "Example Smith, Example Actor 2, Emma Caulfield Ford",
-            Plot = "Tons less interesting stuff probably happens.",
-            Language = "English",
-            Country = "United States",
-            Awards = "N/A",
-            Poster = "https://m.media-amazon.com/images/M/MV5BZTVkOWEzNzUtMjVkOS00Y2QzLTk2MGQtN2VkOGE3NTBjODI5XkEyXkFqcGdeQXVyMDM2NDM2MQ@@._V1_SX300.jpg",
-            Ratings = new OmdbRatingDataModel[]
-            {
-                new OmdbRatingDataModel
-                {
-                    Source = "Internet Movie Database",
-                    Value = "9.6/10"
-                }
-            },
-            Metascore = "N/A",
-            ImdbRating = "9.6",
-            ImdbVotes = "11006",
-            ImdbId = "tt0533467",
-            SeriesId = "tt0118276",
-            Type = "episode",
-            Response = "True"
-        };
         
-        var omdbTvEpisodeResponseDataModel2 = new OmdbResponseDataModel
+        var omdbTvEpisodeResponseDataModel = new OmdbResponseDataModel
         {
             Title = "Example TV Episode 3",
             Year = "N/A",  // Testing this value
@@ -172,40 +137,7 @@ public class TvEpisodeViewModelTests
             Response = "True"
         };
 
-        var tmdbTvEpisodeResponseDataModel = new TmdbTvEpisodeResponseDataModel
-        {
-            AirDate = "",  // Testing this value
-            Crew = new TmdbTvEpisodeCrewDataModel[]
-            {
-                new TmdbTvEpisodeCrewDataModel {
-                    Department = "Writing",
-                    Job = "Writer",
-                    CreditId = "5253387019c2957940053fa5",
-                    Adult = false,
-                    Gender = 2,
-                    Id = 12891,
-                    KnownForDepartment = "Writing",
-                    Name = "Example Creator Martinez",
-                    OriginalName = "Example Creator Martinez",
-                    Popularity = 1.5599,
-                    ProfilePath = "/6PJwHV17KTuTRQaqrXBtVCwchcU.jpg"
-                }
-            },
-            EpisodeNumber = 30,
-            EpisodeType = "standard",
-            GuestStars = [],
-            Name = "Example TV Episode 2",
-            Overview = "This episode is not very interesting.",
-            Id = 949534,
-            ProductionCode = "6ABB08",
-            Runtime = 0,
-            SeasonNumber = 6,
-            StillPath = "/m6DAoR7I3UAeyjGA5ekLf5KQDfS.jpg",
-            VoteAverage = 8.878,
-            VoteCount = 44
-        };
-
-        var tmdbTvEpisodeResponseDataModel2 = new TmdbTvEpisodeResponseDataModel
+        var tmdbTvEpisodeResponseDataModel1 = new TmdbTvEpisodeResponseDataModel
         {
             AirDate = "N/A",  // Testing this value
             Crew = new TmdbTvEpisodeCrewDataModel[]
@@ -238,13 +170,48 @@ public class TvEpisodeViewModelTests
             VoteCount = 43
         };
 
+        var omdbEmptyTvEpisodeResponseDataModel = OmdbResponseDataModel.GetEmptyOmdbResponseDataModel();
+
+        var tmdbTvEpisodeResponseDataModel2 = new TmdbTvEpisodeResponseDataModel
+        {
+            AirDate = "",  // Testing this value
+            Crew = new TmdbTvEpisodeCrewDataModel[]
+            {
+                new TmdbTvEpisodeCrewDataModel {
+                    Department = "Writing",
+                    Job = "Writer",
+                    CreditId = "5253387019c2957940053fa5",
+                    Adult = false,
+                    Gender = 2,
+                    Id = 12891,
+                    KnownForDepartment = "Writing",
+                    Name = "Example Creator Martinez",
+                    OriginalName = "Example Creator Martinez",
+                    Popularity = 1.5599,
+                    ProfilePath = "/6PJwHV17KTuTRQaqrXBtVCwchcU.jpg"
+                }
+            },
+            EpisodeNumber = 30,
+            EpisodeType = "standard",
+            GuestStars = [],
+            Name = "Example TV Episode 2",
+            Overview = "This episode is not very interesting.",
+            Id = 949534,
+            ProductionCode = "6ABB08",
+            Runtime = 0,
+            SeasonNumber = 6,
+            StillPath = "/m6DAoR7I3UAeyjGA5ekLf5KQDfS.jpg",
+            VoteAverage = 8.878,
+            VoteCount = 44
+        };
+
         // Act
 
         TvEpisodeViewModel tvEpisodeViewModel = new(omdbTvEpisodeResponseDataModel, 
-                                                    tmdbTvEpisodeResponseDataModel,
+                                                    tmdbTvEpisodeResponseDataModel1,
                                                     tvEpisodeCreditsResponse);
 
-        TvEpisodeViewModel tvEpisodeViewModel2 = new(omdbTvEpisodeResponseDataModel2, 
+        TvEpisodeViewModel tvEpisodeViewModel2 = new(omdbEmptyTvEpisodeResponseDataModel, 
                                                     tmdbTvEpisodeResponseDataModel2,
                                                     tvEpisodeCreditsResponse);
 
@@ -274,14 +241,14 @@ public class TvEpisodeViewModelTests
         TmdbTvEpisodeResponseDataModel? tmdbTvEpisodeResponse = TmdbHttpClient.GetTvEpisodeModelFromResponse(tmdbHttpClientTvEpisodeResponse);
         Assert.NotNull(tmdbTvEpisodeResponse);
 
-        TmdbTvEpisodeCreditsResponseDataModel? tvEpisodeCreditsResponse = TmdbHttpClient.GetTvEpisodeCreditsModelFromResponse(tmdbHttpClientTvEpisodeCreditsResponse);
-        Assert.NotNull(tvEpisodeCreditsResponse);
+        TmdbTvEpisodeCreditsResponseDataModel? tmdbTvEpisodeCreditsResponse = TmdbHttpClient.GetTvEpisodeCreditsModelFromResponse(tmdbHttpClientTvEpisodeCreditsResponse);
+        Assert.NotNull(tmdbTvEpisodeCreditsResponse);
 
         // Act
 
         TvEpisodeViewModel tvEpisodeViewModel = new(omdbTvEpisodeResponse, 
                                                     tmdbTvEpisodeResponse,
-                                                    tvEpisodeCreditsResponse,
+                                                    tmdbTvEpisodeCreditsResponse,
                                                     default(Guid));
         
         // Assert

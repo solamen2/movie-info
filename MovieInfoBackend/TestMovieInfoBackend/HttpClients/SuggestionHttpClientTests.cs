@@ -6,17 +6,17 @@ using Xunit.Abstractions;
 
 namespace TestMovieInfoBackend.DataModels;
 
-public class MovieHttpClientTests
+public class SuggestionHttpClientTests
 {
     private string malformedResponse;
     private string errorResponse1;
 
-    public MovieHttpClientTests(ITestOutputHelper output)
+    public SuggestionHttpClientTests(ITestOutputHelper output)
     {
         // Arrange
 
-        string malformedDataFilename = "MovieHttpClientMalformedResponse.json";
-        string errorFilename1 = "MovieHttpClientErrorResponse1.json";
+        string malformedDataFilename = "SuggestionHttpClientMalformedResponse.json";
+        string errorFilename1 = "SuggestionHttpClientErrorResponse1.json";
 
         using (StreamReader sr = File.OpenText($"../../../TestData/{malformedDataFilename}"))
         {
@@ -46,7 +46,7 @@ public class MovieHttpClientTests
     public void GetModelFromResponse_InvalidJsonStrings_ThrowsJsonException(string invalidJson)
     {
         // Act & Assert
-        Assert.Throws<System.Text.Json.JsonException>(() => MovieHttpClient.GetModelFromResponse(invalidJson));
+        Assert.Throws<System.Text.Json.JsonException>(() => SuggestionHttpClient.GetModelFromResponse(invalidJson));
     }
 
     [Fact]
@@ -67,10 +67,10 @@ public class MovieHttpClientTests
             });
 
         HttpClient httpClient = new HttpClient(httpMessageHandlerMock.Object);
-        MovieHttpClient movieHttpClient = new MovieHttpClient(httpClient);
+        SuggestionHttpClient suggestionHttpClient = new SuggestionHttpClient(httpClient);
 
         // Act
-        MovieSuggestionsResponseDataModel? suggestionsResponse = await movieHttpClient.GetSuggestions("");
+        SuggestionsResponseDataModel? suggestionsResponse = await suggestionHttpClient.GetSuggestions("");
 
         // Assert
         Assert.Null(suggestionsResponse);
@@ -94,10 +94,10 @@ public class MovieHttpClientTests
             });
 
         HttpClient httpClient = new HttpClient(httpMessageHandlerMock.Object);
-        MovieHttpClient movieHttpClient = new MovieHttpClient(httpClient);
+        SuggestionHttpClient suggestionHttpClient = new SuggestionHttpClient(httpClient);
 
         // Act
-        MovieSuggestionsResponseDataModel? result = await movieHttpClient.GetSuggestions("test query");
+        SuggestionsResponseDataModel? result = await suggestionHttpClient.GetSuggestions("test query");
 
         // Assert
         Assert.Null(result);
@@ -117,11 +117,11 @@ public class MovieHttpClientTests
             .ThrowsAsync(new TaskCanceledException("Request timed out"));
 
         HttpClient httpClient = new HttpClient(httpMessageHandlerMock.Object);
-        MovieHttpClient movieHttpClient = new MovieHttpClient(httpClient);
+        SuggestionHttpClient suggestionHttpClient = new SuggestionHttpClient(httpClient);
 
         // Act & Assert
         await Assert.ThrowsAsync<TaskCanceledException>(
-            () => movieHttpClient.GetSuggestions("test query"));
+            () => suggestionHttpClient.GetSuggestions("test query"));
     }
 
     [Theory]
@@ -146,10 +146,10 @@ public class MovieHttpClientTests
             });
 
         HttpClient httpClient = new HttpClient(httpMessageHandlerMock.Object);
-        MovieHttpClient movieHttpClient = new MovieHttpClient(httpClient);
+        SuggestionHttpClient suggestionHttpClient = new SuggestionHttpClient(httpClient);
 
         // Act
-        MovieSuggestionsResponseDataModel? result = await movieHttpClient.GetSuggestions(query);
+        SuggestionsResponseDataModel? result = await suggestionHttpClient.GetSuggestions(query);
 
         // Assert
         Assert.NotNull(result);
@@ -158,10 +158,10 @@ public class MovieHttpClientTests
     }
 
     [Fact]
-    public void MovieHttpClient_ToString_HandlesNullSuggestions()
+    public void SuggestionHttpClient_ToString_HandlesNullSuggestions()
     {
         // Arrange
-        var model = new MovieSuggestionsResponseDataModel { Suggestions = null };
+        var model = new SuggestionsResponseDataModel { Suggestions = null };
 
         // Act & Assert - Should not throw an exception
         string result = model.ToString();
