@@ -40,9 +40,7 @@ public class SuggestionEndpointTests
     {
         // Act
         SuggestionsResponseDataModel? suggestionsResponse1 = SuggestionHttpClient.GetModelFromResponse(suggestionHttpClientResponse1);
-        Assert.NotNull(suggestionsResponse1);
         SuggestionsResponseDataModel? suggestionsResponse2 = SuggestionHttpClient.GetModelFromResponse(suggestionHttpClientResponse2);
-        Assert.NotNull(suggestionsResponse2);
 
         Assert.NotNull(suggestionsResponse1);
         Assert.NotNull(suggestionsResponse2);
