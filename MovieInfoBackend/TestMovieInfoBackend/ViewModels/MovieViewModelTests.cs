@@ -108,31 +108,31 @@ public class MovieViewModelTests
         TmdbMovieResponseDataModel? tmdbMovieResponse = TmdbHttpClient.GetMovieModelFromResponse(tmdbHttpClientMovieResponse);
         Assert.NotNull(tmdbMovieResponse);
 
-        TmdbMovieCreditsResponseDataModel? movieCreditsResponse = TmdbHttpClient.GetMovieCreditsModelFromResponse(tmdbHttpClientMovieCreditsResponse);
-        Assert.NotNull(movieCreditsResponse);
+        TmdbMovieCreditsResponseDataModel? tmdbMovieCreditsResponse = TmdbHttpClient.GetMovieCreditsModelFromResponse(tmdbHttpClientMovieCreditsResponse);
+        Assert.NotNull(tmdbMovieCreditsResponse);
 
-        TmdbWatchProvidersResponseDataModel? movieWatchProvidersResponse = TmdbHttpClient.GetWatchProvidersModelFromResponse(tmdbHttpClientMovieWatchProvidersResponse);
-        Assert.NotNull(movieWatchProvidersResponse);
+        TmdbWatchProvidersResponseDataModel? tmdbMovieWatchProvidersResponse = TmdbHttpClient.GetWatchProvidersModelFromResponse(tmdbHttpClientMovieWatchProvidersResponse);
+        Assert.NotNull(tmdbMovieWatchProvidersResponse);
 
-        TmdbConfigurationCountriesResponseDataModel? tvConfigurationCountriesResponse = TmdbHttpClient.GetConfigurationCountriesModelFromResponse(tmdbHttpClientConfigurationCountriesResponse);
-        Assert.NotNull(tvConfigurationCountriesResponse);
-        TmdbConfigurationCountriesResponseDataModel.ConfigurationCountriesDictionary? tvConfigurationCountriesDictionary = tvConfigurationCountriesResponse.GetConfigurationCountriesDictionary();
-        Assert.NotNull(tvConfigurationCountriesDictionary);
+        TmdbConfigurationCountriesResponseDataModel? tmdbConfigurationCountriesResponse = TmdbHttpClient.GetConfigurationCountriesModelFromResponse(tmdbHttpClientConfigurationCountriesResponse);
+        Assert.NotNull(tmdbConfigurationCountriesResponse);
+        TmdbConfigurationCountriesResponseDataModel.ConfigurationCountriesDictionary? tmdbConfigurationCountriesDictionary = tmdbConfigurationCountriesResponse.GetConfigurationCountriesDictionary();
+        Assert.NotNull(tmdbConfigurationCountriesDictionary);
 
-        TmdbConfigurationLanguagesResponseDataModel? tvConfigurationLanguagesResponse = TmdbHttpClient.GetConfigurationLanguagesModelFromResponse(tmdbHttpClientConfigurationLanguagesResponse);
-        Assert.NotNull(tvConfigurationLanguagesResponse);
-        TmdbConfigurationLanguagesResponseDataModel.ConfigurationLanguagesDictionary? tvConfigurationLanguagesDictionary = tvConfigurationLanguagesResponse.GetConfigurationLanguagesDictionary();
-        Assert.NotNull(tvConfigurationLanguagesDictionary);
+        TmdbConfigurationLanguagesResponseDataModel? tmdbConfigurationLanguagesResponse = TmdbHttpClient.GetConfigurationLanguagesModelFromResponse(tmdbHttpClientConfigurationLanguagesResponse);
+        Assert.NotNull(tmdbConfigurationLanguagesResponse);
+        TmdbConfigurationLanguagesResponseDataModel.ConfigurationLanguagesDictionary? tmdbConfigurationLanguagesDictionary = tmdbConfigurationLanguagesResponse.GetConfigurationLanguagesDictionary();
+        Assert.NotNull(tmdbConfigurationLanguagesDictionary);
 
         // Act
 
         MovieViewModel movieViewModel = new(suggestionMovieViewModel, 
                                             omdbMovieResponse,
                                             tmdbMovieResponse,
-                                            movieCreditsResponse,
-                                            movieWatchProvidersResponse,
-                                            tvConfigurationCountriesDictionary,
-                                            tvConfigurationLanguagesDictionary);
+                                            tmdbMovieCreditsResponse,
+                                            tmdbMovieWatchProvidersResponse,
+                                            tmdbConfigurationCountriesDictionary,
+                                            tmdbConfigurationLanguagesDictionary);
         
         // Assert
         
@@ -172,21 +172,21 @@ public class MovieViewModelTests
         TmdbMovieResponseDataModel? tmdbMovieResponse = TmdbHttpClient.GetMovieModelFromResponse(tmdbHttpClientMovieResponse);
         Assert.NotNull(tmdbMovieResponse);
 
-        TmdbMovieCreditsResponseDataModel? movieCreditsResponse = TmdbHttpClient.GetMovieCreditsModelFromResponse(tmdbHttpClientMovieCreditsResponse);
-        Assert.NotNull(movieCreditsResponse);
+        TmdbMovieCreditsResponseDataModel? tmdbMovieCreditsResponse = TmdbHttpClient.GetMovieCreditsModelFromResponse(tmdbHttpClientMovieCreditsResponse);
+        Assert.NotNull(tmdbMovieCreditsResponse);
 
-        TmdbWatchProvidersResponseDataModel? movieWatchProvidersResponse = TmdbHttpClient.GetWatchProvidersModelFromResponse(tmdbHttpClientMovieWatchProvidersResponse);
-        Assert.NotNull(movieWatchProvidersResponse);
+        TmdbWatchProvidersResponseDataModel? tmdbMovieWatchProvidersResponse = TmdbHttpClient.GetWatchProvidersModelFromResponse(tmdbHttpClientMovieWatchProvidersResponse);
+        Assert.NotNull(tmdbMovieWatchProvidersResponse);
 
-        TmdbConfigurationCountriesResponseDataModel? tvConfigurationCountriesResponse = TmdbHttpClient.GetConfigurationCountriesModelFromResponse(tmdbHttpClientConfigurationCountriesResponse);
-        Assert.NotNull(tvConfigurationCountriesResponse);
-        TmdbConfigurationCountriesResponseDataModel.ConfigurationCountriesDictionary? tvConfigurationCountriesDictionary = tvConfigurationCountriesResponse.GetConfigurationCountriesDictionary();
-        Assert.NotNull(tvConfigurationCountriesDictionary);
+        TmdbConfigurationCountriesResponseDataModel? tmdbConfigurationCountriesResponse = TmdbHttpClient.GetConfigurationCountriesModelFromResponse(tmdbHttpClientConfigurationCountriesResponse);
+        Assert.NotNull(tmdbConfigurationCountriesResponse);
+        TmdbConfigurationCountriesResponseDataModel.ConfigurationCountriesDictionary? tmdbConfigurationCountriesDictionary = tmdbConfigurationCountriesResponse.GetConfigurationCountriesDictionary();
+        Assert.NotNull(tmdbConfigurationCountriesDictionary);
 
-        TmdbConfigurationLanguagesResponseDataModel? tvConfigurationLanguagesResponse = TmdbHttpClient.GetConfigurationLanguagesModelFromResponse(tmdbHttpClientConfigurationLanguagesResponse);
-        Assert.NotNull(tvConfigurationLanguagesResponse);
-        TmdbConfigurationLanguagesResponseDataModel.ConfigurationLanguagesDictionary? tvConfigurationLanguagesDictionary = tvConfigurationLanguagesResponse.GetConfigurationLanguagesDictionary();
-        Assert.NotNull(tvConfigurationLanguagesDictionary);
+        TmdbConfigurationLanguagesResponseDataModel? tmdbConfigurationLanguagesResponse = TmdbHttpClient.GetConfigurationLanguagesModelFromResponse(tmdbHttpClientConfigurationLanguagesResponse);
+        Assert.NotNull(tmdbConfigurationLanguagesResponse);
+        TmdbConfigurationLanguagesResponseDataModel.ConfigurationLanguagesDictionary? tmdbConfigurationLanguagesDictionary = tmdbConfigurationLanguagesResponse.GetConfigurationLanguagesDictionary();
+        Assert.NotNull(tmdbConfigurationLanguagesDictionary);
 
         var omdbMovieResponseDataModel = new OmdbResponseDataModel
         {
@@ -231,20 +231,20 @@ public class MovieViewModelTests
         MovieViewModel movieViewModel = new(suggestionMovieViewModel, 
                                             omdbMovieResponseDataModel,
                                             tmdbMovieResponse,
-                                            movieCreditsResponse,
-                                            movieWatchProvidersResponse,
-                                            tvConfigurationCountriesDictionary,
-                                            tvConfigurationLanguagesDictionary);
+                                            tmdbMovieCreditsResponse,
+                                            tmdbMovieWatchProvidersResponse,
+                                            tmdbConfigurationCountriesDictionary,
+                                            tmdbConfigurationLanguagesDictionary);
 
         Assert.Equal(0, movieViewModel.BoxOfficeNumber);
 
         MovieViewModel movieViewModel2 = new(suggestionMovieViewModel, 
                                             omdbEmptyMovieResponseDataModel,
                                             tmdbMovieResponse,
-                                            movieCreditsResponse,
-                                            movieWatchProvidersResponse,
-                                            tvConfigurationCountriesDictionary,
-                                            tvConfigurationLanguagesDictionary);
+                                            tmdbMovieCreditsResponse,
+                                            tmdbMovieWatchProvidersResponse,
+                                            tmdbConfigurationCountriesDictionary,
+                                            tmdbConfigurationLanguagesDictionary);
 
         Assert.Equal(0, movieViewModel2.BoxOfficeNumber);
     }
@@ -267,31 +267,31 @@ public class MovieViewModelTests
         TmdbMovieResponseDataModel? tmdbMovieResponse = TmdbHttpClient.GetMovieModelFromResponse(tmdbHttpClientMovieResponse);
         Assert.NotNull(tmdbMovieResponse);
 
-        TmdbMovieCreditsResponseDataModel? movieCreditsResponse = TmdbHttpClient.GetMovieCreditsModelFromResponse(tmdbHttpClientMovieCreditsResponse);
-        Assert.NotNull(movieCreditsResponse);
+        TmdbMovieCreditsResponseDataModel? tmdbMovieCreditsResponse = TmdbHttpClient.GetMovieCreditsModelFromResponse(tmdbHttpClientMovieCreditsResponse);
+        Assert.NotNull(tmdbMovieCreditsResponse);
 
-        TmdbWatchProvidersResponseDataModel? movieWatchProvidersResponse = TmdbHttpClient.GetWatchProvidersModelFromResponse(tmdbHttpClientMovieWatchProvidersResponse);
-        Assert.NotNull(movieWatchProvidersResponse);
+        TmdbWatchProvidersResponseDataModel? tmdbMovieWatchProvidersResponse = TmdbHttpClient.GetWatchProvidersModelFromResponse(tmdbHttpClientMovieWatchProvidersResponse);
+        Assert.NotNull(tmdbMovieWatchProvidersResponse);
 
-        TmdbConfigurationCountriesResponseDataModel? tvConfigurationCountriesResponse = TmdbHttpClient.GetConfigurationCountriesModelFromResponse(tmdbHttpClientConfigurationCountriesResponse);
-        Assert.NotNull(tvConfigurationCountriesResponse);
-        TmdbConfigurationCountriesResponseDataModel.ConfigurationCountriesDictionary? tvConfigurationCountriesDictionary = tvConfigurationCountriesResponse.GetConfigurationCountriesDictionary();
-        Assert.NotNull(tvConfigurationCountriesDictionary);
+        TmdbConfigurationCountriesResponseDataModel? tmdbConfigurationCountriesResponse = TmdbHttpClient.GetConfigurationCountriesModelFromResponse(tmdbHttpClientConfigurationCountriesResponse);
+        Assert.NotNull(tmdbConfigurationCountriesResponse);
+        TmdbConfigurationCountriesResponseDataModel.ConfigurationCountriesDictionary? tmdbConfigurationCountriesDictionary = tmdbConfigurationCountriesResponse.GetConfigurationCountriesDictionary();
+        Assert.NotNull(tmdbConfigurationCountriesDictionary);
 
-        TmdbConfigurationLanguagesResponseDataModel? tvConfigurationLanguagesResponse = TmdbHttpClient.GetConfigurationLanguagesModelFromResponse(tmdbHttpClientConfigurationLanguagesResponse);
-        Assert.NotNull(tvConfigurationLanguagesResponse);
-        TmdbConfigurationLanguagesResponseDataModel.ConfigurationLanguagesDictionary? tvConfigurationLanguagesDictionary = tvConfigurationLanguagesResponse.GetConfigurationLanguagesDictionary();
-        Assert.NotNull(tvConfigurationLanguagesDictionary);
+        TmdbConfigurationLanguagesResponseDataModel? tmdbConfigurationLanguagesResponse = TmdbHttpClient.GetConfigurationLanguagesModelFromResponse(tmdbHttpClientConfigurationLanguagesResponse);
+        Assert.NotNull(tmdbConfigurationLanguagesResponse);
+        TmdbConfigurationLanguagesResponseDataModel.ConfigurationLanguagesDictionary? tmdbConfigurationLanguagesDictionary = tmdbConfigurationLanguagesResponse.GetConfigurationLanguagesDictionary();
+        Assert.NotNull(tmdbConfigurationLanguagesDictionary);
 
         // Act
 
         MovieViewModel movieViewModel = new(suggestionMovieViewModel, 
                                             omdbMovieResponse,
                                             tmdbMovieResponse,
-                                            movieCreditsResponse,
-                                            movieWatchProvidersResponse,
-                                            tvConfigurationCountriesDictionary,
-                                            tvConfigurationLanguagesDictionary,
+                                            tmdbMovieCreditsResponse,
+                                            tmdbMovieWatchProvidersResponse,
+                                            tmdbConfigurationCountriesDictionary,
+                                            tmdbConfigurationLanguagesDictionary,
                                             default(Guid));
         
         // Assert

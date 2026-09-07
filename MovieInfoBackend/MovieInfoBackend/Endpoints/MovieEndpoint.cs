@@ -63,8 +63,8 @@ public class MovieEndpoint
 
                         SuggestionViewModel? movieSuggestionViewModel = await suggestionTask;
                         OmdbResponseDataModel? omdbMovieResponseDataModel = await omdbMovieTask;
-                        ConfigurationCountriesDictionary? configurationCountriesDictionary = await tmdbCountriesTask;
-                        ConfigurationLanguagesDictionary? configurationLanguagesDictionary = await tmdbLanguagesTask;
+                        ConfigurationCountriesDictionary? tmdbConfigurationCountriesDictionary = await tmdbCountriesTask;
+                        ConfigurationLanguagesDictionary? tmdbConfigurationLanguagesDictionary = await tmdbLanguagesTask;
                         TmdbMovieResponseDataModel? tmdbMovieResponseDataModel = await tmdbMovieTask;
                         TmdbMovieCreditsResponseDataModel? tmdbMovieCreditsResponseDataModel = await tmdbMovieCreditsTask;
                         TmdbWatchProvidersResponseDataModel? tmdbMovieWatchProvidersResponseDataModel = await tmdbMovieWatchProvidersTask;
@@ -77,11 +77,11 @@ public class MovieEndpoint
                         {
                             Log.Debug($"Movie OmdbResponseDataModel for search '{imdbId}' was null!");
                         }
-                        if (configurationCountriesDictionary == null)
+                        if (tmdbConfigurationCountriesDictionary == null)
                         {
                             Log.Debug($"Configuration countries dictionary while searching for '{imdbId}' was null!");
                         }
-                        if (configurationLanguagesDictionary == null)
+                        if (tmdbConfigurationLanguagesDictionary == null)
                         {
                             Log.Debug($"Configuration languages dictionary while searching for '{imdbId}' was null!");
                         }
@@ -104,8 +104,8 @@ public class MovieEndpoint
                             && tmdbMovieResponseDataModel != null
                             && tmdbMovieCreditsResponseDataModel != null
                             && tmdbMovieWatchProvidersResponseDataModel != null
-                            && configurationCountriesDictionary != null
-                            && configurationLanguagesDictionary != null)
+                            && tmdbConfigurationCountriesDictionary != null
+                            && tmdbConfigurationLanguagesDictionary != null)
                         {
                             if (omdbMovieResponseDataModel == null)  // Still lots of good info if this is null, so use an empty object
                             {
@@ -117,8 +117,8 @@ public class MovieEndpoint
                                                                 tmdbMovieResponseDataModel,
                                                                 tmdbMovieCreditsResponseDataModel,
                                                                 tmdbMovieWatchProvidersResponseDataModel,
-                                                                configurationCountriesDictionary,
-                                                                configurationLanguagesDictionary);
+                                                                tmdbConfigurationCountriesDictionary,
+                                                                tmdbConfigurationLanguagesDictionary);
                         }
                         else
                         {
@@ -190,20 +190,20 @@ public class MovieEndpoint
 
     public async static Task<ConfigurationCountriesDictionary?> GetConfigurationCountriesDictionary(TmdbHttpClient tmdbHttpClient)
     {
-        ConfigurationCountriesDictionary? configurationCountriesDictionary = await tmdbHttpClient.GetCountries();
+        ConfigurationCountriesDictionary? tmdbConfigurationCountriesDictionary = await tmdbHttpClient.GetCountries();
         
-        Log.Debug($"TMDB configuration countries dictionary:\n\n{configurationCountriesDictionary}\n\n");
+        Log.Debug($"TMDB configuration countries dictionary:\n\n{tmdbConfigurationCountriesDictionary}\n\n");
 
-        return configurationCountriesDictionary;
+        return tmdbConfigurationCountriesDictionary;
     }
 
     public async static Task<ConfigurationLanguagesDictionary?> GetConfigurationLanguagesDictionary(TmdbHttpClient tmdbHttpClient)
     {
-        ConfigurationLanguagesDictionary? configurationLanguagesDictionary = await tmdbHttpClient.GetLanguages();
+        ConfigurationLanguagesDictionary? tmdbConfigurationLanguagesDictionary = await tmdbHttpClient.GetLanguages();
         
-        Log.Debug($"TMDB configuration languages dictionary:\n\n{configurationLanguagesDictionary}\n\n");
+        Log.Debug($"TMDB configuration languages dictionary:\n\n{tmdbConfigurationLanguagesDictionary}\n\n");
 
-        return configurationLanguagesDictionary;
+        return tmdbConfigurationLanguagesDictionary;
     }
 
     public async static Task<int?> GetTmdbId(string imdbId, TmdbHttpClient tmdbHttpClient)

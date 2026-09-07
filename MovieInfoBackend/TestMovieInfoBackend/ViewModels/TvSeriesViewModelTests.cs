@@ -108,31 +108,31 @@ public class TvSeriesViewModelTests
         TmdbTvSeriesResponseDataModel? tmdbTvSeriesResponse = TmdbHttpClient.GetTvSeriesModelFromResponse(tmdbHttpClientTvSeriesResponse);
         Assert.NotNull(tmdbTvSeriesResponse);
 
-        TmdbTvSeriesAggregateCreditsResponseDataModel? tvSeriesAggregateCreditsResponse = TmdbHttpClient.GetTvSeriesAggregateCreditsModelFromResponse(tmdbHttpClientTvSeriesAggregateCreditsResponse);
-        Assert.NotNull(tvSeriesAggregateCreditsResponse);
+        TmdbTvSeriesAggregateCreditsResponseDataModel? tmdbTvSeriesAggregateCreditsResponse = TmdbHttpClient.GetTvSeriesAggregateCreditsModelFromResponse(tmdbHttpClientTvSeriesAggregateCreditsResponse);
+        Assert.NotNull(tmdbTvSeriesAggregateCreditsResponse);
 
-        TmdbWatchProvidersResponseDataModel? tvSeriesWatchProvidersResponse = TmdbHttpClient.GetWatchProvidersModelFromResponse(tmdbHttpClientTvSeriesWatchProvidersResponse);
-        Assert.NotNull(tvSeriesWatchProvidersResponse);
+        TmdbWatchProvidersResponseDataModel? tmdbTvSeriesWatchProvidersResponse = TmdbHttpClient.GetWatchProvidersModelFromResponse(tmdbHttpClientTvSeriesWatchProvidersResponse);
+        Assert.NotNull(tmdbTvSeriesWatchProvidersResponse);
 
-        TmdbConfigurationCountriesResponseDataModel? tvConfigurationCountriesResponse = TmdbHttpClient.GetConfigurationCountriesModelFromResponse(tmdbHttpClientConfigurationCountriesResponse);
-        Assert.NotNull(tvConfigurationCountriesResponse);
-        TmdbConfigurationCountriesResponseDataModel.ConfigurationCountriesDictionary? tvConfigurationCountriesDictionary = tvConfigurationCountriesResponse.GetConfigurationCountriesDictionary();
-        Assert.NotNull(tvConfigurationCountriesDictionary);
+        TmdbConfigurationCountriesResponseDataModel? tmdbConfigurationCountriesResponse = TmdbHttpClient.GetConfigurationCountriesModelFromResponse(tmdbHttpClientConfigurationCountriesResponse);
+        Assert.NotNull(tmdbConfigurationCountriesResponse);
+        TmdbConfigurationCountriesResponseDataModel.ConfigurationCountriesDictionary? tmdbConfigurationCountriesDictionary = tmdbConfigurationCountriesResponse.GetConfigurationCountriesDictionary();
+        Assert.NotNull(tmdbConfigurationCountriesDictionary);
 
-        TmdbConfigurationLanguagesResponseDataModel? tvConfigurationLanguagesResponse = TmdbHttpClient.GetConfigurationLanguagesModelFromResponse(tmdbHttpClientConfigurationLanguagesResponse);
-        Assert.NotNull(tvConfigurationLanguagesResponse);
-        TmdbConfigurationLanguagesResponseDataModel.ConfigurationLanguagesDictionary? tvConfigurationLanguagesDictionary = tvConfigurationLanguagesResponse.GetConfigurationLanguagesDictionary();
-        Assert.NotNull(tvConfigurationLanguagesDictionary);
+        TmdbConfigurationLanguagesResponseDataModel? tmdbConfigurationLanguagesResponse = TmdbHttpClient.GetConfigurationLanguagesModelFromResponse(tmdbHttpClientConfigurationLanguagesResponse);
+        Assert.NotNull(tmdbConfigurationLanguagesResponse);
+        TmdbConfigurationLanguagesResponseDataModel.ConfigurationLanguagesDictionary? tmdbConfigurationLanguagesDictionary = tmdbConfigurationLanguagesResponse.GetConfigurationLanguagesDictionary();
+        Assert.NotNull(tmdbConfigurationLanguagesDictionary);
 
         // Act
 
         TvSeriesViewModel tvSeriesViewModel = new(suggestionTvSeriesViewModel, 
                                                   omdbTvSeriesResponse,
                                                   tmdbTvSeriesResponse,
-                                                  tvSeriesAggregateCreditsResponse,
-                                                  tvSeriesWatchProvidersResponse,
-                                                  tvConfigurationCountriesDictionary,
-                                                  tvConfigurationLanguagesDictionary);
+                                                  tmdbTvSeriesAggregateCreditsResponse,
+                                                  tmdbTvSeriesWatchProvidersResponse,
+                                                  tmdbConfigurationCountriesDictionary,
+                                                  tmdbConfigurationLanguagesDictionary);
         
         // Assert
         
@@ -182,56 +182,23 @@ public class TvSeriesViewModelTests
         Assert.NotNull(suggestionTvSeriesDataModel);
         SuggestionViewModel suggestionTvSeriesViewModel = new(suggestionTvSeriesDataModel);
 
-        TmdbTvSeriesAggregateCreditsResponseDataModel? tvSeriesAggregateCreditsResponse = TmdbHttpClient.GetTvSeriesAggregateCreditsModelFromResponse(tmdbHttpClientTvSeriesAggregateCreditsResponse);
-        Assert.NotNull(tvSeriesAggregateCreditsResponse);
+        TmdbTvSeriesAggregateCreditsResponseDataModel? tmdbTvSeriesAggregateCreditsResponse = TmdbHttpClient.GetTvSeriesAggregateCreditsModelFromResponse(tmdbHttpClientTvSeriesAggregateCreditsResponse);
+        Assert.NotNull(tmdbTvSeriesAggregateCreditsResponse);
 
-        TmdbWatchProvidersResponseDataModel? tvSeriesWatchProvidersResponse = TmdbHttpClient.GetWatchProvidersModelFromResponse(tmdbHttpClientTvSeriesWatchProvidersResponse);
-        Assert.NotNull(tvSeriesWatchProvidersResponse);
+        TmdbWatchProvidersResponseDataModel? tmdbTvSeriesWatchProvidersResponse = TmdbHttpClient.GetWatchProvidersModelFromResponse(tmdbHttpClientTvSeriesWatchProvidersResponse);
+        Assert.NotNull(tmdbTvSeriesWatchProvidersResponse);
 
-        TmdbConfigurationCountriesResponseDataModel? tvConfigurationCountriesResponse = TmdbHttpClient.GetConfigurationCountriesModelFromResponse(tmdbHttpClientConfigurationCountriesResponse);
-        Assert.NotNull(tvConfigurationCountriesResponse);
-        TmdbConfigurationCountriesResponseDataModel.ConfigurationCountriesDictionary? tvConfigurationCountriesDictionary = tvConfigurationCountriesResponse.GetConfigurationCountriesDictionary();
-        Assert.NotNull(tvConfigurationCountriesDictionary);
+        TmdbConfigurationCountriesResponseDataModel? tmdbConfigurationCountriesResponse = TmdbHttpClient.GetConfigurationCountriesModelFromResponse(tmdbHttpClientConfigurationCountriesResponse);
+        Assert.NotNull(tmdbConfigurationCountriesResponse);
+        TmdbConfigurationCountriesResponseDataModel.ConfigurationCountriesDictionary? tmdbConfigurationCountriesDictionary = tmdbConfigurationCountriesResponse.GetConfigurationCountriesDictionary();
+        Assert.NotNull(tmdbConfigurationCountriesDictionary);
 
-        TmdbConfigurationLanguagesResponseDataModel? tvConfigurationLanguagesResponse = TmdbHttpClient.GetConfigurationLanguagesModelFromResponse(tmdbHttpClientConfigurationLanguagesResponse);
-        Assert.NotNull(tvConfigurationLanguagesResponse);
-        TmdbConfigurationLanguagesResponseDataModel.ConfigurationLanguagesDictionary? tvConfigurationLanguagesDictionary = tvConfigurationLanguagesResponse.GetConfigurationLanguagesDictionary();
-        Assert.NotNull(tvConfigurationLanguagesDictionary);
+        TmdbConfigurationLanguagesResponseDataModel? tmdbConfigurationLanguagesResponse = TmdbHttpClient.GetConfigurationLanguagesModelFromResponse(tmdbHttpClientConfigurationLanguagesResponse);
+        Assert.NotNull(tmdbConfigurationLanguagesResponse);
+        TmdbConfigurationLanguagesResponseDataModel.ConfigurationLanguagesDictionary? tmdbConfigurationLanguagesDictionary = tmdbConfigurationLanguagesResponse.GetConfigurationLanguagesDictionary();
+        Assert.NotNull(tmdbConfigurationLanguagesDictionary);
 
         var omdbTvSeriesResponseDataModel = new OmdbResponseDataModel
-        {
-            Title = "Example TV Series 2",
-            Year = "1997–2004",
-            Rated = "TV-14",
-            Released = "9 Mar 1997",
-            Runtime = "",  // Testing this value
-            Genre = "Action, Adventure, Drama",
-            Director = "N/A",
-            Writer = "Example Creator Martinez",
-            Actors = "Example Smith, Example Actor 2, Example Actress 4",
-            Plot = "This TV show will have an awful lot of story in it.",
-            Language = "English",
-            Country = "United States, Japan",
-            Awards = "Won 2 Primetime Emmys. 55 wins & 136 nominations total",
-            Poster = "https://m.media-amazon.com/images/M/MV5BMDk4MGVkNDAtZjQwZi00MDc3LWE4MmEtY2YyODQ2NDQyMjgxXkEyXkFqcGc@._V1_SX300.jpg",
-            Ratings = new OmdbRatingDataModel[]
-            {
-                new OmdbRatingDataModel
-                {
-                    Source = "Internet Movie Database",
-                    Value = "8.2/10"
-                }
-            },
-            Metascore = "N/A",
-            ImdbRating = "8.2",
-            ImdbVotes = "172,659",
-            ImdbId = "tt0118277",
-            Type = "series",
-            TotalSeasons = "7",
-            Response = "True"
-        };
-
-        var omdbTvSeriesResponseDataModel2 = new OmdbResponseDataModel
         {
             Title = "Example TV Series 3",
             Year = "1998–2004",
@@ -263,130 +230,8 @@ public class TvSeriesViewModelTests
             TotalSeasons = "7",
             Response = "True"
         };
-        
-        var tmdbTvSeriesResponseDataModel = new TmdbTvSeriesResponseDataModel
-        {
-            Adult = false,
-            BackdropPath = "/lBmlLro9ZfY815ZXE5NKhYNxPRQ.jpg",
-            CreatedBy = new TmdbCreatorDataModel[]
-            {
-                new TmdbCreatorDataModel {
-                    Id = 12891,
-                    CreditId = "52801b45760ee366c254a8b6",
-                    Name = "Example Creator Martinez",
-                    OriginalName = "Example Creator Martinez",
-                    Gender = 2,
-                    ProfilePath = "/6PJwHV17KTuTRQaqrXBtVCwchcU.jpg"
-                }
-            },
-            EpisodeRunTime = [],
-            FirstAirDate = "",  // Testing this value
-            Genres = new TmdbGenreDataModel[]
-            {
-                new TmdbGenreDataModel {
-                    Id = 35,
-                    Name = "Comedy"
-                }
-            },
-            Homepage = "",
-            Id = 95,
-            InProduction = false,
-            Languages = ["en", "ja"],
-            LastAirDate = "",  // Testing this value
-            LastEpisodeToAir = new TmdbIndividualTvEpisodeIdDataModel {
-                TmdbId = 949556,
-                Name = "Last Episode",
-                Overview = "This is where the last episode happened.",
-                VoteAverage = 8.2,
-                VoteCount = 24,
-                AirDate = "2008-10-02",
-                EpisodeNumber = 22,
-                EpisodeType = "finale",
-                ProductionCode = "7ABB22",
-                Runtime = 43,
-                SeasonNumber = 7,
-                ShowId = 95,
-                StillPath = "/yRaLZCHG2wvagDY6hPDo6mXqITc.jpg"
-            },
-            Name = "Example TV Series 2",
-            NextEpisodeToAir = new TmdbIndividualTvEpisodeIdDataModel {
-                TmdbId = 949556,
-                Name = "Last Episode",
-                Overview = "This is where the ending will happen.",
-                VoteAverage = 8.2,
-                VoteCount = 24,
-                AirDate = "2004-05-01",  // Testing this value
-                EpisodeNumber = 22,
-                EpisodeType = "finale",
-                ProductionCode = "7ABB22",
-                Runtime = 43,
-                SeasonNumber = 7,
-                ShowId = 95,
-                StillPath = "/yRaLZCHG2wvagDY6hPDo6mXqITc.jpg"
-            },
-            Networks = new TmdbNetworkDataModel[]
-            {
-                new TmdbNetworkDataModel {
-                    Id = 21,
-                    LogoPath = "/9GlDHjQj9c2dkfARCR3zlH87R66.png",
-                    Name = "The WB",
-                    OriginCountry = "US"
-                }
-            },
-            NumberOfEpisodes = 144,
-            NumberOfSeasons = 1,
-            OriginCountry = ["US"],
-            OriginalLanguage = "en",
-            OriginalName = "Example TV Series",
-            Overview = "This series will go on for a while and many exciting events will happen in it.",
-            Popularity = 55.5136,
-            PosterPath = "/y7fVZkyheCEQHDUEHwNmYENGfT2.jpg",
-            ProductionCompanies = new TmdbProductionCompanyDataModel[]
-            {
-                new TmdbProductionCompanyDataModel {
-                    Id = 10567,
-                    LogoPath = "/kbZu62C3ZwNfOtao1ECIFTzL40Q.png",
-                    Name = "Example Productions",
-                    OriginCountry = "US"
-                }
-            },
-            ProductionCountries = new TmdbProductionCountryDataModel[]
-            {
-                new TmdbProductionCountryDataModel {
-                    Iso31661 = "US",
-                    Name = "United States of America"
-                }
-            },
-            Seasons = new TmdbTvSeasonDataModel[]
-            {
-                new TmdbTvSeasonDataModel {
-                    AirDate = "",  // Testing this value
-                    EpisodeCount = 12,
-                    Id = 59465,
-                    Name = "Season 1",
-                    Overview = "This was the first season and it was awesome.",
-                    PosterPath = "/hD6tN0K6DLk43QeX84fK1Lobwm5.jpg",
-                    SeasonNumber = 1,
-                    VoteAverage = 7.5
-                }
-            },
-            Softcore = false,
-            SpokenLanguages = new TmdbSpokenLanguageDataModel[]
-            {
-                new TmdbSpokenLanguageDataModel {
-                    EnglishName = "English",
-                    Iso6391 = "en",
-                    Name = "English"
-                }
-            },
-            Status = "Returning Series",
-            Tagline = "The tagline is short. And punchy and...it's a little too long.",
-            Type = "Scripted",
-            VoteAverage = 8.1,
-            VoteCount = 1990
-        };
 
-        var tmdbTvSeriesResponseDataModel2 = new TmdbTvSeriesResponseDataModel
+        var tmdbTvSeriesResponseDataModel1 = new TmdbTvSeriesResponseDataModel
         {
             Adult = false,
             BackdropPath = "/lBmlLro9ZfY815ZXE5NKhYNxPRQ.jpg",
@@ -508,23 +353,147 @@ public class TvSeriesViewModelTests
             VoteCount = 1999
         };
 
+        var omdbEmptyTvSeriesResponseDataModel = OmdbResponseDataModel.GetEmptyOmdbResponseDataModel();
+
+        var tmdbTvSeriesResponseDataModel2 = new TmdbTvSeriesResponseDataModel
+        {
+            Adult = false,
+            BackdropPath = "/lBmlLro9ZfY815ZXE5NKhYNxPRQ.jpg",
+            CreatedBy = new TmdbCreatorDataModel[]
+            {
+                new TmdbCreatorDataModel {
+                    Id = 12891,
+                    CreditId = "52801b45760ee366c254a8b6",
+                    Name = "Example Creator Martinez",
+                    OriginalName = "Example Creator Martinez",
+                    Gender = 2,
+                    ProfilePath = "/6PJwHV17KTuTRQaqrXBtVCwchcU.jpg"
+                }
+            },
+            EpisodeRunTime = [],
+            FirstAirDate = "",  // Testing this value
+            Genres = new TmdbGenreDataModel[]
+            {
+                new TmdbGenreDataModel {
+                    Id = 35,
+                    Name = "Comedy"
+                }
+            },
+            Homepage = "",
+            Id = 95,
+            InProduction = false,
+            Languages = ["en", "ja"],
+            LastAirDate = "",  // Testing this value
+            LastEpisodeToAir = new TmdbIndividualTvEpisodeIdDataModel {
+                TmdbId = 949556,
+                Name = "Last Episode",
+                Overview = "This is where the last episode happened.",
+                VoteAverage = 8.2,
+                VoteCount = 24,
+                AirDate = "2008-10-02",
+                EpisodeNumber = 22,
+                EpisodeType = "finale",
+                ProductionCode = "7ABB22",
+                Runtime = 43,
+                SeasonNumber = 7,
+                ShowId = 95,
+                StillPath = "/yRaLZCHG2wvagDY6hPDo6mXqITc.jpg"
+            },
+            Name = "Example TV Series 2",
+            NextEpisodeToAir = new TmdbIndividualTvEpisodeIdDataModel {
+                TmdbId = 949556,
+                Name = "Last Episode",
+                Overview = "This is where the ending will happen.",
+                VoteAverage = 8.2,
+                VoteCount = 24,
+                AirDate = "2004-05-01",  // Testing this value
+                EpisodeNumber = 22,
+                EpisodeType = "finale",
+                ProductionCode = "7ABB22",
+                Runtime = 43,
+                SeasonNumber = 7,
+                ShowId = 95,
+                StillPath = "/yRaLZCHG2wvagDY6hPDo6mXqITc.jpg"
+            },
+            Networks = new TmdbNetworkDataModel[]
+            {
+                new TmdbNetworkDataModel {
+                    Id = 21,
+                    LogoPath = "/9GlDHjQj9c2dkfARCR3zlH87R66.png",
+                    Name = "The WB",
+                    OriginCountry = "US"
+                }
+            },
+            NumberOfEpisodes = 144,
+            NumberOfSeasons = 1,
+            OriginCountry = ["US"],
+            OriginalLanguage = "en",
+            OriginalName = "Example TV Series",
+            Overview = "This series will go on for a while and many exciting events will happen in it.",
+            Popularity = 55.5136,
+            PosterPath = "/y7fVZkyheCEQHDUEHwNmYENGfT2.jpg",
+            ProductionCompanies = new TmdbProductionCompanyDataModel[]
+            {
+                new TmdbProductionCompanyDataModel {
+                    Id = 10567,
+                    LogoPath = "/kbZu62C3ZwNfOtao1ECIFTzL40Q.png",
+                    Name = "Example Productions",
+                    OriginCountry = "US"
+                }
+            },
+            ProductionCountries = new TmdbProductionCountryDataModel[]
+            {
+                new TmdbProductionCountryDataModel {
+                    Iso31661 = "US",
+                    Name = "United States of America"
+                }
+            },
+            Seasons = new TmdbTvSeasonDataModel[]
+            {
+                new TmdbTvSeasonDataModel {
+                    AirDate = "",  // Testing this value
+                    EpisodeCount = 12,
+                    Id = 59465,
+                    Name = "Season 1",
+                    Overview = "This was the first season and it was awesome.",
+                    PosterPath = "/hD6tN0K6DLk43QeX84fK1Lobwm5.jpg",
+                    SeasonNumber = 1,
+                    VoteAverage = 7.5
+                }
+            },
+            Softcore = false,
+            SpokenLanguages = new TmdbSpokenLanguageDataModel[]
+            {
+                new TmdbSpokenLanguageDataModel {
+                    EnglishName = "English",
+                    Iso6391 = "en",
+                    Name = "English"
+                }
+            },
+            Status = "Returning Series",
+            Tagline = "The tagline is short. And punchy and...it's a little too long.",
+            Type = "Scripted",
+            VoteAverage = 8.1,
+            VoteCount = 1990
+        };
+
         // Act
 
         TvSeriesViewModel tvSeriesViewModel = new(suggestionTvSeriesViewModel, 
                                                   omdbTvSeriesResponseDataModel,
-                                                  tmdbTvSeriesResponseDataModel,
-                                                  tvSeriesAggregateCreditsResponse,
-                                                  tvSeriesWatchProvidersResponse,
-                                                  tvConfigurationCountriesDictionary,
-                                                  tvConfigurationLanguagesDictionary);
+                                                  tmdbTvSeriesResponseDataModel1,
+                                                  tmdbTvSeriesAggregateCreditsResponse,
+                                                  tmdbTvSeriesWatchProvidersResponse,
+                                                  tmdbConfigurationCountriesDictionary,
+                                                  tmdbConfigurationLanguagesDictionary);
 
         TvSeriesViewModel tvSeriesViewModel2 = new(suggestionTvSeriesViewModel, 
-                                                  omdbTvSeriesResponseDataModel2,
+                                                  omdbEmptyTvSeriesResponseDataModel,
                                                   tmdbTvSeriesResponseDataModel2,
-                                                  tvSeriesAggregateCreditsResponse,
-                                                  tvSeriesWatchProvidersResponse,
-                                                  tvConfigurationCountriesDictionary,
-                                                  tvConfigurationLanguagesDictionary);
+                                                  tmdbTvSeriesAggregateCreditsResponse,
+                                                  tmdbTvSeriesWatchProvidersResponse,
+                                                  tmdbConfigurationCountriesDictionary,
+                                                  tmdbConfigurationLanguagesDictionary);
         
         // Assert
         
@@ -535,7 +504,7 @@ public class TvSeriesViewModelTests
         Assert.Null(tvSeriesViewModel.LastAirDate);
         Assert.NotNull(tvSeriesViewModel.NextAirDate);
         DateOnly NextAirDateNotNull = (DateOnly)tvSeriesViewModel.NextAirDate;
-        Assert.Equal("05/01/2004", NextAirDateNotNull.ToString("MM/dd/yyy"));
+        Assert.Equal("09/02/2002", NextAirDateNotNull.ToString("MM/dd/yyy"));
         Assert.Null(tvSeriesViewModel.Seasons[0].FirstAirDate);
 
         Assert.NotNull(tvSeriesViewModel2);
@@ -545,7 +514,7 @@ public class TvSeriesViewModelTests
         Assert.Null(tvSeriesViewModel2.LastAirDate);
         Assert.NotNull(tvSeriesViewModel2.NextAirDate);
         DateOnly NextAirDate2NotNull = (DateOnly)tvSeriesViewModel2.NextAirDate;
-        Assert.Equal("09/02/2002", NextAirDate2NotNull.ToString("MM/dd/yyy"));
+        Assert.Equal("05/01/2004", NextAirDate2NotNull.ToString("MM/dd/yyy"));
         Assert.Null(tvSeriesViewModel2.Seasons[0].FirstAirDate);
     }
 
@@ -567,31 +536,31 @@ public class TvSeriesViewModelTests
         TmdbTvSeriesResponseDataModel? tmdbTvSeriesResponse = TmdbHttpClient.GetTvSeriesModelFromResponse(tmdbHttpClientTvSeriesResponse);
         Assert.NotNull(tmdbTvSeriesResponse);
 
-        TmdbTvSeriesAggregateCreditsResponseDataModel? tvSeriesAggregateCreditsResponse = TmdbHttpClient.GetTvSeriesAggregateCreditsModelFromResponse(tmdbHttpClientTvSeriesAggregateCreditsResponse);
-        Assert.NotNull(tvSeriesAggregateCreditsResponse);
+        TmdbTvSeriesAggregateCreditsResponseDataModel? tmdbTvSeriesAggregateCreditsResponse = TmdbHttpClient.GetTvSeriesAggregateCreditsModelFromResponse(tmdbHttpClientTvSeriesAggregateCreditsResponse);
+        Assert.NotNull(tmdbTvSeriesAggregateCreditsResponse);
 
-        TmdbWatchProvidersResponseDataModel? tvSeriesWatchProvidersResponse = TmdbHttpClient.GetWatchProvidersModelFromResponse(tmdbHttpClientTvSeriesWatchProvidersResponse);
-        Assert.NotNull(tvSeriesWatchProvidersResponse);
+        TmdbWatchProvidersResponseDataModel? tmdbTvSeriesWatchProvidersResponse = TmdbHttpClient.GetWatchProvidersModelFromResponse(tmdbHttpClientTvSeriesWatchProvidersResponse);
+        Assert.NotNull(tmdbTvSeriesWatchProvidersResponse);
 
-        TmdbConfigurationCountriesResponseDataModel? tvConfigurationCountriesResponse = TmdbHttpClient.GetConfigurationCountriesModelFromResponse(tmdbHttpClientConfigurationCountriesResponse);
-        Assert.NotNull(tvConfigurationCountriesResponse);
-        TmdbConfigurationCountriesResponseDataModel.ConfigurationCountriesDictionary? tvConfigurationCountriesDictionary = tvConfigurationCountriesResponse.GetConfigurationCountriesDictionary();
-        Assert.NotNull(tvConfigurationCountriesDictionary);
+        TmdbConfigurationCountriesResponseDataModel? tmdbConfigurationCountriesResponse = TmdbHttpClient.GetConfigurationCountriesModelFromResponse(tmdbHttpClientConfigurationCountriesResponse);
+        Assert.NotNull(tmdbConfigurationCountriesResponse);
+        TmdbConfigurationCountriesResponseDataModel.ConfigurationCountriesDictionary? tmdbConfigurationCountriesDictionary = tmdbConfigurationCountriesResponse.GetConfigurationCountriesDictionary();
+        Assert.NotNull(tmdbConfigurationCountriesDictionary);
 
-        TmdbConfigurationLanguagesResponseDataModel? tvConfigurationLanguagesResponse = TmdbHttpClient.GetConfigurationLanguagesModelFromResponse(tmdbHttpClientConfigurationLanguagesResponse);
-        Assert.NotNull(tvConfigurationLanguagesResponse);
-        TmdbConfigurationLanguagesResponseDataModel.ConfigurationLanguagesDictionary? tvConfigurationLanguagesDictionary = tvConfigurationLanguagesResponse.GetConfigurationLanguagesDictionary();
-        Assert.NotNull(tvConfigurationLanguagesDictionary);
+        TmdbConfigurationLanguagesResponseDataModel? tmdbConfigurationLanguagesResponse = TmdbHttpClient.GetConfigurationLanguagesModelFromResponse(tmdbHttpClientConfigurationLanguagesResponse);
+        Assert.NotNull(tmdbConfigurationLanguagesResponse);
+        TmdbConfigurationLanguagesResponseDataModel.ConfigurationLanguagesDictionary? tmdbConfigurationLanguagesDictionary = tmdbConfigurationLanguagesResponse.GetConfigurationLanguagesDictionary();
+        Assert.NotNull(tmdbConfigurationLanguagesDictionary);
 
         // Act
 
         TvSeriesViewModel tvSeriesViewModel = new(suggestionTvSeriesViewModel, 
                                                   omdbTvSeriesResponse,
                                                   tmdbTvSeriesResponse,
-                                                  tvSeriesAggregateCreditsResponse,
-                                                  tvSeriesWatchProvidersResponse,
-                                                  tvConfigurationCountriesDictionary,
-                                                  tvConfigurationLanguagesDictionary,
+                                                  tmdbTvSeriesAggregateCreditsResponse,
+                                                  tmdbTvSeriesWatchProvidersResponse,
+                                                  tmdbConfigurationCountriesDictionary,
+                                                  tmdbConfigurationLanguagesDictionary,
                                                   default(Guid));
         
         // Assert
