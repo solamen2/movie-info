@@ -136,7 +136,7 @@ void ConfigDatabase()
                 connectionString = builder.Configuration.GetConnectionString("MOVIE_INFO_LOCAL_DOCKER_DB");
                 break;
             case LocalDbConnType.AzureDev:
-                // from .env file using --env-file in Docker, or from launch.json outside of Docker (env var needs to be added if you do this!)
+                // from .env file using --env-file in Docker, or from launch.json envFile outside of Docker
                 connectionString = builder.Configuration.GetConnectionString("MOVIE_INFO_AZURE_DEV_DB");
                 break;
             default:  // should never happen currently

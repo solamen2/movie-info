@@ -4,26 +4,32 @@ Small movie information querying app using info from the IMDB and OMDB / TMDB AP
 
 ## Using The App
 
-If you'd like to see how the app works, please go to [movieinfo.dev](https://movieinfo.dev) (it may take a few seconds to spin up if no one has used it for a bit) and use these credentials:
+If you'd like to see how the app works, please go to [movieinfo.dev](https://movieinfo.dev) (it may take 30 seconds or so to spin up if no one has used it for a bit) and use these credentials:
 
 - Email: demo@example.com
 - Password: Moviepass2@
 
-This account is heavily rate-limited (60 requests / minute). If it's not working after retrying for a couple of minutes, feel free to send me an email and I'll investigate.
+This account is heavily rate-limited (60 requests / minute) to prevent abuse. But if the app isn't working after retrying for a couple of minutes, feel free to send me an email and I'll investigate.
+
+TODO: Display some screenshots of the app
 
 ## AI Usage During Development
 
 - I did not use AI at all during the setup of the project, since I wanted to have a very good understanding of the basic architecture of the app and the technical tradeoffs I was making.
-- After setting up the basic skeleton and backend, I have been using Claude Code to help me code the frontend React pages quickly, since I have some experience with React already. (I go over every change it makes by hand, and sometimes re-prompt or make small changes myself.)
-- I also used AI to generate some test cases after I had set up some test cases myself, in order to increase test coverage of similar cases and catch scenarios I had not considered.
+- After setting up the basic skeleton and fleshing out the backend, I have been using Claude Code to help me code the frontend React pages quickly, since I have some experience with React already. (I personally review every change it makes, and sometimes re-prompt or make small changes myself.)
+- I also used AI to generate some test cases after I had set up some test cases myself, in order to increase test coverage of similar cases and to catch scenarios I had not considered.
 - Any time AI was used, I have included the prompts as a comment on the PR that merged those changes.
 - I did not use AI to write any of the text in this document.
 
 ## Architecture: Backend
 
+### Architecture Diagram
+
+TODO
+
 ### API
 
-The backend API is an ASP.Net Core 10.0.2 app (written in C# 14+, of course), using [minimal APIs](https://learn.microsoft.com/en-us/aspnet/core/tutorials/min-web-api?view=aspnetcore-10.0&tabs=visual-studio).
+The backend APIs are served using an ASP.Net Core 10.0.2 app (written in C# 14+, of course), using [minimal APIs](https://learn.microsoft.com/en-us/aspnet/core/tutorials/min-web-api?view=aspnetcore-10.0&tabs=visual-studio). I've added some basic structure on top of those Minimal APIs to organize things, like moving the app.MapGet() calls into separate endpoint classes and having Program.cs organize its code into many functions.
 
 ### Deployment
 
@@ -33,9 +39,11 @@ The app is deployed using Docker (both the frontend and backend live in a single
 
 A somewhat unusual feature of the app is that I build the Docker image using [Docker multi-platform builds](https://docs.docker.com/build/building/multi-platform/). The project's platforms are "linux/amd64,linux/arm64" so I can build a Docker image that will both work directly on my machine, and also on Azure and Fly.io, without changes, ensuring uniformity and ease of debugging.
 
-### Database
+### Data
 
-The app uses a SQL Server database to store user configration. This is a bit of overkill, as it could have easily been handled using Azure Cache For Redis or SQLite (both which I have used before successfully), or other technologies as well. But I wanted to teach myself how to build an app using SQL Server from the ground up, and it works well so far.
+Virtually all the data this app uses comes in from web requests in JSON format. None of this is ever persisted locally (though a few things are temporarily cached via [.NET's built-in IMemoryCache](https://learn.microsoft.com/en-us/aspnet/core/performance/caching/memory?view=aspnetcore-10.0)), and the data are processed via JsonPropertyName annotations and calling JsonSerializer.Deserialize() to deserialize into data models (in HttpClient-derived classes). These data models are aggregated into view models in the endpoint classes and then serialized back out to JSON for this app's API calls.
+
+The app uses a SQL Server database to store a tiny bit of user configration and login info. This is a bit of overkill, as it could have easily been handled using Azure Cache For Redis or SQLite (both which I have used before successfully), or other technologies as well. But I wanted to teach myself how to build an app using SQL Server from the ground up, and it works well so far.
 
 Database operations are handled using [Entity Framework Core](https://learn.microsoft.com/en-us/ef/core/). I'm very comfortable using SQL directly, but I like EF Core, and I think it's a great fit for many apps, especially simple apps like this one.
 
@@ -47,7 +55,9 @@ The secrets for this app are stored in environment variables, which are handled 
 
 ### Authentication / Authorization
 
-Authentication uses HttpOnly cookies generated by [ASP.NET Core Identity](https://learn.microsoft.com/en-us/aspnet/core/security/authentication/identity), and stores user credentials in the SQL Server db. (There's no need for more complex solutions like JWTs or OIDC in a simple, single-domain app like this one, and besides, I think modern [Backend For Frontends](https://learn.microsoft.com/en-us/azure/architecture/patterns/backends-for-frontends) apps make JWTs less necessary these days.) Authorization uses claims-based access control, which is added on using a [scaffolded ASP.NET Core Identity](https://learn.microsoft.com/en-us/aspnet/core/security/authentication/scaffold-identity) user with most of the rest of the scaffolding removed. The app doesn't use role-based access control as you might expect for a simple app; as mentioned earlier, probably a bit of overkill for the level of complexity of this app at the moment, but claims-based access control is often a lot easier to work with down the road as an app gets more complex, and it can be tough to convert to using it later (a pain I have experienced personally). And I think the overhead isn't too bad, myself.
+Authentication uses HttpOnly cookies generated by [ASP.NET Core Identity](https://learn.microsoft.com/en-us/aspnet/core/security/authentication/identity), and stores user credentials in the SQL Server db. (There's no need for more complex solutions like JWTs or OIDC in a simple, single-domain app like this one, and besides, I think modern [Backend For Frontends](https://learn.microsoft.com/en-us/azure/architecture/patterns/backends-for-frontends) apps make JWTs less necessary these days.)
+
+Authorization uses claims-based access control, which is added on using a [scaffolded ASP.NET Core Identity](https://learn.microsoft.com/en-us/aspnet/core/security/authentication/scaffold-identity) user with most of the rest of the scaffolding removed. The app doesn't use role-based access control as you might expect for a simple app; as mentioned earlier, probably a bit of overkill for the level of complexity of this app at the moment, but I find that claims-based access control is often a lot easier to work with down the road as an app gets more complex, and it can be tough to convert to using it later (a pain I have experienced personally). And I think the overhead isn't too bad, myself.
 
 ### Logging
 
@@ -55,7 +65,7 @@ Logs are handled using [Serilog](https://serilog.net/) for structured logging. I
 
 ### Testing
 
-Backend unit testing is done using [xUnit.net](https://xunit.net/?tabs=cs) with HTTP mocks provided via [Moq](https://github.com/devlooped/moq). Ad-hoc API testing is done using [Scalar](https://scalar.com/), since [SwaggerUI / Swashbuckle was removed by default in .NET 9](https://github.com/dotnet/aspnetcore/issues/54599). As [Microsoft recommends](https://learn.microsoft.com/en-us/ef/core/testing/testing-with-the-database), end-to-end testing is done on the backend using an actual SQL Server database. Code coverage is handled on the backend using [the built-in xUnit / dotnet test functionality](https://learn.microsoft.com/en-us/dotnet/core/testing/unit-testing-code-coverage?tabs=windows) and reported in PRs with [CodeCoverageSummary](https://github.com/irongut/CodeCoverageSummary/tree/v1.3.0/).
+Backend unit testing is done using [xUnit.net](https://xunit.net/?tabs=cs) with HTTP mocks provided via [Moq](https://github.com/devlooped/moq). Ad-hoc API testing is done using [Scalar](https://scalar.com/), since [SwaggerUI / Swashbuckle was removed by default in .NET 9](https://github.com/dotnet/aspnetcore/issues/54599). As [Microsoft recommends](https://learn.microsoft.com/en-us/ef/core/testing/testing-with-the-database), end-to-end testing is done on the backend using an actual SQL Server database. Code coverage is handled on the backend using [the built-in xUnit / dotnet test functionality](https://learn.microsoft.com/en-us/dotnet/core/testing/unit-testing-code-coverage?tabs=windows) and reported in PRs with [CodeCoverageSummary](https://github.com/irongut/CodeCoverageSummary/tree/v1.3.0/). The tests have a large amount of mock data generated by me by hand, and the tests can run against that mock data or live data, as desired.
 
 ### Data Sources
 
@@ -73,7 +83,9 @@ The frontend framework is React, and the app is written using Typescript in TSX 
 
 ### Testing
 
-Frontend unit/component/integration tests are done using [Vitest](https://vitest.dev/) as the test runner, [React Testing Library](https://testing-library.com/) and [@testing-library/jest-dom](https://github.com/testing-library/jest-dom) for the tests themselves, and [MSW](https://mswjs.io/) to mock the HTTP calls. End-to-end tests are done on the frontend using [Playwright](https://playwright.dev/), with toggleable mocked HTTP calls using [mswjs/playwright](https://github.com/mswjs/playwright), and environment variables for end-to-end testing provided by [dotenv](https://github.com/motdotla/dotenv). (Yes, I am aware that, when using MSW, it's not a true end-to-end test.) Ad-hoc UI tests are performed the same as the end-to-end tests, but by me instead of Playwright. Code coverage is handled on the frontend with [@vitest/coverage-v8](https://vitest.dev/guide/coverage) and reported in PRs with [vitest-coverage-report](https://github.com/marketplace/actions/vitest-coverage-report).
+Frontend unit/component/integration tests are done using [Vitest](https://vitest.dev/) as the test runner, [React Testing Library](https://testing-library.com/) and [@testing-library/jest-dom](https://github.com/testing-library/jest-dom) for the tests themselves, and [MSW](https://mswjs.io/) to mock the HTTP calls. End-to-end tests are done on the frontend using [Playwright](https://playwright.dev/), with toggleable mocked HTTP calls using [mswjs/playwright](https://github.com/mswjs/playwright), and environment variables for end-to-end testing provided by [dotenv](https://github.com/motdotla/dotenv). (Yes, I am aware that, when using MSW, it's not a true end-to-end test.) Code coverage is handled on the frontend with [@vitest/coverage-v8](https://vitest.dev/guide/coverage) and reported in PRs with [vitest-coverage-report](https://github.com/marketplace/actions/vitest-coverage-report).
+
+I also do a lot of ad-hoc API tests myself; the project has a full suite of [Bruno](https://www.usebruno.com/) calls and environments for both its own APIs and all of the IMDB, TMDB, and OMDB APIs it calls. And I do some ad-hoc UI tests myself, of course.
 
 ### Handling Web Requests
 

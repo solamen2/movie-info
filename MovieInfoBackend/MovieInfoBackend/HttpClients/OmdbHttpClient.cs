@@ -33,6 +33,21 @@ public class OmdbHttpClient
 
     public static OmdbResponseDataModel? GetModelFromResponse(string responseJsonString)
     {
+        OmdbErrorResponseDataModel? errorResponseDataModel = JsonSerializer.Deserialize<OmdbErrorResponseDataModel>(responseJsonString);
+        if (errorResponseDataModel == null)
+        {
+            return null;
+        }
+        if (errorResponseDataModel.Response == "False")
+        {
+            OmdbErrorResponseWithReasonDataModel? errorResponseWithReasonDataModel = JsonSerializer.Deserialize<OmdbErrorResponseWithReasonDataModel>(responseJsonString);
+            if (errorResponseWithReasonDataModel != null)
+            {
+                // TODO: Log errors here if this happens a lot
+            }
+            return null;
+        }
+        
         return JsonSerializer.Deserialize<OmdbResponseDataModel>(responseJsonString);
     }
 }

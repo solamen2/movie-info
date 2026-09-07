@@ -4,12 +4,12 @@ using Xunit.Abstractions;
 
 namespace TestMovieInfoBackend.Endpoints;
 
-public class SuggestionEndpointsTests
+public class SuggestionEndpointTests
 {
     private string suggestionHttpClientResponse1;
     private string suggestionHttpClientResponse2;
 
-    public SuggestionEndpointsTests(ITestOutputHelper output)
+    public SuggestionEndpointTests(ITestOutputHelper output)
     {
         // Arrange
 

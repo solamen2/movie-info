@@ -6,15 +6,14 @@ using Xunit.Abstractions;
 
 namespace TestMovieInfoBackend.Endpoints;
 
-public class OmdbEndpointsTests
+public class OmdbEndpointTests
 {
     private string omdbHttpClientMovieResponse;
     private string omdbHttpClientTvSeriesResponse;
     private string omdbHttpClientTvEpisodeResponse;
 
-    public OmdbEndpointsTests(ITestOutputHelper output)
+    public OmdbEndpointTests(ITestOutputHelper output)
     {        
-        // TODO: Implement HttpClientTests too
         // TODO: Merge with TmdbEndpointsTests to make MediaEndpointsTests
 
         // Arrange

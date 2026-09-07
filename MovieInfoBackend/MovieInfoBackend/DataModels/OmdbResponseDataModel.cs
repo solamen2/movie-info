@@ -90,7 +90,7 @@ public record OmdbResponseDataModel
     [JsonPropertyName("Website")]  // Note for ViewModel: this used to be a website URL, but now always seems to be "N/A"
     public string? Website { get; init; }
 
-    [JsonPropertyName("Response")]
+    [JsonPropertyName("Response")]  // False when IMDB ID is not found
     public required string Response { get; init; }  // Note for ViewModel: this is a bool
 
     public override string ToString()

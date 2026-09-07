@@ -38,7 +38,6 @@ public class TmdbEndpointsTests
 
     public TmdbEndpointsTests(ITestOutputHelper output)
     {   
-        // TODO: Implement HttpClientTests too
         // TODO: Merge with OmdbEndpointsTests to make MediaEndpointsTests
 
         // Arrange
