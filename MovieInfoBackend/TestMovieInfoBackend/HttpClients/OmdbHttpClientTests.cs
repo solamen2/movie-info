@@ -9,14 +9,14 @@ namespace TestMovieInfoBackend.DataModels;
 public class OmdbHttpClientTests
 {
     private string malformedResponse;
-    private string errorResponse1;
+    private string errorResponse;
 
     public OmdbHttpClientTests(ITestOutputHelper output)
     {
         // Arrange
 
         string malformedDataFilename = "OmdbHttpClientMalformedResponse.json";
-        string errorFilename1 = "OmdbHttpClientErrorResponse1.json";
+        string errorFilename1 = "OmdbHttpClientErrorResponse.json";
 
         using (StreamReader sr = File.OpenText($"../../../TestData/{malformedDataFilename}"))
         {
@@ -29,9 +29,9 @@ public class OmdbHttpClientTests
 
         using (StreamReader sr = File.OpenText($"../../../TestData/{errorFilename1}"))
         {
-            errorResponse1 = sr.ReadToEnd();
+            errorResponse = sr.ReadToEnd();
         }
-        if (String.IsNullOrWhiteSpace(errorResponse1))
+        if (String.IsNullOrWhiteSpace(errorResponse))
         {
             throw new ArgumentException($"{errorFilename1} is not valid test data.");
         }
@@ -142,7 +142,7 @@ public class OmdbHttpClientTests
             .ReturnsAsync(new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.OK,
-                Content = new StringContent(errorResponse1) // Error response (no usable fields)
+                Content = new StringContent(errorResponse) // Error response (no usable fields)
             });
 
         HttpClient httpClient = new HttpClient(httpMessageHandlerMock.Object);

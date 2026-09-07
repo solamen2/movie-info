@@ -36,7 +36,7 @@ public class SuggestionEndpointTests
     }
 
     [Fact]
-    public async Task SuggestionEndpoints_ValidSuggestionDataModels_ConvertSuccessfullyIntoViewModels()
+    public async Task SuggestionEndpoint_ValidSuggestionDataModels_ConvertSuccessfullyIntoViewModels()
     {
         // Act
         SuggestionsResponseDataModel? suggestionsResponse1 = SuggestionHttpClient.GetModelFromResponse(suggestionHttpClientResponse1);
@@ -66,7 +66,7 @@ public class SuggestionEndpointTests
     }
 
     [Fact]
-    public void SuggestionEndpoints_SearchEndpointConfiguration_HasCorrectAttributes()
+    public void SuggestionEndpoint_SearchEndpointConfiguration_HasCorrectAttributes()
     {
         // This test verifies the endpoint configuration by examining what the Map method should set up
         // The actual endpoint testing would require full integration testing
