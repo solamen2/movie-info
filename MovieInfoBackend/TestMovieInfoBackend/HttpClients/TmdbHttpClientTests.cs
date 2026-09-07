@@ -13,44 +13,14 @@ namespace TestMovieInfoBackend.DataModels;
 public class TmdbHttpClientTests
 {
     private string malformedResponse;
-    private string configCountriesErrorResponse1;
-    private string configCountriesErrorResponse2;
-    private string configLanguagesErrorResponse1;
-    private string configLanguagesErrorResponse2;
-    private string genresErrorResponse1;
-    private string genresErrorResponse2;
     private string findByImdbIdErrorResponse;
-    private string movieCreditsErrorResponse;
-    private string personImagesErrorResponse;
-    private string personMovieCreditsErrorResponse;
-    private string personTvSeriesCreditsErrorResponse;
-    private string tvEpisodeCreditsErrorResponse;
-    private string tvSeriesAggregateCreditsErrorResponse;
-    private string watchProvidersErrorResponse1;
-    private string watchProvidersErrorResponse2;
-    private string watchProvidersErrorResponse3;
 
     public TmdbHttpClientTests(ITestOutputHelper output)
     {
         // Arrange
 
         string malformedDataFilename = "TmdbHttpClientMalformedResponse.json";
-        string configCountriesErrorFilename1 = "TmdbHttpClientConfigurationCountriesErrorResponse1.json";
-        string configCountriesErrorFilename2 = "TmdbHttpClientConfigurationCountriesErrorResponse2.json";
-        string configLanguagesErrorFilename1 = "TmdbHttpClientConfigurationLanguagesErrorResponse1.json";
-        string configLanguagesErrorFilename2 = "TmdbHttpClientConfigurationLanguagesErrorResponse2.json";
-        string genresErrorFilename1 = "TmdbHttpClientGenresErrorResponse1.json";
-        string genresErrorFilename2 = "TmdbHttpClientGenresErrorResponse2.json";
-        string findByImdbIdErrorFilename = "TmdbHttpClientFindByImdbIdErrorResponse1.json";
-        string movieCreditsErrorFilename = "TmdbHttpClientMovieCreditsErrorResponse1.json";
-        string personImagesErrorFilename = "TmdbHttpClientPersonImagesErrorResponse1.json";
-        string personMovieCreditsErrorFilename = "TmdbHttpClientPersonMovieCreditsErrorResponse1.json";
-        string personTvSeriesCreditsErrorFilename = "TmdbHttpClientPersonTvSeriesCreditsErrorResponse1.json";
-        string tvEpisodeCreditsErrorFilename = "TmdbHttpClientTvEpisodeCreditsErrorResponse1.json";
-        string tvSeriesAggregateCreditsErrorFilename = "TmdbHttpClientTvSeriesAggregateCreditsErrorResponse1.json";
-        string watchProvidersErrorFilename1 = "TmdbHttpClientWatchProvidersErrorResponse1.json";
-        string watchProvidersErrorFilename2 = "TmdbHttpClientWatchProvidersErrorResponse1.json";
-        string watchProvidersErrorFilename3 = "TmdbHttpClientWatchProvidersErrorResponse1.json";
+        string findByImdbIdErrorFilename = "TmdbHttpClientFindByImdbIdErrorResponse.json";
 
         using (StreamReader sr = File.OpenText($"../../../TestData/{malformedDataFilename}"))
         {
@@ -61,60 +31,6 @@ public class TmdbHttpClientTests
             throw new ArgumentException($"{malformedDataFilename} is not valid test data.");
         }
 
-        using (StreamReader sr = File.OpenText($"../../../TestData/{configCountriesErrorFilename1}"))
-        {
-            configCountriesErrorResponse1 = sr.ReadToEnd();
-        }
-        if (String.IsNullOrWhiteSpace(configCountriesErrorResponse1))
-        {
-            throw new ArgumentException($"{configCountriesErrorFilename1} is not valid test data.");
-        }
-
-        using (StreamReader sr = File.OpenText($"../../../TestData/{configCountriesErrorFilename2}"))
-        {
-            configCountriesErrorResponse2 = sr.ReadToEnd();
-        }
-        if (String.IsNullOrWhiteSpace(configCountriesErrorResponse2))
-        {
-            throw new ArgumentException($"{configCountriesErrorFilename2} is not valid test data.");
-        }
-
-        using (StreamReader sr = File.OpenText($"../../../TestData/{configLanguagesErrorFilename1}"))
-        {
-            configLanguagesErrorResponse1 = sr.ReadToEnd();
-        }
-        if (String.IsNullOrWhiteSpace(configLanguagesErrorResponse1))
-        {
-            throw new ArgumentException($"{configLanguagesErrorFilename1} is not valid test data.");
-        }
-
-        using (StreamReader sr = File.OpenText($"../../../TestData/{configLanguagesErrorFilename2}"))
-        {
-            configLanguagesErrorResponse2 = sr.ReadToEnd();
-        }
-        if (String.IsNullOrWhiteSpace(configLanguagesErrorResponse2))
-        {
-            throw new ArgumentException($"{configLanguagesErrorFilename2} is not valid test data.");
-        }
-
-        using (StreamReader sr = File.OpenText($"../../../TestData/{genresErrorFilename1}"))
-        {
-            genresErrorResponse1 = sr.ReadToEnd();
-        }
-        if (String.IsNullOrWhiteSpace(genresErrorResponse1))
-        {
-            throw new ArgumentException($"{genresErrorFilename1} is not valid test data.");
-        }
-
-        using (StreamReader sr = File.OpenText($"../../../TestData/{genresErrorFilename2}"))
-        {
-            genresErrorResponse2 = sr.ReadToEnd();
-        }
-        if (String.IsNullOrWhiteSpace(genresErrorResponse2))
-        {
-            throw new ArgumentException($"{genresErrorFilename2} is not valid test data.");
-        }
-
         using (StreamReader sr = File.OpenText($"../../../TestData/{findByImdbIdErrorFilename}"))
         {
             findByImdbIdErrorResponse = sr.ReadToEnd();
@@ -122,87 +38,6 @@ public class TmdbHttpClientTests
         if (String.IsNullOrWhiteSpace(findByImdbIdErrorResponse))
         {
             throw new ArgumentException($"{findByImdbIdErrorFilename} is not valid test data.");
-        }
-
-        using (StreamReader sr = File.OpenText($"../../../TestData/{movieCreditsErrorFilename}"))
-        {
-            movieCreditsErrorResponse = sr.ReadToEnd();
-        }
-        if (String.IsNullOrWhiteSpace(movieCreditsErrorResponse))
-        {
-            throw new ArgumentException($"{movieCreditsErrorFilename} is not valid test data.");
-        }
-
-        using (StreamReader sr = File.OpenText($"../../../TestData/{personImagesErrorFilename}"))
-        {
-            personImagesErrorResponse = sr.ReadToEnd();
-        }
-        if (String.IsNullOrWhiteSpace(personImagesErrorResponse))
-        {
-            throw new ArgumentException($"{personImagesErrorFilename} is not valid test data.");
-        }
-
-        using (StreamReader sr = File.OpenText($"../../../TestData/{personMovieCreditsErrorFilename}"))
-        {
-            personMovieCreditsErrorResponse = sr.ReadToEnd();
-        }
-        if (String.IsNullOrWhiteSpace(personMovieCreditsErrorResponse))
-        {
-            throw new ArgumentException($"{personMovieCreditsErrorFilename} is not valid test data.");
-        }
-
-        using (StreamReader sr = File.OpenText($"../../../TestData/{personTvSeriesCreditsErrorFilename}"))
-        {
-            personTvSeriesCreditsErrorResponse = sr.ReadToEnd();
-        }
-        if (String.IsNullOrWhiteSpace(personTvSeriesCreditsErrorResponse))
-        {
-            throw new ArgumentException($"{personTvSeriesCreditsErrorFilename} is not valid test data.");
-        }
-
-        using (StreamReader sr = File.OpenText($"../../../TestData/{tvEpisodeCreditsErrorFilename}"))
-        {
-            tvEpisodeCreditsErrorResponse = sr.ReadToEnd();
-        }
-        if (String.IsNullOrWhiteSpace(tvEpisodeCreditsErrorResponse))
-        {
-            throw new ArgumentException($"{tvEpisodeCreditsErrorFilename} is not valid test data.");
-        }
-
-        using (StreamReader sr = File.OpenText($"../../../TestData/{tvSeriesAggregateCreditsErrorFilename}"))
-        {
-            tvSeriesAggregateCreditsErrorResponse = sr.ReadToEnd();
-        }
-        if (String.IsNullOrWhiteSpace(tvSeriesAggregateCreditsErrorResponse))
-        {
-            throw new ArgumentException($"{tvSeriesAggregateCreditsErrorFilename} is not valid test data.");
-        }
-
-        using (StreamReader sr = File.OpenText($"../../../TestData/{watchProvidersErrorFilename1}"))
-        {
-            watchProvidersErrorResponse1 = sr.ReadToEnd();
-        }
-        if (String.IsNullOrWhiteSpace(watchProvidersErrorResponse1))
-        {
-            throw new ArgumentException($"{watchProvidersErrorFilename1} is not valid test data.");
-        }
-
-        using (StreamReader sr = File.OpenText($"../../../TestData/{watchProvidersErrorFilename2}"))
-        {
-            watchProvidersErrorResponse2 = sr.ReadToEnd();
-        }
-        if (String.IsNullOrWhiteSpace(watchProvidersErrorResponse2))
-        {
-            throw new ArgumentException($"{watchProvidersErrorFilename2} is not valid test data.");
-        }
-
-        using (StreamReader sr = File.OpenText($"../../../TestData/{watchProvidersErrorFilename3}"))
-        {
-            watchProvidersErrorResponse3 = sr.ReadToEnd();
-        }
-        if (String.IsNullOrWhiteSpace(watchProvidersErrorResponse3))
-        {
-            throw new ArgumentException($"{watchProvidersErrorFilename3} is not valid test data.");
         }
     }
 
