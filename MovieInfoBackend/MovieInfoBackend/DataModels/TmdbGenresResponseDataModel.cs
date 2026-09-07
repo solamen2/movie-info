@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace MovieInfoBackend.DataModels;
 
+// NOTE: This model is not used by this app currently, because in all endpoints used by this app, the data models have the genre names already in them and don't need lookups
 public record TmdbGenresResponseDataModel
 {
     [JsonPropertyName("genres")]
