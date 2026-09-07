@@ -101,13 +101,17 @@ public class MovieEndpoint
                         MovieViewModel movieViewModel;
                         // Null checks all happened above, but there's no good way to let the compiler know about that, so recheck here
                         if (movieSuggestionViewModel != null
-                            && omdbMovieResponseDataModel != null
                             && tmdbMovieResponseDataModel != null
                             && tmdbMovieCreditsResponseDataModel != null
                             && tmdbMovieWatchProvidersResponseDataModel != null
                             && configurationCountriesDictionary != null
                             && configurationLanguagesDictionary != null)
                         {
+                            if (omdbMovieResponseDataModel == null)  // Still lots of good info if this is null, so use an empty object
+                            {
+                                omdbMovieResponseDataModel = OmdbResponseDataModel.GetEmptyOmdbResponseDataModel();
+                            }
+                            
                             movieViewModel = new MovieViewModel(movieSuggestionViewModel,
                                                                 omdbMovieResponseDataModel,
                                                                 tmdbMovieResponseDataModel,

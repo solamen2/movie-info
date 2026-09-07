@@ -224,41 +224,7 @@ public class MovieViewModelTests
             Response = "True"
         };
 
-        var omdbMovieResponseDataModel2 = new OmdbResponseDataModel
-        {
-            Title = "Example Movie 3",
-            Year = "2013",
-            Rated = "Not Rated",
-            Released = "01 Mar 2013",
-            Runtime = "90 min",
-            Genre = "Family",
-            Director = "David DeCoteau",
-            Writer = "Sebastian Dinwiddie",
-            Actors = "Alison Sieke, August Roads, Chris Petrovski",
-            Plot = "This is another very silly movie.",
-            Language = "English",
-            Country = "United States",
-            Awards = "N/A",
-            Poster = "https://m.media-amazon.com/images/M/MV5BMTQ3MzY4OTE5N15BMl5BanBnXkFtZTcwMDg0OTgxOQ@@._V1_SX300.jpg",
-            Ratings = new OmdbRatingDataModel[]
-            {
-                new OmdbRatingDataModel
-                {
-                    Source = "Internet Movie Database",
-                    Value = "2.4/10"
-                }
-            },
-            Metascore = "N/A",
-            ImdbRating = "2.4",
-            ImdbVotes = "211",
-            ImdbId = "tt0000003",
-            Type = "movie",
-            DVD = "N/A",
-            BoxOffice = "",  // Testing this value
-            Production = "N/A",
-            Website = "N/A",
-            Response = "True"
-        };
+        var omdbEmptyMovieResponseDataModel = OmdbResponseDataModel.GetEmptyOmdbResponseDataModel();
 
         // Act
 
@@ -273,7 +239,7 @@ public class MovieViewModelTests
         Assert.Equal(0, movieViewModel.BoxOfficeNumber);
 
         MovieViewModel movieViewModel2 = new(suggestionMovieViewModel, 
-                                            omdbMovieResponseDataModel2,
+                                            omdbEmptyMovieResponseDataModel,
                                             tmdbMovieResponse,
                                             movieCreditsResponse,
                                             movieWatchProvidersResponse,

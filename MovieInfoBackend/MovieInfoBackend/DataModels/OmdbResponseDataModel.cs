@@ -93,6 +93,34 @@ public record OmdbResponseDataModel
     [JsonPropertyName("Response")]  // False when IMDB ID is not found
     public required string Response { get; init; }  // Note for ViewModel: this is a bool
 
+    public static OmdbResponseDataModel GetEmptyOmdbResponseDataModel()
+    {
+        return new OmdbResponseDataModel
+        {
+            Title = "",
+            Year = "",
+            Rated = "",
+            Released = "",
+            Runtime = "",
+            Genre = "",
+            Director = "",
+            Writer = "",
+            Actors = "",
+            Plot = "",
+            Language = "",
+            Country = "",
+            Awards = "",
+            Poster = "",
+            Ratings = new OmdbRatingDataModel[] {},
+            Metascore = "",
+            ImdbRating = "",
+            ImdbVotes = "",
+            ImdbId = "",
+            Type = "",
+            Response = ""
+        };
+    }
+
     public override string ToString()
     {
         return $"Title: {Title}\nYear: {Year}\nRated: {Rated}\nReleased: {Released}\nSeason: {Season}\nEpisode: {Episode}\nRuntime: {Runtime}\nGenre: {Genre}\nDirector: {Director}\nWriter: {Writer}\nActors: {Actors}\nPlot: {Plot}\nLanguage: {Language}\nCountry: {Country}\nAwards: {Awards}\nPoster: {Poster}\nRatings:\n*****\n{string.Join("\n\n", Ratings)}\n*****\nMetascore: {Metascore}\nImdbRating: {ImdbRating}\nImdbVotes: {ImdbVotes}\nImdbId: {ImdbId}\nSeriesId: {SeriesId}\nType: {Type}\nDVD: {DVD}\nTotal Seasons: {TotalSeasons}\nBoxOffice: {BoxOffice}\nProduction: {Production}\nWebsite: {Website}\nResponse: {Response}";
