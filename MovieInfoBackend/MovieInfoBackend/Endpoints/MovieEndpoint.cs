@@ -16,9 +16,6 @@ namespace MovieInfoBackend.Endpoints;
 [ExcludeFromCodeCoverage]
 public class MovieEndpoint
 {
-    // TODO: Add endpoints for people, TV series, TV seasons, and TV episodes
-    // These endpoints will have to call multiple TMDB APIs (and sometimes the OMDB API), and await on all of them at the end using Task.WhenAll()
-
     public static string CachePrefix = "movie-";
 
     public static void Map(WebApplication app)
@@ -248,29 +245,5 @@ public class MovieEndpoint
         Log.Debug($"TMDB movie watch providers response:\n\n{tmdbMovieWatchProvidersResponseDataModel}\n\n");
 
         return tmdbMovieWatchProvidersResponseDataModel;
-    }
-
-    // WARNING: This function should only ever be used in local development to generate test case data
-    [ExcludeFromCodeCoverage]
-    private class MovieEndpointHelper
-    {
-        private static SuggestionsResponseDataModel? LoadMockData()
-        {
-            string suggestionHttpClientResponse;
-            string testDataFilename = "SuggestionHttpClientResponse2.json";
-
-            using (StreamReader sr = File.OpenText($"../TestMovieInfoBackend/TestData/{testDataFilename}"))
-            {
-                suggestionHttpClientResponse = sr.ReadToEnd();
-            }
-            if (String.IsNullOrWhiteSpace(suggestionHttpClientResponse))
-            {
-                throw new ArgumentException($"{testDataFilename} is not valid test data.");
-            }
-
-            return SuggestionHttpClient.GetModelFromResponse(suggestionHttpClientResponse);
-        }
-
-        // TODO: Need to do test case data helpers for other calls too
     }
 }
