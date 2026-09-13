@@ -75,26 +75,4 @@ public class SuggestionEndpoint
         .RequireAuthorization(ProgramConstants.SearchUsersOnlyPolicyName)  // TODO: Check that this returns appropriate error on frontend
         .RequireRateLimiting(ProgramConstants.TokenRateLimiterPolicyName);
     }
-
-    // WARNING: This function should only ever be used in local development to generate test case data
-    [ExcludeFromCodeCoverage]
-    private class SuggestionEndpointHelper
-    {
-        private static SuggestionsResponseDataModel? LoadMockData()
-        {
-            string suggestionHttpClientResponse;
-            string testDataFilename = "SuggestionHttpClientResponse2.json";
-
-            using (StreamReader sr = File.OpenText($"../TestMovieInfoBackend/TestData/{testDataFilename}"))
-            {
-                suggestionHttpClientResponse = sr.ReadToEnd();
-            }
-            if (String.IsNullOrWhiteSpace(suggestionHttpClientResponse))
-            {
-                throw new ArgumentException($"{testDataFilename} is not valid test data.");
-            }
-
-            return SuggestionHttpClient.GetModelFromResponse(suggestionHttpClientResponse);
-        }
-    }
 }

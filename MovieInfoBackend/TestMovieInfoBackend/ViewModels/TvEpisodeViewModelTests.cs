@@ -7,7 +7,6 @@ namespace TestMovieInfoBackend.DataModels;
 
 public class TvEpisodeViewModelTests
 {
-    private string suggestionHttpClientResponse1;
     private string omdbHttpClientTvEpisodeResponse;
     private string tmdbHttpClientTvEpisodeResponse;
     private string tmdbHttpClientTvEpisodeCreditsResponse;
@@ -16,19 +15,9 @@ public class TvEpisodeViewModelTests
     {        
         // Arrange
 
-        string testDataFilename1 = "SuggestionHttpClientResponse1.json";
         string testOmdbTvEpisodeDataFilename = "OmdbHttpClientTvEpisodeResponse.json";
         string testTmdbTvEpisodeDataFilename = "TmdbHttpClientTvEpisodeResponse.json";
         string testTvEpisodeCreditsDataFilename = "TmdbHttpClientTvEpisodeCreditsResponse.json";
-
-        using (StreamReader sr = File.OpenText($"../../../TestData/{testDataFilename1}"))
-        {
-            suggestionHttpClientResponse1 = sr.ReadToEnd();
-        }
-        if (String.IsNullOrWhiteSpace(suggestionHttpClientResponse1))
-        {
-            throw new ArgumentException($"{testDataFilename1} is not valid test data.");
-        }
 
         using (StreamReader sr = File.OpenText($"../../../TestData/{testOmdbTvEpisodeDataFilename}"))
         {

@@ -6,7 +6,6 @@ namespace MovieInfoBackend.ViewModels;
 public record TvEpisodeViewModel
 {
     // NOTE: This exists at the episode level, after an episode is selected; TvSeasonEpisodeViewModel is shown at the season level, when no episode is selected
-    // TODO: No way to get omdbDataModel without knowing the IMDB ID! So there will have to be a call to the TMDB External IDs API to get it in the HTTP Client
     public TvEpisodeViewModel(OmdbResponseDataModel omdbDataModel,
                               TmdbTvEpisodeResponseDataModel tmdbTvEpisodeDataModel,
                               TmdbTvEpisodeCreditsResponseDataModel tmdbTvEpisodeCreditsDataModel,

@@ -33,8 +33,12 @@ try
 
     Log.Information("Mapping endpoints...");
     AuthEndpoint.Map(app);
-    SuggestionEndpoint.Map(app);
     MovieEndpoint.Map(app);
+    PersonEndpoint.Map(app);
+    SuggestionEndpoint.Map(app);
+    TvEpisodeEndpoint.Map(app);
+    TvSeasonEndpoint.Map(app);
+    TvSeriesEndpoint.Map(app);
 
     Log.Information("Starting app...");
     app.Run();
