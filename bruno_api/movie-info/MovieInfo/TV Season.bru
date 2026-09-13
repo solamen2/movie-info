@@ -1,0 +1,21 @@
+meta {
+  name: TV Season
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{base-url}}/api/tvseason?tmdbTvSeriesId=95&seasonNumber=6
+  body: none
+  auth: inherit
+}
+
+params:query {
+  tmdbTvSeriesId: 95
+  seasonNumber: 6
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
