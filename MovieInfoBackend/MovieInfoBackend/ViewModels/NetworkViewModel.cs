@@ -14,7 +14,7 @@ public record NetworkViewModel
         this.OriginCountry = tmdbNetworkDataModel.OriginCountry;
     }
     
-    public Guid ID { get; }    [JsonPropertyName("id")]
+    public Guid ID { get; }
     public int TmdbId { get; }
     public string? LogoPath { get; }
     public string Name { get; }
