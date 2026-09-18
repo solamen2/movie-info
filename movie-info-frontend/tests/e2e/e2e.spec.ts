@@ -28,39 +28,158 @@ test.afterEach(async ({ page }) => {
   console.log("Logout finished.");
 });
 
-// TODO: Update happy path with UI changes
-test("Basic happy path: search, check results are valid, and select a search card", async ({
+const useMockHttpCalls = process.env.VITE_USE_MOCK_HTTP_CALLS === "true";
+
+// Real data is limited to values that are unlikely to change over time (so no
+// rating, vote count, rank, revenue, or watch providers).
+const expectedMovie = useMockHttpCalls
+  ? {
+      searchText: "1",
+      title: "Example Movie",
+      cardText: [
+        "Example MovieSearch Type: MediaMedia Type: MovieRank: ",
+        "4444Known For: Example Jones, Example BrownYear: 2016",
+      ],
+      tagline: "An example tagline.",
+      imdbRow: /IMDB: 7\.9 \(123,456\)Rank: 4444Link/,
+      imdbUrl: "https://www.imdb.com/title/tt0000001",
+      facts: [
+        "Original TitleExample Movie Original",
+        "Release DateSep 23, 2016",
+        "Runtime2h 22m",
+        "RatedPG-13",
+        "StatusReleased",
+        "Known ForExample Jones, Example Brown",
+        "GenresMystery, Thriller, Drama, Science Fiction, Horror",
+        "Budget$25,000,000",
+        "Revenue$58,000,000",
+        "Homepagehttps://example.com/example-movie",
+        "Origin CountriesUnited States of America",
+        "Production CountriesUnited States of America",
+        "Origin LanguageEnglish",
+        "Spoken LanguagesEnglish, Spanish",
+      ],
+      sections: [
+        ["Cast", "Example Jones"],
+        ["Directors", "Example Director"],
+        ["Writers", "Example Writer"],
+        ["Plot (TMDB)", "An example plot from TMDB."],
+        ["Plot (OMDB)", "An example plot from OMDB."],
+        ["Where to Stream", "Example Stream"],
+        ["Where to Rent", "None"],
+        ["Where to Buy", "Example Buy Store"],
+      ],
+    }
+  : {
+      searchText: "The Shawshank Redemption",
+      title: "The Shawshank Redemption",
+      cardText: [
+        "The Shawshank RedemptionSearch Type: MediaMedia Type: MovieRank: ",
+        "Known For: Tim Robbins, Morgan FreemanYear: 1994", // remove rank from Shawshank because it changes over time
+      ],
+      tagline: "Fear can hold you prisoner. Hope can set you free.",
+      imdbRow: /IMDB: \d\.\d \([\d,]+\)Rank: \d+Link/,
+      imdbUrl: "https://www.imdb.com/title/tt0111161",
+      facts: [
+        "Original TitleThe Shawshank Redemption",
+        "Release DateSep 23, 1994",
+        "Runtime2h 22m",
+        "RatedR",
+        "StatusReleased",
+        "Known ForTim Robbins, Morgan Freeman",
+        "GenresDrama, Crime",
+        "Budget$25,000,000",
+        "Origin CountriesUnited States of America",
+        "Production CountriesUnited States of America",
+        "Origin LanguageEnglish",
+        "Spoken LanguagesEnglish",
+      ],
+      sections: [
+        ["Cast", "Tim Robbins"],
+        ["Directors", "Frank Darabont"],
+        ["Writers", "Stephen King"],
+        ["Plot (TMDB)", "Shawshank"],
+        ["Plot (OMDB)", "Shawshank"],
+        ["Where to Stream", ""],
+        ["Where to Rent", ""],
+        ["Where to Buy", ""],
+      ],
+    };
+
+test("Basic happy path: search, check results are valid, select a movie search card, check the movie panel is valid, and unselect the card", async ({
   page,
 }) => {
   console.log("Starting basic happy path test...");
-  const searchText =
-    process.env.VITE_USE_MOCK_HTTP_CALLS === "true"
-      ? "1"
-      : "The Shawshank Redemption";
   const searchQueryInput = page.getByRole("textbox", {
     name: "search-query-input",
   });
-  await searchQueryInput.fill(searchText);
+  await searchQueryInput.fill(expectedMovie.searchText);
   const searchButton = page.getByRole("button", { name: "search" });
   await searchButton.click();
 
-  const movieNameTextToSearch =
-    process.env.VITE_USE_MOCK_HTTP_CALLS === "true"
-      ? "Example Movie"
-      : "The Shawshank Redemption";
-  const movieTextElement = page.getByText(movieNameTextToSearch, {
+  const movieTextElement = page.getByText(expectedMovie.title, {
     exact: true,
   });
   const movieCard = movieTextElement.locator("ancestor=#search-card");
-  const movieCardText1 =
-    process.env.VITE_USE_MOCK_HTTP_CALLS === "true"
-      ? "Example MovieSearch Type: MediaMedia Type: MovieRank: "
-      : "The Shawshank RedemptionSearch Type: MediaMedia Type: MovieRank: ";
-  const movieCardText2 =
-    process.env.VITE_USE_MOCK_HTTP_CALLS === "true"
-      ? "4444Known For: Example Jones, Example BrownYear: 2016"
-      : "Known For: Tim Robbins, Morgan FreemanYear: 1994"; // remove rank from Shawshank because it changes over time
-  expect(await movieCard.textContent()).toContain(movieCardText1);
-  expect(await movieCard.textContent()).toContain(movieCardText2);
+  for (const cardText of expectedMovie.cardText) {
+    expect(await movieCard.textContent()).toContain(cardText);
+  }
+  const resultsMessage = page.getByText(/^\d+ results\.$/);
+  await expect(resultsMessage).toBeVisible();
+
+  console.log("Selecting the movie search card...");
+  await movieCard.click();
+  const backButton = page.getByRole("button", { name: "back" });
+  await expect(backButton).toBeVisible();
+  await expect(resultsMessage).toBeHidden();
+
+  const moviePanel = page.getByTestId("movie-panel");
+  await expect(moviePanel).toBeVisible();
+  const selectedCard = page.locator("#search-card.selected.expanded");
+  await expect(selectedCard).toHaveCount(1);
+  await expect(
+    moviePanel.getByRole("heading", { name: expectedMovie.title, exact: true }),
+  ).toBeVisible();
+  await expect(moviePanel).toContainText(expectedMovie.tagline);
+  await expect(moviePanel).toContainText(expectedMovie.imdbRow);
+  const imdbLink = moviePanel.getByRole("link", { name: "Link", exact: true });
+  await expect(imdbLink).toHaveAttribute("href", expectedMovie.imdbUrl);
+  await expect(imdbLink).toHaveAttribute("target", "_blank");
+  await expect(
+    moviePanel.getByRole("button", { name: "copy-imdb-link" }),
+  ).toBeVisible();
+  for (const fact of expectedMovie.facts) {
+    await expect(moviePanel).toContainText(fact);
+  }
+
+  console.log("Checking the collapsible sections...");
+  const sections = moviePanel.locator("details");
+  await expect(sections.locator("summary")).toHaveText(
+    expectedMovie.sections.map(
+      ([title]) => new RegExp(`^${escapeRegExp(title)}`),
+    ),
+  );
+  for (const [index, [, content]] of expectedMovie.sections.entries()) {
+    const section = sections.nth(index);
+    const sectionBody = section.locator(".movie-collapsible-body");
+    await expect(sectionBody).toBeHidden();
+    await section.locator("summary").click();
+    await expect(sectionBody).toBeVisible();
+    await expect(sectionBody).toContainText(content);
+  }
+
+  console.log("Unselecting the movie search card...");
+  await backButton.click();
+  await expect(moviePanel).toBeHidden();
+  await expect(page.locator("#search-card.selected")).toHaveCount(0);
+  await expect(backButton).toBeHidden();
+  await expect(resultsMessage).toBeVisible();
+  for (const cardText of expectedMovie.cardText) {
+    expect(await movieCard.textContent()).toContain(cardText);
+  }
   console.log("Basic happy path test finished.");
 });
+
+function escapeRegExp(text: string): string {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
