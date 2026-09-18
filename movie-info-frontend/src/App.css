@@ -73,6 +73,37 @@
   white-space: nowrap;
 }
 
+/* Holds either the "x results." message or, while a card is selected, the
+   back arrow. A fixed min-height keeps the results from jumping when the two
+   swap. */
+.results-toolbar {
+  display: flex;
+  align-items: center;
+  min-height: 2.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.results-toolbar .search-message {
+  margin: 0;
+}
+
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border-radius: 50%;
+}
+
+@media (max-width: 640px) {
+  .search-page {
+    margin: 1rem auto;
+    padding: 0 1rem;
+  }
+}
+
 /* Results grid */
 .results-container {
   display: flex;
@@ -96,6 +127,7 @@
      layout slot to fade back into. */
   transition:
     border-color 0.15s,
+    width 0.3s ease,
     opacity 0.5s ease,
     display 0.5s allow-discrete;
 }
@@ -151,6 +183,14 @@
   to {
     transform: translate(0, 0);
   }
+}
+
+/* Once the selected card has reached the upper-left, it grows to fill the
+   container and shows its detail panel. Width subtracts the card's padding and
+   border since .result-card uses content-box sizing. */
+.result-card.expanded {
+  width: calc(100% - 1.5rem - 4px);
+  cursor: default;
 }
 
 /* While a card is selected, every other card fades out and is then pulled

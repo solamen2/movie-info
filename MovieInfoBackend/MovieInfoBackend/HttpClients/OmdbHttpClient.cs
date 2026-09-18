@@ -20,7 +20,7 @@ public class OmdbHttpClient
 
     public async Task<OmdbResponseDataModel?> GetMedia(string imdbId)
     {
-        using HttpResponseMessage response = await _httpClient.GetAsync($"?i={HttpUtility.HtmlEncode(imdbId)}&apikey={_apiKey}");
+        using HttpResponseMessage response = await _httpClient.GetAsync($"?i={HttpUtility.HtmlEncode(imdbId)}&apikey={_apiKey}&plot=full");
         if (response.StatusCode != System.Net.HttpStatusCode.OK)
         {
             return null;

@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import MoviePanel from "./movie/MoviePanel";
 
 export interface SuggestionImage {
   height: number;
@@ -28,6 +29,10 @@ interface SuggestionSearchCardProps {
   item: Suggestion;
   selected: boolean;
   deselecting?: boolean;
+  // When true the card has grown into a full detail panel (currently only
+  // movies), and card clicks are ignored so interacting with the panel
+  // doesn't deselect it — the back arrow / ESC key handle that instead.
+  expanded?: boolean;
   onClick: () => void;
 }
 
@@ -35,6 +40,7 @@ function SuggestionSearchCard({
   item,
   selected,
   deselecting,
+  expanded,
   onClick,
 }: SuggestionSearchCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
@@ -49,6 +55,7 @@ function SuggestionSearchCard({
     (mediaTypeValue === "TV Series" || mediaTypeValue === "TV Mini Series");
 
   function handleClick() {
+    if (expanded) return;
     // When transitioning into the selected state, capture the card's layout
     // offset so CSS can translate it to the upper-left corner. The results
     // container is position:relative, so it is the card's offsetParent and
@@ -68,7 +75,16 @@ function SuggestionSearchCard({
   const className =
     "result-card" +
     (selected ? " selected" : "") +
-    (deselecting ? " deselecting" : "");
+    (deselecting ? " deselecting" : "") +
+    (expanded ? " expanded" : "");
+
+  if (expanded) {
+    return (
+      <div ref={cardRef} id="search-card" className={className}>
+        <MoviePanel imdbId={item.itemID} />
+      </div>
+    );
+  }
 
   return (
     <div

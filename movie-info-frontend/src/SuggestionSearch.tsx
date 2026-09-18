@@ -1,6 +1,21 @@
-import { type SubmitEvent, useEffect, useState } from "react";
+import {
+  type SubmitEvent,
+  useEffect,
+  useEffectEvent,
+  useRef,
+  useState,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import SuggestionSearchCard, { type Suggestion } from "./SuggestionSearchCard";
+
+// Keep in sync with the `select-fly` / `deselect-fly` animation duration and
+// the `.result-card` width transition duration in App.css.
+const CARD_FLY_MS = 500;
+const CARD_RESIZE_MS = 300;
+
+function hasDetailPanel(item: Suggestion) {
+  return item.mediaType?.value === "Movie";
+}
 
 function SuggestionSearch() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -14,24 +29,49 @@ function SuggestionSearch() {
   const [previouslySelectedItemId, setPreviouslySelectedItemId] = useState<
     string | null
   >(null);
+  // A selected card with a detail panel animates in two phases: first it flies
+  // to the upper-left (selectedItemId), then it grows into the panel
+  // (expandedItemId). Going back runs the phases in reverse.
+  const [expandedItemId, setExpandedItemId] = useState<string | null>(null);
+  const phaseTimeoutRef = useRef<number | undefined>(undefined);
   const [error, setError] = useState("");
   const [searchMessage, setSearchMessage] = useState("");
   const navigate = useNavigate();
 
+  const onEscape = useEffectEvent(() => {
+    handleBack();
+  });
+
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       if (e.key === "Escape") {
-        setSelectedItemId((prev) => {
-          setPreviouslySelectedItemId(prev);
-          return null;
-        });
+        onEscape();
       }
     }
     window.addEventListener("keydown", onKeyDown);
     return () => {
       window.removeEventListener("keydown", onKeyDown);
+      window.clearTimeout(phaseTimeoutRef.current);
     };
   }, []);
+
+  function deselect() {
+    setSelectedItemId((prev) => {
+      setPreviouslySelectedItemId(prev);
+      return null;
+    });
+  }
+
+  function handleBack() {
+    window.clearTimeout(phaseTimeoutRef.current);
+    if (expandedItemId) {
+      // Shrink the panel back to card size first, then fly the card home.
+      setExpandedItemId(null);
+      phaseTimeoutRef.current = window.setTimeout(deselect, CARD_RESIZE_MS);
+    } else {
+      deselect();
+    }
+  }
 
   async function handleSearch(e: SubmitEvent) {
     e.preventDefault();
@@ -39,6 +79,8 @@ function SuggestionSearch() {
     setSearchMessage("");
     setResults([]);
     setSelectedItemId(null);
+    setExpandedItemId(null);
+    window.clearTimeout(phaseTimeoutRef.current);
     // Cards unmount on a new search, so any in-flight deselect animation is
     // moot — clearing this prevents a card in the next result set that
     // happens to share an itemID from rendering with `.deselecting` and
@@ -71,11 +113,20 @@ function SuggestionSearch() {
     }
   }
 
-  function handleCardClick(itemId: string) {
+  function handleCardClick(item: Suggestion) {
+    const itemId = item.itemID;
+    const isSelecting = selectedItemId !== itemId;
+    window.clearTimeout(phaseTimeoutRef.current);
+    setExpandedItemId(null);
     setSelectedItemId((prev) => {
       setPreviouslySelectedItemId(prev);
       return prev === itemId ? null : itemId;
     });
+    if (isSelecting && hasDetailPanel(item)) {
+      phaseTimeoutRef.current = window.setTimeout(() => {
+        setExpandedItemId(itemId);
+      }, CARD_FLY_MS);
+    }
   }
 
   async function handleLogout() {
@@ -123,7 +174,33 @@ function SuggestionSearch() {
       </div>
 
       {error && <p className="error-message">{error}</p>}
-      {searchMessage && <p className="search-message">{searchMessage}</p>}
+      <div className="results-toolbar">
+        {selectedItemId ? (
+          <button
+            type="button"
+            aria-label="back"
+            title="Back to results (Esc)"
+            className="back-button"
+            onClick={handleBack}
+          >
+            <svg
+              viewBox="0 0 24 24"
+              width="20"
+              height="20"
+              aria-hidden="true"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+          </button>
+        ) : (
+          searchMessage && <p className="search-message">{searchMessage}</p>
+        )}
+      </div>
 
       <div
         className={`results-container${selectedItemId ? " has-selection" : ""}`}
@@ -133,12 +210,13 @@ function SuggestionSearch() {
             key={item.id}
             item={item}
             selected={selectedItemId === item.itemID}
+            expanded={expandedItemId === item.itemID}
             deselecting={
               previouslySelectedItemId === item.itemID &&
               selectedItemId !== item.itemID
             }
             onClick={() => {
-              handleCardClick(item.itemID);
+              handleCardClick(item);
             }}
           />
         ))}
