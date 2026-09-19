@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -7,8 +8,10 @@ using MovieInfoBackend.Auth;
 namespace MovieInfoBackend.Areas.Identity.Data;
 
 [ExcludeFromCodeCoverage]
-public class MovieInfoDbContext : IdentityDbContext<ApplicationUser>
+public class MovieInfoDbContext : IdentityDbContext<ApplicationUser>, IDataProtectionKeyContext
 {
+    public DbSet<DataProtectionKey> DataProtectionKeys { get; set; } = null!;
+
     public MovieInfoDbContext(DbContextOptions<MovieInfoDbContext> options)
         : base(options)
     {
