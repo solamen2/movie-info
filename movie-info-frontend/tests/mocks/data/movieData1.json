@@ -1,0 +1,107 @@
+{
+  "id": "5b0f6c1e-2f7a-4d0e-9d7c-8b1f2a3c4d5e",
+  "image": {
+    "height": 3000,
+    "imageURL": "https://example.com/example2.jpg",
+    "width": 2031
+  },
+  "imdbId": "tt0000001",
+  "title": "Example Movie",
+  "imdbRank": 4444,
+  "knownForActors": "Example Jones, Example Brown",
+  "year": 2016,
+  "rated": "PG-13",
+  "omdbGenres": "Drama, mystery, Sci-Fi, Horror",
+  "omdbPlot": "An example plot from OMDB.",
+  "awards": "Won 2 Example Awards",
+  "imdbRating": "7.9",
+  "imdbVotes": "123,456",
+  "boxOfficeString": "$12,345,678",
+  "boxOfficeNumber": 12345678,
+  "budget": 25000000,
+  "tmdbGenres": "Mystery, Thriller, Drama, Science Fiction",
+  "homepage": "https://example.com/example-movie",
+  "tmdbId": 90001,
+  "originCountries": "United States of America",
+  "originLanguage": "English",
+  "originalTitle": "Example Movie Original",
+  "tmdbPlot": "An example plot from TMDB.",
+  "productionCompanies": "Example Studios; Example Pictures",
+  "productionCountries": "United States of America",
+  "releaseDate": "2016-09-23",
+  "revenue": 58000000,
+  "runtime": 142,
+  "spokenLanguages": "English, Spanish",
+  "status": "Released",
+  "tagline": "An example tagline.",
+  "cast": [
+    {
+      "id": "c2",
+      "gender": "Male",
+      "tmdbId": 2,
+      "name": "Example Brown",
+      "originalName": "Example Brown",
+      "popularity": 5.5,
+      "profilePath": null,
+      "character": "Second Lead",
+      "billedOrder": 1
+    },
+    {
+      "id": "c1",
+      "gender": "Female",
+      "tmdbId": 1,
+      "name": "Example Jones",
+      "originalName": "Example Jones",
+      "popularity": 10.2,
+      "profilePath": "/exampleJones.jpg",
+      "character": "Lead",
+      "billedOrder": 0
+    }
+  ],
+  "directors": [
+    {
+      "id": "d1",
+      "gender": "Male",
+      "tmdbId": 3,
+      "knownForDepartment": "Directing",
+      "name": "Example Director",
+      "originalName": "Example Director",
+      "popularity": 3.1,
+      "profilePath": "/exampleDirector.jpg",
+      "department": "Directing",
+      "job": "Director"
+    }
+  ],
+  "writers": [
+    {
+      "id": "w1",
+      "gender": "Female",
+      "tmdbId": 4,
+      "knownForDepartment": "Writing",
+      "name": "Example Writer",
+      "originalName": "Example Writer",
+      "popularity": 2.0,
+      "profilePath": null,
+      "department": "Writing",
+      "job": "Screenplay"
+    }
+  ],
+  "producers": [],
+  "watchProvidersBuy": [
+    {
+      "id": "b1",
+      "logoPath": "/exampleBuy.jpg",
+      "providerName": "Example Buy Store",
+      "displayPriority": 3
+    }
+  ],
+  "watchProvidersFlatrate": [
+    {
+      "id": "f1",
+      "logoPath": "/exampleStream.jpg",
+      "providerName": "Example Stream",
+      "displayPriority": 1
+    }
+  ],
+  "watchProvidersRent": []
+}
