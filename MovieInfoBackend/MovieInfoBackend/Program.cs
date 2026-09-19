@@ -11,6 +11,7 @@ using Polly;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.DataProtection;
 
 var builder = WebApplication.CreateBuilder(args);
 WebApplication app;
@@ -168,6 +169,10 @@ void ConfigAuth()
         options.ExpireTimeSpan = ProgramConfig.LoginCookieTimeout;
         options.Cookie.SameSite = SameSiteMode.Strict;
     });
+    // Needed to run multiple servers
+    builder.Services.AddDataProtection()
+        .SetApplicationName("movie-info")
+        .PersistKeysToDbContext<MovieInfoDbContext>();
 
     // Authorization
     builder.Services.AddAuthorization(options =>
