@@ -16,7 +16,7 @@ public record SuggestionDataModel
     [JsonPropertyName("rank")]
     public int? Rank { get; init; }  // rank of this item in its category of results (I believe)
     [JsonPropertyName("s")]
-    public required string KnownFor { get; init; }  // top two actors for media, best known work (or role) for people, who knows for others
+    public string? KnownFor { get; init; }  // top two actors for media, best known work (or role) for people, who knows for others
     [JsonPropertyName("y")]
     public int? Year { get; init; }  // only for media, not people
     [JsonPropertyName("yr")]
