@@ -75,7 +75,7 @@ export const handlers = [
         return HttpResponse.json([], { status: 200 });
       default:
         return HttpResponse.json(
-          { error: "Not a valid search query for mock" },
+          { message: "Not a valid search query for mock" },
           { status: 404 },
         );
     }

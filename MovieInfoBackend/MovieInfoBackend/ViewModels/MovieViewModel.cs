@@ -147,7 +147,7 @@ public record MovieViewModel
     public long Revenue { get; }
     public int Runtime { get; }
     public string SpokenLanguages { get; }
-    public string Status { get; }
+    public string Status { get; }  // TODO: Show next to title if anything but "Released"
     public string? Tagline { get; }
     public List<MovieCastViewModel> Cast { get; }
     public List<MovieCrewViewModel> Directors { get; }

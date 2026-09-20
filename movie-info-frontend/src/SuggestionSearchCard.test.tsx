@@ -66,7 +66,7 @@ describe("SuggestionSearchCard", () => {
       const tvSeriesText = await screen.findByText("Example TV Series");
       const tvSeriesCard = tvSeriesText.closest("#search-card");
       expect(tvSeriesCard?.textContent).toMatch(
-        "Example TV SeriesSearch Type: MediaMedia Type: TV SeriesRank: 4444Known For: John Smith, James JohnsonYear: 2001Years: 2001-2003",
+        "Example TV SeriesSearch Type: MediaMedia Type: TV SeriesRank: 4444Known For: John Smith, James JohnsonYears: 2001-2003",
       );
     });
   });
@@ -89,7 +89,7 @@ describe("SuggestionSearchCard", () => {
       );
       const tvMiniSeriesCard = tvMiniSeriesText.closest("#search-card");
       expect(tvMiniSeriesCard?.textContent).toMatch(
-        "Example TV Mini SeriesSearch Type: MediaMedia Type: TV Mini SeriesRank: 4444Known For: Maria Garcia, James SmithYear: 1982Years: 1982-1982",
+        "Example TV Mini SeriesSearch Type: MediaMedia Type: TV Mini SeriesRank: 4444Known For: Maria Garcia, James SmithYears: 1982-1982",
       );
     });
   });

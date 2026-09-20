@@ -25,7 +25,8 @@
         "action": "debugWithChrome",
         "killOnServerStop": true,
         "pattern": "Local:   http://localhost:([0-9]+)/",
-        "uriFormat": "http://localhost:%s"
+        "uriFormat": "http://localhost:%s",
+        "webRoot": "${workspaceFolder}/movie-info-frontend"
       }
     },
     {

@@ -1,5 +1,7 @@
 import { useRef } from "react";
 import MoviePanel from "./movie/MoviePanel";
+import { type MediaResultType, type MediaType } from "./utilities/constants";
+import { canHaveMoviePanel, canHaveTvSeriesPanel } from "./utilities/utilities";
 
 export interface SuggestionImage {
   height: number;
@@ -13,7 +15,7 @@ export interface Suggestion {
   itemID: string;
   name: string;
   searchType: number | null;
-  mediaType: { value: string } | null;
+  mediaType: MediaResultType | null;
   rank: number | null;
   knownFor: string;
   year: number | null;
@@ -33,6 +35,7 @@ interface SuggestionSearchCardProps {
   // movies), and card clicks are ignored so interacting with the panel
   // doesn't deselect it — the back arrow / ESC key handle that instead.
   expanded?: boolean;
+  mediaType: MediaType | null;
   onClick: () => void;
 }
 
@@ -41,6 +44,7 @@ function SuggestionSearchCard({
   selected,
   deselecting,
   expanded,
+  mediaType,
   onClick,
 }: SuggestionSearchCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
@@ -49,10 +53,8 @@ function SuggestionSearchCard({
       ? (SEARCH_TYPE_LABELS[item.searchType] ?? String(item.searchType))
       : "—";
   const isPerson = searchTypeLabel === "Person";
-  const mediaTypeValue = item.mediaType?.value;
-  const showYears =
-    !isPerson &&
-    (mediaTypeValue === "TV Series" || mediaTypeValue === "TV Mini Series");
+  const showYear = !isPerson && !canHaveTvSeriesPanel(mediaType);
+  const showYears = !isPerson && canHaveTvSeriesPanel(mediaType);
 
   function handleClick() {
     if (expanded) return;
@@ -81,7 +83,7 @@ function SuggestionSearchCard({
   if (expanded) {
     return (
       <div ref={cardRef} id="search-card" className={className}>
-        <MoviePanel imdbId={item.itemID} />
+        {canHaveMoviePanel(mediaType) && <MoviePanel imdbId={item.itemID} />}
       </div>
     );
   }
@@ -111,7 +113,7 @@ function SuggestionSearchCard({
         </p>
         {!isPerson && (
           <p>
-            <strong>Media Type:</strong> {mediaTypeValue ?? "—"}
+            <strong>Media Type:</strong> {mediaType ?? "—"}
           </p>
         )}
         <p>
@@ -120,7 +122,7 @@ function SuggestionSearchCard({
         <p>
           <strong>Known For:</strong> {item.knownFor}
         </p>
-        {!isPerson && (
+        {showYear && (
           <p>
             <strong>Year:</strong> {item.year ?? "—"}
           </p>

@@ -36,7 +36,7 @@ public class SuggestionEndpoint
 
                         List<SuggestionViewModel> suggestionViewModels = new List<SuggestionViewModel>();
                         if (suggestionsResponse == null || suggestionsResponse.Suggestions == null || suggestionsResponse.Suggestions.Length <= 0)
-                            return null;  // TODO: return proper HTML error codes
+                            return Results.Json(suggestionViewModels);  // empty array, so the frontend can always parse the body as JSON
                         foreach (SuggestionDataModel suggestionDataModel in suggestionsResponse.Suggestions)
                         {
                             suggestionViewModels.Add(new SuggestionViewModel(suggestionDataModel));
@@ -46,7 +46,6 @@ public class SuggestionEndpoint
                         Log.Debug($"Username: {username}");
                         Log.Debug($"Suggestions:\n\n{suggestionsResponse}\n\n");   // NOTE: Not destructuring using @ operator because Serilog doesn't let you configure output easily
                                                                                    // (and Seq doesn't support Azure Container Apps, so it's not used in this app)
-
 
                         suggestionViewModelsJson = Results.Json(suggestionViewModels);
                         
