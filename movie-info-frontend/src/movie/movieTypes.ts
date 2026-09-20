@@ -1,4 +1,4 @@
-import type { SuggestionImage } from "../SuggestionSearchCard";
+import type { SuggestionImage } from "../suggestion/SuggestionSearchCard";
 
 // Mirrors MovieInfoBackend's MovieViewModel (and child view models) as
 // serialized by System.Text.Json: camelCase properties, enums as strings.

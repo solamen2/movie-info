@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { MemoryRouter } from "react-router-dom";
-import SuggestionSearch from "../SuggestionSearch";
+import SuggestionSearch from "../suggestion/SuggestionSearch";
 import MoviePanel from "./MoviePanel";
 
 async function searchAndSelectExampleMovie() {

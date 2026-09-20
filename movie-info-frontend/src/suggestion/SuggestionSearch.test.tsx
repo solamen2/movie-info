@@ -58,7 +58,7 @@ describe("SuggestionSearch", () => {
       const searchButton = screen.getByRole("button", { name: "search" });
       fireEvent.click(searchButton);
       const errorSearchResults = await screen.findByText(
-        "Search failed with status 404. Please try again.",
+        "Search failed with status 404: Not a valid search query for mock",
       );
       expect(errorSearchResults).toBeInTheDocument();
     });

@@ -7,14 +7,16 @@ import {
 } from "react";
 import { useNavigate } from "react-router-dom";
 import SuggestionSearchCard, { type Suggestion } from "./SuggestionSearchCard";
+import type { MediaResultType } from "../utilities/constants";
+import { canHaveMoviePanel } from "../utilities/utilities";
 
 // Keep in sync with the `select-fly` / `deselect-fly` animation duration and
 // the `.result-card` width transition duration in App.css.
 const CARD_FLY_MS = 500;
 const CARD_RESIZE_MS = 300;
 
-function hasDetailPanel(item: Suggestion) {
-  return item.mediaType?.value === "Movie";
+function hasDetailPanel(mediaType: MediaResultType | null) {
+  return canHaveMoviePanel(mediaType?.value ?? null);
 }
 
 function SuggestionSearch() {
@@ -95,9 +97,12 @@ function SuggestionSearch() {
       );
 
       if (!response.ok) {
-        setError(
-          `Search failed with status ${String(response.status)}. Please try again.`,
-        );
+        // Error responses may carry a JSON body like { message: "..." }
+        const body = (await response.json().catch(() => null)) as {
+          message?: string;
+        } | null;
+        const status = `Search failed with status ${String(response.status)}`;
+        setError(body?.message ? `${status}: ${body.message}` : `${status}.`);
         return;
       }
 
@@ -122,7 +127,7 @@ function SuggestionSearch() {
       setPreviouslySelectedItemId(prev);
       return prev === itemId ? null : itemId;
     });
-    if (isSelecting && hasDetailPanel(item)) {
+    if (isSelecting && hasDetailPanel(item.mediaType)) {
       phaseTimeoutRef.current = window.setTimeout(() => {
         setExpandedItemId(itemId);
       }, CARD_FLY_MS);
@@ -215,6 +220,7 @@ function SuggestionSearch() {
               previouslySelectedItemId === item.itemID &&
               selectedItemId !== item.itemID
             }
+            mediaType={item.mediaType?.value ?? null}
             onClick={() => {
               handleCardClick(item);
             }}
