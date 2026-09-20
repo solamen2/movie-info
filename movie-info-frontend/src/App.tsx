@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import LoginUser from "./LoginUser";
-import RegisterUser from "./RegisterUser";
-import SuggestionSearch from "./SuggestionSearch";
+import LoginUser from "./user/LoginUser";
+import RegisterUser from "./user/RegisterUser";
+import SuggestionSearch from "./suggestion/SuggestionSearch";
 import "./App.css";
 
 function App() {

@@ -1,7 +1,10 @@
 import { useRef } from "react";
-import MoviePanel from "./movie/MoviePanel";
-import { type MediaResultType, type MediaType } from "./utilities/constants";
-import { canHaveMoviePanel, canHaveTvSeriesPanel } from "./utilities/utilities";
+import MoviePanel from "../movie/MoviePanel";
+import { type MediaResultType, type MediaType } from "../utilities/constants";
+import {
+  canHaveMoviePanel,
+  canHaveTvSeriesPanel,
+} from "../utilities/utilities";
 
 export interface SuggestionImage {
   height: number;

@@ -7,8 +7,8 @@ import {
 } from "react";
 import { useNavigate } from "react-router-dom";
 import SuggestionSearchCard, { type Suggestion } from "./SuggestionSearchCard";
-import type { MediaResultType } from "./utilities/constants";
-import { canHaveMoviePanel } from "./utilities/utilities";
+import type { MediaResultType } from "../utilities/constants";
+import { canHaveMoviePanel } from "../utilities/utilities";
 
 // Keep in sync with the `select-fly` / `deselect-fly` animation duration and
 // the `.result-card` width transition duration in App.css.
