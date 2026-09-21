@@ -123,7 +123,7 @@ public record MovieViewModel
     public string ImdbId { get; }
     public string Title { get; }
     public int? ImdbRank { get; }
-    public string KnownForActors { get; }
+    public string? KnownForActors { get; }
     public int? Year { get; }
     public string Rated { get; }
     public string OmdbGenres { get; }
