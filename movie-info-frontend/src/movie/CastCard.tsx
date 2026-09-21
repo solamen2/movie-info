@@ -1,11 +1,12 @@
-import { type MovieCast, tmdbImageUrl } from "./movieTypes";
+import { type MovieCast } from "./movieTypes";
+import { getTmdbImageUrl } from "../utilities/utilities";
 
 interface CastCardProps {
   cast: MovieCast;
 }
 
 function CastCard({ cast }: CastCardProps) {
-  const imageUrl = tmdbImageUrl(cast.profilePath, "w185");
+  const imageUrl = getTmdbImageUrl(cast.profilePath, "w185");
 
   return (
     <div className="person-card" data-testid="cast-card">

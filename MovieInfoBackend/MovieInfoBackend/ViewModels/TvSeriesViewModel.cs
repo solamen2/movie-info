@@ -168,7 +168,7 @@ public record TvSeriesViewModel
     public string ImdbId { get; }
     public string Name { get; }
     public int? ImdbRank { get; }
-    public string KnownForActors { get; }
+    public string? KnownForActors { get; }
     public int? FirstYear { get; }
     public string? Years { get; }
     public string Rated { get; }

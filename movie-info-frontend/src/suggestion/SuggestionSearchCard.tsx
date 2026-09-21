@@ -1,9 +1,12 @@
 import { useRef } from "react";
 import MoviePanel from "../movie/MoviePanel";
+import PersonPanel from "../person/PersonPanel";
 import { type MediaResultType, type MediaType } from "../utilities/constants";
 import {
   canHaveMoviePanel,
+  canHavePersonPanel,
   canHaveTvSeriesPanel,
+  getSearchTypeLabel,
 } from "../utilities/utilities";
 
 export interface SuggestionImage {
@@ -25,17 +28,12 @@ export interface Suggestion {
   years: string | null;
 }
 
-const SEARCH_TYPE_LABELS: Record<number, string> = {
-  0: "Person",
-  1: "Media",
-};
-
 interface SuggestionSearchCardProps {
   item: Suggestion;
   selected: boolean;
   deselecting?: boolean;
   // When true the card has grown into a full detail panel (currently only
-  // movies), and card clicks are ignored so interacting with the panel
+  // movies and people), and card clicks are ignored so interacting with the panel
   // doesn't deselect it — the back arrow / ESC key handle that instead.
   expanded?: boolean;
   mediaType: MediaType | null;
@@ -51,10 +49,7 @@ function SuggestionSearchCard({
   onClick,
 }: SuggestionSearchCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
-  const searchTypeLabel =
-    item.searchType != null
-      ? (SEARCH_TYPE_LABELS[item.searchType] ?? String(item.searchType))
-      : "—";
+  const searchTypeLabel = getSearchTypeLabel(item.searchType);
   const isPerson = searchTypeLabel === "Person";
   const showYear = !isPerson && !canHaveTvSeriesPanel(mediaType);
   const showYears = !isPerson && canHaveTvSeriesPanel(mediaType);
@@ -87,6 +82,9 @@ function SuggestionSearchCard({
     return (
       <div ref={cardRef} id="search-card" className={className}>
         {canHaveMoviePanel(mediaType) && <MoviePanel imdbId={item.itemID} />}
+        {canHavePersonPanel(isPerson, mediaType) && (
+          <PersonPanel imdbId={item.itemID} />
+        )}
       </div>
     );
   }

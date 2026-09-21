@@ -40,7 +40,7 @@ public record SuggestionViewModel
     public SearchResultType? SearchType { get; }
     public MediaResultType? MediaType { get; }
     public int? Rank { get; }
-    public string KnownFor { get; }
+    public string? KnownFor { get; }
     public int? Year { get; }
     public string? Years { get; }
 
