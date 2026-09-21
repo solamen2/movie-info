@@ -161,7 +161,7 @@ test("Basic happy path: search, check results are valid, select a movie search c
   );
   for (const [index, [, content]] of expectedMovie.sections.entries()) {
     const section = sections.nth(index);
-    const sectionBody = section.locator(".movie-collapsible-body");
+    const sectionBody = section.locator(".collapsible-body");
     await expect(sectionBody).toBeHidden();
     await section.locator("summary").click();
     await expect(sectionBody).toBeVisible();
@@ -178,6 +178,147 @@ test("Basic happy path: search, check results are valid, select a movie search c
     expect(await movieCard.textContent()).toContain(cardText);
   }
   console.log("Basic happy path test finished.");
+});
+
+// Real data is limited to values that are unlikely to change over time (so no
+// rank, "known for" text, or credit counts).
+const expectedPerson = useMockHttpCalls
+  ? {
+      searchText: "1",
+      name: "Example Smith",
+      cardText: [
+        "Example SmithSearch Type: PersonRank: ",
+        "3Known For: Actress, Example Film",
+      ],
+      imdbRow: /IMDB: 3Link/,
+      imdbUrl: "https://www.imdb.com/name/nm9000000",
+      facts: [
+        "Known ForActress, Example Film",
+        "Known For DepartmentActing",
+        "Also Known AsExample Smithee, Betsy Smith",
+        "BirthdayApr 14, 1977",
+        "Deathday—",
+        "Place of BirthNew York City, New York, USA",
+        "GenderFemale",
+        "Homepagehttps://example.com/example-smith",
+      ],
+      sections: [
+        ["Biography", "She is especially known for Example Film."],
+        ["Movie Cast Credits", "Example Hero"],
+        ["Movie Crew Credits", "Executive Producer"],
+        ["TV Series Cast Credits", "Example Slayer"],
+        ["TV Series Crew Credits", "None"],
+        ["Profile Images", ""],
+      ],
+    }
+  : {
+      searchText: "Sarah Michelle Gellar",
+      name: "Sarah Michelle Gellar",
+      cardText: [
+        "Sarah Michelle GellarSearch Type: PersonRank: ",
+        "Known For: ",
+      ],
+      imdbRow: /IMDB: \d+Link/,
+      imdbUrl: "https://www.imdb.com/name/nm0001264",
+      facts: [
+        "Known For DepartmentActing",
+        "BirthdayApr 14, 1977",
+        "Deathday—",
+        "Place of BirthNew York City, New York, USA",
+        "GenderFemale",
+      ],
+      sections: [
+        ["Biography", "Gellar"],
+        ["Movie Cast Credits", "Cruel Intentions"],
+        ["Movie Crew Credits", ""],
+        ["TV Series Cast Credits", "Buffy the Vampire Slayer"],
+        ["TV Series Crew Credits", "Ringer"],
+        ["Profile Images", ""],
+      ],
+    };
+
+test("Person happy path: search, check results are valid, select a person search card, check the person panel is valid, and unselect the card", async ({
+  page,
+}) => {
+  console.log("Starting person happy path test...");
+  const searchQueryInput = page.getByRole("textbox", {
+    name: "search-query-input",
+  });
+  await searchQueryInput.fill(expectedPerson.searchText);
+  const searchButton = page.getByRole("button", { name: "search" });
+  await searchButton.click();
+
+  const personTextElement = page
+    .getByText(expectedPerson.name, { exact: true })
+    .first();
+  const personCard = personTextElement.locator("ancestor=#search-card");
+  for (const cardText of expectedPerson.cardText) {
+    expect(await personCard.textContent()).toContain(cardText);
+  }
+  const resultsMessage = page.getByText(/^\d+ results\.$/);
+  await expect(resultsMessage).toBeVisible();
+
+  console.log("Selecting the person search card...");
+  await personCard.click();
+  const backButton = page.getByRole("button", { name: "back" });
+  await expect(backButton).toBeVisible();
+  await expect(resultsMessage).toBeHidden();
+
+  const personPanel = page.getByTestId("person-panel");
+  await expect(personPanel).toBeVisible();
+  const selectedCard = page.locator("#search-card.selected.expanded");
+  await expect(selectedCard).toHaveCount(1);
+  await expect(
+    personPanel.getByRole("heading", {
+      name: expectedPerson.name,
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(personPanel).toContainText(expectedPerson.imdbRow);
+  const imdbLink = personPanel.getByRole("link", { name: "Link", exact: true });
+  await expect(imdbLink).toHaveAttribute("href", expectedPerson.imdbUrl);
+  await expect(imdbLink).toHaveAttribute("target", "_blank");
+  await expect(
+    personPanel.getByRole("button", { name: "copy-imdb-link" }),
+  ).toBeVisible();
+  for (const fact of expectedPerson.facts) {
+    await expect(personPanel).toContainText(fact);
+  }
+
+  console.log("Checking the collapsible sections...");
+  const sections = personPanel.locator("details");
+  await expect(sections.locator("summary")).toHaveText(
+    expectedPerson.sections.map(
+      ([title]) => new RegExp(`^${escapeRegExp(title)}`),
+    ),
+  );
+  for (const [index, [, content]] of expectedPerson.sections.entries()) {
+    const section = sections.nth(index);
+    const sectionBody = section.locator(".collapsible-body");
+    await expect(sectionBody).toBeHidden();
+    await section.locator("summary").click();
+    await expect(sectionBody).toBeVisible();
+    await expect(sectionBody).toContainText(content);
+  }
+
+  console.log("Checking the page does not scroll horizontally...");
+  const hasHorizontalScrollbar = await page.evaluate(
+    () =>
+      document.documentElement.scrollWidth >
+      document.documentElement.clientWidth,
+  );
+  expect(hasHorizontalScrollbar).toBe(false);
+
+  console.log("Unselecting the person search card...");
+  await page.keyboard.press("Escape");
+  await expect(personPanel).toBeHidden();
+  await expect(page.locator("#search-card.selected")).toHaveCount(0);
+  await expect(backButton).toBeHidden();
+  await expect(resultsMessage).toBeVisible();
+  for (const cardText of expectedPerson.cardText) {
+    expect(await personCard.textContent()).toContain(cardText);
+  }
+  console.log("Person happy path test finished.");
 });
 
 function escapeRegExp(text: string): string {

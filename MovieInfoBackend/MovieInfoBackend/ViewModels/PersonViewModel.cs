@@ -49,7 +49,7 @@ public record PersonViewModel
     public string ImdbId { get; }
     public string Name { get; }
     public int? ImdbRank { get; }
-    public string KnownForMovies { get; }
+    public string? KnownForMovies { get; }
     public List<string> AlsoKnownAs { get; }
     public string? Biography { get; }
     public string Birthday { get; }  // Actually a date, of course

@@ -2,6 +2,7 @@ import { http, HttpResponse } from "msw";
 import searchDataJson1 from "./data/searchData1.json" with { type: "json" };
 import searchDataJson2 from "./data/searchData2.json" with { type: "json" };
 import movieDataJson1 from "./data/movieData1.json" with { type: "json" };
+import personDataJson1 from "./data/personData1.json" with { type: "json" };
 
 type LoginPathParams = object;
 
@@ -87,6 +88,19 @@ export const handlers = [
 
     if (imdbId === movieDataJson1.imdbId) {
       return HttpResponse.json(movieDataJson1, { status: 200 });
+    }
+    return HttpResponse.json(
+      { error: "Not a valid IMDB ID for mock" },
+      { status: 404 },
+    );
+  }),
+
+  http.get("/api/person", ({ request }) => {
+    const url = new URL(request.url);
+    const imdbId = url.searchParams.get("imdbId");
+
+    if (imdbId === personDataJson1.imdbId) {
+      return HttpResponse.json(personDataJson1, { status: 200 });
     }
     return HttpResponse.json(
       { error: "Not a valid IMDB ID for mock" },

@@ -1,11 +1,12 @@
-import { type WatchProvider, tmdbImageUrl } from "./movieTypes";
+import { type WatchProvider } from "./movieTypes";
+import { getTmdbImageUrl } from "../utilities/utilities";
 
 interface WatchProviderCardProps {
   provider: WatchProvider;
 }
 
 function WatchProviderCard({ provider }: WatchProviderCardProps) {
-  const logoUrl = tmdbImageUrl(provider.logoPath, "w92");
+  const logoUrl = getTmdbImageUrl(provider.logoPath, "w92");
 
   return (
     <div className="watch-provider-card" data-testid="watch-provider-card">

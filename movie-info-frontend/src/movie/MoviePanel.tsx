@@ -1,4 +1,8 @@
-import { type ReactNode, useEffect, useRef, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
+import Collapsible from "../shared/Collapsible";
+import HorizontalList from "../shared/HorizontalList";
+import ImdbRow, { ImdbRowSeparator } from "../shared/ImdbRow";
+import { displayDate, displayText } from "../utilities/utilities";
 import CastCard from "./CastCard";
 import CrewCard from "./CrewCard";
 import WatchProviderCard from "./WatchProviderCard";
@@ -8,17 +12,8 @@ import {
   type WatchProvider,
   imdbTitleUrl,
 } from "./movieTypes";
+import "../shared/shared.css";
 import "./movie.css";
-
-const COPY_FEEDBACK_MS = 1500;
-
-// OMDB uses "N/A" for missing values, and the backend substitutes empty
-// strings when OMDB returns nothing at all.
-function displayText(value: string | number | null | undefined): string {
-  if (value == null) return "—";
-  const text = String(value).trim();
-  return text === "" || text === "N/A" ? "—" : text;
-}
 
 // OMDB genre names (lowercased) that differ from TMDB's name for the same genre.
 const OMDB_GENRE_ALIASES: Record<string, string> = {
@@ -58,52 +53,6 @@ function displayRuntime(minutes: number): string {
   const hours = Math.floor(minutes / 60);
   const mins = minutes % 60;
   return hours > 0 ? `${String(hours)}h ${String(mins)}m` : `${String(mins)}m`;
-}
-
-function displayDate(isoDate: string): string {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(isoDate)) return displayText(isoDate);
-  return new Date(`${isoDate}T00:00:00Z`).toLocaleDateString("en-US", {
-    timeZone: "UTC",
-    dateStyle: "medium",
-  });
-}
-
-function ImdbRowSeparator() {
-  return (
-    <span
-      className="imdb-row-separator"
-      role="separator"
-      aria-orientation="vertical"
-    />
-  );
-}
-
-interface CollapsibleProps {
-  title: string;
-  count?: number;
-  children: ReactNode;
-}
-
-function Collapsible({ title, count, children }: CollapsibleProps) {
-  return (
-    <details className="movie-collapsible">
-      <summary>
-        <span className="chevron" aria-hidden="true" />
-        {title}
-        {count != null && (
-          <span className="movie-collapsible-count">({count})</span>
-        )}
-      </summary>
-      <div className="movie-collapsible-body">{children}</div>
-    </details>
-  );
-}
-
-function HorizontalList({ children }: { children: ReactNode[] }) {
-  if (children.length === 0) {
-    return <p className="movie-empty">None</p>;
-  }
-  return <div className="horizontal-list">{children}</div>;
 }
 
 function CrewSection({ title, crew }: { title: string; crew: MovieCrew[] }) {
@@ -146,10 +95,6 @@ interface MoviePanelProps {
 function MoviePanel({ imdbId }: MoviePanelProps) {
   const [movie, setMovie] = useState<Movie | null>(null);
   const [error, setError] = useState("");
-  const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "failed">(
-    "idle",
-  );
-  const copyTimeoutRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -185,15 +130,9 @@ function MoviePanel({ imdbId }: MoviePanelProps) {
     };
   }, [imdbId]);
 
-  useEffect(() => {
-    return () => {
-      window.clearTimeout(copyTimeoutRef.current);
-    };
-  }, []);
-
   if (error) {
     return (
-      <div className="movie-panel">
+      <div className="detail-panel">
         <p className="error-message">{error}</p>
       </div>
     );
@@ -201,8 +140,8 @@ function MoviePanel({ imdbId }: MoviePanelProps) {
 
   if (!movie) {
     return (
-      <div className="movie-panel">
-        <p className="movie-loading">Loading movie details…</p>
+      <div className="detail-panel">
+        <p className="detail-loading">Loading movie details…</p>
       </div>
     );
   }
@@ -213,19 +152,6 @@ function MoviePanel({ imdbId }: MoviePanelProps) {
   const sortedCast = [...movie.cast].sort(
     (a, b) => a.billedOrder - b.billedOrder,
   );
-
-  async function handleCopy() {
-    window.clearTimeout(copyTimeoutRef.current);
-    try {
-      await navigator.clipboard.writeText(`<a href="${imdbUrl}">Link</a>`);
-      setCopyStatus("copied");
-    } catch {
-      setCopyStatus("failed");
-    }
-    copyTimeoutRef.current = window.setTimeout(() => {
-      setCopyStatus("idle");
-    }, COPY_FEEDBACK_MS);
-  }
 
   const facts: [string, ReactNode][] = [
     ["Original Title", displayText(movie.originalTitle)],
@@ -254,53 +180,35 @@ function MoviePanel({ imdbId }: MoviePanelProps) {
   ];
 
   return (
-    <div className="movie-panel" data-testid="movie-panel">
-      <div className="movie-panel-top">
+    <div className="detail-panel" data-testid="movie-panel">
+      <div className="detail-panel-top">
         {movie.image ? (
           <img
             src={movie.image.imageURL}
             alt={movie.title}
-            className="movie-poster"
+            className="detail-poster"
           />
         ) : (
-          <div className="movie-poster card-image-placeholder">No image</div>
+          <div className="detail-poster card-image-placeholder">No image</div>
         )}
-        <div className="movie-panel-heading">
-          <h2 className="movie-title">{movie.title}</h2>
+        <div className="detail-panel-heading">
+          <h2 className="detail-title">{movie.title}</h2>
           {movie.tagline && <p className="movie-tagline">{movie.tagline}</p>}
-          <p className="imdb-row">
-            <span>
-              <span className="imdb-row-label">IMDB:</span> {imdbRating}
-              {imdbRating !== "—" && imdbVotes !== "—" && (
-                <>
-                  {" "}
-                  <span className="imdb-row-votes">({imdbVotes})</span>
-                </>
-              )}
-              <ImdbRowSeparator />
-              <span className="imdb-row-label">Rank:</span>{" "}
-              {displayText(movie.imdbRank)}
-              <ImdbRowSeparator />
-              <a href={imdbUrl} target="_blank" rel="noopener">
-                Link
-              </a>
-            </span>
-            <button
-              type="button"
-              aria-label="copy-imdb-link"
-              className="copy-button"
-              onClick={handleCopy}
-            >
-              {copyStatus === "copied"
-                ? "Copied!"
-                : copyStatus === "failed"
-                  ? "Failed"
-                  : "Copy"}
-            </button>
-          </p>
-          <dl className="movie-facts">
+          <ImdbRow imdbUrl={imdbUrl}>
+            <span className="imdb-row-label">IMDB:</span> {imdbRating}
+            {imdbRating !== "—" && imdbVotes !== "—" && (
+              <>
+                {" "}
+                <span className="imdb-row-votes">({imdbVotes})</span>
+              </>
+            )}
+            <ImdbRowSeparator />
+            <span className="imdb-row-label">Rank:</span>{" "}
+            {displayText(movie.imdbRank)}
+          </ImdbRow>
+          <dl className="detail-facts">
             {facts.map(([label, value]) => (
-              <div className="movie-fact" key={label}>
+              <div className="detail-fact" key={label}>
                 <dt>{label}</dt>
                 <dd>{value}</dd>
               </div>
@@ -309,7 +217,7 @@ function MoviePanel({ imdbId }: MoviePanelProps) {
         </div>
       </div>
 
-      <div className="movie-sections">
+      <div className="detail-sections">
         <Collapsible title="Cast" count={movie.cast.length}>
           <HorizontalList>
             {sortedCast.map((c) => (
@@ -320,10 +228,10 @@ function MoviePanel({ imdbId }: MoviePanelProps) {
         <CrewSection title="Directors" crew={movie.directors} />
         <CrewSection title="Writers" crew={movie.writers} />
         <Collapsible title="Plot (TMDB)">
-          <p className="movie-prose">{displayText(movie.tmdbPlot)}</p>
+          <p className="detail-prose">{displayText(movie.tmdbPlot)}</p>
         </Collapsible>
         <Collapsible title="Plot (OMDB)">
-          <p className="movie-prose">{displayText(movie.omdbPlot)}</p>
+          <p className="detail-prose">{displayText(movie.omdbPlot)}</p>
         </Collapsible>
         <WatchProviderSection
           title="Where to Stream"

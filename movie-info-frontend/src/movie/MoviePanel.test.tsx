@@ -250,7 +250,7 @@ describe("MoviePanel", () => {
     });
   });
 
-  describe("When a non-movie search card is selected", () => {
+  describe("When a search card without a detail panel is selected", () => {
     it("Should not expand into a movie panel", async () => {
       render(
         <MemoryRouter>
@@ -263,17 +263,17 @@ describe("MoviePanel", () => {
       );
       fireEvent.click(screen.getByRole("button", { name: "search" }));
 
-      const personCard = (await screen.findByText("Example Smith")).closest(
-        "#search-card",
-      );
-      if (!personCard) {
-        throw new Error("Person search card not found");
+      const tvSeriesCard = (
+        await screen.findByText("Example TV Series")
+      ).closest("#search-card");
+      if (!tvSeriesCard) {
+        throw new Error("TV series search card not found");
       }
-      fireEvent.click(personCard);
+      fireEvent.click(tvSeriesCard);
 
       await new Promise((resolve) => setTimeout(resolve, 700));
-      expect(personCard.classList.contains("selected")).toBe(true);
-      expect(personCard.classList.contains("expanded")).toBe(false);
+      expect(tvSeriesCard.classList.contains("selected")).toBe(true);
+      expect(tvSeriesCard.classList.contains("expanded")).toBe(false);
       expect(screen.queryByTestId("movie-panel")).not.toBeInTheDocument();
     });
   });

@@ -7,16 +7,23 @@ import {
 } from "react";
 import { useNavigate } from "react-router-dom";
 import SuggestionSearchCard, { type Suggestion } from "./SuggestionSearchCard";
-import type { MediaResultType } from "../utilities/constants";
-import { canHaveMoviePanel } from "../utilities/utilities";
+import {
+  canHaveMoviePanel,
+  canHavePersonPanel,
+  getSearchTypeLabel,
+} from "../utilities/utilities";
 
 // Keep in sync with the `select-fly` / `deselect-fly` animation duration and
 // the `.result-card` width transition duration in App.css.
 const CARD_FLY_MS = 500;
 const CARD_RESIZE_MS = 300;
 
-function hasDetailPanel(mediaType: MediaResultType | null) {
-  return canHaveMoviePanel(mediaType?.value ?? null);
+function hasDetailPanel(item: Suggestion) {
+  const mediaType = item.mediaType?.value ?? null;
+  const isPerson = getSearchTypeLabel(item.searchType) === "Person";
+  return (
+    canHaveMoviePanel(mediaType) || canHavePersonPanel(isPerson, mediaType)
+  );
 }
 
 function SuggestionSearch() {
@@ -127,7 +134,7 @@ function SuggestionSearch() {
       setPreviouslySelectedItemId(prev);
       return prev === itemId ? null : itemId;
     });
-    if (isSelecting && hasDetailPanel(item.mediaType)) {
+    if (isSelecting && hasDetailPanel(item)) {
       phaseTimeoutRef.current = window.setTimeout(() => {
         setExpandedItemId(itemId);
       }, CARD_FLY_MS);

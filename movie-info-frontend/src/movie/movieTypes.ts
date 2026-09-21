@@ -78,17 +78,6 @@ export interface Movie {
   watchProvidersRent: WatchProvider[];
 }
 
-// TMDB returns image paths relative to its image CDN (e.g. "/abc123.jpg").
-// See https://developer.themoviedb.org/docs/image-basics
-const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p";
-
-export function tmdbImageUrl(
-  path: string | null,
-  size: "w92" | "w185",
-): string | null {
-  return path ? `${TMDB_IMAGE_BASE_URL}/${size}${path}` : null;
-}
-
 export function imdbTitleUrl(imdbId: string): string {
   return `https://www.imdb.com/title/${imdbId}`;
 }

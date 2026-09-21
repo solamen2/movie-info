@@ -1,11 +1,12 @@
-import { type MovieCrew, tmdbImageUrl } from "./movieTypes";
+import { type MovieCrew } from "./movieTypes";
+import { getTmdbImageUrl } from "../utilities/utilities";
 
 interface CrewCardProps {
   crew: MovieCrew;
 }
 
 function CrewCard({ crew }: CrewCardProps) {
-  const imageUrl = tmdbImageUrl(crew.profilePath, "w185");
+  const imageUrl = getTmdbImageUrl(crew.profilePath, "w185");
 
   return (
     <div className="person-card" data-testid="crew-card">

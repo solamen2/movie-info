@@ -1,0 +1,118 @@
+{
+  "id": "7d1c2b3a-4e5f-4a6b-8c7d-9e0f1a2b3c4d",
+  "image": {
+    "height": 2048,
+    "imageURL": "https://example.com/example1.jpg",
+    "width": 1359
+  },
+  "imdbId": "nm9000000",
+  "name": "Example Smith",
+  "imdbRank": 3,
+  "knownForMovies": "Actress, Example Film",
+  "alsoKnownAs": ["Example Smithee", "Betsy Smith"],
+  "biography": "Example Smith (born April 14, 1977) is an example actress.\n\nShe is especially known for Example Film.",
+  "birthday": "1977-04-14",
+  "deathday": null,
+  "gender": "Female",
+  "homepage": "https://example.com/example-smith",
+  "tmdbId": 80001,
+  "knownForDepartment": "Acting",
+  "placeOfBirth": "New York City, New York, USA",
+  "profilePath": "/exampleSmithProfile.jpg",
+  "movieCastCredits": [
+    {
+      "id": "mc1",
+      "stillPath": "/exampleOldFilmStill.jpg",
+      "tmdbId": 81001,
+      "title": "Example Old Film",
+      "originalTitle": "Example Old Film",
+      "popularity": 1.5,
+      "posterPath": "/exampleOldFilm.jpg",
+      "releaseDate": "1999-03-05",
+      "isVideo": false,
+      "character": "Example Sidekick"
+    },
+    {
+      "id": "mc2",
+      "stillPath": null,
+      "tmdbId": 81002,
+      "title": "Example Film",
+      "originalTitle": "Film d'exemple",
+      "popularity": 9.25,
+      "posterPath": null,
+      "releaseDate": "2006-11-10",
+      "isVideo": false,
+      "character": "Example Hero"
+    },
+    {
+      "id": "mc3",
+      "stillPath": null,
+      "tmdbId": 81003,
+      "title": "Example Upcoming Film",
+      "originalTitle": "Example Upcoming Film",
+      "popularity": 0.5,
+      "posterPath": null,
+      "releaseDate": "",
+      "isVideo": false,
+      "character": ""
+    }
+  ],
+  "movieCrewCredits": [
+    {
+      "id": "mw1",
+      "stillPath": "/exampleProducedFilmStill.jpg",
+      "tmdbId": 82001,
+      "title": "Example Produced Film",
+      "originalTitle": "Example Produced Film",
+      "popularity": 1.75,
+      "posterPath": "/exampleProducedFilm.jpg",
+      "releaseDate": "2004-08-27",
+      "isVideo": false,
+      "department": "Production",
+      "job": "Executive Producer"
+    }
+  ],
+  "tvSeriesCastCredits": [
+    {
+      "id": "tc1",
+      "backdropPath": "/exampleShowBackdrop.jpg",
+      "tmdbId": 83001,
+      "originalName": "Example Show",
+      "popularity": 48.05,
+      "posterPath": "/exampleShow.jpg",
+      "firstAirDate": "1997-03-10",
+      "name": "Example Show",
+      "character": "Example Slayer",
+      "episodeCount": 144,
+      "firstCreditAirDate": "1997-03-10"
+    },
+    {
+      "id": "tc2",
+      "backdropPath": null,
+      "tmdbId": 83002,
+      "originalName": "Example Talk Show",
+      "popularity": 3.5,
+      "posterPath": null,
+      "firstAirDate": "1992-05-25",
+      "name": "Example Talk Show",
+      "character": "Self",
+      "episodeCount": 1,
+      "firstCreditAirDate": "2011-09-13"
+    }
+  ],
+  "tvSeriesCrewCredits": [],
+  "profileImages": [
+    {
+      "id": "pi1",
+      "height": 2813,
+      "filePath": "/exampleSmithProfile.jpg",
+      "width": 1875
+    },
+    {
+      "id": "pi2",
+      "height": 1500,
+      "filePath": "/exampleSmithProfile2.jpg",
+      "width": 1000
+    }
+  ]
+}
