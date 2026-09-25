@@ -30,8 +30,8 @@ public record PersonTvSeriesCrewViewModel
     public string? FirstAirDate { get; }  // Actually a date, of course
     public string Name { get; }
     public string Department { get; }
-    public int EpisodeCount { get; }
-    public string FirstCreditAirDate { get; }  // Actually a date, of course
+    public int? EpisodeCount { get; }
+    public string? FirstCreditAirDate { get; }  // Actually a date, of course
     public string Job { get; }
 
     public override string ToString()

@@ -39,9 +39,9 @@ public record TmdbPersonTvSeriesCrewDataModel  // NOTE: More of a TV series desc
     [JsonPropertyName("department")]
     public required string Department { get; init; }
     [JsonPropertyName("episode_count")]
-    public required int EpisodeCount { get; init; }
+    public int? EpisodeCount { get; init; }
     [JsonPropertyName("first_credit_air_date")]
-    public required string FirstCreditAirDate { get; init; }
+    public string? FirstCreditAirDate { get; init; }
     [JsonPropertyName("job")]
     public required string Job { get; init; }
 
