@@ -99,7 +99,7 @@ function PersonPanel({ imdbId }: PersonPanelProps) {
     ["Known For", displayText(person.knownForMovies)],
     ["Known For Department", displayText(person.knownForDepartment)],
     ["Also Known As", displayText(person.alsoKnownAs.join(", "))],
-    ["Birthday", displayDate(person.birthday)],
+    ["Birthday", displayDate(person.birthday)], // TODO: Show age too
     ["Deathday", displayDate(person.deathday)],
     ["Place of Birth", displayText(person.placeOfBirth)],
     ["Gender", GENDER_LABELS[person.gender]],
@@ -131,6 +131,7 @@ function PersonPanel({ imdbId }: PersonPanelProps) {
           <h2 className="detail-title">{person.name}</h2>
           <ImdbRow imdbUrl={imdbNameUrl(person.imdbId)}>
             <span className="imdb-row-label">IMDB:</span>{" "}
+            <span className="imdb-row-label">Rank:</span>{" "}
             {displayText(person.imdbRank)}
           </ImdbRow>
           <dl className="detail-facts">

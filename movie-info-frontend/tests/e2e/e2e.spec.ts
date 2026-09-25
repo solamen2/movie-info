@@ -190,7 +190,7 @@ const expectedPerson = useMockHttpCalls
         "Example SmithSearch Type: PersonRank: ",
         "3Known For: Actress, Example Film",
       ],
-      imdbRow: /IMDB: 3Link/,
+      imdbRow: /IMDB: Rank: 3Link/,
       imdbUrl: "https://www.imdb.com/name/nm9000000",
       facts: [
         "Known ForActress, Example Film",
@@ -218,7 +218,7 @@ const expectedPerson = useMockHttpCalls
         "Sarah Michelle GellarSearch Type: PersonRank: ",
         "Known For: ",
       ],
-      imdbRow: /IMDB: \d+Link/,
+      imdbRow: /IMDB: Rank: \d+Link/,
       imdbUrl: "https://www.imdb.com/name/nm0001264",
       facts: [
         "Known For DepartmentActing",
