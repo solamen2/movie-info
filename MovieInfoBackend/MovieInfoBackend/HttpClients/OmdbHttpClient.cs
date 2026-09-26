@@ -1,5 +1,4 @@
 using System.Text.Json;
-using System.Web;
 using Microsoft.Net.Http.Headers;
 using MovieInfoBackend.DataModels;
 
@@ -20,7 +19,7 @@ public class OmdbHttpClient
 
     public async Task<OmdbResponseDataModel?> GetMedia(string imdbId)
     {
-        using HttpResponseMessage response = await _httpClient.GetAsync($"?i={HttpUtility.HtmlEncode(imdbId)}&apikey={_apiKey}&plot=full");
+        using HttpResponseMessage response = await _httpClient.GetAsync($"?i={Uri.EscapeDataString(imdbId)}&apikey={_apiKey}&plot=full");
         if (response.StatusCode != System.Net.HttpStatusCode.OK)
         {
             return null;
