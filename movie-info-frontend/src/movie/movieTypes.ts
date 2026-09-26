@@ -1,9 +1,8 @@
+import type { TmdbGender, WatchProvider } from "../shared/sharedTypes";
 import type { SuggestionImage } from "../suggestion/SuggestionSearchCard";
 
 // Mirrors MovieInfoBackend's MovieViewModel (and child view models) as
 // serialized by System.Text.Json: camelCase properties, enums as strings.
-
-export type TmdbGender = "NotSetNotSpecified" | "Female" | "Male" | "NonBinary";
 
 export interface MovieCast {
   id: string;
@@ -28,13 +27,6 @@ export interface MovieCrew {
   profilePath: string | null;
   department: string;
   job: string;
-}
-
-export interface WatchProvider {
-  id: string;
-  logoPath: string | null;
-  providerName: string;
-  displayPriority: number;
 }
 
 export interface Movie {

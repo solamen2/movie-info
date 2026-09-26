@@ -1,0 +1,161 @@
+/* TV series-specific styles; the shared panel layout and the person / watch
+   provider cards live in ../shared/shared.css */
+
+/* Season cards shown in the horizontally scrolling seasons row. They are
+   wide, with the poster beside the details, so opening the overview doesn't
+   stretch the card much. */
+.season-card {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+  width: 300px;
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 0.5rem;
+}
+
+.season-card-top {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+}
+
+.season-card-image {
+  display: block;
+  flex: 0 0 auto;
+  width: 90px;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.season-card-image-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #333;
+  color: #999;
+  font-size: 0.8rem;
+}
+
+.season-card-details {
+  min-width: 0;
+}
+
+.season-card-name {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.season-card-secondary {
+  margin: 0.15rem 0 0;
+  font-size: 0.8rem;
+  line-height: 1.3;
+  opacity: 0.75;
+  overflow-wrap: anywhere;
+}
+
+.season-card .collapsible {
+  margin-top: 0.4rem;
+  border-top: 1px solid #444;
+  border-bottom: none;
+}
+
+.season-card .collapsible summary {
+  padding: 0.4rem 0.1rem;
+  font-size: 0.85rem;
+}
+
+.season-card .collapsible-body {
+  padding: 0 0.1rem 0.4rem;
+}
+
+.season-card .detail-prose {
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.season-card-expand {
+  margin-top: auto;
+  width: 100%;
+  padding: 0.7em 1em;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+/* Network cards shown in the horizontally scrolling networks row */
+.network-card {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+  width: 120px;
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 0.5rem;
+  text-align: center;
+}
+
+.network-logo {
+  display: block;
+  width: 92px;
+  height: 46px;
+  margin: 0 auto;
+  object-fit: contain;
+  border-radius: 4px;
+  /* Network logos are usually dark or transparent, so give them a light
+     backing in both color schemes */
+  background: #f2f2f2;
+  padding: 0.25rem;
+  box-sizing: border-box;
+}
+
+.network-logo-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #333;
+  color: #999;
+  font-size: 0.75rem;
+}
+
+.network-name {
+  margin: 0.35rem 0 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.network-country {
+  margin: 0.1rem 0 0;
+  font-size: 0.75rem;
+  line-height: 1.3;
+  opacity: 0.75;
+}
+
+@media (prefers-color-scheme: light) {
+  .season-card,
+  .season-card .collapsible,
+  .network-card {
+    border-color: #ccc;
+  }
+
+  .season-card-image-placeholder,
+  .network-logo-placeholder {
+    background: #e8e8e8;
+    color: #888;
+  }
+}
+
+@media (max-width: 640px) {
+  .season-card {
+    width: 260px;
+  }
+
+  .network-card {
+    width: 110px;
+  }
+}

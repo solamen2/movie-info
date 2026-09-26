@@ -190,7 +190,7 @@ const expectedPerson = useMockHttpCalls
         "Example SmithSearch Type: PersonRank: ",
         "3Known For: Actress, Example Film",
       ],
-      imdbRow: /IMDB: 3Link/,
+      imdbRow: /IMDB: Rank: 3Link/,
       imdbUrl: "https://www.imdb.com/name/nm9000000",
       facts: [
         "Known ForActress, Example Film",
@@ -218,7 +218,7 @@ const expectedPerson = useMockHttpCalls
         "Sarah Michelle GellarSearch Type: PersonRank: ",
         "Known For: ",
       ],
-      imdbRow: /IMDB: \d+Link/,
+      imdbRow: /IMDB: Rank: \d+Link/,
       imdbUrl: "https://www.imdb.com/name/nm0001264",
       facts: [
         "Known For DepartmentActing",
@@ -319,6 +319,212 @@ test("Person happy path: search, check results are valid, select a person search
     expect(await personCard.textContent()).toContain(cardText);
   }
   console.log("Person happy path test finished.");
+});
+
+// Real data is limited to values that are unlikely to change over time (so no
+// rating, vote count, rank, "known for" text, credit counts, or watch
+// providers).
+const expectedTvSeries = useMockHttpCalls
+  ? {
+      searchText: "1",
+      name: "Example TV Series",
+      cardText: [
+        "Example TV SeriesSearch Type: MediaMedia Type: TV SeriesRank: ",
+        "4444Known For: John Smith, James JohnsonYears: 2001-2003",
+      ],
+      tagline: "An example TV series tagline.",
+      imdbRow: /IMDB: 8\.3 \(172,659\)Rank: 4444Link/,
+      imdbUrl: "https://www.imdb.com/title/tt10000002",
+      facts: [
+        "Original NameExample TV Series Original",
+        "Years2001-2003",
+        "First Air DateMar 10, 2001",
+        "Last Air DateMay 20, 2003",
+        "Next Air Date—",
+        "Average Runtime44m42m, 44m",
+        "RatedTV-14",
+        "StatusEnded",
+        "In ProductionNo",
+        "TypeScripted",
+        "Number of Seasons2",
+        "Number of Episodes37",
+        "Known ForJohn Smith, James Johnson",
+        "GenresComedy, Drama, Sci-Fi & Fantasy, Action, Adventure",
+        "Homepagehttps://example.com/example-tv-series",
+        "Origin CountriesUnited States of America, Japan",
+        "Production CountriesUnited States of America, Japan",
+        "Origin LanguageEnglish",
+        "Spoken LanguagesEnglish, Japanese",
+      ],
+      sections: [
+        ["Seasons", "Season 1"],
+        ["Cast", "Example Jones"],
+        ["Creators", "Example Creator"],
+        ["Directors", "Example Director"],
+        ["Writers", "Example Writer"],
+        ["Overview (TMDB)", "An example overview from TMDB."],
+        ["Overview (OMDB)", "An example overview from OMDB."],
+        ["Networks", "Example Network"],
+        ["Where to Stream", "Example Stream"],
+        ["Where to Rent", "None"],
+        ["Where to Buy", "Example Buy Store"],
+      ],
+      firstSeason: {
+        name: "Season 1",
+        overview: "An example overview for season 1.",
+      },
+    }
+  : {
+      searchText: "Buffy the Vampire Slayer",
+      name: "Buffy the Vampire Slayer",
+      cardText: [
+        "Buffy the Vampire SlayerSearch Type: MediaMedia Type: TV SeriesRank: ",
+        "Years: 1997-2003",
+      ],
+      tagline: "",
+      imdbRow: /IMDB: \d\.\d \([\d,]+\)Rank: \d+Link/,
+      imdbUrl: "https://www.imdb.com/title/tt0118276",
+      facts: [
+        "Original NameBuffy the Vampire Slayer",
+        "Years1997-2003",
+        "First Air DateMar 10, 1997",
+        "Last Air DateMay 20, 2003",
+        "Next Air Date—",
+        "RatedTV-14",
+        "StatusEnded",
+        "In ProductionNo",
+        "TypeScripted",
+        "Number of Seasons7",
+        "Number of Episodes144",
+        "Origin CountriesUnited States of America",
+        "Origin LanguageEnglish",
+      ],
+      sections: [
+        ["Seasons", "Season 1"],
+        ["Cast", "Sarah Michelle Gellar"],
+        ["Creators", "Joss Whedon"],
+        ["Directors", "Joss Whedon"],
+        ["Writers", "Joss Whedon"],
+        ["Overview (TMDB)", "vampire"],
+        ["Overview (OMDB)", "vampire"],
+        ["Networks", "The WB"],
+        ["Where to Stream", ""],
+        ["Where to Rent", ""],
+        ["Where to Buy", ""],
+      ],
+      firstSeason: {
+        name: "Season 1",
+        overview: "",
+      },
+    };
+
+test("TV series happy path: search, check results are valid, select a TV series search card, check the TV series panel is valid, open a season overview, and unselect the card", async ({
+  page,
+}) => {
+  console.log("Starting TV series happy path test...");
+  const searchQueryInput = page.getByRole("textbox", {
+    name: "search-query-input",
+  });
+  await searchQueryInput.fill(expectedTvSeries.searchText);
+  const searchButton = page.getByRole("button", { name: "search" });
+  await searchButton.click();
+
+  const tvSeriesTextElement = page
+    .getByText(expectedTvSeries.name, { exact: true })
+    .first();
+  const tvSeriesCard = tvSeriesTextElement.locator("ancestor=#search-card");
+  for (const cardText of expectedTvSeries.cardText) {
+    expect(await tvSeriesCard.textContent()).toContain(cardText);
+  }
+  const resultsMessage = page.getByText(/^\d+ results\.$/);
+  await expect(resultsMessage).toBeVisible();
+
+  console.log("Selecting the TV series search card...");
+  await tvSeriesCard.click();
+  const backButton = page.getByRole("button", { name: "back" });
+  await expect(backButton).toBeVisible();
+  await expect(resultsMessage).toBeHidden();
+
+  const tvSeriesPanel = page.getByTestId("tv-series-panel");
+  await expect(tvSeriesPanel).toBeVisible();
+  const selectedCard = page.locator("#search-card.selected.expanded");
+  await expect(selectedCard).toHaveCount(1);
+  await expect(
+    tvSeriesPanel.getByRole("heading", {
+      name: expectedTvSeries.name,
+      exact: true,
+    }),
+  ).toBeVisible();
+  if (expectedTvSeries.tagline) {
+    await expect(tvSeriesPanel).toContainText(expectedTvSeries.tagline);
+  }
+  await expect(tvSeriesPanel).toContainText(expectedTvSeries.imdbRow);
+  const imdbLink = tvSeriesPanel.getByRole("link", {
+    name: "Link",
+    exact: true,
+  });
+  await expect(imdbLink).toHaveAttribute("href", expectedTvSeries.imdbUrl);
+  await expect(imdbLink).toHaveAttribute("target", "_blank");
+  await expect(
+    tvSeriesPanel.getByRole("button", { name: "copy-imdb-link" }),
+  ).toBeVisible();
+  for (const fact of expectedTvSeries.facts) {
+    await expect(tvSeriesPanel).toContainText(fact);
+  }
+
+  console.log("Checking the collapsible sections...");
+  // Season cards have their own (nested) overview collapsible, so only look at
+  // the panel's top-level sections here
+  const sections = tvSeriesPanel.locator(".detail-sections > details");
+  await expect(sections.locator("> summary")).toHaveText(
+    expectedTvSeries.sections.map(
+      ([title]) => new RegExp(`^${escapeRegExp(title)}`),
+    ),
+  );
+  for (const [index, [, content]] of expectedTvSeries.sections.entries()) {
+    const section = sections.nth(index);
+    const sectionBody = section.locator("> .collapsible-body");
+    await expect(sectionBody).toBeHidden();
+    await section.locator("> summary").click();
+    await expect(sectionBody).toBeVisible();
+    await expect(sectionBody).toContainText(content);
+  }
+
+  console.log("Checking a season card...");
+  const firstSeasonCard = page
+    .getByTestId("season-card")
+    .filter({ hasText: expectedTvSeries.firstSeason.name })
+    .first();
+  await expect(firstSeasonCard).toBeVisible();
+  const seasonOverview = firstSeasonCard.locator(".collapsible-body");
+  await expect(seasonOverview).toBeHidden();
+  await firstSeasonCard.locator("summary").click();
+  await expect(seasonOverview).toBeVisible();
+  await expect(seasonOverview).toContainText(
+    expectedTvSeries.firstSeason.overview,
+  );
+  await expect(
+    firstSeasonCard.getByRole("button", { name: "Expand" }),
+  ).toBeVisible();
+
+  console.log("Checking the page does not scroll horizontally...");
+  const hasHorizontalScrollbar = await page.evaluate(
+    () =>
+      document.documentElement.scrollWidth >
+      document.documentElement.clientWidth,
+  );
+  expect(hasHorizontalScrollbar).toBe(false);
+
+  console.log("Unselecting the TV series search card...");
+  await backButton.click();
+  await expect(tvSeriesPanel).toBeHidden();
+  await expect(page.locator("#search-card.selected")).toHaveCount(0);
+  await expect(backButton).toBeHidden();
+  await expect(resultsMessage).toBeVisible();
+  for (const cardText of expectedTvSeries.cardText) {
+    expect(await tvSeriesCard.textContent()).toContain(cardText);
+  }
+  console.log("TV series happy path test finished.");
 });
 
 function escapeRegExp(text: string): string {

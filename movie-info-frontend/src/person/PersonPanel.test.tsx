@@ -64,7 +64,7 @@ describe("PersonPanel", () => {
       const text = panel.textContent;
 
       for (const expected of [
-        "Example SmithIMDB: 3LinkCopy",
+        "Example SmithIMDB: Rank: 3LinkCopy",
         "Known ForActress, Example Film",
         "Known For DepartmentActing",
         "Also Known AsExample Smithee, Betsy Smith",
@@ -329,7 +329,7 @@ describe("PersonPanel", () => {
       const text = panel.textContent;
 
       for (const expected of [
-        "No imageExample SmithIMDB: —LinkCopy",
+        "No imageExample SmithIMDB: Rank: —LinkCopy",
         "Known For—",
         "Also Known As—",
         "DeathdayJan 2, 2020",

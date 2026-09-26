@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import MoviePanel from "../movie/MoviePanel";
 import PersonPanel from "../person/PersonPanel";
+import TvSeriesPanel from "../tvseries/TvSeriesPanel";
 import { type MediaResultType, type MediaType } from "../utilities/constants";
 import {
   canHaveMoviePanel,
@@ -32,9 +33,10 @@ interface SuggestionSearchCardProps {
   item: Suggestion;
   selected: boolean;
   deselecting?: boolean;
-  // When true the card has grown into a full detail panel (currently only
-  // movies and people), and card clicks are ignored so interacting with the panel
-  // doesn't deselect it — the back arrow / ESC key handle that instead.
+  // When true the card has grown into a full detail panel (currently movies,
+  // TV series, and people), and card clicks are ignored so interacting with
+  // the panel doesn't deselect it — the back arrow / ESC key handle that
+  // instead.
   expanded?: boolean;
   mediaType: MediaType | null;
   onClick: () => void;
@@ -82,6 +84,9 @@ function SuggestionSearchCard({
     return (
       <div ref={cardRef} id="search-card" className={className}>
         {canHaveMoviePanel(mediaType) && <MoviePanel imdbId={item.itemID} />}
+        {canHaveTvSeriesPanel(mediaType) && (
+          <TvSeriesPanel imdbId={item.itemID} />
+        )}
         {canHavePersonPanel(isPerson, mediaType) && (
           <PersonPanel imdbId={item.itemID} />
         )}

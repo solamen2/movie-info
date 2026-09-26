@@ -1,5 +1,4 @@
 using System.Text.Json;
-using System.Web;
 using Microsoft.Net.Http.Headers;
 using MovieInfoBackend.DataModels;
 
@@ -24,7 +23,7 @@ public class SuggestionHttpClient
 
     public async Task<SuggestionsResponseDataModel?> GetSuggestions(string searchQuery)
     {
-        using HttpResponseMessage response = await _httpClient.GetAsync($"suggestion/a/{HttpUtility.HtmlEncode(searchQuery)}.json");
+        using HttpResponseMessage response = await _httpClient.GetAsync($"suggestion/a/{Uri.EscapeDataString(searchQuery)}.json");
         if (response.StatusCode != System.Net.HttpStatusCode.OK)
         {
             return null;

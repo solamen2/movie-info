@@ -157,6 +157,43 @@ public class SuggestionHttpClientTests
         Assert.Empty(result.Suggestions);
     }
 
+    [Theory]
+    [InlineData("Schitt's Creek", "Schitt%27s%20Creek")]
+    [InlineData("Ocean's 11", "Ocean%27s%2011")]
+    [InlineData("Amélie", "Am%C3%A9lie")]
+    [InlineData("What/If?", "What%2FIf%3F")]
+    [InlineData("50% off & more #1", "50%25%20off%20%26%20more%20%231")]
+    [InlineData("\"quoted\" <tag>", "%22quoted%22%20%3Ctag%3E")]
+    public async Task GetSuggestions_SpecialCharactersInSearchQuery_PercentEncodesTheUrlPath(string query, string expectedEncodedQuery)
+    {
+        // Arrange
+        Uri? requestUri = null;
+        Mock<HttpMessageHandler> httpMessageHandlerMock = new Mock<HttpMessageHandler>();
+        httpMessageHandlerMock
+            .Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>())
+            .Callback<HttpRequestMessage, CancellationToken>((request, _) => requestUri = request.RequestUri)
+            .ReturnsAsync(new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent(errorResponse1)
+            });
+
+        HttpClient httpClient = new HttpClient(httpMessageHandlerMock.Object);
+        SuggestionHttpClient suggestionHttpClient = new SuggestionHttpClient(httpClient);
+
+        // Act
+        SuggestionsResponseDataModel? result = await suggestionHttpClient.GetSuggestions(query);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.NotNull(requestUri);
+        Assert.Equal($"https://v3.sg.media-imdb.com/suggestion/a/{expectedEncodedQuery}.json", requestUri.AbsoluteUri);
+    }
+
     [Fact]
     public void SuggestionHttpClient_ToString_HandlesNullSuggestions()
     {

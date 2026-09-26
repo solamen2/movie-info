@@ -1,6 +1,5 @@
 using System.Net.Http.Headers;
 using System.Text.Json;
-using System.Web;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Net.Http.Headers;
 using MovieInfoBackend.DataModels;
@@ -149,7 +148,7 @@ public class TmdbHttpClient
 
     public async Task<TmdbIdResponseDataModel?> GetFindByImdbIdResults(string imdbId)
     {
-        using HttpResponseMessage response = await _httpClient.GetAsync($"find/{HttpUtility.HtmlEncode(imdbId)}?external_source=imdb_id");
+        using HttpResponseMessage response = await _httpClient.GetAsync($"find/{Uri.EscapeDataString(imdbId)}?external_source=imdb_id");
         if (response.StatusCode != System.Net.HttpStatusCode.OK)
         {
             return null;

@@ -1,11 +1,11 @@
-import type { TmdbGender } from "../movie/movieTypes";
+import type { TmdbGender } from "../shared/sharedTypes";
 import type { SuggestionImage } from "../suggestion/SuggestionSearchCard";
 
 // Mirrors MovieInfoBackend's PersonViewModel (and child view models) as
 // serialized by System.Text.Json: camelCase properties, enums as strings.
 // TMDB returns null for many of the image paths and dates even where the
 // backend declares them non-nullable, so they are nullable here.
-// TODO: Fix the backend's non-nullable dates
+// TODO: Fix the backend's non-nullable dates / image paths
 
 export interface PersonMovieCast {
   id: string;

@@ -259,21 +259,21 @@ describe("MoviePanel", () => {
       );
       fireEvent.change(
         screen.getByRole("textbox", { name: "search-query-input" }),
-        { target: { value: "1" } },
+        { target: { value: "2" } },
       );
       fireEvent.click(screen.getByRole("button", { name: "search" }));
 
-      const tvSeriesCard = (
-        await screen.findByText("Example TV Series")
+      const videoGameCard = (
+        await screen.findByText("Example Video Game")
       ).closest("#search-card");
-      if (!tvSeriesCard) {
-        throw new Error("TV series search card not found");
+      if (!videoGameCard) {
+        throw new Error("Video game search card not found");
       }
-      fireEvent.click(tvSeriesCard);
+      fireEvent.click(videoGameCard);
 
       await new Promise((resolve) => setTimeout(resolve, 700));
-      expect(tvSeriesCard.classList.contains("selected")).toBe(true);
-      expect(tvSeriesCard.classList.contains("expanded")).toBe(false);
+      expect(videoGameCard.classList.contains("selected")).toBe(true);
+      expect(videoGameCard.classList.contains("expanded")).toBe(false);
       expect(screen.queryByTestId("movie-panel")).not.toBeInTheDocument();
     });
   });
