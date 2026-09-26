@@ -1,4 +1,4 @@
-import type { TmdbGender } from "../movie/movieTypes";
+import type { TmdbGender } from "../shared/sharedTypes";
 import type { SuggestionImage } from "../suggestion/SuggestionSearchCard";
 
 // Mirrors MovieInfoBackend's PersonViewModel (and child view models) as

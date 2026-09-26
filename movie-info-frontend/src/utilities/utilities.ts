@@ -45,6 +45,36 @@ export function displayText(value: string | number | null | undefined): string {
   return text === "" || text === "N/A" ? "—" : text;
 }
 
+export function displayRuntime(minutes: number): string {
+  if (minutes <= 0) return "—";
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  return hours > 0 ? `${String(hours)}h ${String(mins)}m` : `${String(mins)}m`;
+}
+
+// OMDB genre names (lowercased) that differ from TMDB's name for the same genre.
+const OMDB_GENRE_ALIASES: Record<string, string> = {
+  "sci-fi": "Science Fiction",
+};
+
+// OMDB and TMDB each supply a comma-separated genre list; merge them,
+// preferring TMDB's spelling of each genre.
+export function displayGenres(tmdbGenres: string, omdbGenres: string): string {
+  const genres = new Map<string, string>();
+  for (const genreList of [tmdbGenres, omdbGenres]) {
+    if (displayText(genreList) === "—") continue;
+    for (const genre of genreList.split(",")) {
+      const trimmed = genre.trim();
+      const name = OMDB_GENRE_ALIASES[trimmed.toLowerCase()] ?? trimmed;
+      const key = name.toLowerCase();
+      if (name !== "" && !genres.has(key)) {
+        genres.set(key, name);
+      }
+    }
+  }
+  return displayText([...genres.values()].join(", "));
+}
+
 export function displayDate(isoDate: string | null): string {
   if (isoDate == null || !/^\d{4}-\d{2}-\d{2}$/.test(isoDate)) {
     return displayText(isoDate);

@@ -10,6 +10,7 @@ import SuggestionSearchCard, { type Suggestion } from "./SuggestionSearchCard";
 import {
   canHaveMoviePanel,
   canHavePersonPanel,
+  canHaveTvSeriesPanel,
   getSearchTypeLabel,
 } from "../utilities/utilities";
 
@@ -22,7 +23,9 @@ function hasDetailPanel(item: Suggestion) {
   const mediaType = item.mediaType?.value ?? null;
   const isPerson = getSearchTypeLabel(item.searchType) === "Person";
   return (
-    canHaveMoviePanel(mediaType) || canHavePersonPanel(isPerson, mediaType)
+    canHaveMoviePanel(mediaType) ||
+    canHaveTvSeriesPanel(mediaType) ||
+    canHavePersonPanel(isPerson, mediaType)
   );
 }
 

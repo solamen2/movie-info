@@ -2,41 +2,17 @@ import { type ReactNode, useEffect, useState } from "react";
 import Collapsible from "../shared/Collapsible";
 import HorizontalList from "../shared/HorizontalList";
 import ImdbRow, { ImdbRowSeparator } from "../shared/ImdbRow";
-import { displayDate, displayText } from "../utilities/utilities";
+import WatchProviderSection from "../shared/WatchProviderSection";
+import {
+  displayDate,
+  displayGenres,
+  displayRuntime,
+  displayText,
+} from "../utilities/utilities";
 import CastCard from "./CastCard";
 import CrewCard from "./CrewCard";
-import WatchProviderCard from "./WatchProviderCard";
-import {
-  type Movie,
-  type MovieCrew,
-  type WatchProvider,
-  imdbTitleUrl,
-} from "./movieTypes";
+import { type Movie, type MovieCrew, imdbTitleUrl } from "./movieTypes";
 import "../shared/shared.css";
-import "./movie.css";
-
-// OMDB genre names (lowercased) that differ from TMDB's name for the same genre.
-const OMDB_GENRE_ALIASES: Record<string, string> = {
-  "sci-fi": "Science Fiction",
-};
-
-// OMDB and TMDB each supply a comma-separated genre list; merge them,
-// preferring TMDB's spelling of each genre.
-function displayGenres(tmdbGenres: string, omdbGenres: string): string {
-  const genres = new Map<string, string>();
-  for (const genreList of [tmdbGenres, omdbGenres]) {
-    if (displayText(genreList) === "—") continue;
-    for (const genre of genreList.split(",")) {
-      const trimmed = genre.trim();
-      const name = OMDB_GENRE_ALIASES[trimmed.toLowerCase()] ?? trimmed;
-      const key = name.toLowerCase();
-      if (name !== "" && !genres.has(key)) {
-        genres.set(key, name);
-      }
-    }
-  }
-  return displayText([...genres.values()].join(", "));
-}
 
 function displayMoney(value: number): string {
   return value > 0
@@ -48,40 +24,12 @@ function displayMoney(value: number): string {
     : "—";
 }
 
-function displayRuntime(minutes: number): string {
-  if (minutes <= 0) return "—";
-  const hours = Math.floor(minutes / 60);
-  const mins = minutes % 60;
-  return hours > 0 ? `${String(hours)}h ${String(mins)}m` : `${String(mins)}m`;
-}
-
 function CrewSection({ title, crew }: { title: string; crew: MovieCrew[] }) {
   return (
     <Collapsible title={title} count={crew.length}>
       <HorizontalList>
         {crew.map((c) => (
           <CrewCard key={c.id} crew={c} />
-        ))}
-      </HorizontalList>
-    </Collapsible>
-  );
-}
-
-function WatchProviderSection({
-  title,
-  providers,
-}: {
-  title: string;
-  providers: WatchProvider[];
-}) {
-  const sorted = [...providers].sort(
-    (a, b) => a.displayPriority - b.displayPriority,
-  );
-  return (
-    <Collapsible title={title} count={providers.length}>
-      <HorizontalList>
-        {sorted.map((p) => (
-          <WatchProviderCard key={p.id} provider={p} />
         ))}
       </HorizontalList>
     </Collapsible>
@@ -193,7 +141,7 @@ function MoviePanel({ imdbId }: MoviePanelProps) {
         )}
         <div className="detail-panel-heading">
           <h2 className="detail-title">{movie.title}</h2>
-          {movie.tagline && <p className="movie-tagline">{movie.tagline}</p>}
+          {movie.tagline && <p className="detail-tagline">{movie.tagline}</p>}
           <ImdbRow imdbUrl={imdbUrl}>
             <span className="imdb-row-label">IMDB:</span> {imdbRating}
             {imdbRating !== "—" && imdbVotes !== "—" && (

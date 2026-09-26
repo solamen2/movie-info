@@ -1,5 +1,6 @@
-import { type WatchProvider } from "./movieTypes";
+import { type WatchProvider } from "./sharedTypes";
 import { getTmdbImageUrl } from "../utilities/utilities";
+import "./shared.css";
 
 interface WatchProviderCardProps {
   provider: WatchProvider;

@@ -1,5 +1,5 @@
 import { type ReactNode, useEffect, useState } from "react";
-import type { TmdbGender } from "../movie/movieTypes";
+import type { TmdbGender } from "../shared/sharedTypes";
 import Collapsible from "../shared/Collapsible";
 import HorizontalList from "../shared/HorizontalList";
 import ImdbRow from "../shared/ImdbRow";
