@@ -1,0 +1,212 @@
+{
+  "id": "a1b2c3d4-0000-4000-8000-000000000001",
+  "firstAirDateString": "2001-03-10",
+  "firstAirDate": "2001-03-10",
+  "episodes": [
+    {
+      "id": "se1",
+      "airDateString": "2001-03-10",
+      "airDate": "2001-03-10",
+      "episodeNumber": 1,
+      "episodeType": "standard",
+      "tmdbId": 7001,
+      "title": "Example Pilot",
+      "tmdbOverview": "An example overview for episode 1.",
+      "runtime": 44,
+      "seasonNumber": 1,
+      "tmdbTvSeriesId": 90002,
+      "stillPath": "/exampleStill1.jpg",
+      "directors": [
+        {
+          "id": "ed1",
+          "department": "Directing",
+          "job": "Director",
+          "gender": "Male",
+          "tmdbId": 3,
+          "knownForDepartment": "Directing",
+          "name": "Example Director",
+          "originalName": "Example Director",
+          "popularity": 3.1,
+          "profilePath": "/exampleDirector.jpg"
+        }
+      ],
+      "writers": [
+        {
+          "id": "ew1",
+          "department": "Writing",
+          "job": "Writer",
+          "gender": "Female",
+          "tmdbId": 4,
+          "knownForDepartment": "Writing",
+          "name": "Example Writer",
+          "originalName": "Example Writer",
+          "popularity": 2.0,
+          "profilePath": null
+        }
+      ],
+      "producers": [
+        {
+          "id": "ep1",
+          "department": "Production",
+          "job": "Executive Producer",
+          "gender": "Male",
+          "tmdbId": 5,
+          "knownForDepartment": "Production",
+          "name": "Example Producer",
+          "originalName": "Example Producer",
+          "popularity": 1.5,
+          "profilePath": null
+        }
+      ],
+      "guestStars": [
+        {
+          "id": "egs1",
+          "character": "Example Villain",
+          "billedOrder": 0,
+          "gender": "Male",
+          "tmdbId": 8,
+          "name": "Example Guest",
+          "originalName": "Example Guest",
+          "popularity": 1.2,
+          "profilePath": "/exampleGuest.jpg"
+        },
+        {
+          "id": "egs2",
+          "character": "Example Bystander",
+          "billedOrder": 1,
+          "gender": "Female",
+          "tmdbId": 9,
+          "name": "Example Extra",
+          "originalName": "Example Extra Original",
+          "popularity": 0.4,
+          "profilePath": null
+        }
+      ]
+    },
+    {
+      "id": "se2",
+      "airDateString": "2001-03-17",
+      "airDate": "2001-03-17",
+      "episodeNumber": 2,
+      "episodeType": "standard",
+      "tmdbId": 7002,
+      "title": "Example Second Episode",
+      "tmdbOverview": "",
+      "runtime": 0,
+      "seasonNumber": 1,
+      "tmdbTvSeriesId": 90002,
+      "stillPath": null,
+      "directors": [],
+      "writers": [],
+      "producers": [],
+      "guestStars": []
+    },
+    {
+      "id": "se3",
+      "airDateString": "2001-05-22",
+      "airDate": "2001-05-22",
+      "episodeNumber": 3,
+      "episodeType": "finale",
+      "tmdbId": 7003,
+      "title": "Example Finale",
+      "tmdbOverview": "An example overview for the finale.",
+      "runtime": 45,
+      "seasonNumber": 1,
+      "tmdbTvSeriesId": 90002,
+      "stillPath": "/exampleStill3.jpg",
+      "directors": [
+        {
+          "id": "ed1",
+          "department": "Directing",
+          "job": "Director",
+          "gender": "Male",
+          "tmdbId": 3,
+          "knownForDepartment": "Directing",
+          "name": "Example Director",
+          "originalName": "Example Director",
+          "popularity": 3.1,
+          "profilePath": "/exampleDirector.jpg"
+        }
+      ],
+      "writers": [
+        {
+          "id": "ew1",
+          "department": "Writing",
+          "job": "Writer",
+          "gender": "Female",
+          "tmdbId": 4,
+          "knownForDepartment": "Writing",
+          "name": "Example Writer",
+          "originalName": "Example Writer",
+          "popularity": 2.0,
+          "profilePath": null
+        },
+        {
+          "id": "ew2",
+          "department": "Writing",
+          "job": "Story",
+          "gender": "Male",
+          "tmdbId": 3,
+          "knownForDepartment": "Directing",
+          "name": "Example Director",
+          "originalName": "Example Director",
+          "popularity": 3.1,
+          "profilePath": "/exampleDirector.jpg"
+        }
+      ],
+      "producers": [],
+      "guestStars": [
+        {
+          "id": "egs1",
+          "character": "Example Villain",
+          "billedOrder": 0,
+          "gender": "Male",
+          "tmdbId": 8,
+          "name": "Example Guest",
+          "originalName": "Example Guest",
+          "popularity": 1.2,
+          "profilePath": "/exampleGuest.jpg"
+        }
+      ]
+    }
+  ],
+  "name": "Season 1",
+  "networks": [
+    {
+      "id": "sn1",
+      "tmdbId": 21,
+      "logoPath": "/exampleNetwork.png",
+      "name": "Example Network",
+      "originCountry": "US"
+    },
+    {
+      "id": "sn2",
+      "tmdbId": 40,
+      "logoPath": null,
+      "name": "Example Network 2",
+      "originCountry": "JP"
+    }
+  ],
+  "tmdbOverview": "An example overview for season 1.",
+  "tmdbId": 59473,
+  "posterPath": "/exampleSeason1.jpg",
+  "seasonNumber": 1,
+  "watchProvidersBuy": [
+    {
+      "id": "sb1",
+      "logoPath": "/exampleBuy.jpg",
+      "providerName": "Example Buy Store",
+      "displayPriority": 3
+    }
+  ],
+  "watchProvidersFlatrate": [
+    {
+      "id": "sf1",
+      "logoPath": "/exampleStream.jpg",
+      "providerName": "Example Stream",
+      "displayPriority": 1
+    }
+  ],
+  "watchProvidersRent": [],
+  "numberOfEpisodes": 3
+}

@@ -87,7 +87,7 @@ export function displayDate(isoDate: string | null): string {
 
 export function getTmdbImageUrl(
   path: string | null,
-  size: "w92" | "w185" | "w500",
+  size: "w92" | "w185" | "w300" | "w500",
 ): string | null {
   return path ? `${TMDB_IMAGE_BASE_URL}/${size}${path}` : null;
 }
@@ -116,6 +116,41 @@ function querySuffix(query: string): string {
 
 export function searchPath(query: string): string {
   return `/search${querySuffix(query)}`;
+}
+
+// The current URL with some query parameters added, replaced (string) or
+// removed (null). Used to select a card within an already open panel, e.g.
+// `?tmdbTvSeriesId=95&seasonNumber=1`, without disturbing the rest.
+export function withQueryParams(
+  pathname: string,
+  search: string,
+  updates: Record<string, string | null>,
+): string {
+  const params = new URLSearchParams(search);
+  for (const [name, value] of Object.entries(updates)) {
+    if (value === null) {
+      params.delete(name);
+    } else {
+      params.set(name, value);
+    }
+  }
+  const suffix = params.toString();
+  return suffix ? `${pathname}?${suffix}` : pathname;
+}
+
+// Reads a positive integer query parameter such as a season number.
+export function getIntParam(
+  params: URLSearchParams,
+  name: string,
+): number | null {
+  const value = params.get(name);
+  if (value === null || !/^\d+$/.test(value)) return null;
+  return Number(value);
+}
+
+// A results card without a detail panel, highlighted in place.
+export function selectedCardPath(query: string, itemId: string): string {
+  return withQueryParams("/search", querySuffix(query), { selected: itemId });
 }
 
 export function detailPath(

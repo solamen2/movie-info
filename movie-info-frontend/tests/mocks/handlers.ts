@@ -4,6 +4,8 @@ import searchDataJson2 from "./data/searchData2.json" with { type: "json" };
 import movieDataJson1 from "./data/movieData1.json" with { type: "json" };
 import personDataJson1 from "./data/personData1.json" with { type: "json" };
 import tvSeriesDataJson1 from "./data/tvSeriesData1.json" with { type: "json" };
+import tvSeasonDataJson1 from "./data/tvSeasonData1.json" with { type: "json" };
+import tvEpisodeDataJson1 from "./data/tvEpisodeData1.json" with { type: "json" };
 
 type LoginPathParams = object;
 
@@ -105,6 +107,42 @@ export const handlers = [
     }
     return HttpResponse.json(
       { error: "Not a valid IMDB ID for mock" },
+      { status: 404 },
+    );
+  }),
+
+  http.get("/api/tvseason", ({ request }) => {
+    const url = new URL(request.url);
+    const tmdbTvSeriesId = url.searchParams.get("tmdbTvSeriesId");
+    const seasonNumber = url.searchParams.get("seasonNumber");
+
+    if (
+      tmdbTvSeriesId === String(tvSeriesDataJson1.tmdbId) &&
+      seasonNumber === String(tvSeasonDataJson1.seasonNumber)
+    ) {
+      return HttpResponse.json(tvSeasonDataJson1, { status: 200 });
+    }
+    return HttpResponse.json(
+      { error: "Not a valid TV season for mock" },
+      { status: 404 },
+    );
+  }),
+
+  http.get("/api/tvepisode", ({ request }) => {
+    const url = new URL(request.url);
+    const tmdbTvSeriesId = url.searchParams.get("tmdbTvSeriesId");
+    const seasonNumber = url.searchParams.get("seasonNumber");
+    const episodeNumber = url.searchParams.get("episodeNumber");
+
+    if (
+      tmdbTvSeriesId === String(tvSeriesDataJson1.tmdbId) &&
+      seasonNumber === String(tvEpisodeDataJson1.seasonNumber) &&
+      episodeNumber === String(tvEpisodeDataJson1.episodeNumber)
+    ) {
+      return HttpResponse.json(tvEpisodeDataJson1, { status: 200 });
+    }
+    return HttpResponse.json(
+      { error: "Not a valid TV episode for mock" },
       { status: 404 },
     );
   }),

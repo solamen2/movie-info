@@ -1,4 +1,4 @@
-import { fireEvent, screen } from "@testing-library/react";
+import { fireEvent, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { renderApp } from "../../tests/renderApp";
 
@@ -348,27 +348,29 @@ describe("SuggestionSearchCard", () => {
       expect(resultsContainer.classList.contains("has-selection")).toBe(true);
 
       fireEvent.keyDown(window, { key: "Escape" });
-      expect(personCard.classList.contains("selected")).toBe(false);
+      await waitFor(() => {
+        expect(personCard.classList.contains("selected")).toBe(false);
+      });
       expect(resultsContainer.classList.contains("has-selection")).toBe(false);
     });
 
-    it("Should be a no-op when ESC is pressed and no card is selected", () => {
-      const { container } = renderApp();
+    it("Should go back to the previous URL when ESC is pressed and no card is selected", async () => {
+      const { container, currentUrl } = renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
         name: "search-query-input",
       });
       fireEvent.change(searchQueryInput, { target: { value: "1" } });
       const searchButton = screen.getByRole("button", { name: "search" });
       fireEvent.click(searchButton);
+      await screen.findByText("Example Smith");
+      expect(currentUrl()).toBe("/search?q=1");
 
-      const resultsContainer = container.querySelector(".results-container");
-      if (!resultsContainer) {
-        throw new Error("results-container not found");
-      }
-
-      expect(resultsContainer.classList.contains("has-selection")).toBe(false);
       fireEvent.keyDown(window, { key: "Escape" });
-      expect(resultsContainer.classList.contains("has-selection")).toBe(false);
+      await waitFor(() => {
+        expect(currentUrl()).toBe("/search");
+      });
+      expect(container.querySelectorAll("#search-card")).toHaveLength(0);
+      expect(searchQueryInput).toHaveValue("");
     });
   });
 
@@ -432,7 +434,9 @@ describe("SuggestionSearchCard", () => {
       expect(personCard.classList.contains("selected")).toBe(true);
 
       fireEvent.keyDown(window, { key: "Escape" });
-      expect(personCard.classList.contains("selected")).toBe(false);
+      await waitFor(() => {
+        expect(personCard.classList.contains("selected")).toBe(false);
+      });
       expect(personCard.classList.contains("deselecting")).toBe(true);
     });
   });
@@ -472,8 +476,10 @@ describe("SuggestionSearchCard", () => {
       }
 
       fireEvent.click(personCard); // select
-      fireEvent.click(personCard); // deselect
-      expect(personCard.classList.contains("deselecting")).toBe(true);
+      fireEvent.click(personCard); // deselect (goes back in history)
+      await waitFor(() => {
+        expect(personCard.classList.contains("deselecting")).toBe(true);
+      });
 
       fireEvent.click(personCard); // re-select
       expect(personCard.classList.contains("selected")).toBe(true);
@@ -497,8 +503,10 @@ describe("SuggestionSearchCard", () => {
         throw new Error("Person search card not found");
       }
       fireEvent.click(personCard); // select
-      fireEvent.click(personCard); // deselect
-      expect(personCard.classList.contains("deselecting")).toBe(true);
+      fireEvent.click(personCard); // deselect (goes back in history)
+      await waitFor(() => {
+        expect(personCard.classList.contains("deselecting")).toBe(true);
+      });
 
       fireEvent.change(searchQueryInput, { target: { value: "1" } });
       fireEvent.click(searchButton);

@@ -15,11 +15,21 @@ export function ImdbRowSeparator() {
 
 interface ImdbRowProps {
   imdbUrl: string;
+  // A bold label shown right before the link, for rows that carry no data of
+  // their own (e.g. "TV Series IMDB:").
+  label?: string;
+  // Whether to offer copying the link as an HTML anchor (default true).
+  copyButton?: boolean;
   // The IMDB data shown ahead of the link (rating, rank, etc.)
-  children: ReactNode;
+  children?: ReactNode;
 }
 
-function ImdbRow({ imdbUrl, children }: ImdbRowProps) {
+function ImdbRow({
+  imdbUrl,
+  label,
+  copyButton = true,
+  children,
+}: ImdbRowProps) {
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "failed">(
     "idle",
   );
@@ -47,24 +57,31 @@ function ImdbRow({ imdbUrl, children }: ImdbRowProps) {
   return (
     <p className="imdb-row">
       <span>
-        {children}
-        <ImdbRowSeparator />
+        {label && <span className="imdb-row-label">{label}</span>}
+        {children != null && (
+          <>
+            {children}
+            <ImdbRowSeparator />
+          </>
+        )}
         <a href={imdbUrl} target="_blank" rel="noopener">
           Link
         </a>
       </span>
-      <button
-        type="button"
-        aria-label="copy-imdb-link"
-        className="copy-button"
-        onClick={handleCopy}
-      >
-        {copyStatus === "copied"
-          ? "Copied!"
-          : copyStatus === "failed"
-            ? "Failed"
-            : "Copy"}
-      </button>
+      {copyButton && (
+        <button
+          type="button"
+          aria-label="copy-imdb-link"
+          className="copy-button"
+          onClick={handleCopy}
+        >
+          {copyStatus === "copied"
+            ? "Copied!"
+            : copyStatus === "failed"
+              ? "Failed"
+              : "Copy"}
+        </button>
+      )}
     </p>
   );
 }

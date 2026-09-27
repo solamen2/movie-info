@@ -2,6 +2,8 @@ import { act, render } from "@testing-library/react";
 import { createMemoryRouter, RouterProvider } from "react-router-dom";
 import AppRoutes from "../src/AppRoutes";
 
+export type AppRouter = ReturnType<typeof createMemoryRouter>;
+
 // Mounts the real app routes in an in-memory router so component tests can
 // start at any URL, read the URL the app navigated to, and drive the history
 // like the browser's back / forward buttons.

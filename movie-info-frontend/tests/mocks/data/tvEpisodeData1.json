@@ -1,0 +1,114 @@
+{
+  "id": "b2c3d4e5-0000-4000-8000-000000000002",
+  "year": 2001,
+  "rated": "TV-14",
+  "omdbAverageEpisodeRuntimeString": "44 min",
+  "omdbAverageEpisodeRuntimeNumber": 44,
+  "omdbGenres": "Action, Drama, Sci-Fi",
+  "knownForActors": "Example Jones, Example Brown",
+  "omdbOverview": "An example episode overview from OMDB.",
+  "awards": "Won 1 Example Award",
+  "imdbRating": "8.1",
+  "imdbVotes": "3,456",
+  "imdbId": "tt20000001",
+  "airDateString": "2001-03-10",
+  "airDate": "2001-03-10",
+  "episodeNumber": 1,
+  "episodeType": "standard",
+  "title": "Example Pilot",
+  "tmdbOverview": "An example episode overview from TMDB.",
+  "tmdbId": 7001,
+  "runtime": 43,
+  "seasonNumber": 1,
+  "stillPath": "/exampleStill1.jpg",
+  "cast": [
+    {
+      "id": "ec2",
+      "gender": "Male",
+      "tmdbId": 2,
+      "name": "Example Brown",
+      "originalName": "Example Brown",
+      "popularity": 5.5,
+      "profilePath": null,
+      "character": "Second Lead",
+      "billedOrder": 1
+    },
+    {
+      "id": "ec1",
+      "gender": "Female",
+      "tmdbId": 1,
+      "name": "Example Jones",
+      "originalName": "Example Jones",
+      "popularity": 9.9,
+      "profilePath": "/exampleJones.jpg",
+      "character": "Lead",
+      "billedOrder": 0
+    }
+  ],
+  "directors": [
+    {
+      "id": "ed1",
+      "gender": "Male",
+      "tmdbId": 3,
+      "knownForDepartment": "Directing",
+      "name": "Example Director",
+      "originalName": "Example Director",
+      "popularity": 3.1,
+      "profilePath": "/exampleDirector.jpg",
+      "department": "Directing",
+      "job": "Director"
+    }
+  ],
+  "writers": [
+    {
+      "id": "ew1",
+      "gender": "Female",
+      "tmdbId": 4,
+      "knownForDepartment": "Writing",
+      "name": "Example Writer",
+      "originalName": "Example Writer",
+      "popularity": 2.0,
+      "profilePath": null,
+      "department": "Writing",
+      "job": "Writer"
+    }
+  ],
+  "producers": [
+    {
+      "id": "ep1",
+      "gender": "Male",
+      "tmdbId": 5,
+      "knownForDepartment": "Production",
+      "name": "Example Producer",
+      "originalName": "Example Producer",
+      "popularity": 1.5,
+      "profilePath": null,
+      "department": "Production",
+      "job": "Executive Producer"
+    }
+  ],
+  "guestStars": [
+    {
+      "id": "egs1",
+      "character": "Example Villain",
+      "billedOrder": 0,
+      "gender": "Male",
+      "tmdbId": 8,
+      "name": "Example Guest",
+      "originalName": "Example Guest",
+      "popularity": 1.2,
+      "profilePath": "/exampleGuest.jpg"
+    },
+    {
+      "id": "egs2",
+      "character": "Example Bystander",
+      "billedOrder": 1,
+      "gender": "Female",
+      "tmdbId": 9,
+      "name": "Example Extra",
+      "originalName": "Example Extra Original",
+      "popularity": 0.4,
+      "profilePath": null
+    }
+  ]
+}

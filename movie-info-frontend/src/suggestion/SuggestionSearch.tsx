@@ -1,30 +1,15 @@
 import { type SubmitEvent, useEffect, useEffectEvent, useState } from "react";
-import {
-  useLocation,
-  useNavigate,
-  useParams,
-  useSearchParams,
-} from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import SuggestionSearchCard, { type Suggestion } from "./SuggestionSearchCard";
+import { useCardSelection } from "../shared/useCardSelection";
 import {
   detailPath,
   getPanelKind,
   type PanelKind,
   searchPath,
+  selectedCardPath,
 } from "../utilities/utilities";
 import { MediaTypes } from "../utilities/constants";
-
-// Keep in sync with the `select-fly` / `deselect-fly` animation duration and
-// the `.result-card` width transition duration in App.css.
-const CARD_FLY_MS = 500;
-const CARD_RESIZE_MS = 300;
-
-// Set as navigation state when a card click pushes a detail URL, so the
-// in-app back button knows it can pop history (matching the browser's back
-// button) instead of pushing a fresh results URL.
-interface DetailLocationState {
-  fromSearch?: boolean;
-}
 
 function panelKindOf(item: Suggestion): PanelKind | null {
   return getPanelKind(item.searchType, item.mediaType?.value ?? null);
@@ -62,81 +47,19 @@ interface SuggestionSearchProps {
   panelKind?: PanelKind;
 }
 
-// Delayed second half of a two-phase card animation: expand the selected card
-// into its panel once it has flown to the corner, or fly the card home once
-// its panel has shrunk back to card size.
-type PendingPhase = "expand" | "deselect";
-
-// Which card is selected and where it is in its animation. Always replaced as
-// a whole via the helpers below, since the fields only make sense together.
-interface Selection {
-  selectedItemId: string | null;
-  // The card the user just transitioned out of selected. It gets a
-  // `.deselecting` class which fires the `deselect-fly` keyframe animation in
-  // CSS — required because CSS animations only run on class addition, not on
-  // class removal, so we can't rely on .selected alone to animate both
-  // directions.
-  previouslySelectedItemId: string | null;
-  // A selected card with a detail panel animates in two phases: first it flies
-  // to the upper-left (selectedItemId), then it grows into the panel
-  // (expandedItemId). Going back runs the phases in reverse.
-  expandedItemId: string | null;
-  // A fresh object per transition so the timer effect restarts even when two
-  // transitions in a row wait on the same phase.
-  pendingPhase: { kind: PendingPhase } | null;
-}
-
-const NO_SELECTION: Selection = {
-  selectedItemId: null,
-  previouslySelectedItemId: null,
-  expandedItemId: null,
-  pendingPhase: null,
-};
-
-// Shown already expanded, with no animation (e.g. a directly loaded URL).
-function expandedAtOnce(itemId: string | null): Selection {
-  return { ...NO_SELECTION, selectedItemId: itemId, expandedItemId: itemId };
-}
-
-// The card flies to the corner and, if it opens a panel, expands afterwards.
-function selectCard(
-  prev: Selection,
-  itemId: string,
-  opensPanel: boolean,
-): Selection {
-  return {
-    selectedItemId: itemId,
-    previouslySelectedItemId: prev.selectedItemId,
-    expandedItemId: null,
-    pendingPhase: opensPanel ? { kind: "expand" } : null,
-  };
-}
-
-// The card flies back home.
-function deselectCard(prev: Selection): Selection {
-  return { ...NO_SELECTION, previouslySelectedItemId: prev.selectedItemId };
-}
-
-// The panel shrinks back to card size, after which the card is deselected.
-function shrinkPanel(prev: Selection): Selection {
-  return { ...prev, expandedItemId: null, pendingPhase: { kind: "deselect" } };
-}
-
-function expandCard(prev: Selection): Selection {
-  return { ...prev, expandedItemId: prev.selectedItemId, pendingPhase: null };
-}
-
-// The URL is the source of truth for both the search (`?q=`) and the selected
-// detail item (`/movie/:imdbId` etc.). Submitting a search or clicking a card
-// only navigates; the component then syncs its state to the new URL, so that
-// browser back / forward and directly loaded URLs behave exactly like clicks.
+// The URL is the source of truth for the search (`?q=`) and the selected card:
+// a detail item (`/movie/:imdbId` etc.) or a merely highlighted card without a
+// panel (`?selected=`). Submitting a search or clicking a card only navigates;
+// the component then syncs to the new URL, so browser back / forward and
+// directly loaded URLs behave exactly like clicks.
 function SuggestionSearch({ panelKind }: SuggestionSearchProps) {
   const { imdbId } = useParams();
   const [searchParams] = useSearchParams();
-  const location = useLocation();
   const navigate = useNavigate();
   const query = searchParams.get("q") ?? "";
-  const targetItemId = panelKind && imdbId ? imdbId : null;
+  const targetItemId = panelKind
+    ? (imdbId ?? null)
+    : searchParams.get("selected");
 
   const [searchQuery, setSearchQuery] = useState(query);
   // null until a search for the current query has succeeded.
@@ -144,14 +67,17 @@ function SuggestionSearch({ panelKind }: SuggestionSearchProps) {
   // Bumped to re-run a search whose query is already in the URL.
   const [searchAttempt, setSearchAttempt] = useState(0);
   const [error, setError] = useState("");
-  const [selection, setSelection] = useState(() =>
-    expandedAtOnce(targetItemId),
-  );
-  // The URL values the selection was last synced to.
-  const [syncedUrl, setSyncedUrl] = useState({ query, targetItemId });
+  // The query the results above were last synced to.
+  const [syncedQuery, setSyncedQuery] = useState(query);
 
-  const { selectedItemId, previouslySelectedItemId, expandedItemId } =
-    selection;
+  const { selectedId, previouslySelectedId, expandedId } = useCardSelection({
+    targetId: targetItemId,
+    opensPanel: panelKind !== undefined,
+    hasCardFor: (id) => results?.some((r) => r.itemID === id) ?? false,
+    // Every search (including re-running the same query) replaces the cards
+    resetKey: `${String(searchAttempt)}:${query}`,
+  });
+
   const searchMessage =
     results === null
       ? ""
@@ -159,51 +85,21 @@ function SuggestionSearch({ panelKind }: SuggestionSearchProps) {
         ? "No results."
         : `${String(results.length)} results.`;
   const hasCardForSelected =
-    results?.some((r) => r.itemID === selectedItemId) ?? false;
+    results?.some((r) => r.itemID === selectedId) ?? false;
   const displayedResults =
-    selectedItemId && panelKind && !hasCardForSelected
-      ? [placeholderSuggestion(selectedItemId, panelKind), ...(results ?? [])]
+    selectedId && panelKind && !hasCardForSelected
+      ? [placeholderSuggestion(selectedId, panelKind), ...(results ?? [])]
       : (results ?? []);
 
-  // Sync to the URL during render (see "Adjusting some state when a prop
-  // changes" in the React docs), so the very next paint already reflects it.
-  if (query !== syncedUrl.query) {
-    // A new query means a new page of results, so any selection from the old
-    // results is dropped without animating, and the URL's item (if any) is
-    // shown expanded right away.
-    setSyncedUrl({ query, targetItemId });
+  // A new query means a new page of results; sync during render so the very
+  // next paint already reflects it (see "Adjusting some state when a prop
+  // changes" in the React docs).
+  if (query !== syncedQuery) {
+    setSyncedQuery(query);
     setSearchQuery(query);
     setResults(null);
     setError("");
-    setSelection(expandedAtOnce(targetItemId));
-  } else if (targetItemId !== syncedUrl.targetItemId) {
-    // The URL's item changed while the results stayed put (card click, in-app
-    // back, or browser back / forward), so animate the card in or out.
-    setSyncedUrl({ query, targetItemId });
-    if (targetItemId) {
-      setSelection(selectCard(selection, targetItemId, true));
-    } else if (expandedItemId && hasCardForSelected) {
-      setSelection(shrinkPanel(selection));
-    } else {
-      // A placeholder card has no home to fly back to, so just drop it.
-      setSelection(deselectCard(selection));
-    }
   }
-
-  const pendingPhase = selection.pendingPhase;
-  useEffect(() => {
-    if (!pendingPhase) return;
-    const isExpand = pendingPhase.kind === "expand";
-    const timeoutId = window.setTimeout(
-      () => {
-        setSelection(isExpand ? expandCard : deselectCard);
-      },
-      isExpand ? CARD_FLY_MS : CARD_RESIZE_MS,
-    );
-    return () => {
-      window.clearTimeout(timeoutId);
-    };
-  }, [pendingPhase]);
 
   useEffect(() => {
     if (query === "") return;
@@ -243,8 +139,9 @@ function SuggestionSearch({ panelKind }: SuggestionSearchProps) {
     };
   }, [query, searchAttempt]);
 
+  // ESC does exactly what the browser's back button does, everywhere.
   const onEscape = useEffectEvent(() => {
-    handleBack();
+    void navigate(-1);
   });
 
   useEffect(() => {
@@ -259,20 +156,6 @@ function SuggestionSearch({ panelKind }: SuggestionSearchProps) {
     };
   }, []);
 
-  function handleBack() {
-    if (targetItemId) {
-      const state = location.state as DetailLocationState | null;
-      if (state?.fromSearch) {
-        void navigate(-1);
-      } else {
-        void navigate(searchPath(query));
-      }
-      return;
-    }
-    // Selected card without a detail panel: purely local state.
-    setSelection(deselectCard(selection));
-  }
-
   function handleSearch(e: SubmitEvent) {
     e.preventDefault();
     if (searchQuery !== query || targetItemId) {
@@ -283,30 +166,23 @@ function SuggestionSearch({ panelKind }: SuggestionSearchProps) {
       // re-fetch here instead.
       setResults(null);
       setError("");
-      setSelection(NO_SELECTION);
       setSearchAttempt((n) => n + 1);
     }
   }
 
   function handleCardClick(item: Suggestion) {
     const itemId = item.itemID;
-    const itemPanelKind = panelKindOf(item);
-    if (itemPanelKind) {
-      if (targetItemId === itemId) {
-        // Clicked again mid-fly: treat it like the back button.
-        handleBack();
-      } else {
-        void navigate(detailPath(itemPanelKind, itemId, query), {
-          state: { fromSearch: true } satisfies DetailLocationState,
-        });
-      }
+    if (targetItemId === itemId) {
+      // Clicking the selected card again undoes the navigation that selected
+      // it, exactly like the browser's back button.
+      void navigate(-1);
       return;
     }
-    // Cards without a detail panel just toggle a local highlight.
-    setSelection(
-      selectedItemId === itemId
-        ? deselectCard(selection)
-        : selectCard(selection, itemId, false),
+    const itemPanelKind = panelKindOf(item);
+    void navigate(
+      itemPanelKind
+        ? detailPath(itemPanelKind, itemId, query)
+        : selectedCardPath(query, itemId),
     );
   }
 
@@ -356,35 +232,13 @@ function SuggestionSearch({ panelKind }: SuggestionSearchProps) {
 
       {error && <p className="error-message">{error}</p>}
       <div className="results-toolbar">
-        {selectedItemId ? (
-          <button
-            type="button"
-            aria-label="back"
-            title="Back to results (Esc)"
-            className="back-button"
-            onClick={handleBack}
-          >
-            <svg
-              viewBox="0 0 24 24"
-              width="20"
-              height="20"
-              aria-hidden="true"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M19 12H5M12 19l-7-7 7-7" />
-            </svg>
-          </button>
-        ) : (
-          searchMessage && <p className="search-message">{searchMessage}</p>
+        {!selectedId && searchMessage && (
+          <p className="search-message">{searchMessage}</p>
         )}
       </div>
 
       <div
-        className={`results-container${selectedItemId ? " has-selection" : ""}`}
+        className={`results-container fly-origin${selectedId ? " has-selection" : ""}`}
       >
         {displayedResults.map((item) => (
           <SuggestionSearchCard
@@ -393,11 +247,10 @@ function SuggestionSearch({ panelKind }: SuggestionSearchProps) {
             // mounted.
             key={item.itemID}
             item={item}
-            selected={selectedItemId === item.itemID}
-            expanded={expandedItemId === item.itemID}
+            selected={selectedId === item.itemID}
+            expanded={expandedId === item.itemID}
             deselecting={
-              previouslySelectedItemId === item.itemID &&
-              selectedItemId !== item.itemID
+              previouslySelectedId === item.itemID && selectedId !== item.itemID
             }
             mediaType={item.mediaType?.value ?? null}
             // The URL decides which panel the selected item opens; other cards

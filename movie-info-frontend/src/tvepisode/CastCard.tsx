@@ -1,0 +1,36 @@
+import { getTmdbImageUrl } from "../utilities/utilities";
+import { type TvEpisodeCast } from "./tvEpisodeTypes";
+
+interface CastCardProps {
+  cast: TvEpisodeCast;
+}
+
+function CastCard({ cast }: CastCardProps) {
+  const imageUrl = getTmdbImageUrl(cast.profilePath, "w185");
+
+  return (
+    <div className="person-card" data-testid="cast-card">
+      {imageUrl ? (
+        <img
+          src={imageUrl}
+          alt={cast.name}
+          loading="lazy"
+          className="person-card-image"
+        />
+      ) : (
+        <div className="person-card-image person-card-image-placeholder">
+          No image
+        </div>
+      )}
+      <p className="person-card-name">{cast.name}</p>
+      {cast.originalName && cast.originalName !== cast.name && (
+        <p className="person-card-secondary">({cast.originalName})</p>
+      )}
+      {cast.character && (
+        <p className="person-card-secondary">{cast.character}</p>
+      )}
+    </div>
+  );
+}
+
+export default CastCard;

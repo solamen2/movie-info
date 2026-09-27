@@ -1,6 +1,12 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { renderApp } from "../../tests/renderApp";
+import { type AppRouter, renderApp } from "../../tests/renderApp";
 import MoviePanel from "./MoviePanel";
 
 async function searchAndSelectExampleMovie() {
@@ -198,20 +204,17 @@ describe("MoviePanel", () => {
   });
 
   describe("When a card is selected", () => {
-    it("Should replace the results message with a back arrow", async () => {
+    it("Should hide the results message", async () => {
       await searchAndSelectExampleMovie();
 
       expect(screen.queryByText("8 results.")).not.toBeInTheDocument();
-      expect(screen.getByRole("button", { name: "back" })).toBeInTheDocument();
     });
   });
 
   describe.each([
     [
-      "the back arrow is clicked",
-      () => {
-        fireEvent.click(screen.getByRole("button", { name: "back" }));
-      },
+      "the browser back button is used",
+      (router: AppRouter) => act(() => router.navigate(-1)),
     ],
     [
       "the ESC key is pressed",
@@ -221,11 +224,14 @@ describe("MoviePanel", () => {
     ],
   ])("When %s while the movie panel is expanded", (_, goBack) => {
     it("Should shrink the panel, then deselect the card and restore the results message", async () => {
-      const { container, movieCard } = await searchAndSelectExampleMovie();
+      const { container, router, movieCard } =
+        await searchAndSelectExampleMovie();
       await screen.findByTestId("movie-panel");
 
-      goBack();
-      expect(movieCard.classList.contains("expanded")).toBe(false);
+      await goBack(router);
+      await waitFor(() => {
+        expect(movieCard.classList.contains("expanded")).toBe(false);
+      });
       expect(movieCard.classList.contains("selected")).toBe(true);
       expect(screen.queryByTestId("movie-panel")).not.toBeInTheDocument();
 
@@ -239,9 +245,6 @@ describe("MoviePanel", () => {
           ?.classList.contains("has-selection"),
       ).toBe(false);
       expect(screen.getByText("8 results.")).toBeInTheDocument();
-      expect(
-        screen.queryByRole("button", { name: "back" }),
-      ).not.toBeInTheDocument();
     });
   });
 

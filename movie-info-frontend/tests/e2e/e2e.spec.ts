@@ -1,4 +1,4 @@
-import { expect } from "@playwright/test";
+import { expect, type Locator, type Page } from "@playwright/test";
 import { test } from "./e2ebase.ts";
 import process from "node:process";
 
@@ -131,8 +131,6 @@ test("Basic happy path: search, check results are valid, select a movie search c
 
   console.log("Selecting the movie search card...");
   await movieCard.click();
-  const backButton = page.getByRole("button", { name: "back" });
-  await expect(backButton).toBeVisible();
   await expect(resultsMessage).toBeHidden();
   const detailUrl = new RegExp(
     `/movie/${expectedMovie.imdbId}\\?q=${encodeURIComponent(expectedMovie.searchText).replace(/%20/g, "\\+")}$`,
@@ -175,10 +173,9 @@ test("Basic happy path: search, check results are valid, select a movie search c
   }
 
   console.log("Unselecting the movie search card...");
-  await backButton.click();
+  await page.goBack();
   await expect(moviePanel).toBeHidden();
   await expect(page.locator("#search-card.selected")).toHaveCount(0);
-  await expect(backButton).toBeHidden();
   await expect(resultsMessage).toBeVisible();
   for (const cardText of expectedMovie.cardText) {
     expect(await movieCard.textContent()).toContain(cardText);
@@ -194,7 +191,6 @@ test("Basic happy path: search, check results are valid, select a movie search c
   await expect(page).toHaveURL(searchUrl);
   await expect(moviePanel).toBeHidden();
   await expect(page.locator("#search-card.selected")).toHaveCount(0);
-  await expect(backButton).toBeHidden();
   await expect(resultsMessage).toBeVisible();
 
   console.log("Using the browser forward button...");
@@ -217,7 +213,7 @@ test("Basic happy path: search, check results are valid, select a movie search c
   await expect(
     page.getByRole("textbox", { name: "search-query-input" }),
   ).toHaveValue(expectedMovie.searchText);
-  await backButton.click();
+  await page.goBack();
   await expect(page).toHaveURL(searchUrl);
   await expect(moviePanel).toBeHidden();
   await expect(resultsMessage).toBeVisible();
@@ -307,8 +303,6 @@ test("Person happy path: search, check results are valid, select a person search
 
   console.log("Selecting the person search card...");
   await personCard.click();
-  const backButton = page.getByRole("button", { name: "back" });
-  await expect(backButton).toBeVisible();
   await expect(resultsMessage).toBeHidden();
 
   const personPanel = page.getByTestId("person-panel");
@@ -360,7 +354,6 @@ test("Person happy path: search, check results are valid, select a person search
   await page.keyboard.press("Escape");
   await expect(personPanel).toBeHidden();
   await expect(page.locator("#search-card.selected")).toHaveCount(0);
-  await expect(backButton).toBeHidden();
   await expect(resultsMessage).toBeVisible();
   for (const cardText of expectedPerson.cardText) {
     expect(await personCard.textContent()).toContain(cardText);
@@ -375,6 +368,8 @@ const expectedTvSeries = useMockHttpCalls
   ? {
       searchText: "1",
       name: "Example TV Series",
+      imdbId: "tt10000002",
+      tmdbId: 90002,
       cardText: [
         "Example TV SeriesSearch Type: MediaMedia Type: TV SeriesRank: ",
         "4444Known For: John Smith, James JohnsonYears: 2001-2003",
@@ -424,6 +419,8 @@ const expectedTvSeries = useMockHttpCalls
   : {
       searchText: "Buffy the Vampire Slayer",
       name: "Buffy the Vampire Slayer",
+      imdbId: "tt0118276",
+      tmdbId: 95,
       cardText: [
         "Buffy the Vampire SlayerSearch Type: MediaMedia Type: TV SeriesRank: ",
         "Years: 1997-2003",
@@ -488,8 +485,6 @@ test("TV series happy path: search, check results are valid, select a TV series 
 
   console.log("Selecting the TV series search card...");
   await tvSeriesCard.click();
-  const backButton = page.getByRole("button", { name: "back" });
-  await expect(backButton).toBeVisible();
   await expect(resultsMessage).toBeHidden();
 
   const tvSeriesPanel = page.getByTestId("tv-series-panel");
@@ -563,15 +558,353 @@ test("TV series happy path: search, check results are valid, select a TV series 
   expect(hasHorizontalScrollbar).toBe(false);
 
   console.log("Unselecting the TV series search card...");
-  await backButton.click();
+  await page.goBack();
   await expect(tvSeriesPanel).toBeHidden();
   await expect(page.locator("#search-card.selected")).toHaveCount(0);
-  await expect(backButton).toBeHidden();
   await expect(resultsMessage).toBeVisible();
   for (const cardText of expectedTvSeries.cardText) {
     expect(await tvSeriesCard.textContent()).toContain(cardText);
   }
   console.log("TV series happy path test finished.");
+});
+
+// Real data is limited to values that are unlikely to change over time (so no
+// watch providers, guest stars, or ratings).
+const expectedTvSeason = useMockHttpCalls
+  ? {
+      name: "Season 1",
+      seasonNumber: 1,
+      facts: [
+        "Season Number1",
+        "Number of Episodes3",
+        "First Air DateMar 10, 2001",
+      ],
+      sections: [
+        ["Episodes", "Example Pilot"],
+        ["Overview (TMDB)", "An example overview for season 1."],
+        ["Networks", "Example Network"],
+        ["Where to Stream", "Example Stream"],
+        ["Where to Rent", "None"],
+        ["Where to Buy", "Example Buy Store"],
+      ],
+      episode: {
+        episodeNumber: 1,
+        cardText: "1. Example PilotMar 10, 200144m · Standard",
+        title: "Example Pilot",
+        seasonEpisode: "Season 1, Episode 1",
+        imdbRow: /IMDB: 8\.1 \(3,456\)Link/,
+        facts: [
+          "Air DateMar 10, 2001",
+          "Year2001",
+          "Runtime44m43m",
+          "RatedTV-14",
+          "TypeStandard",
+          "Known ForExample Jones, Example Brown",
+          "GenresAction, Drama, Science Fiction",
+        ],
+        sections: [
+          ["Cast", "Example Jones"],
+          ["Directors", "Example Director"],
+          ["Writers", "Example Writer"],
+          ["Guest Stars", "Example Guest"],
+          ["Overview (OMDB)", "An example episode overview from OMDB."],
+          ["Overview (TMDB)", "An example episode overview from TMDB."],
+        ],
+      },
+    }
+  : {
+      name: "Season 6",
+      seasonNumber: 6,
+      facts: [
+        "Season Number6",
+        "Number of Episodes22",
+        "First Air DateOct 2, 2001",
+      ],
+      sections: [
+        ["Episodes", "Once More, with Feeling"],
+        ["Overview (TMDB)", ""],
+        ["Networks", ""],
+        ["Where to Stream", ""],
+        ["Where to Rent", ""],
+        ["Where to Buy", ""],
+      ],
+      episode: {
+        episodeNumber: 7,
+        cardText: "7. Once More, with FeelingNov 6, 2001",
+        title: "Once More, with Feeling",
+        seasonEpisode: "Season 6, Episode 7",
+        imdbRow: /IMDB: \d\.\d \([\d,]+\)Link/,
+        facts: ["Air DateNov 6, 2001", "Year2001", "TypeStandard"],
+        sections: [
+          ["Cast", "Sarah Michelle Gellar"],
+          ["Directors", "Joss Whedon"],
+          ["Writers", "Joss Whedon"],
+          ["Guest Stars", ""],
+          ["Overview (OMDB)", ""],
+          ["Overview (TMDB)", ""],
+        ],
+      },
+    };
+
+// Search for the TV series, open its panel, and expand the expected season.
+async function openSeason(page: Page) {
+  const searchQueryInput = page.getByRole("textbox", {
+    name: "search-query-input",
+  });
+  await searchQueryInput.fill(expectedTvSeries.searchText);
+  await page.getByRole("button", { name: "search" }).click();
+
+  const tvSeriesCard = page
+    .getByText(expectedTvSeries.name, { exact: true })
+    .first()
+    .locator("ancestor=#search-card");
+  await tvSeriesCard.click();
+  const tvSeriesPanel = page.getByTestId("tv-series-panel");
+  await expect(tvSeriesPanel).toBeVisible();
+
+  await tvSeriesPanel
+    .locator(".detail-sections > details")
+    .filter({ has: page.locator("> summary", { hasText: /^Seasons/ }) })
+    .locator("> summary")
+    .click();
+  const seasonCard = page
+    .getByTestId("season-card")
+    .filter({ hasText: expectedTvSeason.name })
+    .first();
+  await expect(seasonCard).toBeVisible();
+  await seasonCard.getByRole("button", { name: "Expand" }).click();
+
+  const seasonUrl = new RegExp(
+    `/tvseries/${expectedTvSeries.imdbId}\\?q=[^&]+&tmdbTvSeriesId=${String(expectedTvSeries.tmdbId)}&seasonNumber=${String(expectedTvSeason.seasonNumber)}$`,
+  );
+  await expect(page).toHaveURL(seasonUrl);
+  const tvSeasonPanel = page.getByTestId("tv-season-panel");
+  await expect(tvSeasonPanel).toBeVisible();
+  await expect(seasonCard).toHaveClass(/selected/);
+  await expect(seasonCard).toHaveClass(/expanded/);
+
+  console.log("Checking the season has taken over from the TV series...");
+  const tvSeriesTop = tvSeriesPanel.locator("> .detail-panel-top");
+  await expect(tvSeriesTop).toBeHidden();
+  await expect(
+    tvSeriesPanel.getByRole("heading", {
+      name: expectedTvSeries.name,
+      exact: true,
+    }),
+  ).toBeHidden();
+  await expect(
+    page.locator("[data-testid='season-card']:not(.selected)").first(),
+  ).toBeHidden();
+  return { tvSeriesPanel, tvSeriesTop, seasonCard, tvSeasonPanel, seasonUrl };
+}
+
+async function checkCollapsibleSections(panel: Locator, expected: string[][]) {
+  const sections = panel.locator(".detail-sections > details");
+  await expect(sections.locator("> summary")).toHaveText(
+    expected.map(([title]) => new RegExp(`^${escapeRegExp(title)}`)),
+  );
+  for (const [index, [, content]] of expected.entries()) {
+    const section = sections.nth(index);
+    const sectionBody = section.locator("> .collapsible-body");
+    await expect(sectionBody).toBeHidden();
+    await section.locator("> summary").click();
+    await expect(sectionBody).toBeVisible();
+    await expect(sectionBody).toContainText(content);
+  }
+}
+
+test("TV season happy path: open a TV series, expand a season card, check the season panel is valid, and go back with the browser", async ({
+  page,
+}) => {
+  console.log("Starting TV season happy path test...");
+  const { tvSeriesPanel, tvSeriesTop, seasonCard, tvSeasonPanel } =
+    await openSeason(page);
+
+  await expect(
+    tvSeasonPanel.getByRole("heading", {
+      name: expectedTvSeason.name,
+      exact: true,
+    }),
+  ).toBeVisible();
+  const imdbLink = tvSeasonPanel.getByRole("link", {
+    name: "Link",
+    exact: true,
+  });
+  await expect(imdbLink).toHaveAttribute("href", expectedTvSeries.imdbUrl);
+  await expect(imdbLink).toHaveAttribute("target", "_blank");
+  await expect(
+    tvSeasonPanel.getByRole("button", { name: "copy-imdb-link" }),
+  ).toHaveCount(0);
+  for (const fact of expectedTvSeason.facts) {
+    await expect(tvSeasonPanel).toContainText(fact);
+  }
+
+  console.log("Checking the collapsible sections...");
+  await checkCollapsibleSections(tvSeasonPanel, expectedTvSeason.sections);
+
+  console.log("Checking an episode card...");
+  const episodeCard = tvSeasonPanel
+    .getByTestId("episode-card")
+    .filter({ hasText: expectedTvSeason.episode.title })
+    .first();
+  await expect(episodeCard).toBeVisible();
+  expect(await episodeCard.textContent()).toContain(
+    expectedTvSeason.episode.cardText,
+  );
+  const episodeOverview = episodeCard.locator(".collapsible-body");
+  await expect(episodeOverview).toBeHidden();
+  await episodeCard.locator("summary").click();
+  await expect(episodeOverview).toBeVisible();
+  await expect(
+    episodeCard.getByRole("button", { name: "Expand" }),
+  ).toBeVisible();
+
+  console.log("Checking the page does not scroll horizontally...");
+  const hasHorizontalScrollbar = await page.evaluate(
+    () =>
+      document.documentElement.scrollWidth >
+      document.documentElement.clientWidth,
+  );
+  expect(hasHorizontalScrollbar).toBe(false);
+
+  console.log("Going back to the TV series with the browser back button...");
+  await page.goBack();
+  await expect(page).toHaveURL(
+    new RegExp(`/tvseries/${expectedTvSeries.imdbId}\\?q=[^&]+$`),
+  );
+  await expect(tvSeasonPanel).toBeHidden();
+  await expect(seasonCard).not.toHaveClass(/selected/);
+  await expect(tvSeriesPanel).toBeVisible();
+  await expect(tvSeriesTop).toBeVisible();
+  await expect(
+    tvSeriesPanel.getByRole("heading", {
+      name: expectedTvSeries.name,
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(
+    page.locator("[data-testid='season-card']:not(.selected)").first(),
+  ).toBeVisible();
+  await expect(seasonCard).toContainText(expectedTvSeason.name);
+  console.log("TV season happy path test finished.");
+});
+
+test("TV episode happy path: open a TV season, expand an episode card, check the episode panel is valid, reload it, and go back with the browser", async ({
+  page,
+}) => {
+  console.log("Starting TV episode happy path test...");
+  const { tvSeriesTop, seasonCard, tvSeasonPanel, seasonUrl } =
+    await openSeason(page);
+  const expectedEpisode = expectedTvSeason.episode;
+
+  console.log("Expanding the expected episode card...");
+  await tvSeasonPanel
+    .locator(".detail-sections > details")
+    .filter({ has: page.locator("> summary", { hasText: /^Episodes/ }) })
+    .locator("> summary")
+    .click();
+  const episodeCard = tvSeasonPanel
+    .getByTestId("episode-card")
+    .filter({ hasText: expectedEpisode.title })
+    .first();
+  await expect(episodeCard).toBeVisible();
+  await episodeCard.getByRole("button", { name: "Expand" }).click();
+
+  const episodeUrl = new RegExp(
+    `/tvseries/${expectedTvSeries.imdbId}\\?q=[^&]+&tmdbTvSeriesId=${String(expectedTvSeries.tmdbId)}&seasonNumber=${String(expectedTvSeason.seasonNumber)}&episodeNumber=${String(expectedEpisode.episodeNumber)}$`,
+  );
+  await expect(page).toHaveURL(episodeUrl);
+  const tvEpisodePanel = page.getByTestId("tv-episode-panel");
+  await expect(tvEpisodePanel).toBeVisible();
+  await expect(episodeCard).toHaveClass(/selected/);
+  await expect(episodeCard).toHaveClass(/expanded/);
+  await expect(
+    tvEpisodePanel.getByRole("heading", {
+      name: expectedEpisode.title,
+      exact: true,
+    }),
+  ).toBeVisible();
+
+  console.log("Checking the episode has taken over from the season...");
+  const tvSeasonTop = tvSeasonPanel.locator("> .detail-panel-top");
+  await expect(tvSeasonTop).toBeHidden();
+  await expect(
+    tvSeasonPanel.getByRole("heading", {
+      name: expectedTvSeason.name,
+      exact: true,
+    }),
+  ).toBeHidden();
+  await expect(tvSeriesTop).toBeHidden();
+  await expect(
+    page.locator("[data-testid='episode-card']:not(.selected)").first(),
+  ).toBeHidden();
+  await expect(tvEpisodePanel).toContainText(expectedEpisode.seasonEpisode);
+  await expect(tvEpisodePanel).toContainText(expectedEpisode.imdbRow);
+  const imdbLinks = tvEpisodePanel.getByRole("link", {
+    name: "Link",
+    exact: true,
+  });
+  await expect(imdbLinks).toHaveCount(2);
+  await expect(imdbLinks.first()).toHaveAttribute(
+    "href",
+    /^https:\/\/www\.imdb\.com\/title\/tt\d+$/,
+  );
+  await expect(imdbLinks.last()).toHaveAttribute(
+    "href",
+    expectedTvSeries.imdbUrl,
+  );
+  await expect(
+    tvEpisodePanel.getByRole("button", { name: "copy-imdb-link" }),
+  ).toHaveCount(1);
+  for (const fact of expectedEpisode.facts) {
+    await expect(tvEpisodePanel).toContainText(fact);
+  }
+
+  console.log("Checking the collapsible sections...");
+  await checkCollapsibleSections(tvEpisodePanel, expectedEpisode.sections);
+
+  console.log("Checking the page does not scroll horizontally...");
+  const hasHorizontalScrollbar = await page.evaluate(
+    () =>
+      document.documentElement.scrollWidth >
+      document.documentElement.clientWidth,
+  );
+  expect(hasHorizontalScrollbar).toBe(false);
+
+  console.log("Reloading the episode URL directly...");
+  await page.reload();
+  await expect(page).toHaveURL(episodeUrl);
+  await expect(tvEpisodePanel).toBeVisible();
+  await expect(
+    tvEpisodePanel.getByRole("heading", {
+      name: expectedEpisode.title,
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(page.getByTestId("tv-season-panel")).toBeVisible();
+  await expect(page.getByTestId("tv-series-panel")).toBeVisible();
+
+  console.log("Going back to the season with the ESC key...");
+  await page.keyboard.press("Escape");
+  await expect(page).toHaveURL(seasonUrl);
+  await expect(tvEpisodePanel).toBeHidden();
+  await expect(episodeCard).not.toHaveClass(/selected/);
+  await expect(tvSeasonPanel).toBeVisible();
+  await expect(tvSeasonTop).toBeVisible();
+  await expect(
+    tvSeasonPanel.getByRole("heading", {
+      name: expectedTvSeason.name,
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(
+    page.locator("[data-testid='episode-card']:not(.selected)").first(),
+  ).toBeVisible();
+  // The season still has the series handed over to it
+  await expect(tvSeriesTop).toBeHidden();
+  await expect(seasonCard).toHaveClass(/expanded/);
+  await expect(episodeCard).toContainText(expectedEpisode.title);
+  console.log("TV episode happy path test finished.");
 });
 
 function escapeRegExp(text: string): string {
