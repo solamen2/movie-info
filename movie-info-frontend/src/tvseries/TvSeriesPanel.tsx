@@ -14,11 +14,11 @@ import {
   getIntParam,
   withQueryParams,
 } from "../utilities/utilities";
-import CastCard from "./CastCard";
 import CreatorCard from "./CreatorCard";
 import CrewCard from "./CrewCard";
 import NetworkCard from "./NetworkCard";
 import SeasonCard from "./SeasonCard";
+import TvSeriesCastCollapsible from "./TvSeriesCastCollapsible";
 import { type TvSeries, type TvSeriesCrew, sortSeasons } from "./tvSeriesTypes";
 import "../shared/shared.css";
 import "./tvseries.css";
@@ -120,9 +120,6 @@ function TvSeriesPanel({ imdbId }: TvSeriesPanelProps) {
   const imdbRating = displayText(tvSeries.imdbRating);
   const imdbVotes = displayText(tvSeries.imdbVotes);
   const sortedSeasons = sortSeasons(tvSeries.seasons);
-  const sortedCast = [...tvSeries.cast].sort(
-    (a, b) => a.billedOrder - b.billedOrder,
-  );
 
   const facts: [string, ReactNode][] = [
     ["Original Name", displayText(tvSeries.originalName)],
@@ -241,13 +238,7 @@ function TvSeriesPanel({ imdbId }: TvSeriesPanelProps) {
             })}
           </HorizontalList>
         </Collapsible>
-        <Collapsible title="Cast" count={tvSeries.cast.length}>
-          <HorizontalList>
-            {sortedCast.map((c) => (
-              <CastCard key={c.id} cast={c} />
-            ))}
-          </HorizontalList>
-        </Collapsible>
+        <TvSeriesCastCollapsible cast={tvSeries.cast} />
         <Collapsible title="Creators" count={tvSeries.creators.length}>
           <HorizontalList>
             {tvSeries.creators.map((c) => (

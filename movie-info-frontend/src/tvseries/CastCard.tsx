@@ -3,9 +3,12 @@ import { type TvSeriesCast, displayEpisodeCount } from "./tvSeriesTypes";
 
 interface CastCardProps {
   cast: TvSeriesCast;
+  // Whether to show how many episodes the cast member appears in (default
+  // true); see TvSeriesCastCollapsible for why it can be hidden.
+  showEpisodeCount?: boolean;
 }
 
-function CastCard({ cast }: CastCardProps) {
+function CastCard({ cast, showEpisodeCount = true }: CastCardProps) {
   const imageUrl = getTmdbImageUrl(cast.profilePath, "w185");
   const characters = cast.characters.filter((c) => c !== "").join(", ");
 
@@ -28,7 +31,7 @@ function CastCard({ cast }: CastCardProps) {
         <p className="person-card-secondary">({cast.originalName})</p>
       )}
       {characters && <p className="person-card-secondary">{characters}</p>}
-      {cast.totalEpisodeCount > 0 && (
+      {showEpisodeCount && cast.totalEpisodeCount > 0 && (
         <p className="person-card-secondary">
           {displayEpisodeCount(cast.totalEpisodeCount)}
         </p>

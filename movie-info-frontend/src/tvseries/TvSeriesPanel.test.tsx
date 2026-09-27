@@ -217,8 +217,8 @@ describe("TvSeriesPanel", () => {
 
       const castCards = screen.getAllByTestId("cast-card");
       expect(castCards.map((c) => c.textContent)).toEqual([
-        "Example JonesLead, Lead's Twin37 episodes",
-        "No imageExample BrownSecond Lead1 episode",
+        "Example JonesLead, Lead's Twin",
+        "No imageExample BrownSecond Lead",
       ]);
       expect(screen.getByAltText("Example Jones")).toHaveAttribute(
         "src",
@@ -291,6 +291,83 @@ describe("TvSeriesPanel", () => {
       await searchAndSelectExampleTvSeries();
 
       expect(screen.queryByText("8 results.")).not.toBeInTheDocument();
+    });
+  });
+
+  describe("When the Cast section's 'Hide number of episodes' checkbox is used", () => {
+    function castCardTexts() {
+      return screen.getAllByTestId("cast-card").map((c) => c.textContent);
+    }
+
+    it("Should be checked by default and hide every cast member's episode count", async () => {
+      await searchAndSelectExampleTvSeries();
+      await screen.findByTestId("tv-series-panel");
+
+      const checkbox = screen.getByRole("checkbox", {
+        name: "Hide number of episodes",
+      });
+      expect(screen.getByText("Cast").closest("details")).toContainElement(
+        checkbox,
+      );
+      expect(checkbox).toBeChecked();
+      expect(castCardTexts()).toEqual([
+        "Example JonesLead, Lead's Twin",
+        "No imageExample BrownSecond Lead",
+      ]);
+    });
+
+    it("Should show the episode counts while unchecked and hide them again when re-checked", async () => {
+      await searchAndSelectExampleTvSeries();
+      await screen.findByTestId("tv-series-panel");
+      const checkbox = screen.getByRole("checkbox", {
+        name: "Hide number of episodes",
+      });
+
+      fireEvent.click(checkbox);
+      expect(checkbox).not.toBeChecked();
+      expect(castCardTexts()).toEqual([
+        "Example JonesLead, Lead's Twin37 episodes",
+        "No imageExample BrownSecond Lead1 episode",
+      ]);
+
+      fireEvent.click(checkbox);
+      expect(checkbox).toBeChecked();
+      expect(castCardTexts()).toEqual([
+        "Example JonesLead, Lead's Twin",
+        "No imageExample BrownSecond Lead",
+      ]);
+    });
+
+    it("Should keep the user's choice while the Cast section is collapsed and re-expanded", async () => {
+      await searchAndSelectExampleTvSeries();
+      await screen.findByTestId("tv-series-panel");
+      const checkbox = screen.getByRole("checkbox", {
+        name: "Hide number of episodes",
+      });
+      const castSection = screen.getByText("Cast").closest("details");
+      if (!castSection) {
+        throw new Error("Cast section not found");
+      }
+
+      fireEvent.click(checkbox);
+      castSection.open = true;
+      castSection.open = false;
+      castSection.open = true;
+      expect(checkbox).not.toBeChecked();
+      expect(castCardTexts()[0]).toBe(
+        "Example JonesLead, Lead's Twin37 episodes",
+      );
+    });
+
+    it("Should not put the choice in the URL", async () => {
+      const { currentUrl } = await searchAndSelectExampleTvSeries();
+      await screen.findByTestId("tv-series-panel");
+      const urlBefore = currentUrl();
+
+      fireEvent.click(
+        screen.getByRole("checkbox", { name: "Hide number of episodes" }),
+      );
+      expect(currentUrl()).toBe(urlBefore);
     });
   });
 

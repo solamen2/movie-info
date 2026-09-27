@@ -532,6 +532,21 @@ test("TV series happy path: search, check results are valid, select a TV series 
     await expect(sectionBody).toContainText(content);
   }
 
+  console.log("Checking the cast episode count checkbox...");
+  const castSection = tvSeriesPanel
+    .locator(".detail-sections > details")
+    .filter({ has: page.locator("> summary", { hasText: /^Cast/ }) });
+  const hideEpisodesCheckbox = castSection.getByRole("checkbox", {
+    name: "Hide number of episodes",
+  });
+  const firstCastCard = castSection.getByTestId("cast-card").first();
+  await expect(hideEpisodesCheckbox).toBeChecked();
+  await expect(firstCastCard).not.toContainText(/\d+ episodes?/);
+  await hideEpisodesCheckbox.uncheck();
+  await expect(firstCastCard).toContainText(/\d+ episodes?/);
+  await hideEpisodesCheckbox.check();
+  await expect(firstCastCard).not.toContainText(/\d+ episodes?/);
+
   console.log("Checking a season card...");
   const firstSeasonCard = page
     .getByTestId("season-card")
