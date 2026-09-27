@@ -36,6 +36,7 @@ const expectedMovie = useMockHttpCalls
   ? {
       searchText: "1",
       title: "Example Movie",
+      imdbId: "tt0000001",
       cardText: [
         "Example MovieSearch Type: MediaMedia Type: MovieRank: ",
         "4444Known For: Example Jones, Example BrownYear: 2016",
@@ -73,6 +74,7 @@ const expectedMovie = useMockHttpCalls
   : {
       searchText: "The Shawshank Redemption",
       title: "The Shawshank Redemption",
+      imdbId: "tt0111161",
       cardText: [
         "The Shawshank RedemptionSearch Type: MediaMedia Type: MovieRank: ",
         "Known For: Tim Robbins, Morgan FreemanYear: 1994", // remove rank from Shawshank because it changes over time
@@ -132,6 +134,10 @@ test("Basic happy path: search, check results are valid, select a movie search c
   const backButton = page.getByRole("button", { name: "back" });
   await expect(backButton).toBeVisible();
   await expect(resultsMessage).toBeHidden();
+  const detailUrl = new RegExp(
+    `/movie/${expectedMovie.imdbId}\\?q=${encodeURIComponent(expectedMovie.searchText).replace(/%20/g, "\\+")}$`,
+  );
+  await expect(page).toHaveURL(detailUrl);
 
   const moviePanel = page.getByTestId("movie-panel");
   await expect(moviePanel).toBeVisible();
@@ -173,6 +179,47 @@ test("Basic happy path: search, check results are valid, select a movie search c
   await expect(moviePanel).toBeHidden();
   await expect(page.locator("#search-card.selected")).toHaveCount(0);
   await expect(backButton).toBeHidden();
+  await expect(resultsMessage).toBeVisible();
+  for (const cardText of expectedMovie.cardText) {
+    expect(await movieCard.textContent()).toContain(cardText);
+  }
+  const searchUrl = /\/search\?q=[^/]+$/;
+  await expect(page).toHaveURL(searchUrl);
+
+  console.log("Reselecting the movie and using the browser back button...");
+  await movieCard.click();
+  await expect(moviePanel).toBeVisible();
+  await expect(page).toHaveURL(detailUrl);
+  await page.goBack();
+  await expect(page).toHaveURL(searchUrl);
+  await expect(moviePanel).toBeHidden();
+  await expect(page.locator("#search-card.selected")).toHaveCount(0);
+  await expect(backButton).toBeHidden();
+  await expect(resultsMessage).toBeVisible();
+
+  console.log("Using the browser forward button...");
+  await page.goForward();
+  await expect(page).toHaveURL(detailUrl);
+  await expect(moviePanel).toBeVisible();
+  await expect(page.locator("#search-card.selected.expanded")).toHaveCount(1);
+  await expect(
+    moviePanel.getByRole("heading", { name: expectedMovie.title, exact: true }),
+  ).toBeVisible();
+
+  console.log("Reloading the movie URL directly...");
+  await page.reload();
+  await expect(page).toHaveURL(detailUrl);
+  await expect(moviePanel).toBeVisible();
+  await expect(page.locator("#search-card.selected.expanded")).toHaveCount(1);
+  await expect(
+    moviePanel.getByRole("heading", { name: expectedMovie.title, exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("textbox", { name: "search-query-input" }),
+  ).toHaveValue(expectedMovie.searchText);
+  await backButton.click();
+  await expect(page).toHaveURL(searchUrl);
+  await expect(moviePanel).toBeHidden();
   await expect(resultsMessage).toBeVisible();
   for (const cardText of expectedMovie.cardText) {
     expect(await movieCard.textContent()).toContain(cardText);

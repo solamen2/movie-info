@@ -1,18 +1,13 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { MemoryRouter } from "react-router-dom";
+import { renderApp } from "../../tests/renderApp";
 import { http, HttpResponse } from "msw";
 import { server } from "../../tests/mocks/node.ts";
 import personDataJson1 from "../../tests/mocks/data/personData1.json" with { type: "json" };
-import SuggestionSearch from "../suggestion/SuggestionSearch";
 import PersonPanel from "./PersonPanel";
 
 async function searchAndSelectExamplePerson() {
-  const utils = render(
-    <MemoryRouter>
-      <SuggestionSearch />
-    </MemoryRouter>,
-  );
+  const utils = renderApp();
   const searchQueryInput = screen.getByRole("textbox", {
     name: "search-query-input",
   });

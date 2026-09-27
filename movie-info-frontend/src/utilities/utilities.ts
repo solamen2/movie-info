@@ -91,3 +91,37 @@ export function getTmdbImageUrl(
 ): string | null {
   return path ? `${TMDB_IMAGE_BASE_URL}/${size}${path}` : null;
 }
+
+// Which detail panel (and therefore which URL path) a search result opens.
+// The segment doubles as the route path, e.g. "/movie/tt0111161".
+export type PanelKind = "movie" | "tvseries" | "person";
+
+export function getPanelKind(
+  searchType: number | string | null,
+  mediaType: MediaType | null,
+): PanelKind | null {
+  if (canHaveMoviePanel(mediaType)) return "movie";
+  if (canHaveTvSeriesPanel(mediaType)) return "tvseries";
+  const isPerson = getSearchTypeLabel(searchType) === "Person";
+  if (canHavePersonPanel(isPerson, mediaType)) return "person";
+  return null;
+}
+
+// The search query travels with every route as `?q=` so that the results grid
+// can be rebuilt when a detail URL is loaded directly, and so that in-app and
+// browser back both land on the same results.
+function querySuffix(query: string): string {
+  return query ? `?${new URLSearchParams({ q: query }).toString()}` : "";
+}
+
+export function searchPath(query: string): string {
+  return `/search${querySuffix(query)}`;
+}
+
+export function detailPath(
+  panelKind: PanelKind,
+  imdbId: string,
+  query: string,
+): string {
+  return `/${panelKind}/${encodeURIComponent(imdbId)}${querySuffix(query)}`;
+}

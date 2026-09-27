@@ -1,13 +1,12 @@
-import { useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 import MoviePanel from "../movie/MoviePanel";
 import PersonPanel from "../person/PersonPanel";
 import TvSeriesPanel from "../tvseries/TvSeriesPanel";
 import { type MediaResultType, type MediaType } from "../utilities/constants";
 import {
-  canHaveMoviePanel,
-  canHavePersonPanel,
   canHaveTvSeriesPanel,
   getSearchTypeLabel,
+  type PanelKind,
 } from "../utilities/utilities";
 
 export interface SuggestionImage {
@@ -39,6 +38,9 @@ interface SuggestionSearchCardProps {
   // instead.
   expanded?: boolean;
   mediaType: MediaType | null;
+  // Which detail panel this card grows into, or null for cards that only
+  // highlight when selected.
+  panelKind: PanelKind | null;
   onClick: () => void;
 }
 
@@ -48,6 +50,7 @@ function SuggestionSearchCard({
   deselecting,
   expanded,
   mediaType,
+  panelKind,
   onClick,
 }: SuggestionSearchCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
@@ -56,21 +59,27 @@ function SuggestionSearchCard({
   const showYear = !isPerson && !canHaveTvSeriesPanel(mediaType);
   const showYears = !isPerson && canHaveTvSeriesPanel(mediaType);
 
+  // On becoming selected, capture the card's layout offset so CSS can translate
+  // it to the upper-left corner. This runs before the browser paints the
+  // `.selected` class, and the other cards are still in layout at that point
+  // (their `display: none` is deferred until their fade-out ends), so the
+  // offset is still the card's slot in the grid. Selection can be triggered
+  // by the browser's back / forward buttons as well as by a click, which is
+  // why this lives here rather than in the click handler. The results
+  // container is position:relative, so it is the card's offsetParent and
+  // offsetLeft / offsetTop are already measured from its inner edges.
+  // (offsetLeft/offsetTop reflect layout position and ignore any in-flight
+  // transform, so this is safe even mid-animation.)
+  useLayoutEffect(() => {
+    const card = cardRef.current;
+    if (selected && card) {
+      card.style.setProperty("--orig-x", `${String(card.offsetLeft)}px`);
+      card.style.setProperty("--orig-y", `${String(card.offsetTop)}px`);
+    }
+  }, [selected]);
+
   function handleClick() {
     if (expanded) return;
-    // When transitioning into the selected state, capture the card's layout
-    // offset so CSS can translate it to the upper-left corner. The results
-    // container is position:relative, so it is the card's offsetParent and
-    // offsetLeft / offsetTop are already measured from its inner edges.
-    // (offsetLeft/offsetTop reflect layout position and ignore any in-flight
-    // transform, so this is safe even mid-animation.)
-    if (!selected) {
-      const card = cardRef.current;
-      if (card) {
-        card.style.setProperty("--orig-x", `${String(card.offsetLeft)}px`);
-        card.style.setProperty("--orig-y", `${String(card.offsetTop)}px`);
-      }
-    }
     onClick();
   }
 
@@ -83,13 +92,9 @@ function SuggestionSearchCard({
   if (expanded) {
     return (
       <div ref={cardRef} id="search-card" className={className}>
-        {canHaveMoviePanel(mediaType) && <MoviePanel imdbId={item.itemID} />}
-        {canHaveTvSeriesPanel(mediaType) && (
-          <TvSeriesPanel imdbId={item.itemID} />
-        )}
-        {canHavePersonPanel(isPerson, mediaType) && (
-          <PersonPanel imdbId={item.itemID} />
-        )}
+        {panelKind === "movie" && <MoviePanel imdbId={item.itemID} />}
+        {panelKind === "tvseries" && <TvSeriesPanel imdbId={item.itemID} />}
+        {panelKind === "person" && <PersonPanel imdbId={item.itemID} />}
       </div>
     );
   }

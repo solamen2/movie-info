@@ -1,18 +1,13 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { MemoryRouter } from "react-router-dom";
+import { renderApp } from "../../tests/renderApp";
 import { http, HttpResponse } from "msw";
 import { server } from "../../tests/mocks/node.ts";
 import tvSeriesDataJson1 from "../../tests/mocks/data/tvSeriesData1.json" with { type: "json" };
-import SuggestionSearch from "../suggestion/SuggestionSearch";
 import TvSeriesPanel from "./TvSeriesPanel";
 
 async function searchAndSelectExampleTvSeries() {
-  const utils = render(
-    <MemoryRouter>
-      <SuggestionSearch />
-    </MemoryRouter>,
-  );
+  const utils = renderApp();
   const searchQueryInput = screen.getByRole("textbox", {
     name: "search-query-input",
   });

@@ -1,17 +1,12 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { MemoryRouter } from "react-router-dom";
-import SuggestionSearch from "./SuggestionSearch";
+import { renderApp } from "../../tests/renderApp";
 
 // screen.logTestingPlaygroundURL();
 describe("SuggestionSearch", () => {
   describe("When using search terms with results", () => {
     it("Should return search results", async () => {
-      render(
-        <MemoryRouter>
-          <SuggestionSearch />
-        </MemoryRouter>,
-      ); // MemoryRouter required to use navigate()
+      renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
         name: "search-query-input",
       });
@@ -29,11 +24,7 @@ describe("SuggestionSearch", () => {
   });
   describe("When using search terms with no results", () => {
     it("Should show 'No results.'", async () => {
-      render(
-        <MemoryRouter>
-          <SuggestionSearch />
-        </MemoryRouter>,
-      );
+      renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
         name: "search-query-input",
       });
@@ -46,11 +37,7 @@ describe("SuggestionSearch", () => {
   });
   describe("When using a bad search term", () => {
     it("Should show error 'An unexpected error occurred. Please try again.'", async () => {
-      render(
-        <MemoryRouter>
-          <SuggestionSearch />
-        </MemoryRouter>,
-      );
+      renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
         name: "search-query-input",
       });
@@ -65,11 +52,7 @@ describe("SuggestionSearch", () => {
   });
   describe("When valid user clicks the log out button", () => {
     it("Should log out user successfully", () => {
-      render(
-        <MemoryRouter>
-          <SuggestionSearch />
-        </MemoryRouter>,
-      );
+      renderApp();
       const logoutButton = screen.getByRole("button", { name: "logout" });
       fireEvent.click(logoutButton);
     });

@@ -1,15 +1,10 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { MemoryRouter } from "react-router-dom";
-import SuggestionSearch from "../suggestion/SuggestionSearch";
+import { renderApp } from "../../tests/renderApp";
 import MoviePanel from "./MoviePanel";
 
 async function searchAndSelectExampleMovie() {
-  const utils = render(
-    <MemoryRouter>
-      <SuggestionSearch />
-    </MemoryRouter>,
-  );
+  const utils = renderApp();
   const searchQueryInput = screen.getByRole("textbox", {
     name: "search-query-input",
   });
@@ -252,11 +247,7 @@ describe("MoviePanel", () => {
 
   describe("When a search card without a detail panel is selected", () => {
     it("Should not expand into a movie panel", async () => {
-      render(
-        <MemoryRouter>
-          <SuggestionSearch />
-        </MemoryRouter>,
-      );
+      renderApp();
       fireEvent.change(
         screen.getByRole("textbox", { name: "search-query-input" }),
         { target: { value: "2" } },
