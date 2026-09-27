@@ -282,6 +282,10 @@
    results grid or a .horizontal-list, each of which gets `.has-selection`
    while one of its cards is selected. */
 .expandable-card {
+  /* The card's width is always set explicitly; pinning the flex minimum to 0
+     guarantees a wide row of cards inside an expanded panel can never widen
+     the card beyond its own row. */
+  min-width: 0;
   opacity: 1;
   transform: translate(0, 0);
   /* `allow-discrete` lets `display` participate in the transition: on the

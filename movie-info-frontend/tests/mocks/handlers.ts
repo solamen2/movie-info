@@ -23,7 +23,23 @@ interface RegisterRequestBody {
   password: string;
 }
 
+// A tiny poster-shaped image served for every mock image URL, so pages render
+// real (not broken) images in mock mode. Browsers size a broken image
+// differently from a loaded one, which shifts the layout under the user (and
+// under the end-to-end tests) when the failed request comes back.
+const PLACEHOLDER_IMAGE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="300" viewBox="0 0 200 300"><rect width="200" height="300" fill="#556"/><text x="100" y="160" fill="#ccd" font-family="sans-serif" font-size="28" text-anchor="middle">mock</text></svg>`;
+
+function placeholderImage() {
+  return new HttpResponse(PLACEHOLDER_IMAGE_SVG, {
+    status: 200,
+    headers: { "Content-Type": "image/svg+xml" },
+  });
+}
+
 export const handlers = [
+  http.get("https://image.tmdb.org/t/p/*", placeholderImage),
+  http.get("https://example.com/*", placeholderImage),
+
   http.post<LoginPathParams, LoginRequestBody, LoginResponseBody>(
     "/api/login",
     async ({ request }) => {
