@@ -568,9 +568,29 @@ test("TV series happy path: search, check results are valid, select a TV series 
   console.log("TV series happy path test finished.");
 });
 
+// A collapsible section's title and the content (one string, or several that
+// must all appear) expected inside it once opened.
+type ExpectedSection = [title: string, content: string | string[]];
+
+interface ExpectedTvSeason {
+  name: string;
+  seasonNumber: number;
+  facts: string[];
+  sections: ExpectedSection[];
+  episode: {
+    episodeNumber: number;
+    cardText: string;
+    title: string;
+    seasonEpisode: string;
+    imdbRow: RegExp;
+    facts: string[];
+    sections: ExpectedSection[];
+  };
+}
+
 // Real data is limited to values that are unlikely to change over time (so no
-// watch providers, guest stars, or ratings).
-const expectedTvSeason = useMockHttpCalls
+// watch providers or overviews).
+const expectedTvSeason: ExpectedTvSeason = useMockHttpCalls
   ? {
       name: "Season 1",
       seasonNumber: 1,
@@ -634,12 +654,19 @@ const expectedTvSeason = useMockHttpCalls
         title: "Once More, with Feeling",
         seasonEpisode: "Season 6, Episode 7",
         imdbRow: /IMDB: \d\.\d \([\d,]+\)Link/,
-        facts: ["Air DateNov 6, 2001", "Year2001", "TypeStandard"],
+        facts: [
+          "Air DateNov 6, 2001",
+          "Year2001",
+          // The musical episode runs long (OMDB runtime, then TMDB's)
+          "Runtime50m50m",
+          "Rated13+",
+          "TypeStandard",
+        ],
         sections: [
-          ["Cast", "Sarah Michelle Gellar"],
+          ["Cast", ["Sarah Michelle Gellar", "James Marsters"]],
           ["Directors", "Joss Whedon"],
           ["Writers", "Joss Whedon"],
-          ["Guest Stars", ""],
+          ["Guest Stars", ["Hinton Battle", "Amber Benson"]],
           ["Overview (OMDB)", ""],
           ["Overview (TMDB)", ""],
         ],
@@ -698,7 +725,12 @@ async function openSeason(page: Page) {
   return { tvSeriesPanel, tvSeriesTop, seasonCard, tvSeasonPanel, seasonUrl };
 }
 
-async function checkCollapsibleSections(panel: Locator, expected: string[][]) {
+// Each section is [title, expected content], where the content can be a
+// single string or several strings that must all appear.
+async function checkCollapsibleSections(
+  panel: Locator,
+  expected: ExpectedSection[],
+) {
   const sections = panel.locator(".detail-sections > details");
   await expect(sections.locator("> summary")).toHaveText(
     expected.map(([title]) => new RegExp(`^${escapeRegExp(title)}`)),
@@ -709,7 +741,9 @@ async function checkCollapsibleSections(panel: Locator, expected: string[][]) {
     await expect(sectionBody).toBeHidden();
     await section.locator("> summary").click();
     await expect(sectionBody).toBeVisible();
-    await expect(sectionBody).toContainText(content);
+    for (const text of Array.isArray(content) ? content : [content]) {
+      await expect(sectionBody).toContainText(text);
+    }
   }
 }
 
