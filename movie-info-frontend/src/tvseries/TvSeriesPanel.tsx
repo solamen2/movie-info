@@ -7,6 +7,7 @@ import ImdbRow, { ImdbRowSeparator } from "../shared/ImdbRow";
 import WatchProviderSection from "../shared/WatchProviderSection";
 import { useCardSelection } from "../shared/useCardSelection";
 import {
+  describeFailedResponse,
   displayDate,
   displayGenres,
   displayRuntime,
@@ -76,7 +77,7 @@ function TvSeriesPanel({ imdbId }: TvSeriesPanelProps) {
         );
         if (!response.ok) {
           setError(
-            `Loading TV series failed with status ${String(response.status)}. Please try again.`,
+            `${await describeFailedResponse("Loading TV series", response)} Please try again.`,
           );
           return;
         }

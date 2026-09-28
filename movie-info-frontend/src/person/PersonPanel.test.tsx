@@ -348,7 +348,7 @@ describe("PersonPanel", () => {
 
       expect(
         await screen.findByText(
-          "Loading person failed with status 404. Please try again.",
+          "Loading person failed with status 404: Not a valid IMDB ID for mock. Please try again.",
         ),
       ).toBeInTheDocument();
     });

@@ -48,7 +48,7 @@ public class TvSeriesEndpoint
                         if (tmdbTvSeriesIdNullable == null)
                         {
                             Log.Debug($"TV series TMDB ID for search '{imdbId}' was null!");
-                            return null;
+                            return Results.NotFound($"TV series for search '{imdbId}' was not found in the TMDB.");
                         }
                         int tmdbTvSeriesId = tmdbTvSeriesIdNullable.GetValueOrDefault();
                         Task<TmdbTvSeriesResponseDataModel?> tmdbTvSeriesTask = GetTmdbTvSeriesResponseDataModel(tmdbTvSeriesId, tmdbHttpClient);

@@ -4,6 +4,7 @@ import HorizontalList from "../shared/HorizontalList";
 import ImdbRow, { ImdbRowSeparator } from "../shared/ImdbRow";
 import WatchProviderSection from "../shared/WatchProviderSection";
 import {
+  describeFailedResponse,
   displayDate,
   displayGenres,
   displayRuntime,
@@ -55,7 +56,7 @@ function MoviePanel({ imdbId }: MoviePanelProps) {
         );
         if (!response.ok) {
           setError(
-            `Loading movie failed with status ${String(response.status)}. Please try again.`,
+            `${await describeFailedResponse("Loading movie", response)} Please try again.`,
           );
           return;
         }

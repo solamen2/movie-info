@@ -46,7 +46,7 @@ public class TvEpisodeEndpoint
                         if (imdbTvEpisodeIdNullable == null)
                         {
                             Log.Debug($"TV episode external IMDB ID for search with TMDB TV series ID '{tmdbTvSeriesId}', seasonNumber '{seasonNumber}', and episode number '{episodeNumber}' was null!");
-                            return null;
+                            return Results.NotFound($"TV episode for search '{tmdbTvSeriesId}', seasonNumber '{seasonNumber}', and episode number '{episodeNumber}' was not found in the TMDB.");
                         }
                         string imdbTvEpisodeId = imdbTvEpisodeIdNullable;
                         Task<OmdbResponseDataModel?> omdbTvEpisodeTask = GetOmdbResponseDataModel(imdbTvEpisodeId, omdbHttpClient);

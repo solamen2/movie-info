@@ -3,7 +3,11 @@ import type { TmdbGender } from "../shared/sharedTypes";
 import Collapsible from "../shared/Collapsible";
 import HorizontalList from "../shared/HorizontalList";
 import ImdbRow from "../shared/ImdbRow";
-import { displayDate, displayText } from "../utilities/utilities";
+import {
+  describeFailedResponse,
+  displayDate,
+  displayText,
+} from "../utilities/utilities";
 import MovieCastCard from "./MovieCastCard";
 import MovieCrewCard from "./MovieCrewCard";
 import ProfileImagesList from "./ProfileImagesList";
@@ -39,7 +43,7 @@ function PersonPanel({ imdbId }: PersonPanelProps) {
         );
         if (!response.ok) {
           setError(
-            `Loading person failed with status ${String(response.status)}. Please try again.`,
+            `${await describeFailedResponse("Loading person", response)} Please try again.`,
           );
           return;
         }

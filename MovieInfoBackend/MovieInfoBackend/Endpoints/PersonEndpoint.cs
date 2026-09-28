@@ -42,7 +42,7 @@ public class PersonEndpoint
                         if (tmdbPersonIdNullable == null)
                         {
                             Log.Debug($"Person TMDB ID for search '{imdbId}' was null!");
-                            return null;
+                            return Results.NotFound($"Person for search '{imdbId}' was not found in the TMDB.");
                         }
                         int tmdbPersonId = tmdbPersonIdNullable.GetValueOrDefault();
                         Task<TmdbPersonResponseDataModel?> tmdbPersonTask = GetTmdbPersonResponseDataModel(tmdbPersonId, tmdbHttpClient);

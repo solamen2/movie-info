@@ -278,7 +278,7 @@ describe("MoviePanel", () => {
 
       expect(
         await screen.findByText(
-          "Loading movie failed with status 404. Please try again.",
+          "Loading movie failed with status 404: Not a valid IMDB ID for mock. Please try again.",
         ),
       ).toBeInTheDocument();
     });

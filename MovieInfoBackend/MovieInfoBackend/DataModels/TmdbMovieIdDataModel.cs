@@ -11,9 +11,9 @@ public record TmdbMovieIdDataModel
     [JsonPropertyName("id")]
     public required int TmdbId { get; init; }
     [JsonPropertyName("title")]
-    public required string Title { get; init; }
+    public string? Title { get; init; }
     [JsonPropertyName("original_title")]
-    public required string OriginalTitle { get; init; }
+    public string? OriginalTitle { get; init; }
     [JsonPropertyName("overview")]
     public required string Overview { get; init; }
     [JsonPropertyName("poster_path")]
@@ -31,7 +31,7 @@ public record TmdbMovieIdDataModel
     [JsonPropertyName("softcore")]
     public required bool Softcore { get; init; }
     [JsonPropertyName("video")]
-    public required bool Video { get; init; }
+    public bool? Video { get; init; }
     [JsonPropertyName("vote_average")]
     public required double VoteAverage { get; init; }
     [JsonPropertyName("vote_count")]
