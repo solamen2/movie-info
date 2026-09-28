@@ -59,24 +59,31 @@
   overflow-wrap: anywhere;
 }
 
-.season-card .collapsible {
+.season-card > .collapsible {
   margin-top: 0.4rem;
   border-top: 1px solid #444;
   border-bottom: none;
 }
 
-.season-card .collapsible summary {
+.season-card > .collapsible > summary {
   padding: 0.4rem 0.1rem;
   font-size: 0.85rem;
 }
 
-.season-card .collapsible-body {
+.season-card > .collapsible > .collapsible-body {
   padding: 0 0.1rem 0.4rem;
 }
 
-.season-card .detail-prose {
+.season-card > .collapsible .detail-prose {
   font-size: 0.8rem;
   line-height: 1.4;
+}
+
+/* A selected season card grows to fill the seasons row and shows the season
+   panel (see .expandable-card in shared.css). Width subtracts the card's
+   padding and border since it uses content-box sizing. */
+.season-card.expanded {
+  width: calc(100% - 1rem - 2px);
 }
 
 .season-card-expand {
@@ -85,6 +92,25 @@
   padding: 0.7em 1em;
   font-size: 1.05rem;
   font-weight: 600;
+}
+
+/* A checkbox option shown at the top of a collapsible section's body (e.g.
+   "Hide number of episodes" in the Cast section) */
+.collapsible-option {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0 0 0.6rem;
+  font-size: 0.85rem;
+}
+
+.collapsible-option input {
+  margin: 0;
+}
+
+.collapsible-option label {
+  cursor: pointer;
+  user-select: none;
 }
 
 /* Network cards shown in the horizontally scrolling networks row */
@@ -138,7 +164,7 @@
 
 @media (prefers-color-scheme: light) {
   .season-card,
-  .season-card .collapsible,
+  .season-card > .collapsible,
   .network-card {
     border-color: #ccc;
   }

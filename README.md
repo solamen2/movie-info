@@ -16,7 +16,7 @@ TODO: Display some screenshots of the app
 ## AI Usage During Development
 
 - I did not use AI at all during the setup of the project, since I wanted to have a very good understanding of the basic architecture of the app and the technical tradeoffs I was making.
-- After setting up the basic skeleton and fleshing out the backend, I have been using Claude Code to help me code the frontend React pages quickly, since I have some experience with React already. (I personally review every change it makes, and sometimes re-prompt or make small changes myself.)
+- After setting up the basic skeleton and fleshing out the backend, I have been using Claude Code to help me code the frontend React pages quickly, since I have some experience with React already. (I personally review every change it makes, and sometimes re-prompt or make small changes myself.) Commits and PRs that are totally (or even mostly) AI-created I have labeled with the prefix "AI-GENERATED:".
 - I also used AI to generate some test cases after I had set up some test cases myself, in order to increase test coverage of similar cases and to catch scenarios I had not considered.
 - Any time AI was used, I have included the prompts as a comment on the PR that merged those changes.
 - I did not use AI to write any of the text in this document.
@@ -41,7 +41,7 @@ A somewhat unusual feature of the app is that I build the Docker image using [Do
 
 ### Data
 
-Virtually all the data this app uses comes in from web requests in JSON format. None of this is ever persisted locally (though a few things are temporarily cached via [.NET's built-in IMemoryCache](https://learn.microsoft.com/en-us/aspnet/core/performance/caching/memory?view=aspnetcore-10.0)), and the data are processed via JsonPropertyName annotations and calling JsonSerializer.Deserialize() to deserialize into data models (in HttpClient-derived classes). These data models are aggregated into view models in the endpoint classes and then serialized back out to JSON for this app's API calls.
+Virtually all the data this app uses comes in from web requests in JSON format. None of this is ever persisted locally (though a few things are temporarily cached via [.NET's built-in IMemoryCache](https://learn.microsoft.com/en-us/aspnet/core/performance/caching/memory?view=aspnetcore-10.0)), and the data are processed via JsonPropertyName annotations and calling JsonSerializer.Deserialize() to deserialize into data models (in HttpClient-derived classes). These data models are aggregated into view models in the endpoint classes and then serialized back out to JSON for this app's API calls. TODO: Remove unused items in ViewModel classes
 
 The app uses a SQL Server database to store a tiny bit of user configration and login info. This is a bit of overkill, as it could have easily been handled using Azure Cache For Redis or SQLite (both which I have used before successfully), or other technologies as well. But I wanted to teach myself how to build an app using SQL Server from the ground up, and it works well so far.
 

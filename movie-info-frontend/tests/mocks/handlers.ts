@@ -4,6 +4,8 @@ import searchDataJson2 from "./data/searchData2.json" with { type: "json" };
 import movieDataJson1 from "./data/movieData1.json" with { type: "json" };
 import personDataJson1 from "./data/personData1.json" with { type: "json" };
 import tvSeriesDataJson1 from "./data/tvSeriesData1.json" with { type: "json" };
+import tvSeasonDataJson1 from "./data/tvSeasonData1.json" with { type: "json" };
+import tvEpisodeDataJson1 from "./data/tvEpisodeData1.json" with { type: "json" };
 
 type LoginPathParams = object;
 
@@ -21,7 +23,23 @@ interface RegisterRequestBody {
   password: string;
 }
 
+// A tiny poster-shaped image served for every mock image URL, so pages render
+// real (not broken) images in mock mode. Browsers size a broken image
+// differently from a loaded one, which shifts the layout under the user (and
+// under the end-to-end tests) when the failed request comes back.
+const PLACEHOLDER_IMAGE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="300" viewBox="0 0 200 300"><rect width="200" height="300" fill="#556"/><text x="100" y="160" fill="#ccd" font-family="sans-serif" font-size="28" text-anchor="middle">mock</text></svg>`;
+
+function placeholderImage() {
+  return new HttpResponse(PLACEHOLDER_IMAGE_SVG, {
+    status: 200,
+    headers: { "Content-Type": "image/svg+xml" },
+  });
+}
+
 export const handlers = [
+  http.get("https://image.tmdb.org/t/p/*", placeholderImage),
+  http.get("https://example.com/*", placeholderImage),
+
   http.post<LoginPathParams, LoginRequestBody, LoginResponseBody>(
     "/api/login",
     async ({ request }) => {
@@ -105,6 +123,42 @@ export const handlers = [
     }
     return HttpResponse.json(
       { error: "Not a valid IMDB ID for mock" },
+      { status: 404 },
+    );
+  }),
+
+  http.get("/api/tvseason", ({ request }) => {
+    const url = new URL(request.url);
+    const tmdbTvSeriesId = url.searchParams.get("tmdbTvSeriesId");
+    const seasonNumber = url.searchParams.get("seasonNumber");
+
+    if (
+      tmdbTvSeriesId === String(tvSeriesDataJson1.tmdbId) &&
+      seasonNumber === String(tvSeasonDataJson1.seasonNumber)
+    ) {
+      return HttpResponse.json(tvSeasonDataJson1, { status: 200 });
+    }
+    return HttpResponse.json(
+      { error: "Not a valid TV season for mock" },
+      { status: 404 },
+    );
+  }),
+
+  http.get("/api/tvepisode", ({ request }) => {
+    const url = new URL(request.url);
+    const tmdbTvSeriesId = url.searchParams.get("tmdbTvSeriesId");
+    const seasonNumber = url.searchParams.get("seasonNumber");
+    const episodeNumber = url.searchParams.get("episodeNumber");
+
+    if (
+      tmdbTvSeriesId === String(tvSeriesDataJson1.tmdbId) &&
+      seasonNumber === String(tvEpisodeDataJson1.seasonNumber) &&
+      episodeNumber === String(tvEpisodeDataJson1.episodeNumber)
+    ) {
+      return HttpResponse.json(tvEpisodeDataJson1, { status: 200 });
+    }
+    return HttpResponse.json(
+      { error: "Not a valid TV episode for mock" },
       { status: 404 },
     );
   }),

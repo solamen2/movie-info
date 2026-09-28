@@ -1,57 +1,147 @@
-import {
-  type SubmitEvent,
-  useEffect,
-  useEffectEvent,
-  useRef,
-  useState,
-} from "react";
-import { useNavigate } from "react-router-dom";
+import { type SubmitEvent, useEffect, useEffectEvent, useState } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import SuggestionSearchCard, { type Suggestion } from "./SuggestionSearchCard";
+import { useCardSelection } from "../shared/useCardSelection";
 import {
-  canHaveMoviePanel,
-  canHavePersonPanel,
-  canHaveTvSeriesPanel,
-  getSearchTypeLabel,
+  detailPath,
+  getPanelKind,
+  type PanelKind,
+  searchPath,
+  selectedCardPath,
 } from "../utilities/utilities";
+import { MediaTypes } from "../utilities/constants";
 
-// Keep in sync with the `select-fly` / `deselect-fly` animation duration and
-// the `.result-card` width transition duration in App.css.
-const CARD_FLY_MS = 500;
-const CARD_RESIZE_MS = 300;
-
-function hasDetailPanel(item: Suggestion) {
-  const mediaType = item.mediaType?.value ?? null;
-  const isPerson = getSearchTypeLabel(item.searchType) === "Person";
-  return (
-    canHaveMoviePanel(mediaType) ||
-    canHaveTvSeriesPanel(mediaType) ||
-    canHavePersonPanel(isPerson, mediaType)
-  );
+function panelKindOf(item: Suggestion): PanelKind | null {
+  return getPanelKind(item.searchType, item.mediaType?.value ?? null);
 }
 
-function SuggestionSearch() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [results, setResults] = useState<Suggestion[]>([]);
-  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
-  // Tracks the card the user just transitioned out of selected. The card
-  // gets a `.deselecting` class which fires the `deselect-fly` keyframe
-  // animation in CSS — required because CSS animations only run on class
-  // addition, not on class removal, so we can't rely on .selected alone to
-  // animate both directions.
-  const [previouslySelectedItemId, setPreviouslySelectedItemId] = useState<
-    string | null
-  >(null);
-  // A selected card with a detail panel animates in two phases: first it flies
-  // to the upper-left (selectedItemId), then it grows into the panel
-  // (expandedItemId). Going back runs the phases in reverse.
-  const [expandedItemId, setExpandedItemId] = useState<string | null>(null);
-  const phaseTimeoutRef = useRef<number | undefined>(undefined);
-  const [error, setError] = useState("");
-  const [searchMessage, setSearchMessage] = useState("");
-  const navigate = useNavigate();
+// Stand-in result for a detail URL whose item isn't in the current results
+// (e.g. a movie link opened directly). It only ever renders expanded, so the
+// card's own details are never shown.
+function placeholderSuggestion(
+  itemId: string,
+  panelKind: PanelKind,
+): Suggestion {
+  return {
+    id: itemId,
+    image: null,
+    itemID: itemId,
+    name: "",
+    searchType: panelKind === "person" ? 0 : 1,
+    mediaType:
+      panelKind === "movie"
+        ? { value: MediaTypes.Movie }
+        : panelKind === "tvseries"
+          ? { value: MediaTypes.TvSeries }
+          : null,
+    rank: null,
+    knownFor: "",
+    year: null,
+    years: null,
+  };
+}
 
+interface SuggestionSearchProps {
+  // Set by the /movie, /tvseries and /person routes; the item to show comes
+  // from the route's :imdbId param.
+  panelKind?: PanelKind;
+}
+
+// The URL is the source of truth for the search (`?q=`) and the selected card:
+// a detail item (`/movie/:imdbId` etc.) or a merely highlighted card without a
+// panel (`?selected=`). Submitting a search or clicking a card only navigates;
+// the component then syncs to the new URL, so browser back / forward and
+// directly loaded URLs behave exactly like clicks.
+function SuggestionSearch({ panelKind }: SuggestionSearchProps) {
+  const { imdbId } = useParams();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const query = searchParams.get("q") ?? "";
+  const targetItemId = panelKind
+    ? (imdbId ?? null)
+    : searchParams.get("selected");
+
+  const [searchQuery, setSearchQuery] = useState(query);
+  // null until a search for the current query has succeeded.
+  const [results, setResults] = useState<Suggestion[] | null>(null);
+  // Bumped to re-run a search whose query is already in the URL.
+  const [searchAttempt, setSearchAttempt] = useState(0);
+  const [error, setError] = useState("");
+  // The query the results above were last synced to.
+  const [syncedQuery, setSyncedQuery] = useState(query);
+
+  const { selectedId, previouslySelectedId, expandedId } = useCardSelection({
+    targetId: targetItemId,
+    opensPanel: panelKind !== undefined,
+    hasCardFor: (id) => results?.some((r) => r.itemID === id) ?? false,
+    // Every search (including re-running the same query) replaces the cards
+    resetKey: `${String(searchAttempt)}:${query}`,
+  });
+
+  const searchMessage =
+    results === null
+      ? ""
+      : results.length === 0
+        ? "No results."
+        : `${String(results.length)} results.`;
+  const hasCardForSelected =
+    results?.some((r) => r.itemID === selectedId) ?? false;
+  const displayedResults =
+    selectedId && panelKind && !hasCardForSelected
+      ? [placeholderSuggestion(selectedId, panelKind), ...(results ?? [])]
+      : (results ?? []);
+
+  // A new query means a new page of results; sync during render so the very
+  // next paint already reflects it (see "Adjusting some state when a prop
+  // changes" in the React docs).
+  if (query !== syncedQuery) {
+    setSyncedQuery(query);
+    setSearchQuery(query);
+    setResults(null);
+    setError("");
+  }
+
+  useEffect(() => {
+    if (query === "") return;
+    const controller = new AbortController();
+
+    async function runSearch() {
+      try {
+        // TODO: Add a pending indicator while the search is running
+
+        const response = await fetch(
+          `/api/search?searchQuery=${encodeURIComponent(query)}`,
+          { signal: controller.signal },
+        );
+
+        if (!response.ok) {
+          // Error responses may carry a JSON body like { message: "..." }
+          const body = (await response.json().catch(() => null)) as {
+            message?: string;
+          } | null;
+          const status = `Search failed with status ${String(response.status)}`;
+          setError(body?.message ? `${status}: ${body.message}` : `${status}.`);
+          return;
+        }
+
+        const data: Suggestion[] = (await response.json()) as Suggestion[]; // TODO: Maybe someday make this validation more robust
+        setResults(data);
+      } catch {
+        if (!controller.signal.aborted) {
+          setError("An unexpected error occurred. Please try again.");
+        }
+      }
+    }
+
+    void runSearch();
+    return () => {
+      controller.abort();
+    };
+  }, [query, searchAttempt]);
+
+  // ESC does exactly what the browser's back button does, everywhere.
   const onEscape = useEffectEvent(() => {
-    handleBack();
+    void navigate(-1);
   });
 
   useEffect(() => {
@@ -63,85 +153,37 @@ function SuggestionSearch() {
     window.addEventListener("keydown", onKeyDown);
     return () => {
       window.removeEventListener("keydown", onKeyDown);
-      window.clearTimeout(phaseTimeoutRef.current);
     };
   }, []);
 
-  function deselect() {
-    setSelectedItemId((prev) => {
-      setPreviouslySelectedItemId(prev);
-      return null;
-    });
-  }
-
-  function handleBack() {
-    window.clearTimeout(phaseTimeoutRef.current);
-    if (expandedItemId) {
-      // Shrink the panel back to card size first, then fly the card home.
-      setExpandedItemId(null);
-      phaseTimeoutRef.current = window.setTimeout(deselect, CARD_RESIZE_MS);
-    } else {
-      deselect();
-    }
-  }
-
-  async function handleSearch(e: SubmitEvent) {
+  function handleSearch(e: SubmitEvent) {
     e.preventDefault();
-    setError("");
-    setSearchMessage("");
-    setResults([]);
-    setSelectedItemId(null);
-    setExpandedItemId(null);
-    window.clearTimeout(phaseTimeoutRef.current);
-    // Cards unmount on a new search, so any in-flight deselect animation is
-    // moot — clearing this prevents a card in the next result set that
-    // happens to share an itemID from rendering with `.deselecting` and
-    // playing a phantom exit animation.
-    setPreviouslySelectedItemId(null);
-
-    try {
-      // TODO: Add a pending indicator while the search is running
-
-      const response = await fetch(
-        `/api/search?searchQuery=${encodeURIComponent(searchQuery)}`,
-      );
-
-      if (!response.ok) {
-        // Error responses may carry a JSON body like { message: "..." }
-        const body = (await response.json().catch(() => null)) as {
-          message?: string;
-        } | null;
-        const status = `Search failed with status ${String(response.status)}`;
-        setError(body?.message ? `${status}: ${body.message}` : `${status}.`);
-        return;
-      }
-
-      const data: Suggestion[] = (await response.json()) as Suggestion[]; // TODO: Maybe someday make this validation more robust
-      if (data.length === 0) {
-        setSearchMessage("No results.");
-      } else {
-        setSearchMessage(`${String(data.length)} results.`);
-        setResults(data);
-      }
-    } catch {
-      setError("An unexpected error occurred. Please try again.");
+    if (searchQuery !== query || targetItemId) {
+      void navigate(searchPath(searchQuery));
+    }
+    if (searchQuery === query) {
+      // Same query as the URL, so the sync above won't fire; reset and
+      // re-fetch here instead.
+      setResults(null);
+      setError("");
+      setSearchAttempt((n) => n + 1);
     }
   }
 
   function handleCardClick(item: Suggestion) {
     const itemId = item.itemID;
-    const isSelecting = selectedItemId !== itemId;
-    window.clearTimeout(phaseTimeoutRef.current);
-    setExpandedItemId(null);
-    setSelectedItemId((prev) => {
-      setPreviouslySelectedItemId(prev);
-      return prev === itemId ? null : itemId;
-    });
-    if (isSelecting && hasDetailPanel(item)) {
-      phaseTimeoutRef.current = window.setTimeout(() => {
-        setExpandedItemId(itemId);
-      }, CARD_FLY_MS);
+    if (targetItemId === itemId) {
+      // Clicking the selected card again undoes the navigation that selected
+      // it, exactly like the browser's back button.
+      void navigate(-1);
+      return;
     }
+    const itemPanelKind = panelKindOf(item);
+    void navigate(
+      itemPanelKind
+        ? detailPath(itemPanelKind, itemId, query)
+        : selectedCardPath(query, itemId),
+    );
   }
 
   async function handleLogout() {
@@ -190,47 +232,34 @@ function SuggestionSearch() {
 
       {error && <p className="error-message">{error}</p>}
       <div className="results-toolbar">
-        {selectedItemId ? (
-          <button
-            type="button"
-            aria-label="back"
-            title="Back to results (Esc)"
-            className="back-button"
-            onClick={handleBack}
-          >
-            <svg
-              viewBox="0 0 24 24"
-              width="20"
-              height="20"
-              aria-hidden="true"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M19 12H5M12 19l-7-7 7-7" />
-            </svg>
-          </button>
-        ) : (
-          searchMessage && <p className="search-message">{searchMessage}</p>
+        {!selectedId && searchMessage && (
+          <p className="search-message">{searchMessage}</p>
         )}
       </div>
 
       <div
-        className={`results-container${selectedItemId ? " has-selection" : ""}`}
+        className={`results-container fly-origin${selectedId ? " has-selection" : ""}`}
       >
-        {results.map((item) => (
+        {displayedResults.map((item) => (
           <SuggestionSearchCard
-            key={item.id}
+            // Keyed by itemID so a placeholder card is seamlessly replaced by
+            // the real result once the search finishes, keeping its panel
+            // mounted.
+            key={item.itemID}
             item={item}
-            selected={selectedItemId === item.itemID}
-            expanded={expandedItemId === item.itemID}
+            selected={selectedId === item.itemID}
+            expanded={expandedId === item.itemID}
             deselecting={
-              previouslySelectedItemId === item.itemID &&
-              selectedItemId !== item.itemID
+              previouslySelectedId === item.itemID && selectedId !== item.itemID
             }
             mediaType={item.mediaType?.value ?? null}
+            // The URL decides which panel the selected item opens; other cards
+            // open whatever their own result type implies.
+            panelKind={
+              targetItemId === item.itemID && panelKind
+                ? panelKind
+                : panelKindOf(item)
+            }
             onClick={() => {
               handleCardClick(item);
             }}

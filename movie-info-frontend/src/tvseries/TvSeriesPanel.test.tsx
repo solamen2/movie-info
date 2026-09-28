@@ -1,18 +1,20 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { type AppRouter, renderApp } from "../../tests/renderApp";
 import { MemoryRouter } from "react-router-dom";
 import { http, HttpResponse } from "msw";
 import { server } from "../../tests/mocks/node.ts";
 import tvSeriesDataJson1 from "../../tests/mocks/data/tvSeriesData1.json" with { type: "json" };
-import SuggestionSearch from "../suggestion/SuggestionSearch";
 import TvSeriesPanel from "./TvSeriesPanel";
 
 async function searchAndSelectExampleTvSeries() {
-  const utils = render(
-    <MemoryRouter>
-      <SuggestionSearch />
-    </MemoryRouter>,
-  );
+  const utils = renderApp();
   const searchQueryInput = screen.getByRole("textbox", {
     name: "search-query-input",
   });
@@ -215,8 +217,8 @@ describe("TvSeriesPanel", () => {
 
       const castCards = screen.getAllByTestId("cast-card");
       expect(castCards.map((c) => c.textContent)).toEqual([
-        "Example JonesLead, Lead's Twin37 episodes",
-        "No imageExample BrownSecond Lead1 episode",
+        "Example JonesLead, Lead's Twin",
+        "No imageExample BrownSecond Lead",
       ]);
       expect(screen.getByAltText("Example Jones")).toHaveAttribute(
         "src",
@@ -285,20 +287,94 @@ describe("TvSeriesPanel", () => {
       expect(tvSeriesCard.classList.contains("expanded")).toBe(true);
     });
 
-    it("Should replace the results message with a back arrow", async () => {
+    it("Should hide the results message", async () => {
       await searchAndSelectExampleTvSeries();
 
       expect(screen.queryByText("8 results.")).not.toBeInTheDocument();
-      expect(screen.getByRole("button", { name: "back" })).toBeInTheDocument();
+    });
+  });
+
+  describe("When the Cast section's 'Hide number of episodes' checkbox is used", () => {
+    function castCardTexts() {
+      return screen.getAllByTestId("cast-card").map((c) => c.textContent);
+    }
+
+    it("Should be checked by default and hide every cast member's episode count", async () => {
+      await searchAndSelectExampleTvSeries();
+      await screen.findByTestId("tv-series-panel");
+
+      const checkbox = screen.getByRole("checkbox", {
+        name: "Hide number of episodes",
+      });
+      expect(screen.getByText("Cast").closest("details")).toContainElement(
+        checkbox,
+      );
+      expect(checkbox).toBeChecked();
+      expect(castCardTexts()).toEqual([
+        "Example JonesLead, Lead's Twin",
+        "No imageExample BrownSecond Lead",
+      ]);
+    });
+
+    it("Should show the episode counts while unchecked and hide them again when re-checked", async () => {
+      await searchAndSelectExampleTvSeries();
+      await screen.findByTestId("tv-series-panel");
+      const checkbox = screen.getByRole("checkbox", {
+        name: "Hide number of episodes",
+      });
+
+      fireEvent.click(checkbox);
+      expect(checkbox).not.toBeChecked();
+      expect(castCardTexts()).toEqual([
+        "Example JonesLead, Lead's Twin37 episodes",
+        "No imageExample BrownSecond Lead1 episode",
+      ]);
+
+      fireEvent.click(checkbox);
+      expect(checkbox).toBeChecked();
+      expect(castCardTexts()).toEqual([
+        "Example JonesLead, Lead's Twin",
+        "No imageExample BrownSecond Lead",
+      ]);
+    });
+
+    it("Should keep the user's choice while the Cast section is collapsed and re-expanded", async () => {
+      await searchAndSelectExampleTvSeries();
+      await screen.findByTestId("tv-series-panel");
+      const checkbox = screen.getByRole("checkbox", {
+        name: "Hide number of episodes",
+      });
+      const castSection = screen.getByText("Cast").closest("details");
+      if (!castSection) {
+        throw new Error("Cast section not found");
+      }
+
+      fireEvent.click(checkbox);
+      castSection.open = true;
+      castSection.open = false;
+      castSection.open = true;
+      expect(checkbox).not.toBeChecked();
+      expect(castCardTexts()[0]).toBe(
+        "Example JonesLead, Lead's Twin37 episodes",
+      );
+    });
+
+    it("Should not put the choice in the URL", async () => {
+      const { currentUrl } = await searchAndSelectExampleTvSeries();
+      await screen.findByTestId("tv-series-panel");
+      const urlBefore = currentUrl();
+
+      fireEvent.click(
+        screen.getByRole("checkbox", { name: "Hide number of episodes" }),
+      );
+      expect(currentUrl()).toBe(urlBefore);
     });
   });
 
   describe.each([
     [
-      "the back arrow is clicked",
-      () => {
-        fireEvent.click(screen.getByRole("button", { name: "back" }));
-      },
+      "the browser back button is used",
+      (router: AppRouter) => act(() => router.navigate(-1)),
     ],
     [
       "the ESC key is pressed",
@@ -308,12 +384,14 @@ describe("TvSeriesPanel", () => {
     ],
   ])("When %s while the TV series panel is expanded", (_, goBack) => {
     it("Should shrink the panel, then deselect the card and restore the results message", async () => {
-      const { container, tvSeriesCard } =
+      const { container, router, tvSeriesCard } =
         await searchAndSelectExampleTvSeries();
       await screen.findByTestId("tv-series-panel");
 
-      goBack();
-      expect(tvSeriesCard.classList.contains("expanded")).toBe(false);
+      await goBack(router);
+      await waitFor(() => {
+        expect(tvSeriesCard.classList.contains("expanded")).toBe(false);
+      });
       expect(tvSeriesCard.classList.contains("selected")).toBe(true);
       expect(screen.queryByTestId("tv-series-panel")).not.toBeInTheDocument();
 
@@ -327,9 +405,6 @@ describe("TvSeriesPanel", () => {
           ?.classList.contains("has-selection"),
       ).toBe(false);
       expect(screen.getByText("8 results.")).toBeInTheDocument();
-      expect(
-        screen.queryByRole("button", { name: "back" }),
-      ).not.toBeInTheDocument();
     });
   });
 
@@ -364,7 +439,11 @@ describe("TvSeriesPanel", () => {
         ),
       );
 
-      render(<TvSeriesPanel imdbId="tt10000002" />);
+      render(
+        <MemoryRouter>
+          <TvSeriesPanel imdbId="tt10000002" />
+        </MemoryRouter>,
+      );
       const panel = await screen.findByTestId("tv-series-panel");
       const text = panel.textContent;
 
@@ -393,7 +472,11 @@ describe("TvSeriesPanel", () => {
 
   describe("When the TV series API returns an error", () => {
     it("Should show an error message", async () => {
-      render(<TvSeriesPanel imdbId="tt9999999" />);
+      render(
+        <MemoryRouter>
+          <TvSeriesPanel imdbId="tt9999999" />
+        </MemoryRouter>,
+      );
 
       expect(
         await screen.findByText(

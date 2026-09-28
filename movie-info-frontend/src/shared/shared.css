@@ -52,6 +52,25 @@
   opacity: 0.8;
 }
 
+.detail-subtitle {
+  margin: 0 0 0.5rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+/* Episode stills are 16:9 rather than poster-shaped */
+.detail-poster.detail-still {
+  width: 320px;
+  min-height: 0;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.expandable-card .detail-panel .detail-title {
+  font-size: 1.3rem;
+}
+
 .imdb-row {
   display: flex;
   flex-wrap: wrap;
@@ -169,15 +188,182 @@
   opacity: 0.7;
 }
 
-/* Horizontally scrolling card rows */
+/* Horizontally scrolling card rows. position:relative makes the list the
+   offsetParent of its ExpandableCards so their fly animation can be measured
+   from its edges. */
 .horizontal-list {
   display: flex;
   gap: 0.75rem;
+  position: relative;
   overflow-x: auto;
   overscroll-behavior-x: contain;
   scroll-snap-type: x proximity;
   -webkit-overflow-scrolling: touch;
   padding-bottom: 0.5rem;
+}
+
+/* The element a selected ExpandableCard flies to the upper-left of: the search
+   results grid for result cards, and the enclosing detail panel for season /
+   episode cards (so the card takes over the whole panel). position:relative
+   keeps it in the cards' offsetParent chain so the flight can be measured. */
+.fly-origin {
+  position: relative;
+}
+
+/* While a card inside a detail panel is selected, the panel hands itself over
+   to that card: everything except the card's own section fades out and is
+   then pulled from layout, the same way the other search results make room
+   for a selected result card. Once the fade ends, the selected card's natural
+   position is the panel's upper-left, which is exactly where its fly
+   animation left it. Going back reverses all of this. */
+.detail-panel-top,
+.detail-sections > .collapsible,
+.collapsible > summary {
+  opacity: 1;
+  transition:
+    opacity 0.5s ease,
+    display 0.5s allow-discrete;
+}
+
+.detail-panel.has-child-selection > .detail-panel-top,
+.detail-panel.has-child-selection
+  > .detail-sections
+  > .collapsible:not(.has-child-selection),
+.collapsible.has-child-selection > summary {
+  opacity: 0;
+  pointer-events: none;
+  display: none;
+}
+
+/* Collapse the spacing around the selected card's section so the expanded
+   card sits flush with the panel's edges. */
+.detail-sections {
+  transition:
+    margin-top 0.5s ease,
+    border-color 0.5s ease;
+}
+
+.collapsible-body {
+  transition: padding 0.5s ease;
+}
+
+.detail-panel.has-child-selection > .detail-sections {
+  margin-top: 0;
+  border-top-color: transparent;
+}
+
+.collapsible.has-child-selection {
+  border-bottom-color: transparent;
+}
+
+.collapsible.has-child-selection > .collapsible-body {
+  padding: 0;
+}
+
+.collapsible.has-child-selection .horizontal-list {
+  padding-bottom: 0;
+}
+
+/* The selected card flies up and out of its row towards the panel's corner,
+   so the row must not clip it while a card is selected. */
+.horizontal-list.has-selection {
+  overflow: visible;
+}
+
+/* An expanded card whose panel has handed itself over to a child card drops
+   its own frame too, so only the innermost panel is visible. */
+.expandable-card.expanded:has(> .detail-panel.has-child-selection) {
+  padding: 0;
+  border-color: transparent;
+}
+
+/* Cards that can be selected and expanded into a detail panel (search result
+   cards, season cards, episode cards). Their container is either the search
+   results grid or a .horizontal-list, each of which gets `.has-selection`
+   while one of its cards is selected. */
+.expandable-card {
+  /* The card's width is always set explicitly; pinning the flex minimum to 0
+     guarantees a wide row of cards inside an expanded panel can never widen
+     the card beyond its own row. */
+  min-width: 0;
+  opacity: 1;
+  transform: translate(0, 0);
+  /* `allow-discrete` lets `display` participate in the transition: on the
+     way to display:none it's deferred until the opacity fade ends, on the
+     way back from display:none it's applied at the start so the card has a
+     layout slot to fade back into. */
+  transition:
+    border-color 0.5s ease,
+    padding 0.5s ease,
+    width 0.3s ease,
+    opacity 0.5s ease,
+    display 0.5s allow-discrete;
+}
+
+/* Entry animation: fly the card from its layout slot to the upper-left of
+   its .fly-origin while the others fade out. The `select-fly` keyframes end
+   on translate(-orig, -orig); when the animation finishes (default
+   animation-fill-mode: none), the transform reverts to the base
+   translate(0, 0). At that exact moment `display: none` removes the
+   unselected cards from layout, so the selected card's natural position
+   collapses to (0, 0) — the layout shift and transform reset cancel out
+   visually, leaving the card glued to the upper-left. */
+.expandable-card.selected {
+  border-color: blue;
+  z-index: 10;
+  animation: select-fly 0.5s ease;
+}
+
+/* Exit animation: the keyframe's `from` value snaps the transform to
+   translate(-orig, -orig) at the start, which (combined with the layout
+   reflow that immediately puts the card back at its natural position)
+   leaves the visual position unchanged at upper-left. The animation then
+   walks the transform back to identity, sliding the card to its layout
+   home. */
+.expandable-card.deselecting {
+  z-index: 10;
+  animation: deselect-fly 0.5s ease;
+}
+
+@keyframes select-fly {
+  from {
+    transform: translate(0, 0);
+  }
+  to {
+    transform: translate(
+      calc(-1 * var(--orig-x, 0px)),
+      calc(-1 * var(--orig-y, 0px))
+    );
+  }
+}
+
+@keyframes deselect-fly {
+  from {
+    transform: translate(
+      calc(-1 * var(--orig-x, 0px)),
+      calc(-1 * var(--orig-y, 0px))
+    );
+  }
+  to {
+    transform: translate(0, 0);
+  }
+}
+
+/* Once the selected card has reached the upper-left, it grows to fill its
+   container and shows its detail panel. Each card type sets its own expanded
+   width, subtracting its padding and border (content-box sizing). */
+.expandable-card.expanded {
+  cursor: default;
+}
+
+/* While a card is selected, every other card fades out and is then pulled
+   from layout entirely. With only the selected card left in flow, its natural
+   position is (0, 0) of the container, so resizing the viewport can't shove
+   it around — the upper-left placement is the layout, not a transform. */
+.has-selection > .expandable-card:not(.selected) {
+  opacity: 0;
+  pointer-events: none;
+  display: none;
 }
 
 /* Person (cast / crew / creator) and watch provider cards shown in the
@@ -279,6 +465,10 @@
     max-width: 240px;
     max-height: 360px;
     align-self: center;
+  }
+
+  .detail-poster.detail-still {
+    max-width: 100%;
   }
 
   .detail-title {

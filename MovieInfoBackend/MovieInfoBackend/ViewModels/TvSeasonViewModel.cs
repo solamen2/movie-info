@@ -5,6 +5,7 @@ namespace MovieInfoBackend.ViewModels;
 
 public record TvSeasonViewModel
 {
+    // NOTE: This exists at the season level, after a season is selected; TvSeriesSeasonViewModel is shown at the series level, when no season is selected
     public TvSeasonViewModel(TmdbTvSeasonResponseDataModel tmdbTvSeasonDataModel, 
                              TmdbWatchProvidersResponseDataModel tmdbWatchProvidersDataModel,
                              Guid? testGuid = null)

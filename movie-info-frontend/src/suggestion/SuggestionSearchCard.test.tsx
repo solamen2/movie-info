@@ -1,7 +1,6 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { MemoryRouter } from "react-router-dom";
-import SuggestionSearch from "./SuggestionSearch";
+import { renderApp } from "../../tests/renderApp";
 
 // screen.logTestingPlaygroundURL();
 describe("SuggestionSearchCard", () => {
@@ -9,11 +8,7 @@ describe("SuggestionSearchCard", () => {
 
   describe("When search card contains a person", () => {
     it("Should only show person search card data fields", async () => {
-      render(
-        <MemoryRouter>
-          <SuggestionSearch />
-        </MemoryRouter>,
-      );
+      renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
         name: "search-query-input",
       });
@@ -30,11 +25,7 @@ describe("SuggestionSearchCard", () => {
   });
   describe("When search card contains a movie", () => {
     it("Should only show movie search card data fields", async () => {
-      render(
-        <MemoryRouter>
-          <SuggestionSearch />
-        </MemoryRouter>,
-      );
+      renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
         name: "search-query-input",
       });
@@ -51,11 +42,7 @@ describe("SuggestionSearchCard", () => {
   });
   describe("When search card contains a TV series", () => {
     it("Should only show TV series search card data fields", async () => {
-      render(
-        <MemoryRouter>
-          <SuggestionSearch />
-        </MemoryRouter>,
-      );
+      renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
         name: "search-query-input",
       });
@@ -72,11 +59,7 @@ describe("SuggestionSearchCard", () => {
   });
   describe("When search card contains a TV mini series", () => {
     it("Should only show TV mini series search card data fields", async () => {
-      render(
-        <MemoryRouter>
-          <SuggestionSearch />
-        </MemoryRouter>,
-      );
+      renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
         name: "search-query-input",
       });
@@ -95,11 +78,7 @@ describe("SuggestionSearchCard", () => {
   });
   describe("When search card contains a TV movie", () => {
     it("Should only show TV movie search card data fields", async () => {
-      render(
-        <MemoryRouter>
-          <SuggestionSearch />
-        </MemoryRouter>,
-      );
+      renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
         name: "search-query-input",
       });
@@ -116,11 +95,7 @@ describe("SuggestionSearchCard", () => {
   });
   describe("When search card contains a TV special", () => {
     it("Should only show TV special card data fields", async () => {
-      render(
-        <MemoryRouter>
-          <SuggestionSearch />
-        </MemoryRouter>,
-      );
+      renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
         name: "search-query-input",
       });
@@ -137,11 +112,7 @@ describe("SuggestionSearchCard", () => {
   });
   describe("When search card contains a TV short", () => {
     it("Should only show TV short search card data fields", async () => {
-      render(
-        <MemoryRouter>
-          <SuggestionSearch />
-        </MemoryRouter>,
-      );
+      renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
         name: "search-query-input",
       });
@@ -158,11 +129,7 @@ describe("SuggestionSearchCard", () => {
   });
   describe("When search card contains a short", () => {
     it("Should only show short search card data fields", async () => {
-      render(
-        <MemoryRouter>
-          <SuggestionSearch />
-        </MemoryRouter>,
-      );
+      renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
         name: "search-query-input",
       });
@@ -182,11 +149,7 @@ describe("SuggestionSearchCard", () => {
 
   describe("When search card contains a video game", () => {
     it("Should only show video game search card data fields", async () => {
-      render(
-        <MemoryRouter>
-          <SuggestionSearch />
-        </MemoryRouter>,
-      );
+      renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
         name: "search-query-input",
       });
@@ -203,11 +166,7 @@ describe("SuggestionSearchCard", () => {
   });
   describe("When search card contains a video", () => {
     it("Should only show video search card data fields", async () => {
-      render(
-        <MemoryRouter>
-          <SuggestionSearch />
-        </MemoryRouter>,
-      );
+      renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
         name: "search-query-input",
       });
@@ -224,11 +183,7 @@ describe("SuggestionSearchCard", () => {
   });
   describe("When search card contains a music video", () => {
     it("Should only show music video search card data fields", async () => {
-      render(
-        <MemoryRouter>
-          <SuggestionSearch />
-        </MemoryRouter>,
-      );
+      renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
         name: "search-query-input",
       });
@@ -245,11 +200,7 @@ describe("SuggestionSearchCard", () => {
   });
   describe("When search card contains a podcast series", () => {
     it("Should only show podcast series search card data fields", async () => {
-      render(
-        <MemoryRouter>
-          <SuggestionSearch />
-        </MemoryRouter>,
-      );
+      renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
         name: "search-query-input",
       });
@@ -268,11 +219,7 @@ describe("SuggestionSearchCard", () => {
   });
   describe("When search card contains a spotlight", () => {
     it("Should only show spotlight search card data fields", async () => {
-      render(
-        <MemoryRouter>
-          <SuggestionSearch />
-        </MemoryRouter>,
-      );
+      renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
         name: "search-query-input",
       });
@@ -292,11 +239,7 @@ describe("SuggestionSearchCard", () => {
 
   describe("When a search card is selected", () => {
     it("Should mark the results container with has-selection so other cards fade via CSS", async () => {
-      const { container } = render(
-        <MemoryRouter>
-          <SuggestionSearch />
-        </MemoryRouter>,
-      );
+      const { container } = renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
         name: "search-query-input",
       });
@@ -321,11 +264,7 @@ describe("SuggestionSearchCard", () => {
     });
 
     it("Should set --orig-x and --orig-y CSS variables on the card so CSS can translate it to the upper-left", async () => {
-      render(
-        <MemoryRouter>
-          <SuggestionSearch />
-        </MemoryRouter>,
-      );
+      renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
         name: "search-query-input",
       });
@@ -351,11 +290,7 @@ describe("SuggestionSearchCard", () => {
 
   describe("When a selected search card is deselected by clicking it again", () => {
     it("Should remove has-selection from the container and selected from the card so CSS reverses the animation", async () => {
-      const { container } = render(
-        <MemoryRouter>
-          <SuggestionSearch />
-        </MemoryRouter>,
-      );
+      const { container } = renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
         name: "search-query-input",
       });
@@ -390,11 +325,7 @@ describe("SuggestionSearchCard", () => {
 
   describe("When a selected search card is deselected via the ESC key", () => {
     it("Should clear the selection state so CSS reverses the animation", async () => {
-      const { container } = render(
-        <MemoryRouter>
-          <SuggestionSearch />
-        </MemoryRouter>,
-      );
+      const { container } = renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
         name: "search-query-input",
       });
@@ -417,41 +348,35 @@ describe("SuggestionSearchCard", () => {
       expect(resultsContainer.classList.contains("has-selection")).toBe(true);
 
       fireEvent.keyDown(window, { key: "Escape" });
-      expect(personCard.classList.contains("selected")).toBe(false);
+      await waitFor(() => {
+        expect(personCard.classList.contains("selected")).toBe(false);
+      });
       expect(resultsContainer.classList.contains("has-selection")).toBe(false);
     });
 
-    it("Should be a no-op when ESC is pressed and no card is selected", () => {
-      const { container } = render(
-        <MemoryRouter>
-          <SuggestionSearch />
-        </MemoryRouter>,
-      );
+    it("Should go back to the previous URL when ESC is pressed and no card is selected", async () => {
+      const { container, currentUrl } = renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
         name: "search-query-input",
       });
       fireEvent.change(searchQueryInput, { target: { value: "1" } });
       const searchButton = screen.getByRole("button", { name: "search" });
       fireEvent.click(searchButton);
+      await screen.findByText("Example Smith");
+      expect(currentUrl()).toBe("/search?q=1");
 
-      const resultsContainer = container.querySelector(".results-container");
-      if (!resultsContainer) {
-        throw new Error("results-container not found");
-      }
-
-      expect(resultsContainer.classList.contains("has-selection")).toBe(false);
       fireEvent.keyDown(window, { key: "Escape" });
-      expect(resultsContainer.classList.contains("has-selection")).toBe(false);
+      await waitFor(() => {
+        expect(currentUrl()).toBe("/search");
+      });
+      expect(container.querySelectorAll("#search-card")).toHaveLength(0);
+      expect(searchQueryInput).toHaveValue("");
     });
   });
 
   describe("When the search button is clicked while a card is selected", () => {
     it("Should clear the selection and run the new search", async () => {
-      const { container } = render(
-        <MemoryRouter>
-          <SuggestionSearch />
-        </MemoryRouter>,
-      );
+      const { container } = renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
         name: "search-query-input",
       });
@@ -491,11 +416,7 @@ describe("SuggestionSearchCard", () => {
 
   describe("When a card is deselected via the ESC key", () => {
     it("Should add a .deselecting class to that card so the exit animation plays", async () => {
-      render(
-        <MemoryRouter>
-          <SuggestionSearch />
-        </MemoryRouter>,
-      );
+      renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
         name: "search-query-input",
       });
@@ -513,18 +434,16 @@ describe("SuggestionSearchCard", () => {
       expect(personCard.classList.contains("selected")).toBe(true);
 
       fireEvent.keyDown(window, { key: "Escape" });
-      expect(personCard.classList.contains("selected")).toBe(false);
+      await waitFor(() => {
+        expect(personCard.classList.contains("selected")).toBe(false);
+      });
       expect(personCard.classList.contains("deselecting")).toBe(true);
     });
   });
 
   describe("When a card has never been selected", () => {
     it("Should not have the .deselecting class", async () => {
-      const { container } = render(
-        <MemoryRouter>
-          <SuggestionSearch />
-        </MemoryRouter>,
-      );
+      const { container } = renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
         name: "search-query-input",
       });
@@ -542,11 +461,7 @@ describe("SuggestionSearchCard", () => {
 
   describe("When re-selecting a card that was just deselected", () => {
     it("Should clear .deselecting and add .selected so the entry animation plays cleanly", async () => {
-      render(
-        <MemoryRouter>
-          <SuggestionSearch />
-        </MemoryRouter>,
-      );
+      renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
         name: "search-query-input",
       });
@@ -561,8 +476,10 @@ describe("SuggestionSearchCard", () => {
       }
 
       fireEvent.click(personCard); // select
-      fireEvent.click(personCard); // deselect
-      expect(personCard.classList.contains("deselecting")).toBe(true);
+      fireEvent.click(personCard); // deselect (goes back in history)
+      await waitFor(() => {
+        expect(personCard.classList.contains("deselecting")).toBe(true);
+      });
 
       fireEvent.click(personCard); // re-select
       expect(personCard.classList.contains("selected")).toBe(true);
@@ -572,11 +489,7 @@ describe("SuggestionSearchCard", () => {
 
   describe("When a new search runs after a card was previously deselected", () => {
     it("Should clear the deselect tracking so a re-rendered card with a matching id does not animate", async () => {
-      const { container } = render(
-        <MemoryRouter>
-          <SuggestionSearch />
-        </MemoryRouter>,
-      );
+      const { container } = renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
         name: "search-query-input",
       });
@@ -590,8 +503,10 @@ describe("SuggestionSearchCard", () => {
         throw new Error("Person search card not found");
       }
       fireEvent.click(personCard); // select
-      fireEvent.click(personCard); // deselect
-      expect(personCard.classList.contains("deselecting")).toBe(true);
+      fireEvent.click(personCard); // deselect (goes back in history)
+      await waitFor(() => {
+        expect(personCard.classList.contains("deselecting")).toBe(true);
+      });
 
       fireEvent.change(searchQueryInput, { target: { value: "1" } });
       fireEvent.click(searchButton);

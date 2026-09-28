@@ -23,6 +23,10 @@ export const test =
             const network = defineNetworkFixture({
               context,
               handlers,
+              // Also route image requests through the handlers, so mock image
+              // URLs are served (see the placeholder image in handlers.ts)
+              // instead of 404ing on the real image CDNs.
+              skipAssetRequests: false,
             });
 
             await network.enable();

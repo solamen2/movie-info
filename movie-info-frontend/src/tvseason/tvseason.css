@@ -1,0 +1,120 @@
+/* TV season-specific styles; the shared panel layout and the person / watch
+   provider cards live in ../shared/shared.css, and the season card itself in
+   ../tvseries/tvseries.css */
+
+/* Episode cards shown in the horizontally scrolling episodes row. Like season
+   cards they are wide, with the still beside the details. */
+.episode-card {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+  width: 340px;
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 0.5rem;
+}
+
+/* A selected episode card grows to fill the episodes row and shows the
+   episode panel (see .expandable-card in shared.css). */
+.episode-card.expanded {
+  width: calc(100% - 1rem - 2px);
+}
+
+.episode-card-top {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+}
+
+.episode-card-image {
+  display: block;
+  flex: 0 0 auto;
+  width: 140px;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.episode-card-image-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #333;
+  color: #999;
+  font-size: 0.8rem;
+}
+
+.episode-card-details {
+  min-width: 0;
+}
+
+.episode-card-name {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.episode-card-secondary {
+  margin: 0.15rem 0 0;
+  font-size: 0.8rem;
+  line-height: 1.3;
+  opacity: 0.75;
+  overflow-wrap: anywhere;
+}
+
+.episode-card > .collapsible {
+  margin-top: 0.4rem;
+  border-top: 1px solid #444;
+  border-bottom: none;
+}
+
+.episode-card > .collapsible > summary {
+  padding: 0.4rem 0.1rem;
+  font-size: 0.85rem;
+}
+
+.episode-card > .collapsible > .collapsible-body {
+  padding: 0 0.1rem 0.4rem;
+}
+
+.episode-card > .collapsible .detail-prose {
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.episode-card-expand {
+  margin-top: auto;
+  width: 100%;
+  padding: 0.7em 1em;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+@media (prefers-color-scheme: light) {
+  .episode-card,
+  .episode-card > .collapsible {
+    border-color: #ccc;
+  }
+
+  .episode-card-image-placeholder {
+    background: #e8e8e8;
+    color: #888;
+  }
+}
+
+@media (max-width: 640px) {
+  .episode-card {
+    width: 260px;
+  }
+
+  .episode-card-top {
+    flex-direction: column;
+  }
+
+  .episode-card-image {
+    width: 100%;
+  }
+}

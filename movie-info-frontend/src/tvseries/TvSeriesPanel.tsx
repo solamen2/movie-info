@@ -1,20 +1,24 @@
 import { type ReactNode, useEffect, useState } from "react";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { imdbTitleUrl } from "../movie/movieTypes";
 import Collapsible from "../shared/Collapsible";
 import HorizontalList from "../shared/HorizontalList";
 import ImdbRow, { ImdbRowSeparator } from "../shared/ImdbRow";
 import WatchProviderSection from "../shared/WatchProviderSection";
+import { useCardSelection } from "../shared/useCardSelection";
 import {
   displayDate,
   displayGenres,
   displayRuntime,
   displayText,
+  getIntParam,
+  withQueryParams,
 } from "../utilities/utilities";
-import CastCard from "./CastCard";
 import CreatorCard from "./CreatorCard";
 import CrewCard from "./CrewCard";
 import NetworkCard from "./NetworkCard";
 import SeasonCard from "./SeasonCard";
+import TvSeriesCastCollapsible from "./TvSeriesCastCollapsible";
 import { type TvSeries, type TvSeriesCrew, sortSeasons } from "./tvSeriesTypes";
 import "../shared/shared.css";
 import "./tvseries.css";
@@ -41,9 +45,26 @@ interface TvSeriesPanelProps {
   imdbId: string;
 }
 
+// Shows a TV series. A season within it is selected via the URL's
+// `?tmdbTvSeriesId=…&seasonNumber=…` query parameters (the same ones the
+// /api/tvseason call takes), so browser back / forward and directly loaded
+// URLs work for seasons too.
 function TvSeriesPanel({ imdbId }: TvSeriesPanelProps) {
   const [tvSeries, setTvSeries] = useState<TvSeries | null>(null);
   const [error, setError] = useState("");
+  const [searchParams] = useSearchParams();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const selectedSeasonNumber = getIntParam(searchParams, "seasonNumber");
+  const tmdbTvSeriesIdParam = getIntParam(searchParams, "tmdbTvSeriesId");
+  const seasonSelection = useCardSelection({
+    targetId:
+      selectedSeasonNumber === null ? null : String(selectedSeasonNumber),
+    opensPanel: true,
+    hasCardFor: (id) =>
+      tvSeries?.seasons.some((s) => String(s.seasonNumber) === id) ?? false,
+  });
+
   useEffect(() => {
     const controller = new AbortController();
 
@@ -95,12 +116,10 @@ function TvSeriesPanel({ imdbId }: TvSeriesPanelProps) {
   }
 
   const imdbUrl = imdbTitleUrl(tvSeries.imdbId);
+  const tmdbTvSeriesId = tmdbTvSeriesIdParam ?? tvSeries.tmdbId;
   const imdbRating = displayText(tvSeries.imdbRating);
   const imdbVotes = displayText(tvSeries.imdbVotes);
   const sortedSeasons = sortSeasons(tvSeries.seasons);
-  const sortedCast = [...tvSeries.cast].sort(
-    (a, b) => a.billedOrder - b.billedOrder,
-  );
 
   const facts: [string, ReactNode][] = [
     ["Original Name", displayText(tvSeries.originalName)],
@@ -141,7 +160,10 @@ function TvSeriesPanel({ imdbId }: TvSeriesPanelProps) {
   ];
 
   return (
-    <div className="detail-panel" data-testid="tv-series-panel">
+    <div
+      className={`detail-panel fly-origin${seasonSelection.selectedId !== null ? " has-child-selection" : ""}`}
+      data-testid="tv-series-panel"
+    >
       <div className="detail-panel-top">
         {tvSeries.image ? (
           <img
@@ -181,20 +203,42 @@ function TvSeriesPanel({ imdbId }: TvSeriesPanelProps) {
       </div>
 
       <div className="detail-sections">
-        <Collapsible title="Seasons" count={tvSeries.seasons.length}>
-          <HorizontalList>
-            {sortedSeasons.map((s) => (
-              <SeasonCard key={s.id} season={s} />
-            ))}
+        <Collapsible
+          title="Seasons"
+          count={tvSeries.seasons.length}
+          forceOpen={seasonSelection.selectedId !== null}
+          childSelected={seasonSelection.selectedId !== null}
+        >
+          <HorizontalList hasSelection={seasonSelection.selectedId !== null}>
+            {sortedSeasons.map((s) => {
+              const seasonId = String(s.seasonNumber);
+              return (
+                <SeasonCard
+                  key={s.id}
+                  season={s}
+                  tmdbTvSeriesId={tmdbTvSeriesId}
+                  tvSeriesImdbId={tvSeries.imdbId}
+                  selected={seasonSelection.selectedId === seasonId}
+                  expanded={seasonSelection.expandedId === seasonId}
+                  deselecting={
+                    seasonSelection.previouslySelectedId === seasonId &&
+                    seasonSelection.selectedId !== seasonId
+                  }
+                  onExpand={() => {
+                    void navigate(
+                      withQueryParams(location.pathname, location.search, {
+                        tmdbTvSeriesId: String(tvSeries.tmdbId),
+                        seasonNumber: seasonId,
+                        episodeNumber: null,
+                      }),
+                    );
+                  }}
+                />
+              );
+            })}
           </HorizontalList>
         </Collapsible>
-        <Collapsible title="Cast" count={tvSeries.cast.length}>
-          <HorizontalList>
-            {sortedCast.map((c) => (
-              <CastCard key={c.id} cast={c} />
-            ))}
-          </HorizontalList>
-        </Collapsible>
+        <TvSeriesCastCollapsible cast={tvSeries.cast} />
         <Collapsible title="Creators" count={tvSeries.creators.length}>
           <HorizontalList>
             {tvSeries.creators.map((c) => (

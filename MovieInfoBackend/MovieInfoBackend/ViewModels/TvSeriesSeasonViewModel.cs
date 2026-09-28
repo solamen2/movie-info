@@ -4,6 +4,7 @@ namespace MovieInfoBackend.DataModels;
 
 public record TvSeriesSeasonViewModel
 {
+    // NOTE: This exists at the series level; TvSeasonViewModel is shown after selecting a single season
     public TvSeriesSeasonViewModel(TmdbTvSeasonDataModel tmdbTvSeasonDataModel,
                                    Guid? testGuid = null)
     {
