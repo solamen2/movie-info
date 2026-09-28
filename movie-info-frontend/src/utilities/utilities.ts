@@ -160,3 +160,39 @@ export function detailPath(
 ): string {
   return `/${panelKind}/${encodeURIComponent(imdbId)}${querySuffix(query)}`;
 }
+
+// The message carried by an error response, if any. MovieInfoBackend returns
+// `Results.NotFound("...")`, which serializes as a JSON string; other errors
+// come as JSON objects (e.g. `{ message }`, or ASP.NET problem details with
+// `title` / `detail`) or as plain text.
+export async function getErrorResponseMessage(
+  response: Response,
+): Promise<string | null> {
+  const text = (await response.text().catch(() => "")).trim();
+  if (text === "") return null;
+  try {
+    const body: unknown = JSON.parse(text);
+    if (typeof body === "string") return body || null;
+    if (body !== null && typeof body === "object") {
+      for (const key of ["message", "error", "title", "detail"]) {
+        const value = (body as Record<string, unknown>)[key];
+        if (typeof value === "string" && value !== "") return value;
+      }
+    }
+    return null;
+  } catch {
+    return text;
+  }
+}
+
+// A sentence describing a failed response, e.g.
+// "Loading movie failed with status 404: Movie 'tt1' was not found."
+export async function describeFailedResponse(
+  action: string,
+  response: Response,
+): Promise<string> {
+  const status = `${action} failed with status ${String(response.status)}`;
+  const message = await getErrorResponseMessage(response);
+  if (message === null) return `${status}.`;
+  return `${status}: ${message}${/[.!?]$/.test(message) ? "" : "."}`;
+}

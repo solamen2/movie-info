@@ -50,6 +50,7 @@ public class TvSeasonEndpoint
                         if (tmdbTvSeasonResponseDataModel == null)
                         {
                             Log.Debug($"TV season TmdbTvSeasonResponseDataModel for search with TMDB TV series ID '{tmdbTvSeriesId}' and seasonNumber '{seasonNumber}' was null!");
+                            return Results.NotFound($"TV season for search with TV series ID '{tmdbTvSeriesId}' and seasonNumber '{seasonNumber}' was not found in the TMDB.");
                         }
                         if (tmdbTvSeasonWatchProvidersResponseDataModel == null)
                         {

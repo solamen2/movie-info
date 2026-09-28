@@ -48,7 +48,7 @@ public class MovieEndpoint
                         if (tmdbMovieIdNullable == null)
                         {
                             Log.Debug($"Movie TMDB ID for search '{imdbId}' was null!");
-                            return null;
+                            return Results.NotFound($"Movie for search '{imdbId}' was not found in the TMDB.");
                         }
                         int tmdbMovieId = tmdbMovieIdNullable.GetValueOrDefault();
                         Task<TmdbMovieResponseDataModel?> tmdbMovieTask = GetTmdbMovieResponseDataModel(tmdbMovieId, tmdbHttpClient);

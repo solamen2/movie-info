@@ -3,11 +3,12 @@ import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import SuggestionSearchCard, { type Suggestion } from "./SuggestionSearchCard";
 import { useCardSelection } from "../shared/useCardSelection";
 import {
+  describeFailedResponse,
   detailPath,
   getPanelKind,
-  type PanelKind,
   searchPath,
   selectedCardPath,
+  type PanelKind,
 } from "../utilities/utilities";
 import { MediaTypes } from "../utilities/constants";
 
@@ -115,12 +116,7 @@ function SuggestionSearch({ panelKind }: SuggestionSearchProps) {
         );
 
         if (!response.ok) {
-          // Error responses may carry a JSON body like { message: "..." }
-          const body = (await response.json().catch(() => null)) as {
-            message?: string;
-          } | null;
-          const status = `Search failed with status ${String(response.status)}`;
-          setError(body?.message ? `${status}: ${body.message}` : `${status}.`);
+          setError(await describeFailedResponse("Search", response));
           return;
         }
 

@@ -419,7 +419,7 @@ describe("TvEpisodePanel", () => {
 
       expect(
         await screen.findByText(
-          "Loading TV episode failed with status 404. Please try again.",
+          "Loading TV episode failed with status 404: Not a valid TV episode for mock. Please try again.",
         ),
       ).toBeInTheDocument();
     });

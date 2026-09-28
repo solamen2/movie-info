@@ -8,6 +8,7 @@ import {
   displaySeasonEpisode,
 } from "../tvseason/tvSeasonTypes";
 import {
+  describeFailedResponse,
   displayDate,
   displayGenres,
   displayRuntime,
@@ -72,7 +73,7 @@ function TvEpisodePanel({
         });
         if (!response.ok) {
           setError(
-            `Loading TV episode failed with status ${String(response.status)}. Please try again.`,
+            `${await describeFailedResponse("Loading TV episode", response)} Please try again.`,
           );
           return;
         }

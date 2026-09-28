@@ -8,6 +8,7 @@ import WatchProviderSection from "../shared/WatchProviderSection";
 import { useCardSelection } from "../shared/useCardSelection";
 import NetworkCard from "../tvseries/NetworkCard";
 import {
+  describeFailedResponse,
   displayDate,
   displayText,
   getIntParam,
@@ -63,7 +64,7 @@ function TvSeasonPanel({
         });
         if (!response.ok) {
           setError(
-            `Loading TV season failed with status ${String(response.status)}. Please try again.`,
+            `${await describeFailedResponse("Loading TV season", response)} Please try again.`,
           );
           return;
         }
