@@ -4,10 +4,11 @@ import { imdbTitleUrl } from "../movie/movieTypes";
 import Collapsible from "../shared/Collapsible";
 import HorizontalList from "../shared/HorizontalList";
 import ImdbRow, { ImdbRowSeparator } from "../shared/ImdbRow";
+import TitleStatus from "../shared/TitleStatus";
 import WatchProviderSection from "../shared/WatchProviderSection";
 import { useCardSelection } from "../shared/useCardSelection";
 import {
-  describeFailedResponse,
+  describeFailedLoad,
   displayDate,
   displayGenres,
   displayRuntime,
@@ -76,9 +77,7 @@ function TvSeriesPanel({ imdbId }: TvSeriesPanelProps) {
           { signal: controller.signal },
         );
         if (!response.ok) {
-          setError(
-            `${await describeFailedResponse("Loading TV series", response)} Please try again.`,
-          );
+          setError(await describeFailedLoad("Loading TV series", response));
           return;
         }
         const data = (await response.json()) as TvSeries | null; // TODO: Maybe someday make this validation more robust
@@ -137,7 +136,6 @@ function TvSeriesPanel({ imdbId }: TvSeriesPanelProps) {
       </>,
     ],
     ["Rated", displayText(tvSeries.rated)],
-    ["Status", displayText(tvSeries.status)],
     ["In Production", tvSeries.isInProduction ? "Yes" : "No"],
     ["Type", displayText(tvSeries.tvSeriesType)],
     ["Number of Seasons", displayText(tvSeries.numberOfSeasons)],
@@ -176,7 +174,10 @@ function TvSeriesPanel({ imdbId }: TvSeriesPanelProps) {
           <div className="detail-poster card-image-placeholder">No image</div>
         )}
         <div className="detail-panel-heading">
-          <h2 className="detail-title">{tvSeries.name}</h2>
+          <div className="detail-title detail-title-row">
+            <h2>{tvSeries.name}</h2>
+            <TitleStatus status={tvSeries.status} usualStatus="Ended" />
+          </div>
           {tvSeries.tagline && (
             <p className="detail-tagline">{tvSeries.tagline}</p>
           )}

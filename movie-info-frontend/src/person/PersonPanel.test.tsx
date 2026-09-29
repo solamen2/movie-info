@@ -32,6 +32,7 @@ async function searchAndSelectExamplePerson() {
 describe("PersonPanel", () => {
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.useRealTimers();
   });
 
   describe("When a person search card is selected", () => {
@@ -60,17 +61,18 @@ describe("PersonPanel", () => {
     });
 
     it("Should render the visible person data members", async () => {
+      vi.useFakeTimers({ toFake: ["Date"], now: new Date(2026, 8, 28) });
       await searchAndSelectExamplePerson();
       const panel = await screen.findByTestId("person-panel");
       const text = panel.textContent;
+      expect(screen.getByTestId("person-age").tagName).toBe("I");
 
       for (const expected of [
         "Example SmithIMDB: Rank: 3LinkCopy",
         "Known ForActress, Example Film",
         "Known For DepartmentActing",
         "Also Known AsExample Smithee, Betsy Smith",
-        "BirthdayApr 14, 1977",
-        "Deathday—",
+        "BirthdayApr 14, 1977 (49)Deathday—",
         "Place of BirthNew York City, New York, USA",
         "GenderFemale",
         "Homepagehttps://example.com/example-smith",
@@ -175,8 +177,8 @@ describe("PersonPanel", () => {
 
       const tvSeriesCastCards = screen.getAllByTestId("tv-series-cast-card");
       expect(tvSeriesCastCards.map((c) => c.textContent)).toEqual([
-        "No imageExample Talk ShowSelf1 episodeSep 13, 2011",
-        "Example ShowExample Slayer144 episodesMar 10, 1997",
+        "No imageExample Talk ShowSelf1 episodeFirst appearance:Sep 13, 2011",
+        "Example ShowExample Slayer144 episodesFirst appearance:Mar 10, 1997",
       ]);
       for (const card of tvSeriesCastCards) {
         expect(card.parentElement?.classList.contains("horizontal-list")).toBe(
@@ -302,6 +304,36 @@ describe("PersonPanel", () => {
     });
   });
 
+  describe("When the person has no birthday", () => {
+    it("Should not show an age", async () => {
+      server.use(
+        http.get("/api/person", () =>
+          HttpResponse.json({ ...personDataJson1, birthday: null }),
+        ),
+      );
+
+      render(<PersonPanel imdbId="nm9000000" />);
+      const panel = await screen.findByTestId("person-panel");
+      expect(panel.textContent).toContain("Birthday—Deathday—");
+      expect(screen.queryByTestId("person-age")).toBeNull();
+    });
+  });
+
+  describe("When the person is less than a year old", () => {
+    it("Should show the age as '(<1)'", async () => {
+      vi.useFakeTimers({ toFake: ["Date"], now: new Date(2026, 8, 28) });
+      server.use(
+        http.get("/api/person", () =>
+          HttpResponse.json({ ...personDataJson1, birthday: "2026-01-15" }),
+        ),
+      );
+
+      render(<PersonPanel imdbId="nm9000000" />);
+      const panel = await screen.findByTestId("person-panel");
+      expect(panel.textContent).toContain("BirthdayJan 15, 2026 (<1)");
+    });
+  });
+
   describe("When the person has missing data", () => {
     it("Should show placeholders instead of the missing values", async () => {
       server.use(
@@ -330,7 +362,7 @@ describe("PersonPanel", () => {
         "No imageExample SmithIMDB: Rank: —LinkCopy",
         "Known For—",
         "Also Known As—",
-        "DeathdayJan 2, 2020",
+        "BirthdayApr 14, 1977 (42)DeathdayJan 2, 2020",
         "Place of Birth—",
         "GenderNot specified",
         "Homepage—",
@@ -348,7 +380,7 @@ describe("PersonPanel", () => {
 
       expect(
         await screen.findByText(
-          "Loading person failed with status 404: Not a valid IMDB ID for mock. Please try again.",
+          "Loading person failed with status 404: Not a valid IMDB ID for mock. Please try another search.",
         ),
       ).toBeInTheDocument();
     });

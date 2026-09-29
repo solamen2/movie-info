@@ -2,9 +2,10 @@ import { type ReactNode, useEffect, useState } from "react";
 import Collapsible from "../shared/Collapsible";
 import HorizontalList from "../shared/HorizontalList";
 import ImdbRow, { ImdbRowSeparator } from "../shared/ImdbRow";
+import TitleStatus from "../shared/TitleStatus";
 import WatchProviderSection from "../shared/WatchProviderSection";
 import {
-  describeFailedResponse,
+  describeFailedLoad,
   displayDate,
   displayGenres,
   displayRuntime,
@@ -55,9 +56,7 @@ function MoviePanel({ imdbId }: MoviePanelProps) {
           { signal: controller.signal },
         );
         if (!response.ok) {
-          setError(
-            `${await describeFailedResponse("Loading movie", response)} Please try again.`,
-          );
+          setError(await describeFailedLoad("Loading movie", response));
           return;
         }
         const data = (await response.json()) as Movie | null; // TODO: Maybe someday make this validation more robust
@@ -107,7 +106,6 @@ function MoviePanel({ imdbId }: MoviePanelProps) {
     ["Release Date", displayDate(movie.releaseDate)],
     ["Runtime", displayRuntime(movie.runtime)],
     ["Rated", displayText(movie.rated)],
-    ["Status", displayText(movie.status)],
     ["Known For", displayText(movie.knownForActors)],
     ["Genres", displayGenres(movie.tmdbGenres, movie.omdbGenres)],
     ["Budget", displayMoney(movie.budget)],
@@ -141,7 +139,10 @@ function MoviePanel({ imdbId }: MoviePanelProps) {
           <div className="detail-poster card-image-placeholder">No image</div>
         )}
         <div className="detail-panel-heading">
-          <h2 className="detail-title">{movie.title}</h2>
+          <div className="detail-title detail-title-row">
+            <h2>{movie.title}</h2>
+            <TitleStatus status={movie.status} usualStatus="Released" />
+          </div>
           {movie.tagline && <p className="detail-tagline">{movie.tagline}</p>}
           <ImdbRow imdbUrl={imdbUrl}>
             <span className="imdb-row-label">IMDB:</span> {imdbRating}

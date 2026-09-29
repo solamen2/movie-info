@@ -3,14 +3,14 @@ import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import SuggestionSearchCard, { type Suggestion } from "./SuggestionSearchCard";
 import { useCardSelection } from "../shared/useCardSelection";
 import {
-  describeFailedResponse,
+  describeFailedLoad,
   detailPath,
   getPanelKind,
   searchPath,
   selectedCardPath,
   type PanelKind,
 } from "../utilities/utilities";
-import { MediaTypes } from "../utilities/constants";
+import { MediaTypes, SEARCH_AUTO_SUBMIT_MS } from "../utilities/constants";
 
 function panelKindOf(item: Suggestion): PanelKind | null {
   return getPanelKind(item.searchType, item.mediaType?.value ?? null);
@@ -83,7 +83,7 @@ function SuggestionSearch({ panelKind }: SuggestionSearchProps) {
     results === null
       ? ""
       : results.length === 0
-        ? "No results."
+        ? "No results. Please try another search."
         : `${String(results.length)} results.`;
   const hasCardForSelected =
     results?.some((r) => r.itemID === selectedId) ?? false;
@@ -116,7 +116,7 @@ function SuggestionSearch({ panelKind }: SuggestionSearchProps) {
         );
 
         if (!response.ok) {
-          setError(await describeFailedResponse("Search", response));
+          setError(await describeFailedLoad("Search", response));
           return;
         }
 
@@ -134,6 +134,24 @@ function SuggestionSearch({ panelKind }: SuggestionSearchProps) {
       controller.abort();
     };
   }, [query, searchAttempt]);
+
+  // Typing a query and then pausing submits it, exactly like the Search
+  // button. Every keystroke restarts the wait, and so does anything else that
+  // changes the URL's query (e.g. submitting by hand), since the box is then
+  // in sync with the URL again.
+  const onTypingPaused = useEffectEvent(() => {
+    void navigate(searchPath(searchQuery));
+  });
+
+  useEffect(() => {
+    if (searchQuery === query || searchQuery.trim() === "") return;
+    const timeoutId = window.setTimeout(() => {
+      onTypingPaused();
+    }, SEARCH_AUTO_SUBMIT_MS);
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [searchQuery, query]);
 
   // ESC does exactly what the browser's back button does, everywhere.
   const onEscape = useEffectEvent(() => {

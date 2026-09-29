@@ -8,7 +8,7 @@ import WatchProviderSection from "../shared/WatchProviderSection";
 import { useCardSelection } from "../shared/useCardSelection";
 import NetworkCard from "../tvseries/NetworkCard";
 import {
-  describeFailedResponse,
+  describeFailedLoad,
   displayDate,
   displayText,
   getIntParam,
@@ -63,9 +63,7 @@ function TvSeasonPanel({
           signal: controller.signal,
         });
         if (!response.ok) {
-          setError(
-            `${await describeFailedResponse("Loading TV season", response)} Please try again.`,
-          );
+          setError(await describeFailedLoad("Loading TV season", response));
           return;
         }
         const data = (await response.json()) as TvSeason | null; // TODO: Maybe someday make this validation more robust

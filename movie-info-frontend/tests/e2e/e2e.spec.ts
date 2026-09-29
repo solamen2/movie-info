@@ -30,6 +30,81 @@ test.afterEach(async ({ page }) => {
 
 const useMockHttpCalls = process.env.VITE_USE_MOCK_HTTP_CALLS === "true";
 
+// Whether a computed border color is (all but) the blue highlight of a
+// selected card. "All but", since the fade towards the highlight can be cut
+// short a frame early by the next phase of the animation.
+function isHighlighted(color: string): boolean {
+  const match = /^rgba?\((\d+), (\d+), (\d+)(?:, ([\d.]+))?\)$/.exec(color);
+  if (!match) return false;
+  const [red, green, blue] = match.slice(1, 4).map(Number);
+  const alpha = Number((match[4] as string | undefined) ?? 1);
+  return red <= 25 && green <= 25 && blue >= 230 && alpha >= 0.9;
+}
+
+async function getBorderColor(card: Locator): Promise<string> {
+  return card.evaluate((element) => getComputedStyle(element).borderTopColor);
+}
+
+// Long enough for any border color transition to have finished.
+const HIGHLIGHT_SETTLE_MS = 700;
+
+// Called before a card is selected, i.e. at the beginning of the animation
+// that grows it into a panel. Returns the border color to expect once the
+// animation has ended.
+async function getUnselectedColor(card: Locator): Promise<string> {
+  const unselectedColor = await getBorderColor(card);
+  expect(isHighlighted(unselectedColor)).toBe(false);
+  return unselectedColor;
+}
+
+// Every panel has the same frame, whichever kind of card it grew from.
+const PANEL_FRAME = {
+  "border-top-color": "rgb(68, 68, 68)",
+  "border-top-style": "solid",
+  "border-top-width": "2px",
+  "border-top-left-radius": "8px",
+  "padding-top": "12px",
+  "padding-left": "12px",
+};
+
+// At the end of the animation that grows a card into a panel, the highlight
+// has faded out again, leaving the panel's own frame.
+async function expectHighlightFadedOut(panelCard: Locator) {
+  for (const [property, value] of Object.entries(PANEL_FRAME)) {
+    await expect(panelCard).toHaveCSS(property, value);
+  }
+}
+
+// At the end of the animation that takes a panel back to being a card, the
+// card has settled back among the other cards without a highlight. The mouse
+// is moved out of the way first, since result cards change color on hover.
+async function expectHighlightGone(
+  page: Page,
+  card: Locator,
+  unselectedColor: string,
+) {
+  await page.mouse.move(0, 0);
+  await expect(card).toHaveCSS("border-top-color", unselectedColor);
+}
+
+// A panel's border never changes color, no matter where the user clicks.
+async function expectNeverHighlighted(
+  page: Page,
+  panelCard: Locator,
+  panel: Locator,
+) {
+  const panelColor = await getBorderColor(panelCard);
+  expect(isHighlighted(panelColor)).toBe(false);
+  for (const target of [
+    panel.getByRole("heading").first(),
+    page.locator(".results-toolbar"),
+  ]) {
+    await target.click();
+    await page.waitForTimeout(HIGHLIGHT_SETTLE_MS);
+    expect(await getBorderColor(panelCard)).toBe(panelColor);
+  }
+}
+
 // Real data is limited to values that are unlikely to change over time (so no
 // rating, vote count, rank, revenue, or watch providers).
 const expectedMovie = useMockHttpCalls
@@ -49,7 +124,6 @@ const expectedMovie = useMockHttpCalls
         "Release DateSep 23, 2016",
         "Runtime2h 22m",
         "RatedPG-13",
-        "StatusReleased",
         "Known ForExample Jones, Example Brown",
         "GenresMystery, Thriller, Drama, Science Fiction, Horror",
         "Budget$25,000,000",
@@ -87,7 +161,6 @@ const expectedMovie = useMockHttpCalls
         "Release DateSep 23, 1994",
         "Runtime2h 22m",
         "RatedR",
-        "StatusReleased",
         "Known ForTim Robbins, Morgan Freeman",
         "GenresDrama, Crime",
         "Budget$25,000,000",
@@ -130,6 +203,7 @@ test("Basic happy path: search, check results are valid, select a movie search c
   await expect(resultsMessage).toBeVisible();
 
   console.log("Selecting the movie search card...");
+  const unselectedColor = await getUnselectedColor(movieCard);
   await movieCard.click();
   await expect(resultsMessage).toBeHidden();
   const detailUrl = new RegExp(
@@ -144,6 +218,10 @@ test("Basic happy path: search, check results are valid, select a movie search c
   await expect(
     moviePanel.getByRole("heading", { name: expectedMovie.title, exact: true }),
   ).toBeVisible();
+
+  console.log("Checking the highlight faded out and stays away...");
+  await expectHighlightFadedOut(selectedCard);
+  await expectNeverHighlighted(page, selectedCard, moviePanel);
   await expect(moviePanel).toContainText(expectedMovie.tagline);
   await expect(moviePanel).toContainText(expectedMovie.imdbRow);
   const imdbLink = moviePanel.getByRole("link", { name: "Link", exact: true });
@@ -176,6 +254,7 @@ test("Basic happy path: search, check results are valid, select a movie search c
   await page.goBack();
   await expect(moviePanel).toBeHidden();
   await expect(page.locator("#search-card.selected")).toHaveCount(0);
+  await expectHighlightGone(page, movieCard, unselectedColor);
   await expect(resultsMessage).toBeVisible();
   for (const cardText of expectedMovie.cardText) {
     expect(await movieCard.textContent()).toContain(cardText);
@@ -213,6 +292,12 @@ test("Basic happy path: search, check results are valid, select a movie search c
   await expect(
     page.getByRole("textbox", { name: "search-query-input" }),
   ).toHaveValue(expectedMovie.searchText);
+  console.log("Checking the panel shown from a URL is not highlighted...");
+  await expectNeverHighlighted(
+    page,
+    page.locator("#search-card.selected.expanded"),
+    moviePanel,
+  );
   await page.goBack();
   await expect(page).toHaveURL(searchUrl);
   await expect(moviePanel).toBeHidden();
@@ -302,6 +387,7 @@ test("Person happy path: search, check results are valid, select a person search
   await expect(resultsMessage).toBeVisible();
 
   console.log("Selecting the person search card...");
+  const unselectedColor = await getUnselectedColor(personCard);
   await personCard.click();
   await expect(resultsMessage).toBeHidden();
 
@@ -315,6 +401,11 @@ test("Person happy path: search, check results are valid, select a person search
       exact: true,
     }),
   ).toBeVisible();
+
+  console.log("Checking the highlight faded out and stays away...");
+  await expectHighlightFadedOut(selectedCard);
+  await expectNeverHighlighted(page, selectedCard, personPanel);
+
   await expect(personPanel).toContainText(expectedPerson.imdbRow);
   const imdbLink = personPanel.getByRole("link", { name: "Link", exact: true });
   await expect(imdbLink).toHaveAttribute("href", expectedPerson.imdbUrl);
@@ -325,6 +416,14 @@ test("Person happy path: search, check results are valid, select a person search
   for (const fact of expectedPerson.facts) {
     await expect(personPanel).toContainText(fact);
   }
+  // The age depends on today's date, so only its form is checked
+  await expect(personPanel).toContainText(
+    /BirthdayApr 14, 1977 \(\d+\)Deathday—/,
+  );
+  await expect(personPanel.getByTestId("person-age")).toHaveCSS(
+    "font-style",
+    "italic",
+  );
 
   console.log("Checking the collapsible sections...");
   const sections = personPanel.locator("details");
@@ -350,10 +449,21 @@ test("Person happy path: search, check results are valid, select a person search
   );
   expect(hasHorizontalScrollbar).toBe(false);
 
+  console.log("Reloading the person URL directly...");
+  await page.reload();
+  await expect(
+    personPanel.getByRole("heading", {
+      name: expectedPerson.name,
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expectNeverHighlighted(page, selectedCard, personPanel);
+
   console.log("Unselecting the person search card...");
   await page.keyboard.press("Escape");
   await expect(personPanel).toBeHidden();
   await expect(page.locator("#search-card.selected")).toHaveCount(0);
+  await expectHighlightGone(page, personCard, unselectedColor);
   await expect(resultsMessage).toBeVisible();
   for (const cardText of expectedPerson.cardText) {
     expect(await personCard.textContent()).toContain(cardText);
@@ -385,7 +495,6 @@ const expectedTvSeries = useMockHttpCalls
         "Next Air Date—",
         "Average Runtime44m42m, 44m",
         "RatedTV-14",
-        "StatusEnded",
         "In ProductionNo",
         "TypeScripted",
         "Number of Seasons2",
@@ -435,7 +544,6 @@ const expectedTvSeries = useMockHttpCalls
         "Last Air DateMay 20, 2003",
         "Next Air Date—",
         "RatedTV-14",
-        "StatusEnded",
         "In ProductionNo",
         "TypeScripted",
         "Number of Seasons7",
@@ -484,6 +592,7 @@ test("TV series happy path: search, check results are valid, select a TV series 
   await expect(resultsMessage).toBeVisible();
 
   console.log("Selecting the TV series search card...");
+  const unselectedColor = await getUnselectedColor(tvSeriesCard);
   await tvSeriesCard.click();
   await expect(resultsMessage).toBeHidden();
 
@@ -497,6 +606,11 @@ test("TV series happy path: search, check results are valid, select a TV series 
       exact: true,
     }),
   ).toBeVisible();
+
+  console.log("Checking the highlight faded out and stays away...");
+  await expectHighlightFadedOut(selectedCard);
+  await expectNeverHighlighted(page, selectedCard, tvSeriesPanel);
+
   if (expectedTvSeries.tagline) {
     await expect(tvSeriesPanel).toContainText(expectedTvSeries.tagline);
   }
@@ -576,6 +690,7 @@ test("TV series happy path: search, check results are valid, select a TV series 
   await page.goBack();
   await expect(tvSeriesPanel).toBeHidden();
   await expect(page.locator("#search-card.selected")).toHaveCount(0);
+  await expectHighlightGone(page, tvSeriesCard, unselectedColor);
   await expect(resultsMessage).toBeVisible();
   for (const cardText of expectedTvSeries.cardText) {
     expect(await tvSeriesCard.textContent()).toContain(cardText);
@@ -714,6 +829,7 @@ async function openSeason(page: Page) {
     .filter({ hasText: expectedTvSeason.name })
     .first();
   await expect(seasonCard).toBeVisible();
+  const seasonUnselectedColor = await getUnselectedColor(seasonCard);
   await seasonCard.getByRole("button", { name: "Expand" }).click();
 
   const seasonUrl = new RegExp(
@@ -724,6 +840,16 @@ async function openSeason(page: Page) {
   await expect(tvSeasonPanel).toBeVisible();
   await expect(seasonCard).toHaveClass(/selected/);
   await expect(seasonCard).toHaveClass(/expanded/);
+
+  console.log("Checking the highlight faded out and stays away...");
+  await expect(
+    tvSeasonPanel.getByRole("heading", {
+      name: expectedTvSeason.name,
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expectHighlightFadedOut(seasonCard);
+  await expectNeverHighlighted(page, seasonCard, tvSeasonPanel);
 
   console.log("Checking the season has taken over from the TV series...");
   const tvSeriesTop = tvSeriesPanel.locator("> .detail-panel-top");
@@ -737,7 +863,14 @@ async function openSeason(page: Page) {
   await expect(
     page.locator("[data-testid='season-card']:not(.selected)").first(),
   ).toBeHidden();
-  return { tvSeriesPanel, tvSeriesTop, seasonCard, tvSeasonPanel, seasonUrl };
+  return {
+    tvSeriesPanel,
+    tvSeriesTop,
+    seasonCard,
+    tvSeasonPanel,
+    seasonUrl,
+    seasonUnselectedColor,
+  };
 }
 
 // Each section is [title, expected content], where the content can be a
@@ -766,8 +899,13 @@ test("TV season happy path: open a TV series, expand a season card, check the se
   page,
 }) => {
   console.log("Starting TV season happy path test...");
-  const { tvSeriesPanel, tvSeriesTop, seasonCard, tvSeasonPanel } =
-    await openSeason(page);
+  const {
+    tvSeriesPanel,
+    tvSeriesTop,
+    seasonCard,
+    tvSeasonPanel,
+    seasonUnselectedColor,
+  } = await openSeason(page);
 
   await expect(
     tvSeasonPanel.getByRole("heading", {
@@ -823,6 +961,7 @@ test("TV season happy path: open a TV series, expand a season card, check the se
   );
   await expect(tvSeasonPanel).toBeHidden();
   await expect(seasonCard).not.toHaveClass(/selected/);
+  await expectHighlightGone(page, seasonCard, seasonUnselectedColor);
   await expect(tvSeriesPanel).toBeVisible();
   await expect(tvSeriesTop).toBeVisible();
   await expect(
@@ -857,6 +996,7 @@ test("TV episode happy path: open a TV season, expand an episode card, check the
     .filter({ hasText: expectedEpisode.title })
     .first();
   await expect(episodeCard).toBeVisible();
+  const unselectedColor = await getUnselectedColor(episodeCard);
   await episodeCard.getByRole("button", { name: "Expand" }).click();
 
   const episodeUrl = new RegExp(
@@ -873,6 +1013,10 @@ test("TV episode happy path: open a TV season, expand an episode card, check the
       exact: true,
     }),
   ).toBeVisible();
+
+  console.log("Checking the highlight faded out and stays away...");
+  await expectHighlightFadedOut(episodeCard);
+  await expectNeverHighlighted(page, episodeCard, tvEpisodePanel);
 
   console.log("Checking the episode has taken over from the season...");
   const tvSeasonTop = tvSeasonPanel.locator("> .detail-panel-top");
@@ -933,11 +1077,20 @@ test("TV episode happy path: open a TV season, expand an episode card, check the
   await expect(page.getByTestId("tv-season-panel")).toBeVisible();
   await expect(page.getByTestId("tv-series-panel")).toBeVisible();
 
+  console.log("Checking the panels shown from a URL are not highlighted...");
+  const expandedCards = page.locator(".expandable-card.expanded");
+  await expect(expandedCards).toHaveCount(3);
+  for (const expandedCard of await expandedCards.all()) {
+    expect(isHighlighted(await getBorderColor(expandedCard))).toBe(false);
+  }
+  await expectNeverHighlighted(page, episodeCard, tvEpisodePanel);
+
   console.log("Going back to the season with the ESC key...");
   await page.keyboard.press("Escape");
   await expect(page).toHaveURL(seasonUrl);
   await expect(tvEpisodePanel).toBeHidden();
   await expect(episodeCard).not.toHaveClass(/selected/);
+  await expectHighlightGone(page, episodeCard, unselectedColor);
   await expect(tvSeasonPanel).toBeVisible();
   await expect(tvSeasonTop).toBeVisible();
   await expect(

@@ -7,6 +7,9 @@ import {
 } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { type AppRouter, renderApp } from "../../tests/renderApp";
+import { http, HttpResponse } from "msw";
+import { server } from "../../tests/mocks/node.ts";
+import movieDataJson1 from "../../tests/mocks/data/movieData1.json" with { type: "json" };
 import MoviePanel from "./MoviePanel";
 
 async function searchAndSelectExampleMovie() {
@@ -55,7 +58,6 @@ describe("MoviePanel", () => {
         "Release DateSep 23, 2016",
         "Runtime2h 22m",
         "RatedPG-13",
-        "StatusReleased",
         "IMDB: 7.9 (123,456)Rank: 4444LinkCopy",
         "Known ForExample Jones, Example Brown",
         "GenresMystery, Thriller, Drama, Science Fiction, Horror",
@@ -272,13 +274,47 @@ describe("MoviePanel", () => {
     });
   });
 
+  describe("When the movie has been released", () => {
+    it("Should not show the status", async () => {
+      render(<MoviePanel imdbId={movieDataJson1.imdbId} />);
+      const panel = await screen.findByTestId("movie-panel");
+
+      expect(screen.getByRole("heading", { level: 2 }).textContent).toBe(
+        "Example Movie",
+      );
+      expect(screen.queryByTestId("title-status")).toBeNull();
+      expect(panel.textContent).not.toContain("Status");
+    });
+  });
+
+  describe("When the movie has not been released", () => {
+    it("Should show the status beside the title's heading instead of as a fact", async () => {
+      server.use(
+        http.get("/api/movie", () =>
+          HttpResponse.json({ ...movieDataJson1, status: "Post Production" }),
+        ),
+      );
+
+      render(<MoviePanel imdbId={movieDataJson1.imdbId} />);
+      const panel = await screen.findByTestId("movie-panel");
+
+      const heading = screen.getByRole("heading", { level: 2 });
+      expect(heading.textContent).toBe("Example Movie");
+      const status = screen.getByTestId("title-status");
+      expect(heading.nextElementSibling).toBe(status);
+      expect(status.tagName).toBe("I");
+      expect(status.textContent).toBe("(post production)");
+      expect(panel.textContent).not.toContain("Status");
+    });
+  });
+
   describe("When the movie API returns an error", () => {
     it("Should show an error message", async () => {
       render(<MoviePanel imdbId="tt9999999" />);
 
       expect(
         await screen.findByText(
-          "Loading movie failed with status 404: Not a valid IMDB ID for mock. Please try again.",
+          "Loading movie failed with status 404: Not a valid IMDB ID for mock. Please try another search.",
         ),
       ).toBeInTheDocument();
     });

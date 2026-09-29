@@ -364,7 +364,7 @@ describe("TvSeasonPanel", () => {
 
       expect(
         await screen.findByText(
-          "Loading TV season failed with status 404: Not a valid TV season for mock. Please try again.",
+          "Loading TV season failed with status 404: Not a valid TV season for mock. Please try another search.",
         ),
       ).toBeInTheDocument();
     });

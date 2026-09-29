@@ -8,17 +8,10 @@
   display: flex;
   flex-direction: column;
   flex: 0 0 auto;
-  scroll-snap-align: start;
   width: 340px;
   border: 1px solid #444;
   border-radius: 6px;
   padding: 0.5rem;
-}
-
-/* A selected episode card grows to fill the episodes row and shows the
-   episode panel (see .expandable-card in shared.css). */
-.episode-card.expanded {
-  width: calc(100% - 1rem - 2px);
 }
 
 .episode-card-top {

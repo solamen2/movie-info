@@ -4,9 +4,11 @@ import Collapsible from "../shared/Collapsible";
 import HorizontalList from "../shared/HorizontalList";
 import ImdbRow from "../shared/ImdbRow";
 import {
-  describeFailedResponse,
+  describeFailedLoad,
+  displayAge,
   displayDate,
   displayText,
+  getAge,
 } from "../utilities/utilities";
 import MovieCastCard from "./MovieCastCard";
 import MovieCrewCard from "./MovieCrewCard";
@@ -42,9 +44,7 @@ function PersonPanel({ imdbId }: PersonPanelProps) {
           { signal: controller.signal },
         );
         if (!response.ok) {
-          setError(
-            `${await describeFailedResponse("Loading person", response)} Please try again.`,
-          );
+          setError(await describeFailedLoad("Loading person", response));
           return;
         }
         const data = (await response.json()) as Person | null; // TODO: Maybe someday make this validation more robust
@@ -99,11 +99,24 @@ function PersonPanel({ imdbId }: PersonPanelProps) {
     (c) => c.firstCreditAirDate ?? c.firstAirDate,
   );
 
+  const age = getAge(person.birthday, person.deathday);
+
   const facts: [string, ReactNode][] = [
     ["Known For", displayText(person.knownForMovies)],
     ["Known For Department", displayText(person.knownForDepartment)],
     ["Also Known As", displayText(person.alsoKnownAs.join(", "))],
-    ["Birthday", displayDate(person.birthday)], // TODO: Show age too
+    [
+      "Birthday",
+      <>
+        {displayDate(person.birthday)}
+        {age !== null && (
+          <>
+            {" "}
+            <i data-testid="person-age">{displayAge(age)}</i>
+          </>
+        )}
+      </>,
+    ],
     ["Deathday", displayDate(person.deathday)],
     ["Place of Birth", displayText(person.placeOfBirth)],
     ["Gender", GENDER_LABELS[person.gender]],

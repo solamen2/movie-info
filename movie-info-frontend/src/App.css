@@ -105,8 +105,9 @@
   position: relative;
 }
 
-/* The select / expand animation classes come from .expandable-card in
-   shared.css; only the grid card's own sizing lives here. */
+/* The select / expand animation classes and the expanded panel's frame come
+   from .expandable-card in shared.css; only the grid card's own sizing lives
+   here. */
 .result-card {
   width: 260px;
   border: 2px solid #444;
@@ -116,15 +117,11 @@
   overflow: hidden;
 }
 
-.result-card:hover {
+/* Panels (expanded cards) don't react to the pointer; on touch screens :hover
+   would otherwise stick after a tap inside the panel and clear on a tap
+   outside it. */
+.result-card:not(.selected):hover {
   border-color: #888;
-}
-
-/* Once the selected card has reached the upper-left, it grows to fill the
-   container and shows its detail panel. Width subtracts the card's padding and
-   border since .result-card uses content-box sizing. */
-.result-card.expanded {
-  width: calc(100% - 1.5rem - 4px);
 }
 
 .card-image {
