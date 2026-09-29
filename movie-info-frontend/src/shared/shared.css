@@ -190,14 +190,16 @@
 
 /* Horizontally scrolling card rows. position:relative makes the list the
    offsetParent of its ExpandableCards so their fly animation can be measured
-   from its edges. */
+   from its edges. The rows deliberately don't use scroll snapping: it keeps
+   the browser from building up speed over repeated swipes on touch screens,
+   and in Chrome on macOS it makes a press on the scrollbar track crawl and
+   then spring back on release. */
 .horizontal-list {
   display: flex;
   gap: 0.75rem;
   position: relative;
   overflow-x: auto;
   overscroll-behavior-x: contain;
-  scroll-snap-type: x proximity;
   -webkit-overflow-scrolling: touch;
   padding-bottom: 0.5rem;
 }
@@ -389,7 +391,6 @@
 .person-card,
 .watch-provider-card {
   flex: 0 0 auto;
-  scroll-snap-align: start;
   border: 1px solid #444;
   border-radius: 6px;
   padding: 0.5rem;
