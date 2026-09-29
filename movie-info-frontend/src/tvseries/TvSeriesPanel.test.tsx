@@ -65,7 +65,6 @@ describe("TvSeriesPanel", () => {
         "Next Air Date—",
         "Average Runtime44m42m, 44m",
         "RatedTV-14",
-        "StatusEnded",
         "In ProductionNo",
         "TypeScripted",
         "Number of Seasons2",
@@ -467,6 +466,51 @@ describe("TvSeriesPanel", () => {
         expect(text).toContain(expected);
       }
       expect(text).not.toContain("An example TV series tagline.");
+    });
+  });
+
+  describe("When the TV series has ended", () => {
+    it("Should not show the status", async () => {
+      render(
+        <MemoryRouter>
+          <TvSeriesPanel imdbId="tt10000002" />
+        </MemoryRouter>,
+      );
+      const panel = await screen.findByTestId("tv-series-panel");
+
+      expect(screen.getByRole("heading", { level: 2 }).textContent).toBe(
+        "Example TV Series",
+      );
+      expect(screen.queryByTestId("title-status")).toBeNull();
+      expect(panel.textContent).not.toContain("Status");
+    });
+  });
+
+  describe("When the TV series has not ended", () => {
+    it("Should show the status beside the name's heading instead of as a fact", async () => {
+      server.use(
+        http.get("/api/tvseries", () =>
+          HttpResponse.json({
+            ...tvSeriesDataJson1,
+            status: "Returning Series",
+          }),
+        ),
+      );
+
+      render(
+        <MemoryRouter>
+          <TvSeriesPanel imdbId="tt10000002" />
+        </MemoryRouter>,
+      );
+      const panel = await screen.findByTestId("tv-series-panel");
+
+      const heading = screen.getByRole("heading", { level: 2 });
+      expect(heading.textContent).toBe("Example TV Series");
+      const status = screen.getByTestId("title-status");
+      expect(heading.nextElementSibling).toBe(status);
+      expect(status.tagName).toBe("I");
+      expect(status.textContent).toBe("(returning series)");
+      expect(panel.textContent).not.toContain("Status");
     });
   });
 

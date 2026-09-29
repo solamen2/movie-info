@@ -1,6 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
 // NOTE: This is only used for testing dev docker image locally
-// TODO: Need to test this again after removing E2E_TEST_USE_MOCK_HTTP_CALLS env var
 //import dotenv from "dotenv";
 //dotenv.config({ path: "../../movie-info-secrets/dev.env" });
 

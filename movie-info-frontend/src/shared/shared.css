@@ -46,6 +46,27 @@
   line-height: 1.2;
 }
 
+/* A title with its status beside it (see TitleStatus). The row is the
+   .detail-title, so the heading inside it takes its size from the row and the
+   status is sized relative to the title, whatever size that is. */
+.detail-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 0.4em;
+}
+
+.detail-title-row > h2 {
+  margin: 0;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.detail-title-status {
+  font-size: 0.7em;
+  font-weight: normal;
+}
+
 .detail-tagline {
   margin: 0 0 0.5rem;
   font-style: italic;

@@ -4,6 +4,7 @@ import { imdbTitleUrl } from "../movie/movieTypes";
 import Collapsible from "../shared/Collapsible";
 import HorizontalList from "../shared/HorizontalList";
 import ImdbRow, { ImdbRowSeparator } from "../shared/ImdbRow";
+import TitleStatus from "../shared/TitleStatus";
 import WatchProviderSection from "../shared/WatchProviderSection";
 import { useCardSelection } from "../shared/useCardSelection";
 import {
@@ -135,7 +136,6 @@ function TvSeriesPanel({ imdbId }: TvSeriesPanelProps) {
       </>,
     ],
     ["Rated", displayText(tvSeries.rated)],
-    ["Status", displayText(tvSeries.status)],
     ["In Production", tvSeries.isInProduction ? "Yes" : "No"],
     ["Type", displayText(tvSeries.tvSeriesType)],
     ["Number of Seasons", displayText(tvSeries.numberOfSeasons)],
@@ -174,7 +174,10 @@ function TvSeriesPanel({ imdbId }: TvSeriesPanelProps) {
           <div className="detail-poster card-image-placeholder">No image</div>
         )}
         <div className="detail-panel-heading">
-          <h2 className="detail-title">{tvSeries.name}</h2>
+          <div className="detail-title detail-title-row">
+            <h2>{tvSeries.name}</h2>
+            <TitleStatus status={tvSeries.status} usualStatus="Ended" />
+          </div>
           {tvSeries.tagline && (
             <p className="detail-tagline">{tvSeries.tagline}</p>
           )}
