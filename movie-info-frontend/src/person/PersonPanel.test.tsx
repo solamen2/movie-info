@@ -175,8 +175,8 @@ describe("PersonPanel", () => {
 
       const tvSeriesCastCards = screen.getAllByTestId("tv-series-cast-card");
       expect(tvSeriesCastCards.map((c) => c.textContent)).toEqual([
-        "No imageExample Talk ShowSelf1 episodeSep 13, 2011",
-        "Example ShowExample Slayer144 episodesMar 10, 1997",
+        "No imageExample Talk ShowSelf1 episodeFirst appearance:Sep 13, 2011",
+        "Example ShowExample Slayer144 episodesFirst appearance:Mar 10, 1997",
       ]);
       for (const card of tvSeriesCastCards) {
         expect(card.parentElement?.classList.contains("horizontal-list")).toBe(

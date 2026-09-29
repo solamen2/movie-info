@@ -14,6 +14,9 @@ function TvSeriesCastCard({ credit }: TvSeriesCastCardProps) {
       originalTitle={credit.originalName}
       role={credit.character}
       date={credit.firstCreditAirDate ?? credit.firstAirDate}
+      dateLabel={
+        credit.firstCreditAirDate ? "First appearance" : "First air date"
+      }
       episodeCount={credit.episodeCount}
     />
   );

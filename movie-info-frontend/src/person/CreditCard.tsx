@@ -8,6 +8,7 @@ interface CreditCardProps {
   // The person's character or job in the credit
   role: string;
   date: string | null;
+  dateLabel?: string;
   episodeCount?: number;
 }
 
@@ -19,6 +20,7 @@ function CreditCard({
   originalTitle,
   role,
   date,
+  dateLabel,
   episodeCount,
 }: CreditCardProps) {
   const imageUrl = getTmdbImageUrl(posterPath, "w185");
@@ -46,6 +48,9 @@ function CreditCard({
         <p className="credit-card-secondary">
           {episodeCount} {episodeCount === 1 ? "episode" : "episodes"}
         </p>
+      )}
+      {date && dateLabel && (
+        <p className="credit-card-secondary">{dateLabel}:</p>
       )}
       {date && <p className="credit-card-secondary">{displayDate(date)}</p>}
     </div>
