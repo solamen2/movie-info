@@ -79,13 +79,6 @@
   line-height: 1.4;
 }
 
-/* A selected season card grows to fill the seasons row and shows the season
-   panel (see .expandable-card in shared.css). Width subtracts the card's
-   padding and border since it uses content-box sizing. */
-.season-card.expanded {
-  width: calc(100% - 1rem - 2px);
-}
-
 .season-card-expand {
   margin-top: auto;
   width: 100%;

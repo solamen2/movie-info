@@ -293,7 +293,9 @@
      way back from display:none it's applied at the start so the card has a
      layout slot to fade back into. */
   transition:
-    border-color 0.5s ease,
+    border-color var(--highlight-fade, 0.5s) ease,
+    border-width 0.3s ease,
+    border-radius 0.3s ease,
     padding 0.5s ease,
     width 0.3s ease,
     opacity 0.5s ease,
@@ -309,9 +311,19 @@
    collapses to (0, 0) — the layout shift and transform reset cancel out
    visually, leaving the card glued to the upper-left. */
 .expandable-card.selected {
-  border-color: blue;
   z-index: 10;
   animation: select-fly 0.5s ease;
+  /* While selected, the highlight fades in step with the panel's resize (the
+     width transition above) rather than with the flight. */
+  --highlight-fade: 0.3s;
+}
+
+/* Only a selected *card* is highlighted. Once it grows into a panel the
+   highlight fades out as it expands, and fades back in as the panel shrinks
+   to a card again. A panel is never highlighted, so one shown already
+   expanded (e.g. a directly loaded URL) never is either. */
+.expandable-card.selected:not(.expanded) {
+  border-color: blue;
 }
 
 /* Exit animation: the keyframe's `from` value snaps the transform to
@@ -350,9 +362,15 @@
 }
 
 /* Once the selected card has reached the upper-left, it grows to fill its
-   container and shows its detail panel. Each card type sets its own expanded
-   width, subtracting its padding and border (content-box sizing). */
+   container and shows its detail panel. Every panel gets the same frame,
+   whatever the frame of the card it grew from. Width subtracts the panel's
+   padding and border since the cards use content-box sizing. */
 .expandable-card.expanded {
+  width: calc(100% - 1.5rem - 4px);
+  border-width: 2px;
+  border-color: #444;
+  border-radius: 8px;
+  padding: 0.75rem;
   cursor: default;
 }
 

@@ -15,12 +15,6 @@
   padding: 0.5rem;
 }
 
-/* A selected episode card grows to fill the episodes row and shows the
-   episode panel (see .expandable-card in shared.css). */
-.episode-card.expanded {
-  width: calc(100% - 1rem - 2px);
-}
-
 .episode-card-top {
   display: flex;
   gap: 0.6rem;
