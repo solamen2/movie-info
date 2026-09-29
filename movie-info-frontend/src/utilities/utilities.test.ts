@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { describeFailedResponse, getErrorResponseMessage } from "./utilities";
+import {
+  describeFailedLoad,
+  describeFailedResponse,
+  getErrorResponseMessage,
+} from "./utilities";
 
 function response(body: string | null, status = 404) {
   return new Response(body, { status });
@@ -65,5 +69,24 @@ describe("describeFailedResponse", () => {
     expect(
       await describeFailedResponse("Loading movie", response(null, 500)),
     ).toBe("Loading movie failed with status 500.");
+  });
+});
+
+describe("describeFailedLoad", () => {
+  it("Should suggest another search when the response is a 404", async () => {
+    expect(
+      await describeFailedLoad(
+        "Loading movie",
+        response('{"message":"Movie was not found."}', 404),
+      ),
+    ).toBe(
+      "Loading movie failed with status 404: Movie was not found. Please try another search.",
+    );
+  });
+
+  it("Should suggest trying again for any other failed response", async () => {
+    expect(await describeFailedLoad("Loading movie", response(null, 500))).toBe(
+      "Loading movie failed with status 500. Please try again.",
+    );
   });
 });

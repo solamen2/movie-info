@@ -23,7 +23,7 @@ describe("SuggestionSearch", () => {
     });
   });
   describe("When using search terms with no results", () => {
-    it("Should show 'No results.'", async () => {
+    it("Should show 'No results. Please try another search.'", async () => {
       renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
         name: "search-query-input",
@@ -31,12 +31,14 @@ describe("SuggestionSearch", () => {
       fireEvent.change(searchQueryInput, { target: { value: "empty" } });
       const searchButton = screen.getByRole("button", { name: "search" });
       fireEvent.click(searchButton);
-      const noSearchResults = await screen.findByText("No results.");
+      const noSearchResults = await screen.findByText(
+        "No results. Please try another search.",
+      );
       expect(noSearchResults).toBeInTheDocument();
     });
   });
   describe("When using a bad search term", () => {
-    it("Should show error 'An unexpected error occurred. Please try again.'", async () => {
+    it("Should show the 404 error and suggest another search", async () => {
       renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
         name: "search-query-input",
@@ -45,7 +47,7 @@ describe("SuggestionSearch", () => {
       const searchButton = screen.getByRole("button", { name: "search" });
       fireEvent.click(searchButton);
       const errorSearchResults = await screen.findByText(
-        "Search failed with status 404: Not a valid search query for mock.",
+        "Search failed with status 404: Not a valid search query for mock. Please try another search.",
       );
       expect(errorSearchResults).toBeInTheDocument();
     });

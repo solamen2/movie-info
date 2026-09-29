@@ -8,7 +8,7 @@ import {
   displaySeasonEpisode,
 } from "../tvseason/tvSeasonTypes";
 import {
-  describeFailedResponse,
+  describeFailedLoad,
   displayDate,
   displayGenres,
   displayRuntime,
@@ -72,9 +72,7 @@ function TvEpisodePanel({
           signal: controller.signal,
         });
         if (!response.ok) {
-          setError(
-            `${await describeFailedResponse("Loading TV episode", response)} Please try again.`,
-          );
+          setError(await describeFailedLoad("Loading TV episode", response));
           return;
         }
         const data = (await response.json()) as TvEpisode | null; // TODO: Maybe someday make this validation more robust

@@ -480,7 +480,7 @@ describe("TvSeriesPanel", () => {
 
       expect(
         await screen.findByText(
-          "Loading TV series failed with status 404: Not a valid IMDB ID for mock. Please try again.",
+          "Loading TV series failed with status 404: Not a valid IMDB ID for mock. Please try another search.",
         ),
       ).toBeInTheDocument();
     });

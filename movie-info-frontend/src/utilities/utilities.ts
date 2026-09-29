@@ -196,3 +196,17 @@ export async function describeFailedResponse(
   if (message === null) return `${status}.`;
   return `${status}: ${message}${/[.!?]$/.test(message) ? "" : "."}`;
 }
+
+// describeFailedResponse followed by advice on what to do next. Retrying
+// can't help when the item doesn't exist (404), so that case suggests
+// searching for something else instead.
+export async function describeFailedLoad(
+  action: string,
+  response: Response,
+): Promise<string> {
+  const advice =
+    response.status === 404
+      ? "Please try another search."
+      : "Please try again.";
+  return `${await describeFailedResponse(action, response)} ${advice}`;
+}

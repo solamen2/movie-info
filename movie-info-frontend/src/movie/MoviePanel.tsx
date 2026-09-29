@@ -4,7 +4,7 @@ import HorizontalList from "../shared/HorizontalList";
 import ImdbRow, { ImdbRowSeparator } from "../shared/ImdbRow";
 import WatchProviderSection from "../shared/WatchProviderSection";
 import {
-  describeFailedResponse,
+  describeFailedLoad,
   displayDate,
   displayGenres,
   displayRuntime,
@@ -55,9 +55,7 @@ function MoviePanel({ imdbId }: MoviePanelProps) {
           { signal: controller.signal },
         );
         if (!response.ok) {
-          setError(
-            `${await describeFailedResponse("Loading movie", response)} Please try again.`,
-          );
+          setError(await describeFailedLoad("Loading movie", response));
           return;
         }
         const data = (await response.json()) as Movie | null; // TODO: Maybe someday make this validation more robust

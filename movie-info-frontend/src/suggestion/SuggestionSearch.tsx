@@ -3,7 +3,7 @@ import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import SuggestionSearchCard, { type Suggestion } from "./SuggestionSearchCard";
 import { useCardSelection } from "../shared/useCardSelection";
 import {
-  describeFailedResponse,
+  describeFailedLoad,
   detailPath,
   getPanelKind,
   searchPath,
@@ -83,7 +83,7 @@ function SuggestionSearch({ panelKind }: SuggestionSearchProps) {
     results === null
       ? ""
       : results.length === 0
-        ? "No results."
+        ? "No results. Please try another search."
         : `${String(results.length)} results.`;
   const hasCardForSelected =
     results?.some((r) => r.itemID === selectedId) ?? false;
@@ -116,7 +116,7 @@ function SuggestionSearch({ panelKind }: SuggestionSearchProps) {
         );
 
         if (!response.ok) {
-          setError(await describeFailedResponse("Search", response));
+          setError(await describeFailedLoad("Search", response));
           return;
         }
 

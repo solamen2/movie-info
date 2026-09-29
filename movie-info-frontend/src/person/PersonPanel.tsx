@@ -4,7 +4,7 @@ import Collapsible from "../shared/Collapsible";
 import HorizontalList from "../shared/HorizontalList";
 import ImdbRow from "../shared/ImdbRow";
 import {
-  describeFailedResponse,
+  describeFailedLoad,
   displayDate,
   displayText,
 } from "../utilities/utilities";
@@ -42,9 +42,7 @@ function PersonPanel({ imdbId }: PersonPanelProps) {
           { signal: controller.signal },
         );
         if (!response.ok) {
-          setError(
-            `${await describeFailedResponse("Loading person", response)} Please try again.`,
-          );
+          setError(await describeFailedLoad("Loading person", response));
           return;
         }
         const data = (await response.json()) as Person | null; // TODO: Maybe someday make this validation more robust

@@ -7,7 +7,7 @@ import ImdbRow, { ImdbRowSeparator } from "../shared/ImdbRow";
 import WatchProviderSection from "../shared/WatchProviderSection";
 import { useCardSelection } from "../shared/useCardSelection";
 import {
-  describeFailedResponse,
+  describeFailedLoad,
   displayDate,
   displayGenres,
   displayRuntime,
@@ -76,9 +76,7 @@ function TvSeriesPanel({ imdbId }: TvSeriesPanelProps) {
           { signal: controller.signal },
         );
         if (!response.ok) {
-          setError(
-            `${await describeFailedResponse("Loading TV series", response)} Please try again.`,
-          );
+          setError(await describeFailedLoad("Loading TV series", response));
           return;
         }
         const data = (await response.json()) as TvSeries | null; // TODO: Maybe someday make this validation more robust
