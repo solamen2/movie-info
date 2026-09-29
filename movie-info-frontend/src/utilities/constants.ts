@@ -27,6 +27,10 @@ export const SEARCH_TYPE_LABELS: Record<number, string> = {
   1: "Media",
 };
 
+// How long the search box must go without input before its query is submitted
+// automatically, in milliseconds.
+export const SEARCH_AUTO_SUBMIT_MS = 1000;
+
 // TMDB returns image paths relative to its image CDN (e.g. "/abc123.jpg").
 // See https://developer.themoviedb.org/docs/image-basics
 export const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p";

@@ -10,7 +10,7 @@ import {
   selectedCardPath,
   type PanelKind,
 } from "../utilities/utilities";
-import { MediaTypes } from "../utilities/constants";
+import { MediaTypes, SEARCH_AUTO_SUBMIT_MS } from "../utilities/constants";
 
 function panelKindOf(item: Suggestion): PanelKind | null {
   return getPanelKind(item.searchType, item.mediaType?.value ?? null);
@@ -134,6 +134,24 @@ function SuggestionSearch({ panelKind }: SuggestionSearchProps) {
       controller.abort();
     };
   }, [query, searchAttempt]);
+
+  // Typing a query and then pausing submits it, exactly like the Search
+  // button. Every keystroke restarts the wait, and so does anything else that
+  // changes the URL's query (e.g. submitting by hand), since the box is then
+  // in sync with the URL again.
+  const onTypingPaused = useEffectEvent(() => {
+    void navigate(searchPath(searchQuery));
+  });
+
+  useEffect(() => {
+    if (searchQuery === query || searchQuery.trim() === "") return;
+    const timeoutId = window.setTimeout(() => {
+      onTypingPaused();
+    }, SEARCH_AUTO_SUBMIT_MS);
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [searchQuery, query]);
 
   // ESC does exactly what the browser's back button does, everywhere.
   const onEscape = useEffectEvent(() => {
