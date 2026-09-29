@@ -418,6 +418,14 @@ test("Person happy path: search, check results are valid, select a person search
   for (const fact of expectedPerson.facts) {
     await expect(personPanel).toContainText(fact);
   }
+  // The age depends on today's date, so only its form is checked
+  await expect(personPanel).toContainText(
+    /BirthdayApr 14, 1977 \(\d+\)Deathday—/,
+  );
+  await expect(personPanel.getByTestId("person-age")).toHaveCSS(
+    "font-style",
+    "italic",
+  );
 
   console.log("Checking the collapsible sections...");
   const sections = personPanel.locator("details");

@@ -85,6 +85,52 @@ export function displayDate(isoDate: string | null): string {
   });
 }
 
+interface CalendarDate {
+  year: number;
+  month: number;
+  day: number;
+}
+
+function parseIsoDate(isoDate: string): CalendarDate | null {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(isoDate);
+  if (!match) return null;
+  const [year, month, day] = match.slice(1).map(Number);
+  return { year, month, day };
+}
+
+// A person's age in whole years, rounded down: at their death if they have
+// died, otherwise as of `today` in the user's own time zone. Null when the age
+// can't be known (no birthday, or a date that can't be read) or would be
+// negative.
+export function getAge(
+  birthday: string | null,
+  deathday: string | null,
+  today: Date = new Date(),
+): number | null {
+  if (birthday == null) return null;
+  const born = parseIsoDate(birthday);
+  const until =
+    deathday == null
+      ? {
+          year: today.getFullYear(),
+          month: today.getMonth() + 1,
+          day: today.getDate(),
+        }
+      : parseIsoDate(deathday);
+  if (!born || !until) return null;
+
+  const hadBirthdayThatYear =
+    until.month > born.month ||
+    (until.month === born.month && until.day >= born.day);
+  const age = until.year - born.year - (hadBirthdayThatYear ? 0 : 1);
+  return age < 0 ? null : age;
+}
+
+// e.g. "(49)", or "(<1)" for someone who has not reached their first birthday.
+export function displayAge(age: number): string {
+  return `(${age < 1 ? "<1" : String(age)})`;
+}
+
 export function getTmdbImageUrl(
   path: string | null,
   size: "w92" | "w185" | "w300" | "w500",
