@@ -164,7 +164,13 @@ public class TvSeriesEndpoint
             Log.Debug($"Suggestions:\n\n{suggestionsResponse}\n\n");   // NOTE: Not destructuring using @ operator because Serilog doesn't let you configure output easily
                                                                        // (and Seq doesn't support Azure Container Apps, so it's not used in this app)
 
-            tvSeriesSuggestionViewModel = new SuggestionViewModel(suggestionsResponse.Suggestions[0]);
+            SuggestionDataModel? suggestionDataModel = suggestionsResponse.FindByItemId(imdbId);
+            if (suggestionDataModel == null)
+            {
+                Log.Warning($"TV series suggestions for '{imdbId}' did not contain that IMDB ID.");
+                return null;
+            }
+            tvSeriesSuggestionViewModel = new SuggestionViewModel(suggestionDataModel);
             
             var cacheEntryOptions = new MemoryCacheEntryOptions()
                 .SetAbsoluteExpiration(TimeSpan.FromDays(1))

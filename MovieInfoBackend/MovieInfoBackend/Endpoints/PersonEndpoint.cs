@@ -130,7 +130,7 @@ public class PersonEndpoint
     public async static Task<SuggestionViewModel?> GetSuggestionViewModel(string imdbId, SuggestionHttpClient suggestionHttpClient, IMemoryCache cache)
     {
         SuggestionViewModel? personSuggestionViewModel;
-        string personSuggestionCacheKey = CachePrefix + imdbId;  // NOTE: We may not hit the cache that often for suggestions, but being a bit paranoid here to minimize impact
+        string personSuggestionCacheKey = SuggestionEndpoint.CachePrefix + imdbId;  // NOTE: We may not hit the cache that often for suggestions, but being a bit paranoid here to minimize impact
         
         if (!cache.TryGetValue(personSuggestionCacheKey, out personSuggestionViewModel))
         {
@@ -141,7 +141,13 @@ public class PersonEndpoint
             Log.Debug($"Suggestions:\n\n{suggestionsResponse}\n\n");   // NOTE: Not destructuring using @ operator because Serilog doesn't let you configure output easily
                                                                        // (and Seq doesn't support Azure Container Apps, so it's not used in this app)
 
-            personSuggestionViewModel = new SuggestionViewModel(suggestionsResponse.Suggestions[0]);
+            SuggestionDataModel? suggestionDataModel = suggestionsResponse.FindByItemId(imdbId);
+            if (suggestionDataModel == null)
+            {
+                Log.Warning($"Person suggestions for '{imdbId}' did not contain that IMDB ID.");
+                return null;
+            }
+            personSuggestionViewModel = new SuggestionViewModel(suggestionDataModel);
             
             var cacheEntryOptions = new MemoryCacheEntryOptions()
                 .SetAbsoluteExpiration(TimeSpan.FromDays(1))

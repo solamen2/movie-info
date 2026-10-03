@@ -153,7 +153,7 @@ public class MovieEndpoint
     public async static Task<SuggestionViewModel?> GetSuggestionViewModel(string imdbId, SuggestionHttpClient suggestionHttpClient, IMemoryCache cache)
     {
         SuggestionViewModel? movieSuggestionViewModel;
-        string movieSuggestionCacheKey = CachePrefix + imdbId;  // NOTE: We may not hit the cache that often for suggestions, but being a bit paranoid here to minimize impact
+        string movieSuggestionCacheKey = SuggestionEndpoint.CachePrefix + imdbId;  // NOTE: We may not hit the cache that often for suggestions, but being a bit paranoid here to minimize impact
         
         if (!cache.TryGetValue(movieSuggestionCacheKey, out movieSuggestionViewModel))
         {
@@ -164,7 +164,13 @@ public class MovieEndpoint
             Log.Debug($"Suggestions:\n\n{suggestionsResponse}\n\n");   // NOTE: Not destructuring using @ operator because Serilog doesn't let you configure output easily
                                                                        // (and Seq doesn't support Azure Container Apps, so it's not used in this app)
 
-            movieSuggestionViewModel = new SuggestionViewModel(suggestionsResponse.Suggestions[0]);
+            SuggestionDataModel? suggestionDataModel = suggestionsResponse.FindByItemId(imdbId);
+            if (suggestionDataModel == null)
+            {
+                Log.Warning($"Movie suggestions for '{imdbId}' did not contain that IMDB ID.");
+                return null;
+            }
+            movieSuggestionViewModel = new SuggestionViewModel(suggestionDataModel);
             
             var cacheEntryOptions = new MemoryCacheEntryOptions()
                 .SetAbsoluteExpiration(TimeSpan.FromDays(1))
