@@ -43,12 +43,16 @@ public class TvEpisodeEndpoint
                         Task<TmdbTvEpisodeResponseDataModel?> tmdbTvEpisodeTask = GetTmdbTvEpisodeResponseDataModel(tmdbTvSeriesId, seasonNumber, episodeNumber, tmdbHttpClient);
                         Task<TmdbTvEpisodeCreditsResponseDataModel?> tmdbTvEpisodeCreditsTask = GetTmdbTvEpisodeCreditsResponseDataModel(tmdbTvSeriesId, seasonNumber, episodeNumber, tmdbHttpClient);
                         string? imdbTvEpisodeIdNullable = await GetTmdbExternalImdbId(tmdbTvSeriesId, seasonNumber, episodeNumber, tmdbHttpClient);
+                        string imdbTvEpisodeId;
                         if (imdbTvEpisodeIdNullable == null)
                         {
                             Log.Debug($"TV episode external IMDB ID for search with TMDB TV series ID '{tmdbTvSeriesId}', seasonNumber '{seasonNumber}', and episode number '{episodeNumber}' was null!");
-                            return Results.NotFound($"TV episode for search '{tmdbTvSeriesId}', seasonNumber '{seasonNumber}', and episode number '{episodeNumber}' was not found in the TMDB.");
+                            imdbTvEpisodeId = "";
                         }
-                        string imdbTvEpisodeId = imdbTvEpisodeIdNullable;
+                        else
+                        {
+                            imdbTvEpisodeId = imdbTvEpisodeIdNullable;
+                        }
                         Task<OmdbResponseDataModel?> omdbTvEpisodeTask = GetOmdbResponseDataModel(imdbTvEpisodeId, omdbHttpClient);
 
                         // NOTE: Strictly speaking, this is not needed, but it's a good marker for when all tasks have been started
@@ -73,10 +77,14 @@ public class TvEpisodeEndpoint
 
                         TvEpisodeViewModel tvEpisodeViewModel;
                         // Null checks all happened above, but there's no good way to let the compiler know about that, so recheck here
-                        if (omdbTvEpisodeResponseDataModel != null
-                            && tmdbTvEpisodeResponseDataModel != null
+                        if (tmdbTvEpisodeResponseDataModel != null
                             && tmdbTvEpisodeCreditsResponseDataModel != null)
                         {
+                            if (omdbTvEpisodeResponseDataModel == null)  // Still lots of good info if this is null, so use an empty object
+                            {
+                                omdbTvEpisodeResponseDataModel = OmdbResponseDataModel.GetEmptyOmdbResponseDataModel();
+                            }
+                            
                             tvEpisodeViewModel = new TvEpisodeViewModel(omdbTvEpisodeResponseDataModel,
                                                                         tmdbTvEpisodeResponseDataModel,
                                                                         tmdbTvEpisodeCreditsResponseDataModel);

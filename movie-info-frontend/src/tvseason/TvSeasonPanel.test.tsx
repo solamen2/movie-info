@@ -329,6 +329,7 @@ describe("TvSeasonPanel", () => {
             tmdbTvSeriesId={90002}
             seasonNumber={1}
             tvSeriesImdbId="tt10000002"
+            tvSeriesName="Example TV Series"
           />
         </MemoryRouter>,
       );
@@ -358,6 +359,7 @@ describe("TvSeasonPanel", () => {
             tmdbTvSeriesId={90002}
             seasonNumber={9}
             tvSeriesImdbId="tt10000002"
+            tvSeriesName="Example TV Series"
           />
         </MemoryRouter>,
       );

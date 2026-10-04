@@ -73,3 +73,11 @@ export interface Movie {
 export function imdbTitleUrl(imdbId: string): string {
   return `https://www.imdb.com/title/${imdbId}`;
 }
+
+// Whether the backend found an IMDB ID; it sends "" when it did not (and OMDB
+// sends "N/A" for unknown values).
+export function hasImdbId(imdbId: string | null | undefined): boolean {
+  if (imdbId == null) return false;
+  const id = imdbId.trim();
+  return id !== "" && id !== "N/A";
+}

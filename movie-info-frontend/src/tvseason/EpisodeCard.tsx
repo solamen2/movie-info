@@ -11,9 +11,11 @@ import { type TvSeasonEpisode, displayEpisodeType } from "./tvSeasonTypes";
 
 interface EpisodeCardProps {
   episode: TvSeasonEpisode;
-  // The IMDB id of the series, needed by the episode panel the card expands
-  // into. (The TMDB series id and season number come with the episode.)
+  // The IMDB id and name of the series, needed by the episode panel the card
+  // expands into. (The TMDB series id and season number come with the
+  // episode.)
   tvSeriesImdbId: string;
+  tvSeriesName: string;
   selected: boolean;
   deselecting: boolean;
   expanded: boolean;
@@ -29,6 +31,7 @@ function displayNames(people: { name: string }[]): string {
 function EpisodeCard({
   episode,
   tvSeriesImdbId,
+  tvSeriesName,
   selected,
   deselecting,
   expanded,
@@ -52,6 +55,7 @@ function EpisodeCard({
           seasonNumber={episode.seasonNumber}
           episodeNumber={episode.episodeNumber}
           tvSeriesImdbId={tvSeriesImdbId}
+          tvSeriesName={tvSeriesName}
         />
       ) : (
         <>

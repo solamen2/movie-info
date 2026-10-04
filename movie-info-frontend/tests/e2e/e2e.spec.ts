@@ -751,7 +751,6 @@ const expectedTvSeason: ExpectedTvSeason = useMockHttpCalls
         imdbRow: /IMDB: 8\.1 \(3,456\)Link/,
         facts: [
           "Air DateMar 10, 2001",
-          "Year2001",
           "Runtime44m43m",
           "RatedTV-14",
           "TypeStandard",
@@ -792,7 +791,6 @@ const expectedTvSeason: ExpectedTvSeason = useMockHttpCalls
         imdbRow: /IMDB: \d\.\d \([\d,]+\)Link/,
         facts: [
           "Air DateNov 6, 2001",
-          "Year2001",
           // The musical episode runs long (OMDB runtime, then TMDB's)
           "Runtime50m50m",
           "Rated13+",

@@ -24,6 +24,8 @@ interface TvSeasonPanelProps {
   seasonNumber: number;
   // For the link to the series' own IMDB page
   tvSeriesImdbId: string;
+  // For the episode panels (see TvEpisodePanel)
+  tvSeriesName: string;
 }
 
 // Shows one season of a TV series, loaded from /api/tvseason with the same
@@ -34,6 +36,7 @@ function TvSeasonPanel({
   tmdbTvSeriesId,
   seasonNumber,
   tvSeriesImdbId,
+  tvSeriesName,
 }: TvSeasonPanelProps) {
   const params = new URLSearchParams({
     tmdbTvSeriesId: String(tmdbTvSeriesId),
@@ -126,6 +129,7 @@ function TvSeasonPanel({
                   key={e.id}
                   episode={e}
                   tvSeriesImdbId={tvSeriesImdbId}
+                  tvSeriesName={tvSeriesName}
                   selected={episodeSelection.selectedId === episodeId}
                   expanded={episodeSelection.expandedId === episodeId}
                   deselecting={
