@@ -14,7 +14,10 @@ export function ImdbRowSeparator() {
 }
 
 interface ImdbRowProps {
+  // The IMDB page linked to, or "" when the IMDB ID is unknown: the row then
+  // links to searchUrl as "Search Google" instead, with no copy button.
   imdbUrl: string;
+  searchUrl?: string;
   // A bold label shown right before the link, for rows that carry no data of
   // their own (e.g. "TV Series IMDB:").
   label?: string;
@@ -26,6 +29,7 @@ interface ImdbRowProps {
 
 function ImdbRow({
   imdbUrl,
+  searchUrl,
   label,
   copyButton = true,
   children,
@@ -64,11 +68,17 @@ function ImdbRow({
             <ImdbRowSeparator />
           </>
         )}
-        <a href={imdbUrl} target="_blank" rel="noopener">
-          Link
-        </a>
+        {imdbUrl !== "" ? (
+          <a href={imdbUrl} target="_blank" rel="noopener">
+            Link
+          </a>
+        ) : (
+          <a href={searchUrl} target="_blank" rel="noopener">
+            Search Google
+          </a>
+        )}
       </span>
-      {copyButton && (
+      {copyButton && imdbUrl !== "" && (
         <button
           type="button"
           aria-label="copy-imdb-link"

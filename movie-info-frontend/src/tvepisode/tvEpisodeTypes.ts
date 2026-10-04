@@ -73,3 +73,18 @@ export interface TvEpisode {
   producers: TvEpisodeCrew[];
   guestStars: TvEpisodeGuestStar[];
 }
+
+// A Google search for the episode, for when its IMDB page is unknown. The
+// query is `imdb "<TV series name>" season <N> episode <M> "<episode title>"`
+// (spaces become "+").
+export function tvEpisodeGoogleSearchUrl(
+  tvSeriesName: string,
+  seasonNumber: number,
+  episodeNumber: number,
+  episodeTitle: string,
+): string {
+  const params = new URLSearchParams({
+    q: `imdb "${tvSeriesName}" season ${String(seasonNumber)} episode ${String(episodeNumber)} "${episodeTitle}"`,
+  });
+  return `https://www.google.com/search?${params.toString()}`;
+}

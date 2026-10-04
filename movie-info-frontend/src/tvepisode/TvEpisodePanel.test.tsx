@@ -132,7 +132,6 @@ describe("TvEpisodePanel", () => {
       for (const expected of [
         "Example PilotSeason 1, Episode 1IMDB: 8.1 (3,456)LinkCopyTV Series IMDB:Link",
         "Air DateMar 10, 2001",
-        "Year2001",
         "Runtime44m43m",
         "RatedTV-14",
         "TypeStandard",
@@ -164,6 +163,7 @@ describe("TvEpisodePanel", () => {
         "b2c3d4e5-0000-4000-8000-000000000002",
         "Awards",
         "Won 1 Example Award",
+        "Year",
         "Imdb Id",
         "tt20000001",
         "Tmdb",
@@ -391,6 +391,7 @@ describe("TvEpisodePanel", () => {
             seasonNumber={1}
             episodeNumber={1}
             tvSeriesImdbId="tt10000002"
+            tvSeriesName="Example TV Series"
           />
         </MemoryRouter>,
       );
@@ -400,7 +401,6 @@ describe("TvEpisodePanel", () => {
       for (const expected of [
         "No imageExample PilotSeason 1, Episode 1IMDB: —LinkCopyTV Series IMDB:Link",
         "Air Date—",
-        "Year—",
         "Runtime——",
         "Rated—",
         "Type—",
@@ -415,6 +415,59 @@ describe("TvEpisodePanel", () => {
     });
   });
 
+  describe("When the TV episode has no IMDB ID", () => {
+    it("Should link to a Google search for the episode instead of its IMDB page, without a copy button", async () => {
+      server.use(
+        http.get("/api/tvepisode", () =>
+          HttpResponse.json({
+            ...tvEpisodeDataJson1,
+            imdbId: "",
+            imdbRating: "",
+            imdbVotes: "",
+          }),
+        ),
+      );
+
+      render(
+        <MemoryRouter>
+          <TvEpisodePanel
+            tmdbTvSeriesId={90002}
+            seasonNumber={1}
+            episodeNumber={1}
+            tvSeriesImdbId="tt10000002"
+            tvSeriesName="Example TV Series"
+          />
+        </MemoryRouter>,
+      );
+      const panel = await screen.findByTestId("tv-episode-panel");
+
+      expect(panel.textContent).toContain(
+        "Example PilotSeason 1, Episode 1IMDB:Search GoogleTV Series IMDB:Link",
+      );
+      const searchLink = within(panel).getByRole("link", {
+        name: "Search Google",
+      });
+      expect(searchLink).toHaveAttribute(
+        "href",
+        "https://www.google.com/search?q=imdb+%22Example+TV+Series%22+season+1+episode+1+%22Example+Pilot%22",
+      );
+      expect(searchLink).toHaveAttribute("target", "_blank");
+      expect(searchLink).toHaveAttribute("rel", "noopener");
+      // No separator line before the search link, and no IMDB link to copy
+      expect(
+        searchLink.parentElement?.querySelector('[role="separator"]'),
+      ).toBeNull();
+      expect(
+        within(panel).queryByRole("button", { name: "copy-imdb-link" }),
+      ).not.toBeInTheDocument();
+      // The TV series' own IMDB link is unaffected
+      expect(within(panel).getByRole("link", { name: "Link" })).toHaveAttribute(
+        "href",
+        "https://www.imdb.com/title/tt10000002",
+      );
+    });
+  });
+
   describe("When the TV episode API returns an error", () => {
     it("Should show an error message", async () => {
       render(
@@ -424,6 +477,7 @@ describe("TvEpisodePanel", () => {
             seasonNumber={1}
             episodeNumber={9}
             tvSeriesImdbId="tt10000002"
+            tvSeriesName="Example TV Series"
           />
         </MemoryRouter>,
       );

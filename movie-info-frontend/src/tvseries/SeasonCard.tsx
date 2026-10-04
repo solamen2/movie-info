@@ -10,10 +10,11 @@ import { type TvSeriesSeason, displayEpisodeCount } from "./tvSeriesTypes";
 
 interface SeasonCardProps {
   season: TvSeriesSeason;
-  // The TMDB id of the series and its IMDB id, needed by the season panel the
-  // card expands into.
+  // The TMDB id, IMDB id and name of the series, needed by the season panel
+  // the card expands into.
   tmdbTvSeriesId: number;
   tvSeriesImdbId: string;
+  tvSeriesName: string;
   selected: boolean;
   deselecting: boolean;
   expanded: boolean;
@@ -26,6 +27,7 @@ function SeasonCard({
   season,
   tmdbTvSeriesId,
   tvSeriesImdbId,
+  tvSeriesName,
   selected,
   deselecting,
   expanded,
@@ -46,6 +48,7 @@ function SeasonCard({
           tmdbTvSeriesId={tmdbTvSeriesId}
           seasonNumber={season.seasonNumber}
           tvSeriesImdbId={tvSeriesImdbId}
+          tvSeriesName={tvSeriesName}
         />
       ) : (
         <>

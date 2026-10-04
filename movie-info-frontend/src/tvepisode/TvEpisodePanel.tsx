@@ -1,5 +1,5 @@
 import { type ReactNode } from "react";
-import { imdbTitleUrl } from "../movie/movieTypes";
+import { hasImdbId, imdbTitleUrl } from "../movie/movieTypes";
 import Collapsible from "../shared/Collapsible";
 import HorizontalList from "../shared/HorizontalList";
 import ImdbRow, { ImdbRowSeparator } from "../shared/ImdbRow";
@@ -19,7 +19,7 @@ import {
 import CastCard from "./CastCard";
 import CrewCard from "./CrewCard";
 import GuestStarCard from "./GuestStarCard";
-import { type TvEpisodeCrew } from "./tvEpisodeTypes";
+import { type TvEpisodeCrew, tvEpisodeGoogleSearchUrl } from "./tvEpisodeTypes";
 import "../shared/shared.css";
 
 function CrewSection({
@@ -60,6 +60,8 @@ interface TvEpisodePanelProps {
   episodeNumber: number;
   // For the link to the series' own IMDB page
   tvSeriesImdbId: string;
+  // For the Google search offered when the episode has no IMDB page
+  tvSeriesName: string;
 }
 
 // Shows one episode of a TV series, loaded from /api/tvepisode with the same
@@ -71,6 +73,7 @@ function TvEpisodePanel({
   seasonNumber,
   episodeNumber,
   tvSeriesImdbId,
+  tvSeriesName,
 }: TvEpisodePanelProps) {
   const params = new URLSearchParams({
     tmdbTvSeriesId: String(tmdbTvSeriesId),
@@ -120,7 +123,6 @@ function TvEpisodePanel({
 
   const facts: [string, ReactNode][] = [
     ["Air Date", displayDate(tvEpisode.airDate)],
-    ["Year", tvEpisode.year > 0 ? String(tvEpisode.year) : "—"],
     [
       "Runtime",
       <>
@@ -160,15 +162,30 @@ function TvEpisodePanel({
               tvEpisode.episodeNumber,
             )}
           </p>
-          <ImdbRow imdbUrl={imdbTitleUrl(tvEpisode.imdbId)}>
-            <span className="imdb-row-label">IMDB:</span> {imdbRating}
-            {imdbRating !== "—" && imdbVotes !== "—" && (
-              <>
-                {" "}
-                <span className="imdb-row-votes">({imdbVotes})</span>
-              </>
-            )}
-          </ImdbRow>
+          {hasImdbId(tvEpisode.imdbId) ? (
+            <ImdbRow imdbUrl={imdbTitleUrl(tvEpisode.imdbId)}>
+              <span className="imdb-row-label">IMDB:</span> {imdbRating}
+              {imdbRating !== "—" && imdbVotes !== "—" && (
+                <>
+                  {" "}
+                  <span className="imdb-row-votes">({imdbVotes})</span>
+                </>
+              )}
+            </ImdbRow>
+          ) : (
+            // TMDB knows of no IMDB page for the episode (so there is no OMDB
+            // rating either); offer a Google search for it instead
+            <ImdbRow
+              imdbUrl=""
+              searchUrl={tvEpisodeGoogleSearchUrl(
+                tvSeriesName,
+                tvEpisode.seasonNumber,
+                tvEpisode.episodeNumber,
+                tvEpisode.title,
+              )}
+              label="IMDB:"
+            />
+          )}
           <ImdbRow
             imdbUrl={imdbTitleUrl(tvSeriesImdbId)}
             label="TV Series IMDB:"

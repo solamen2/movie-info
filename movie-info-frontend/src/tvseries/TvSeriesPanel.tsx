@@ -228,6 +228,7 @@ function TvSeriesPanel({ itemId }: TvSeriesPanelProps) {
                   season={s}
                   tmdbTvSeriesId={tmdbTvSeriesId}
                   tvSeriesImdbId={tvSeries.imdbId}
+                  tvSeriesName={tvSeries.name}
                   selected={seasonSelection.selectedId === seasonId}
                   expanded={seasonSelection.expandedId === seasonId}
                   deselecting={
