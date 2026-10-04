@@ -344,8 +344,11 @@
 /* Only a selected *card* is highlighted. Once it grows into a panel the
    highlight fades out as it expands, and fades back in as the panel shrinks
    to a card again. A panel is never highlighted, so one shown already
-   expanded (e.g. a directly loaded URL) never is either. */
-.expandable-card.selected:not(.expanded) {
+   expanded (e.g. a directly loaded URL) never is either. A card the URL names
+   inside a panel is highlighted where it is, flight or no flight (see
+   usePanelCards). */
+.expandable-card.selected:not(.expanded),
+.expandable-card.highlighted {
   border-color: blue;
 }
 
@@ -407,6 +410,16 @@
   display: none;
 }
 
+/* A card that is deselecting while its container still has a selection has
+   been replaced: another card was selected straight away (e.g. a person's
+   panel opened from a movie panel's cast, see useCardSelection). It has no
+   home to fly back to, since the other cards are still hidden, so it is
+   dropped at once rather than fading out beside the new panel. */
+.has-selection > .expandable-card.deselecting {
+  animation: none;
+  transition: none;
+}
+
 /* Person (cast / crew / creator) and watch provider cards shown in the
    horizontally scrolling rows */
 .person-card,
@@ -418,8 +431,16 @@
   text-align: center;
 }
 
+/* Person cards open the person's own panel when clicked (see usePanelCards),
+   like the search result cards, so they get the same hover cue. Their
+   select / deselect animation classes come from .expandable-card above. */
 .person-card {
   width: 120px;
+  cursor: pointer;
+}
+
+.person-card:not(.selected):not(.highlighted):hover {
+  border-color: #888;
 }
 
 .person-card-image {

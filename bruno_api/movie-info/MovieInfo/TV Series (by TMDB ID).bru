@@ -1,17 +1,17 @@
 meta {
-  name: Search
+  name: TV Series (by TMDB ID)
   type: http
-  seq: 8
+  seq: 12
 }
 
 get {
-  url: {{base-url}}/api/search?searchQuery=Leonardo DiCaprio
+  url: {{base-url}}/api/tvseries?tmdbId=1396
   body: none
   auth: inherit
 }
 
 params:query {
-  searchQuery: Leonardo DiCaprio
+  tmdbId: 1396
 }
 
 settings {

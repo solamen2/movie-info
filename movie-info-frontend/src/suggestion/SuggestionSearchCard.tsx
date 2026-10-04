@@ -39,6 +39,12 @@ interface SuggestionSearchCardProps {
   // Which detail panel this card grows into, or null for cards that only
   // highlight when selected.
   panelKind: PanelKind | null;
+  // See ExpandableCard
+  growIn?: boolean;
+  // A stand-in for an item that isn't among the results (see SuggestionSearch)
+  // shows nothing of its own: it is only ever seen collapsed for the moment a
+  // panel shrinks into the card inside another panel that opened it.
+  standIn?: boolean;
   onClick: () => void;
 }
 
@@ -49,6 +55,8 @@ function SuggestionSearchCard({
   expanded = false,
   mediaType,
   panelKind,
+  growIn = false,
+  standIn = false,
   onClick,
 }: SuggestionSearchCardProps) {
   const searchTypeLabel = getSearchTypeLabel(item.searchType);
@@ -59,19 +67,20 @@ function SuggestionSearchCard({
   return (
     <ExpandableCard
       id="search-card"
-      className="result-card"
+      className={`result-card${standIn ? " stand-in" : ""}`}
       selected={selected}
       deselecting={deselecting}
       expanded={expanded}
+      growIn={growIn}
       onClick={onClick}
     >
       {expanded ? (
         <>
-          {panelKind === "movie" && <MoviePanel imdbId={item.itemID} />}
-          {panelKind === "tvseries" && <TvSeriesPanel imdbId={item.itemID} />}
-          {panelKind === "person" && <PersonPanel imdbId={item.itemID} />}
+          {panelKind === "movie" && <MoviePanel itemId={item.itemID} />}
+          {panelKind === "tvseries" && <TvSeriesPanel itemId={item.itemID} />}
+          {panelKind === "person" && <PersonPanel itemId={item.itemID} />}
         </>
-      ) : (
+      ) : standIn ? null : (
         <>
           {item.image ? (
             <img

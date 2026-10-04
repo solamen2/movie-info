@@ -1,32 +1,21 @@
-import { getTmdbImageUrl } from "../utilities/utilities";
+import PersonCard from "../shared/PersonCard";
+import { type PanelCardProps } from "../shared/usePanelCards";
 import { type TvSeriesCreator } from "./tvSeriesTypes";
 
-interface CreatorCardProps {
+interface CreatorCardProps extends PanelCardProps {
   creator: TvSeriesCreator;
 }
 
-function CreatorCard({ creator }: CreatorCardProps) {
-  const imageUrl = getTmdbImageUrl(creator.profilePath, "w185");
-
+function CreatorCard({ creator, ...cardProps }: CreatorCardProps) {
   return (
-    <div className="person-card" data-testid="creator-card">
-      {imageUrl ? (
-        <img
-          src={imageUrl}
-          alt={creator.name}
-          loading="lazy"
-          className="person-card-image"
-        />
-      ) : (
-        <div className="person-card-image person-card-image-placeholder">
-          No image
-        </div>
-      )}
-      <p className="person-card-name">{creator.name}</p>
-      {creator.originalName && creator.originalName !== creator.name && (
-        <p className="person-card-secondary">({creator.originalName})</p>
-      )}
-    </div>
+    <PersonCard
+      testId="creator-card"
+      name={creator.name}
+      originalName={creator.originalName}
+      profilePath={creator.profilePath}
+      details={[]}
+      {...cardProps}
+    />
   );
 }
 

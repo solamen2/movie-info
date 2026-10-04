@@ -1,35 +1,21 @@
-import { getTmdbImageUrl } from "../utilities/utilities";
+import PersonCard from "../shared/PersonCard";
+import { type PanelCardProps } from "../shared/usePanelCards";
 import { type TvEpisodeGuestStar } from "./tvEpisodeTypes";
 
-interface GuestStarCardProps {
+interface GuestStarCardProps extends PanelCardProps {
   guestStar: TvEpisodeGuestStar;
 }
 
-function GuestStarCard({ guestStar }: GuestStarCardProps) {
-  const imageUrl = getTmdbImageUrl(guestStar.profilePath, "w185");
-
+function GuestStarCard({ guestStar, ...cardProps }: GuestStarCardProps) {
   return (
-    <div className="person-card" data-testid="guest-star-card">
-      {imageUrl ? (
-        <img
-          src={imageUrl}
-          alt={guestStar.name}
-          loading="lazy"
-          className="person-card-image"
-        />
-      ) : (
-        <div className="person-card-image person-card-image-placeholder">
-          No image
-        </div>
-      )}
-      <p className="person-card-name">{guestStar.name}</p>
-      {guestStar.originalName && guestStar.originalName !== guestStar.name && (
-        <p className="person-card-secondary">({guestStar.originalName})</p>
-      )}
-      {guestStar.character && (
-        <p className="person-card-secondary">{guestStar.character}</p>
-      )}
-    </div>
+    <PersonCard
+      testId="guest-star-card"
+      name={guestStar.name}
+      originalName={guestStar.originalName}
+      profilePath={guestStar.profilePath}
+      details={[guestStar.character]}
+      {...cardProps}
+    />
   );
 }
 

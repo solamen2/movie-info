@@ -1,11 +1,13 @@
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode } from "react";
 import Collapsible from "../shared/Collapsible";
 import HorizontalList from "../shared/HorizontalList";
 import ImdbRow, { ImdbRowSeparator } from "../shared/ImdbRow";
 import TitleStatus from "../shared/TitleStatus";
 import WatchProviderSection from "../shared/WatchProviderSection";
+import { useDetailData } from "../shared/useDetailData";
+import { type PanelCards, usePanelCards } from "../shared/usePanelCards";
 import {
-  describeFailedLoad,
+  detailIdQuery,
   displayDate,
   displayGenres,
   displayRuntime,
@@ -13,7 +15,7 @@ import {
 } from "../utilities/utilities";
 import CastCard from "./CastCard";
 import CrewCard from "./CrewCard";
-import { type Movie, type MovieCrew, imdbTitleUrl } from "./movieTypes";
+import { type MovieCrew, imdbTitleUrl } from "./movieTypes";
 import "../shared/shared.css";
 
 function displayMoney(value: number): string {
@@ -26,12 +28,32 @@ function displayMoney(value: number): string {
     : "—";
 }
 
-function CrewSection({ title, crew }: { title: string; crew: MovieCrew[] }) {
+function CrewSection({
+  title,
+  cardType,
+  crew,
+  cards,
+}: {
+  title: string;
+  // The section's card type in the URL (see usePanelCards)
+  cardType: string;
+  crew: MovieCrew[];
+  cards: PanelCards;
+}) {
+  const selected = cards.isSelectedIn(cardType);
   return (
-    <Collapsible title={title} count={crew.length}>
-      <HorizontalList>
+    <Collapsible
+      title={title}
+      count={crew.length}
+      {...cards.sectionProps(cardType)}
+    >
+      <HorizontalList hasSelection={selected}>
         {crew.map((c) => (
-          <CrewCard key={c.id} crew={c} />
+          <CrewCard
+            key={c.id}
+            crew={c}
+            {...cards.cardProps(cardType, "person", c.tmdbId)}
+          />
         ))}
       </HorizontalList>
     </Collapsible>
@@ -39,44 +61,24 @@ function CrewSection({ title, crew }: { title: string; crew: MovieCrew[] }) {
 }
 
 interface MoviePanelProps {
-  imdbId: string;
+  // The movie's IMDB or TMDB id (see isTmdbId)
+  itemId: string;
 }
 
-function MoviePanel({ imdbId }: MoviePanelProps) {
-  const [movie, setMovie] = useState<Movie | null>(null);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    async function loadMovie() {
-      try {
-        const response = await fetch(
-          `/api/movie?imdbId=${encodeURIComponent(imdbId)}`,
-          { signal: controller.signal },
-        );
-        if (!response.ok) {
-          setError(await describeFailedLoad("Loading movie", response));
-          return;
-        }
-        const data = (await response.json()) as Movie | null; // TODO: Maybe someday make this validation more robust
-        if (data == null) {
-          setError("No movie details were found.");
-          return;
-        }
-        setMovie(data);
-      } catch {
-        if (!controller.signal.aborted) {
-          setError("An unexpected error occurred while loading the movie.");
-        }
-      }
-    }
-
-    void loadMovie();
-    return () => {
-      controller.abort();
-    };
-  }, [imdbId]);
+// Shows a movie. Its cast and crew cards open the person's own panel in place
+// of this one (see usePanelCards).
+function MoviePanel({ itemId }: MoviePanelProps) {
+  const { data: movie, error } = useDetailData(
+    `/api/movie?${detailIdQuery(itemId)}`,
+    "movie",
+  );
+  const cards = usePanelCards({
+    cardsIn: {
+      cast: movie?.cast,
+      directors: movie?.directors,
+      writers: movie?.writers,
+    },
+  });
 
   if (error) {
     return (
@@ -100,6 +102,7 @@ function MoviePanel({ imdbId }: MoviePanelProps) {
   const sortedCast = [...movie.cast].sort(
     (a, b) => a.billedOrder - b.billedOrder,
   );
+  const castSelected = cards.isSelectedIn("cast");
 
   const facts: [string, ReactNode][] = [
     ["Original Title", displayText(movie.originalTitle)],
@@ -127,7 +130,10 @@ function MoviePanel({ imdbId }: MoviePanelProps) {
   ];
 
   return (
-    <div className="detail-panel" data-testid="movie-panel">
+    <div
+      className={`detail-panel fly-origin${cards.hasSelection ? " has-child-selection" : ""}`}
+      data-testid="movie-panel"
+    >
       <div className="detail-panel-top">
         {movie.image ? (
           <img
@@ -168,15 +174,33 @@ function MoviePanel({ imdbId }: MoviePanelProps) {
       </div>
 
       <div className="detail-sections">
-        <Collapsible title="Cast" count={movie.cast.length}>
-          <HorizontalList>
+        <Collapsible
+          title="Cast"
+          count={movie.cast.length}
+          {...cards.sectionProps("cast")}
+        >
+          <HorizontalList hasSelection={castSelected}>
             {sortedCast.map((c) => (
-              <CastCard key={c.id} cast={c} />
+              <CastCard
+                key={c.id}
+                cast={c}
+                {...cards.cardProps("cast", "person", c.tmdbId)}
+              />
             ))}
           </HorizontalList>
         </Collapsible>
-        <CrewSection title="Directors" crew={movie.directors} />
-        <CrewSection title="Writers" crew={movie.writers} />
+        <CrewSection
+          title="Directors"
+          cardType="directors"
+          crew={movie.directors}
+          cards={cards}
+        />
+        <CrewSection
+          title="Writers"
+          cardType="writers"
+          crew={movie.writers}
+          cards={cards}
+        />
         <Collapsible title="Plot (TMDB)">
           <p className="detail-prose">{displayText(movie.tmdbPlot)}</p>
         </Collapsible>

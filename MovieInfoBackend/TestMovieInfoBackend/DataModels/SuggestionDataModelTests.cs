@@ -403,4 +403,59 @@ public class SuggestionDataModelTests
         string result = responseModel.ToString();
         Assert.NotNull(result);
     }
+
+    [Fact]
+    public void FindByItemId_SpotlightItemFirst_ReturnsMatchingSuggestion()
+    {
+        // Arrange
+        var responseModel = new SuggestionsResponseDataModel
+        {
+            Suggestions =
+            [
+                new SuggestionDataModel { ItemID = "/toronto/", Name = "Toronto Int’l Film Festival", KnownFor = "Discover the movies, videos, and stars of the 2026 TIFF" },
+                new SuggestionDataModel { ItemID = "nm0333410", Name = "Topher Grace", Rank = 2152, KnownFor = "Actor, In Good Company (2004)" },
+            ]
+        };
+
+        // Act
+        SuggestionDataModel? actual = responseModel.FindByItemId("nm0333410");
+
+        // Assert
+        Assert.NotNull(actual);
+        Assert.Equal("nm0333410", actual.ItemID);
+        Assert.Equal("Topher Grace", actual.Name);
+        Assert.Equal(2152, actual.Rank);
+    }
+
+    [Theory]
+    [InlineData("nm0333410", "NM0333410")]  // IMDB IDs are case-insensitive
+    [InlineData("tt0000001", "tt0000001")]
+    public void FindByItemId_DifferentCase_ReturnsMatchingSuggestion(string itemId, string searchedItemId)
+    {
+        // Arrange
+        var responseModel = new SuggestionsResponseDataModel
+        {
+            Suggestions = [new SuggestionDataModel { ItemID = itemId, Name = "Example" }]
+        };
+
+        // Act & Assert
+        Assert.NotNull(responseModel.FindByItemId(searchedItemId));
+    }
+
+    [Fact]
+    public void FindByItemId_NoMatchOrNoSuggestions_ReturnsNull()
+    {
+        // Arrange
+        var withOtherItems = new SuggestionsResponseDataModel
+        {
+            Suggestions = [new SuggestionDataModel { ItemID = "/toronto/", Name = "Toronto Int’l Film Festival" }]
+        };
+        var withNullSuggestions = new SuggestionsResponseDataModel { Suggestions = null };
+        var withEmptySuggestions = new SuggestionsResponseDataModel { Suggestions = [] };
+
+        // Act & Assert
+        Assert.Null(withOtherItems.FindByItemId("nm0333410"));
+        Assert.Null(withNullSuggestions.FindByItemId("nm0333410"));
+        Assert.Null(withEmptySuggestions.FindByItemId("nm0333410"));
+    }
 }

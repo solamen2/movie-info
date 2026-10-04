@@ -1,14 +1,15 @@
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode } from "react";
 import { imdbTitleUrl } from "../movie/movieTypes";
 import Collapsible from "../shared/Collapsible";
 import HorizontalList from "../shared/HorizontalList";
 import ImdbRow, { ImdbRowSeparator } from "../shared/ImdbRow";
+import { useDetailData } from "../shared/useDetailData";
+import { type PanelCards, usePanelCards } from "../shared/usePanelCards";
 import {
   displayEpisodeType,
   displaySeasonEpisode,
 } from "../tvseason/tvSeasonTypes";
 import {
-  describeFailedLoad,
   displayDate,
   displayGenres,
   displayRuntime,
@@ -18,21 +19,35 @@ import {
 import CastCard from "./CastCard";
 import CrewCard from "./CrewCard";
 import GuestStarCard from "./GuestStarCard";
-import { type TvEpisode, type TvEpisodeCrew } from "./tvEpisodeTypes";
+import { type TvEpisodeCrew } from "./tvEpisodeTypes";
 import "../shared/shared.css";
 
 function CrewSection({
   title,
+  cardType,
   crew,
+  cards,
 }: {
   title: string;
+  // The section's card type in the URL (see usePanelCards)
+  cardType: string;
   crew: TvEpisodeCrew[];
+  cards: PanelCards;
 }) {
+  const selected = cards.isSelectedIn(cardType);
   return (
-    <Collapsible title={title} count={crew.length}>
-      <HorizontalList>
+    <Collapsible
+      title={title}
+      count={crew.length}
+      {...cards.sectionProps(cardType)}
+    >
+      <HorizontalList hasSelection={selected}>
         {crew.map((c) => (
-          <CrewCard key={c.id} crew={c} />
+          <CrewCard
+            key={c.id}
+            crew={c}
+            {...cards.cardProps(cardType, "person", c.tmdbId)}
+          />
         ))}
       </HorizontalList>
     </Collapsible>
@@ -48,53 +63,32 @@ interface TvEpisodePanelProps {
 }
 
 // Shows one episode of a TV series, loaded from /api/tvepisode with the same
-// query parameters that select it in the URL.
+// query parameters that select it in the URL. Its cast, crew and guest star
+// cards open the person's own panel in place of the whole TV series panel
+// (see usePanelCards).
 function TvEpisodePanel({
   tmdbTvSeriesId,
   seasonNumber,
   episodeNumber,
   tvSeriesImdbId,
 }: TvEpisodePanelProps) {
-  const [tvEpisode, setTvEpisode] = useState<TvEpisode | null>(null);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    async function loadTvEpisode() {
-      try {
-        const params = new URLSearchParams({
-          tmdbTvSeriesId: String(tmdbTvSeriesId),
-          seasonNumber: String(seasonNumber),
-          episodeNumber: String(episodeNumber),
-        });
-        const response = await fetch(`/api/tvepisode?${params.toString()}`, {
-          signal: controller.signal,
-        });
-        if (!response.ok) {
-          setError(await describeFailedLoad("Loading TV episode", response));
-          return;
-        }
-        const data = (await response.json()) as TvEpisode | null; // TODO: Maybe someday make this validation more robust
-        if (data == null) {
-          setError("No TV episode details were found.");
-          return;
-        }
-        setTvEpisode(data);
-      } catch {
-        if (!controller.signal.aborted) {
-          setError(
-            "An unexpected error occurred while loading the TV episode.",
-          );
-        }
-      }
-    }
-
-    void loadTvEpisode();
-    return () => {
-      controller.abort();
-    };
-  }, [tmdbTvSeriesId, seasonNumber, episodeNumber]);
+  const params = new URLSearchParams({
+    tmdbTvSeriesId: String(tmdbTvSeriesId),
+    seasonNumber: String(seasonNumber),
+    episodeNumber: String(episodeNumber),
+  });
+  const { data: tvEpisode, error } = useDetailData(
+    `/api/tvepisode?${params.toString()}`,
+    "TV episode",
+  );
+  const cards = usePanelCards({
+    cardsIn: {
+      cast: tvEpisode?.cast,
+      directors: tvEpisode?.directors,
+      writers: tvEpisode?.writers,
+      "guest-stars": tvEpisode?.guestStars,
+    },
+  });
 
   if (error) {
     return (
@@ -121,6 +115,8 @@ function TvEpisodePanel({
   const sortedGuestStars = [...tvEpisode.guestStars].sort(
     (a, b) => a.billedOrder - b.billedOrder,
   );
+  const castSelected = cards.isSelectedIn("cast");
+  const guestStarSelected = cards.isSelectedIn("guest-stars");
 
   const facts: [string, ReactNode][] = [
     ["Air Date", displayDate(tvEpisode.airDate)],
@@ -140,7 +136,10 @@ function TvEpisodePanel({
   ];
 
   return (
-    <div className="detail-panel" data-testid="tv-episode-panel">
+    <div
+      className={`detail-panel fly-origin${cards.hasSelection ? " has-child-selection" : ""}`}
+      data-testid="tv-episode-panel"
+    >
       <div className="detail-panel-top">
         {stillUrl ? (
           <img
@@ -187,19 +186,45 @@ function TvEpisodePanel({
       </div>
 
       <div className="detail-sections">
-        <Collapsible title="Cast" count={tvEpisode.cast.length}>
-          <HorizontalList>
+        <Collapsible
+          title="Cast"
+          count={tvEpisode.cast.length}
+          {...cards.sectionProps("cast")}
+        >
+          <HorizontalList hasSelection={castSelected}>
             {sortedCast.map((c) => (
-              <CastCard key={c.id} cast={c} />
+              <CastCard
+                key={c.id}
+                cast={c}
+                {...cards.cardProps("cast", "person", c.tmdbId)}
+              />
             ))}
           </HorizontalList>
         </Collapsible>
-        <CrewSection title="Directors" crew={tvEpisode.directors} />
-        <CrewSection title="Writers" crew={tvEpisode.writers} />
-        <Collapsible title="Guest Stars" count={tvEpisode.guestStars.length}>
-          <HorizontalList>
+        <CrewSection
+          title="Directors"
+          cardType="directors"
+          crew={tvEpisode.directors}
+          cards={cards}
+        />
+        <CrewSection
+          title="Writers"
+          cardType="writers"
+          crew={tvEpisode.writers}
+          cards={cards}
+        />
+        <Collapsible
+          title="Guest Stars"
+          count={tvEpisode.guestStars.length}
+          {...cards.sectionProps("guest-stars")}
+        >
+          <HorizontalList hasSelection={guestStarSelected}>
             {sortedGuestStars.map((g) => (
-              <GuestStarCard key={g.id} guestStar={g} />
+              <GuestStarCard
+                key={g.id}
+                guestStar={g}
+                {...cards.cardProps("guest-stars", "person", g.tmdbId)}
+              />
             ))}
           </HorizontalList>
         </Collapsible>

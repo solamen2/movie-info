@@ -36,6 +36,52 @@ function placeholderImage() {
   });
 }
 
+// The people shown as cards in the movie / TV series / TV episode fixtures,
+// and the movies and TV series shown as credit cards in the person fixture, by
+// TMDB id (the only id those cards carry). Opening one of them serves the
+// matching fixture under the clicked card's own name and TMDB id, so a panel
+// opened from a card is recognizably that card's.
+function namesByTmdbId(
+  groups: { tmdbId: number; name: string }[][],
+): Map<number, string> {
+  return new Map(groups.flat().map((item) => [item.tmdbId, item.name]));
+}
+
+const peopleByTmdbId = namesByTmdbId([
+  movieDataJson1.cast,
+  movieDataJson1.directors,
+  movieDataJson1.writers,
+  tvSeriesDataJson1.cast,
+  tvSeriesDataJson1.creators,
+  tvSeriesDataJson1.directors,
+  tvSeriesDataJson1.writers,
+  tvEpisodeDataJson1.cast,
+  tvEpisodeDataJson1.directors,
+  tvEpisodeDataJson1.writers,
+  tvEpisodeDataJson1.guestStars,
+]);
+const movieTitlesByTmdbId = namesByTmdbId(
+  [personDataJson1.movieCastCredits, personDataJson1.movieCrewCredits].map(
+    (credits) => credits.map((c) => ({ tmdbId: c.tmdbId, name: c.title })),
+  ),
+);
+const tvSeriesNamesByTmdbId = namesByTmdbId([
+  personDataJson1.tvSeriesCastCredits,
+  personDataJson1.tvSeriesCrewCredits,
+]);
+
+function invalidIdResponse(tmdbId: string | null) {
+  return HttpResponse.json(
+    {
+      error:
+        tmdbId === null
+          ? "Not a valid IMDB ID for mock"
+          : "Not a valid TMDB ID for mock",
+    },
+    { status: 404 },
+  );
+}
+
 export const handlers = [
   http.get("https://image.tmdb.org/t/p/*", placeholderImage),
   http.get("https://example.com/*", placeholderImage),
@@ -104,27 +150,45 @@ export const handlers = [
   http.get("/api/movie", ({ request }) => {
     const url = new URL(request.url);
     const imdbId = url.searchParams.get("imdbId");
+    const tmdbId = url.searchParams.get("tmdbId");
 
-    if (imdbId === movieDataJson1.imdbId) {
+    if (
+      imdbId === movieDataJson1.imdbId ||
+      tmdbId === String(movieDataJson1.tmdbId)
+    ) {
       return HttpResponse.json(movieDataJson1, { status: 200 });
     }
-    return HttpResponse.json(
-      { error: "Not a valid IMDB ID for mock" },
-      { status: 404 },
-    );
+    const title =
+      tmdbId === null ? undefined : movieTitlesByTmdbId.get(Number(tmdbId));
+    if (title !== undefined) {
+      return HttpResponse.json(
+        { ...movieDataJson1, tmdbId: Number(tmdbId), title },
+        { status: 200 },
+      );
+    }
+    return invalidIdResponse(tmdbId);
   }),
 
   http.get("/api/tvseries", ({ request }) => {
     const url = new URL(request.url);
     const imdbId = url.searchParams.get("imdbId");
+    const tmdbId = url.searchParams.get("tmdbId");
 
-    if (imdbId === tvSeriesDataJson1.imdbId) {
+    if (
+      imdbId === tvSeriesDataJson1.imdbId ||
+      tmdbId === String(tvSeriesDataJson1.tmdbId)
+    ) {
       return HttpResponse.json(tvSeriesDataJson1, { status: 200 });
     }
-    return HttpResponse.json(
-      { error: "Not a valid IMDB ID for mock" },
-      { status: 404 },
-    );
+    const name =
+      tmdbId === null ? undefined : tvSeriesNamesByTmdbId.get(Number(tmdbId));
+    if (name !== undefined) {
+      return HttpResponse.json(
+        { ...tvSeriesDataJson1, tmdbId: Number(tmdbId), name },
+        { status: 200 },
+      );
+    }
+    return invalidIdResponse(tmdbId);
   }),
 
   http.get("/api/tvseason", ({ request }) => {
@@ -166,13 +230,22 @@ export const handlers = [
   http.get("/api/person", ({ request }) => {
     const url = new URL(request.url);
     const imdbId = url.searchParams.get("imdbId");
+    const tmdbId = url.searchParams.get("tmdbId");
 
-    if (imdbId === personDataJson1.imdbId) {
+    if (
+      imdbId === personDataJson1.imdbId ||
+      tmdbId === String(personDataJson1.tmdbId)
+    ) {
       return HttpResponse.json(personDataJson1, { status: 200 });
     }
-    return HttpResponse.json(
-      { error: "Not a valid IMDB ID for mock" },
-      { status: 404 },
-    );
+    const name =
+      tmdbId === null ? undefined : peopleByTmdbId.get(Number(tmdbId));
+    if (name !== undefined) {
+      return HttpResponse.json(
+        { ...personDataJson1, tmdbId: Number(tmdbId), name },
+        { status: 200 },
+      );
+    }
+    return invalidIdResponse(tmdbId);
   }),
 ];

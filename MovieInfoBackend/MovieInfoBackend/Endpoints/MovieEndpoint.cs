@@ -22,7 +22,8 @@ public class MovieEndpoint
     {
         app.MapGet($"{ApiRoutePrefix}/movie", [Authorize]
             async (
-                string imdbId,
+                string? imdbId,
+                int? tmdbId,
                 ClaimsPrincipal user,
                 [FromServices] SuggestionHttpClient suggestionHttpClient,
                 [FromServices] OmdbHttpClient omdbHttpClient,
@@ -33,6 +34,20 @@ public class MovieEndpoint
                 
                 try
                 {
+                    if (imdbId == null)
+                    {
+                        if (tmdbId == null)
+                        {
+                            return Results.BadRequest("Either imdbId or tmdbId must be provided.");
+                        }
+                        imdbId = await GetImdbId(tmdbId.Value, tmdbHttpClient, cache);
+                        if (imdbId == null)
+                        {
+                            Log.Debug($"Movie IMDB ID for TMDB ID '{tmdbId}' was null!");
+                            return Results.NotFound($"Movie with TMDB ID '{tmdbId}' was not found in the TMDB, or has no IMDB ID.");
+                        }
+                    }
+
                     string movieCacheKey = CachePrefix + imdbId;  // NOTE: We may not hit the cache that often for suggestions, but being a bit paranoid here to minimize impact
 
                     if (!cache.TryGetValue(movieCacheKey, out movieViewModelJson))
@@ -44,7 +59,7 @@ public class MovieEndpoint
                         Task<OmdbResponseDataModel?> omdbMovieTask = GetOmdbResponseDataModel(imdbId, omdbHttpClient);
                         Task<ConfigurationCountriesDictionary?> tmdbCountriesTask = GetConfigurationCountriesDictionary(tmdbHttpClient);
                         Task<ConfigurationLanguagesDictionary?> tmdbLanguagesTask = GetConfigurationLanguagesDictionary(tmdbHttpClient);
-                        int? tmdbMovieIdNullable = await GetTmdbId(imdbId, tmdbHttpClient);
+                        int? tmdbMovieIdNullable = tmdbId ?? await GetTmdbId(imdbId, tmdbHttpClient);
                         if (tmdbMovieIdNullable == null)
                         {
                             Log.Debug($"Movie TMDB ID for search '{imdbId}' was null!");
@@ -144,7 +159,7 @@ public class MovieEndpoint
             }
         )
         .WithSummary("Movie")
-        .WithDescription("Searches IMDB, TMDB, and OMDB for detailed information on movies.")
+        .WithDescription("Searches IMDB, TMDB, and OMDB for detailed information on movies, looked up by IMDB ID or by TMDB ID.")
         .RequireAuthorization(ProgramConstants.LoggedInUsersOnlyPolicyName)  // TODO: Check that this returns appropriate error on frontend
         .RequireAuthorization(ProgramConstants.SearchUsersOnlyPolicyName)  // TODO: Check that this returns appropriate error on frontend
         .RequireRateLimiting(ProgramConstants.TokenRateLimiterPolicyName);
@@ -153,7 +168,7 @@ public class MovieEndpoint
     public async static Task<SuggestionViewModel?> GetSuggestionViewModel(string imdbId, SuggestionHttpClient suggestionHttpClient, IMemoryCache cache)
     {
         SuggestionViewModel? movieSuggestionViewModel;
-        string movieSuggestionCacheKey = CachePrefix + imdbId;  // NOTE: We may not hit the cache that often for suggestions, but being a bit paranoid here to minimize impact
+        string movieSuggestionCacheKey = SuggestionEndpoint.CachePrefix + imdbId;  // NOTE: We may not hit the cache that often for suggestions, but being a bit paranoid here to minimize impact
         
         if (!cache.TryGetValue(movieSuggestionCacheKey, out movieSuggestionViewModel))
         {
@@ -164,7 +179,13 @@ public class MovieEndpoint
             Log.Debug($"Suggestions:\n\n{suggestionsResponse}\n\n");   // NOTE: Not destructuring using @ operator because Serilog doesn't let you configure output easily
                                                                        // (and Seq doesn't support Azure Container Apps, so it's not used in this app)
 
-            movieSuggestionViewModel = new SuggestionViewModel(suggestionsResponse.Suggestions[0]);
+            SuggestionDataModel? suggestionDataModel = suggestionsResponse.FindByItemId(imdbId);
+            if (suggestionDataModel == null)
+            {
+                Log.Warning($"Movie suggestions for '{imdbId}' did not contain that IMDB ID.");
+                return null;
+            }
+            movieSuggestionViewModel = new SuggestionViewModel(suggestionDataModel);
             
             var cacheEntryOptions = new MemoryCacheEntryOptions()
                 .SetAbsoluteExpiration(TimeSpan.FromDays(1))
@@ -201,6 +222,28 @@ public class MovieEndpoint
         Log.Debug($"TMDB configuration languages dictionary:\n\n{tmdbConfigurationLanguagesDictionary}\n\n");
 
         return tmdbConfigurationLanguagesDictionary;
+    }
+
+    public async static Task<string?> GetImdbId(int tmdbId, TmdbHttpClient tmdbHttpClient, IMemoryCache cache)
+    {
+        string imdbIdCacheKey = $"{CachePrefix}imdb-{tmdbId}";
+
+        if (!cache.TryGetValue(imdbIdCacheKey, out string? imdbId) || imdbId == null)
+        {
+            TmdbMovieExternalIdsResponseDataModel? externalIdsResponseDataModel = await tmdbHttpClient.GetMovieExternalIds(tmdbId);
+            if (externalIdsResponseDataModel == null || string.IsNullOrEmpty(externalIdsResponseDataModel.ImdbId))
+                return null;
+
+            Log.Debug($"TMDB movie external IDs response:\n\n{externalIdsResponseDataModel}\n\n");
+
+            imdbId = externalIdsResponseDataModel.ImdbId;
+
+            var cacheEntryOptions = new MemoryCacheEntryOptions()
+                .SetAbsoluteExpiration(TimeSpan.FromDays(1))
+                .SetSlidingExpiration(TimeSpan.FromHours(1));
+            cache.Set(imdbIdCacheKey, imdbId, cacheEntryOptions);
+        }
+        return imdbId;
     }
 
     public async static Task<int?> GetTmdbId(string imdbId, TmdbHttpClient tmdbHttpClient)

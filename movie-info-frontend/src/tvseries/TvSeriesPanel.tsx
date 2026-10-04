@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { imdbTitleUrl } from "../movie/movieTypes";
 import Collapsible from "../shared/Collapsible";
@@ -7,8 +7,10 @@ import ImdbRow, { ImdbRowSeparator } from "../shared/ImdbRow";
 import TitleStatus from "../shared/TitleStatus";
 import WatchProviderSection from "../shared/WatchProviderSection";
 import { useCardSelection } from "../shared/useCardSelection";
+import { useDetailData } from "../shared/useDetailData";
+import { type PanelCards, usePanelCards } from "../shared/usePanelCards";
 import {
-  describeFailedLoad,
+  detailIdQuery,
   displayDate,
   displayGenres,
   displayRuntime,
@@ -20,8 +22,10 @@ import CreatorCard from "./CreatorCard";
 import CrewCard from "./CrewCard";
 import NetworkCard from "./NetworkCard";
 import SeasonCard from "./SeasonCard";
-import TvSeriesCastCollapsible from "./TvSeriesCastCollapsible";
-import { type TvSeries, type TvSeriesCrew, sortSeasons } from "./tvSeriesTypes";
+import TvSeriesCastCollapsible, {
+  TV_SERIES_CAST_CARD_TYPE,
+} from "./TvSeriesCastCollapsible";
+import { type TvSeriesCrew, sortSeasons } from "./tvSeriesTypes";
 import "../shared/shared.css";
 import "./tvseries.css";
 
@@ -31,12 +35,32 @@ function displayEpisodeRunTimes(minutes: number[]): string {
   return runtimes.length > 0 ? runtimes.join(", ") : "—";
 }
 
-function CrewSection({ title, crew }: { title: string; crew: TvSeriesCrew[] }) {
+function CrewSection({
+  title,
+  cardType,
+  crew,
+  cards,
+}: {
+  title: string;
+  // The section's card type in the URL (see usePanelCards)
+  cardType: string;
+  crew: TvSeriesCrew[];
+  cards: PanelCards;
+}) {
+  const selected = cards.isSelectedIn(cardType);
   return (
-    <Collapsible title={title} count={crew.length}>
-      <HorizontalList>
+    <Collapsible
+      title={title}
+      count={crew.length}
+      {...cards.sectionProps(cardType)}
+    >
+      <HorizontalList hasSelection={selected}>
         {crew.map((c) => (
-          <CrewCard key={c.id} crew={c} />
+          <CrewCard
+            key={c.id}
+            crew={c}
+            {...cards.cardProps(cardType, "person", c.tmdbId)}
+          />
         ))}
       </HorizontalList>
     </Collapsible>
@@ -44,16 +68,20 @@ function CrewSection({ title, crew }: { title: string; crew: TvSeriesCrew[] }) {
 }
 
 interface TvSeriesPanelProps {
-  imdbId: string;
+  // The TV series' IMDB or TMDB id (see isTmdbId)
+  itemId: string;
 }
 
 // Shows a TV series. A season within it is selected via the URL's
 // `?tmdbTvSeriesId=…&seasonNumber=…` query parameters (the same ones the
 // /api/tvseason call takes), so browser back / forward and directly loaded
-// URLs work for seasons too.
-function TvSeriesPanel({ imdbId }: TvSeriesPanelProps) {
-  const [tvSeries, setTvSeries] = useState<TvSeries | null>(null);
-  const [error, setError] = useState("");
+// URLs work for seasons too. Its cast, creator and crew cards open the
+// person's own panel in place of this one (see usePanelCards).
+function TvSeriesPanel({ itemId }: TvSeriesPanelProps) {
+  const { data: tvSeries, error } = useDetailData(
+    `/api/tvseries?${detailIdQuery(itemId)}`,
+    "TV series",
+  );
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const navigate = useNavigate();
@@ -66,38 +94,16 @@ function TvSeriesPanel({ imdbId }: TvSeriesPanelProps) {
     hasCardFor: (id) =>
       tvSeries?.seasons.some((s) => String(s.seasonNumber) === id) ?? false,
   });
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    async function loadTvSeries() {
-      try {
-        const response = await fetch(
-          `/api/tvseries?imdbId=${encodeURIComponent(imdbId)}`,
-          { signal: controller.signal },
-        );
-        if (!response.ok) {
-          setError(await describeFailedLoad("Loading TV series", response));
-          return;
-        }
-        const data = (await response.json()) as TvSeries | null; // TODO: Maybe someday make this validation more robust
-        if (data == null) {
-          setError("No TV series details were found.");
-          return;
-        }
-        setTvSeries(data);
-      } catch {
-        if (!controller.signal.aborted) {
-          setError("An unexpected error occurred while loading the TV series.");
-        }
-      }
-    }
-
-    void loadTvSeries();
-    return () => {
-      controller.abort();
-    };
-  }, [imdbId]);
+  const cards = usePanelCards({
+    cardsIn: {
+      [TV_SERIES_CAST_CARD_TYPE]: tvSeries?.cast,
+      creators: tvSeries?.creators,
+      directors: tvSeries?.directors,
+      writers: tvSeries?.writers,
+    },
+    // With a season open, the URL's card is one of the season's / episode's
+    enabled: selectedSeasonNumber === null,
+  });
 
   if (error) {
     return (
@@ -120,6 +126,8 @@ function TvSeriesPanel({ imdbId }: TvSeriesPanelProps) {
   const imdbRating = displayText(tvSeries.imdbRating);
   const imdbVotes = displayText(tvSeries.imdbVotes);
   const sortedSeasons = sortSeasons(tvSeries.seasons);
+  const seasonSelected = seasonSelection.selectedId !== null;
+  const creatorSelected = cards.isSelectedIn("creators");
 
   const facts: [string, ReactNode][] = [
     ["Original Name", displayText(tvSeries.originalName)],
@@ -160,7 +168,7 @@ function TvSeriesPanel({ imdbId }: TvSeriesPanelProps) {
 
   return (
     <div
-      className={`detail-panel fly-origin${seasonSelection.selectedId !== null ? " has-child-selection" : ""}`}
+      className={`detail-panel fly-origin${seasonSelected || cards.hasSelection ? " has-child-selection" : ""}`}
       data-testid="tv-series-panel"
     >
       <div className="detail-panel-top">
@@ -208,10 +216,10 @@ function TvSeriesPanel({ imdbId }: TvSeriesPanelProps) {
         <Collapsible
           title="Seasons"
           count={tvSeries.seasons.length}
-          forceOpen={seasonSelection.selectedId !== null}
-          childSelected={seasonSelection.selectedId !== null}
+          forceOpen={seasonSelected}
+          childSelected={seasonSelected}
         >
-          <HorizontalList hasSelection={seasonSelection.selectedId !== null}>
+          <HorizontalList hasSelection={seasonSelected}>
             {sortedSeasons.map((s) => {
               const seasonId = String(s.seasonNumber);
               return (
@@ -240,16 +248,34 @@ function TvSeriesPanel({ imdbId }: TvSeriesPanelProps) {
             })}
           </HorizontalList>
         </Collapsible>
-        <TvSeriesCastCollapsible cast={tvSeries.cast} />
-        <Collapsible title="Creators" count={tvSeries.creators.length}>
-          <HorizontalList>
+        <TvSeriesCastCollapsible cast={tvSeries.cast} cards={cards} />
+        <Collapsible
+          title="Creators"
+          count={tvSeries.creators.length}
+          {...cards.sectionProps("creators")}
+        >
+          <HorizontalList hasSelection={creatorSelected}>
             {tvSeries.creators.map((c) => (
-              <CreatorCard key={c.id} creator={c} />
+              <CreatorCard
+                key={c.id}
+                creator={c}
+                {...cards.cardProps("creators", "person", c.tmdbId)}
+              />
             ))}
           </HorizontalList>
         </Collapsible>
-        <CrewSection title="Directors" crew={tvSeries.directors} />
-        <CrewSection title="Writers" crew={tvSeries.writers} />
+        <CrewSection
+          title="Directors"
+          cardType="directors"
+          crew={tvSeries.directors}
+          cards={cards}
+        />
+        <CrewSection
+          title="Writers"
+          cardType="writers"
+          crew={tvSeries.writers}
+          cards={cards}
+        />
         <Collapsible title="Overview (TMDB)">
           <p className="detail-prose">{displayText(tvSeries.tmdbOverview)}</p>
         </Collapsible>

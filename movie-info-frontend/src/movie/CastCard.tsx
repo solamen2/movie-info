@@ -1,35 +1,21 @@
+import PersonCard from "../shared/PersonCard";
+import { type PanelCardProps } from "../shared/usePanelCards";
 import { type MovieCast } from "./movieTypes";
-import { getTmdbImageUrl } from "../utilities/utilities";
 
-interface CastCardProps {
+interface CastCardProps extends PanelCardProps {
   cast: MovieCast;
 }
 
-function CastCard({ cast }: CastCardProps) {
-  const imageUrl = getTmdbImageUrl(cast.profilePath, "w185");
-
+function CastCard({ cast, ...cardProps }: CastCardProps) {
   return (
-    <div className="person-card" data-testid="cast-card">
-      {imageUrl ? (
-        <img
-          src={imageUrl}
-          alt={cast.name}
-          loading="lazy"
-          className="person-card-image"
-        />
-      ) : (
-        <div className="person-card-image person-card-image-placeholder">
-          No image
-        </div>
-      )}
-      <p className="person-card-name">{cast.name}</p>
-      {cast.originalName && cast.originalName !== cast.name && (
-        <p className="person-card-secondary">({cast.originalName})</p>
-      )}
-      {cast.character && (
-        <p className="person-card-secondary">{cast.character}</p>
-      )}
-    </div>
+    <PersonCard
+      testId="cast-card"
+      name={cast.name}
+      originalName={cast.originalName}
+      profilePath={cast.profilePath}
+      details={[cast.character]}
+      {...cardProps}
+    />
   );
 }
 

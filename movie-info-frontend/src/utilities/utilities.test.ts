@@ -2,9 +2,12 @@ import { describe, expect, it } from "vitest";
 import {
   describeFailedLoad,
   describeFailedResponse,
+  detailIdQuery,
+  detailPath,
   displayAge,
   getAge,
   getErrorResponseMessage,
+  isTmdbId,
 } from "./utilities";
 
 function response(body: string | null, status = 404) {
@@ -148,5 +151,37 @@ describe("displayAge", () => {
 
   it("Should show '(<1)' for someone less than a year old", () => {
     expect(displayAge(0)).toBe("(<1)");
+  });
+});
+
+describe("isTmdbId", () => {
+  it.each([
+    ["278", true],
+    ["tt0111161", false],
+    ["nm0000151", false],
+    ["", false],
+    ["12a", false],
+  ])("Should say whether '%s' is a TMDB id: %s", (itemId, expected) => {
+    expect(isTmdbId(itemId)).toBe(expected);
+  });
+});
+
+describe("detailIdQuery", () => {
+  it("Should ask for a TMDB id by tmdbId", () => {
+    expect(detailIdQuery("278")).toBe("tmdbId=278");
+  });
+
+  it("Should ask for anything else by imdbId, URL-encoded", () => {
+    expect(detailIdQuery("tt0111161")).toBe("imdbId=tt0111161");
+    expect(detailIdQuery("a b")).toBe("imdbId=a+b");
+  });
+});
+
+describe("detailPath", () => {
+  it("Should build the detail URL from the panel kind, item id, and query", () => {
+    expect(detailPath("movie", "tt0111161", "shawshank")).toBe(
+      "/movie/tt0111161?q=shawshank",
+    );
+    expect(detailPath("person", "287", "")).toBe("/person/287");
   });
 });

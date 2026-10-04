@@ -19,6 +19,7 @@ public class OmdbHttpClient
 
     public async Task<OmdbResponseDataModel?> GetMedia(string imdbId)
     {
+        // NOTE: The OMDB seems to sometimes return truncated plot summaries for TV episodes, regardless of the value of the "plot" parameter
         using HttpResponseMessage response = await _httpClient.GetAsync($"?i={Uri.EscapeDataString(imdbId)}&apikey={_apiKey}&plot=full");
         if (response.StatusCode != System.Net.HttpStatusCode.OK)
         {

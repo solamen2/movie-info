@@ -100,6 +100,22 @@
   margin: 0;
 }
 
+/* While a card in the section's row is selected, the option gets out of the
+   way along with the section's heading (see .has-child-selection in
+   shared.css). */
+.collapsible-option {
+  opacity: 1;
+  transition:
+    opacity 0.5s ease,
+    display 0.5s allow-discrete;
+}
+
+.collapsible.has-child-selection .collapsible-option {
+  opacity: 0;
+  pointer-events: none;
+  display: none;
+}
+
 .collapsible-option label {
   cursor: pointer;
   user-select: none;

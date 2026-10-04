@@ -55,6 +55,17 @@ async function searchAndSelectExampleEpisode() {
   return { ...utils, tvSeriesCard, seasonCard, episodeCard };
 }
 
+// Finds the card with the given text (a person or a credit) inside a panel.
+function findCard(panel: HTMLElement, testId: string, text: string) {
+  const card = within(panel)
+    .getAllByTestId(testId)
+    .find((c) => c.textContent.includes(text));
+  if (!card) {
+    throw new Error(`${testId} containing ${text} not found`);
+  }
+  return card;
+}
+
 describe("TvEpisodePanel", () => {
   afterEach(() => {
     vi.restoreAllMocks();
@@ -422,6 +433,124 @@ describe("TvEpisodePanel", () => {
           "Loading TV episode failed with status 404: Not a valid TV episode for mock. Please try another search.",
         ),
       ).toBeInTheDocument();
+    });
+  });
+
+  describe("When a card inside the TV episode panel is clicked", () => {
+    it.each([
+      ["Cast", "cast", "cast-card", "Example Brown", 2],
+      ["Directors", "directors", "crew-card", "Example Director", 3],
+      ["Writers", "writers", "crew-card", "Example Writer", 4],
+      ["Guest Stars", "guest-stars", "guest-star-card", "Example Guest", 8],
+    ])(
+      "Should highlight the %s card and fly it to the episode panel's corner, then replace the whole TV series panel with the person's panel",
+      async (_, cardType, testId, name, tmdbId) => {
+        const { currentUrl, container, tvSeriesCard } =
+          await searchAndSelectExampleEpisode();
+        const episodePanel = await screen.findByTestId("tv-episode-panel");
+        const card = findCard(episodePanel, testId, name);
+
+        fireEvent.click(card);
+        // Step 1: the URL names the card on top of the season and episode;
+        // the episode panel hands itself over to the card, and the card with
+        // the same person in the TV series panel is left alone
+        expect(currentUrl()).toBe(
+          `${EPISODE_URL}&cardType=${cardType}&cardId=${String(tmdbId)}`,
+        );
+        expect(card).toHaveClass("selected");
+        expect(card.closest("details")).toHaveClass("has-child-selection");
+        expect(episodePanel).toHaveClass("has-child-selection");
+        const tvSeriesPanel = screen.getByTestId("tv-series-panel");
+        for (const otherCard of within(tvSeriesPanel).queryAllByTestId(
+          testId,
+        )) {
+          if (!episodePanel.contains(otherCard)) {
+            expect(otherCard).not.toHaveClass("selected");
+          }
+        }
+        expect(screen.queryByTestId("person-panel")).not.toBeInTheDocument();
+
+        // Step 2: the person's own URL, without the season, episode or card,
+        // replaces the TV series panel (and the season and episode panels
+        // inside it) with the person's panel
+        const personPanel = await screen.findByTestId("person-panel");
+        expect(currentUrl()).toBe(`/person/${String(tmdbId)}?q=1`);
+        expect(tvSeriesPanel).not.toBeInTheDocument();
+        expect(screen.queryByTestId("tv-season-panel")).not.toBeInTheDocument();
+        expect(episodePanel).not.toBeInTheDocument();
+        expect(tvSeriesCard).not.toHaveClass("selected");
+        expect(tvSeriesCard).toHaveClass("deselecting");
+        const personCard = personPanel.closest("#search-card");
+        expect(personCard).not.toBe(tvSeriesCard);
+        expect(personCard).toHaveClass("selected");
+        expect(personCard).toHaveClass("expanded");
+        expect(personCard).toHaveClass("grow-in");
+        expect(
+          container.querySelectorAll("#search-card.selected"),
+        ).toHaveLength(1);
+        expect(
+          within(personPanel).getByRole("heading", { name }),
+        ).toBeInTheDocument();
+      },
+    );
+
+    it("Should shrink the person's panel back into the card on browser back, which flies home highlighted inside the episode, season and TV series", async () => {
+      const { currentUrl, tvSeriesCard, goBack } =
+        await searchAndSelectExampleEpisode();
+      const episodePanel = await screen.findByTestId("tv-episode-panel");
+      fireEvent.click(
+        findCard(episodePanel, "guest-star-card", "Example Guest"),
+      );
+      const personPanel = await screen.findByTestId("person-panel");
+      const personCard = personPanel.closest("#search-card");
+
+      await goBack();
+      expect(currentUrl()).toBe(`${EPISODE_URL}&cardType=guest-stars&cardId=8`);
+      // The stand-in card shrinks back to card size first...
+      expect(personCard).toHaveClass("selected");
+      expect(personCard).not.toHaveClass("expanded");
+      expect(personPanel).not.toBeInTheDocument();
+      // ...then the episode is shown at once inside its season and TV series,
+      // and the guest star card flies home from the corner, highlighted, while
+      // the rest of the episode comes back into view
+      await waitFor(() => {
+        expect(tvSeriesCard).toHaveClass("expanded");
+      });
+      expect(personCard).not.toBeInTheDocument();
+      const episodePanelAgain = screen.getByTestId("tv-episode-panel");
+      expect(tvSeriesCard).toContainElement(episodePanelAgain);
+      expect(screen.getByTestId("tv-season-panel")).toContainElement(
+        episodePanelAgain,
+      );
+      const card = findCard(
+        episodePanelAgain,
+        "guest-star-card",
+        "Example Guest",
+      );
+      await waitFor(() => {
+        expect(card).toHaveClass("highlighted");
+      });
+      expect(card).toHaveClass("deselecting");
+      expect(card).not.toHaveClass("selected");
+      expect(episodePanelAgain).not.toHaveClass("has-child-selection");
+      expect(card.closest("details")).not.toHaveClass("has-child-selection");
+      expect(card.closest("details")?.open).toBe(true);
+      // The season and series are still handed over to the open episode
+      expect(screen.getByTestId("tv-series-panel")).toHaveClass(
+        "has-child-selection",
+      );
+      expect(screen.getByTestId("tv-season-panel")).toHaveClass(
+        "has-child-selection",
+      );
+
+      await goBack();
+      expect(currentUrl()).toBe(EPISODE_URL);
+      expect(card).not.toHaveClass("highlighted");
+      expect(card).not.toHaveClass("selected");
+      expect(card.closest("details")?.open).toBe(true);
+      expect(screen.getByTestId("tv-season-panel")).toHaveClass(
+        "has-child-selection",
+      );
     });
   });
 });
