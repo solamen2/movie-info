@@ -3,6 +3,7 @@ import { imdbTitleUrl } from "../movie/movieTypes";
 import Collapsible from "../shared/Collapsible";
 import HorizontalList from "../shared/HorizontalList";
 import ImdbRow, { ImdbRowSeparator } from "../shared/ImdbRow";
+import { useOpenDetail } from "../shared/useOpenDetail";
 import {
   displayEpisodeType,
   displaySeasonEpisode,
@@ -24,15 +25,23 @@ import "../shared/shared.css";
 function CrewSection({
   title,
   crew,
+  onPersonClick,
 }: {
   title: string;
   crew: TvEpisodeCrew[];
+  onPersonClick: (tmdbId: number) => void;
 }) {
   return (
     <Collapsible title={title} count={crew.length}>
       <HorizontalList>
         {crew.map((c) => (
-          <CrewCard key={c.id} crew={c} />
+          <CrewCard
+            key={c.id}
+            crew={c}
+            onClick={() => {
+              onPersonClick(c.tmdbId);
+            }}
+          />
         ))}
       </HorizontalList>
     </Collapsible>
@@ -48,7 +57,9 @@ interface TvEpisodePanelProps {
 }
 
 // Shows one episode of a TV series, loaded from /api/tvepisode with the same
-// query parameters that select it in the URL.
+// query parameters that select it in the URL. Its cast, crew and guest star
+// cards open the person's own panel in place of the whole TV series panel
+// (see useOpenDetail).
 function TvEpisodePanel({
   tmdbTvSeriesId,
   seasonNumber,
@@ -57,6 +68,7 @@ function TvEpisodePanel({
 }: TvEpisodePanelProps) {
   const [tvEpisode, setTvEpisode] = useState<TvEpisode | null>(null);
   const [error, setError] = useState("");
+  const openDetail = useOpenDetail();
 
   useEffect(() => {
     const controller = new AbortController();
@@ -190,16 +202,40 @@ function TvEpisodePanel({
         <Collapsible title="Cast" count={tvEpisode.cast.length}>
           <HorizontalList>
             {sortedCast.map((c) => (
-              <CastCard key={c.id} cast={c} />
+              <CastCard
+                key={c.id}
+                cast={c}
+                onClick={() => {
+                  openDetail("person", c.tmdbId);
+                }}
+              />
             ))}
           </HorizontalList>
         </Collapsible>
-        <CrewSection title="Directors" crew={tvEpisode.directors} />
-        <CrewSection title="Writers" crew={tvEpisode.writers} />
+        <CrewSection
+          title="Directors"
+          crew={tvEpisode.directors}
+          onPersonClick={(tmdbId) => {
+            openDetail("person", tmdbId);
+          }}
+        />
+        <CrewSection
+          title="Writers"
+          crew={tvEpisode.writers}
+          onPersonClick={(tmdbId) => {
+            openDetail("person", tmdbId);
+          }}
+        />
         <Collapsible title="Guest Stars" count={tvEpisode.guestStars.length}>
           <HorizontalList>
             {sortedGuestStars.map((g) => (
-              <GuestStarCard key={g.id} guestStar={g} />
+              <GuestStarCard
+                key={g.id}
+                guestStar={g}
+                onClick={() => {
+                  openDetail("person", g.tmdbId);
+                }}
+              />
             ))}
           </HorizontalList>
         </Collapsible>

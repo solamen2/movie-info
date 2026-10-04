@@ -4,6 +4,7 @@ import {
   render,
   screen,
   waitFor,
+  within,
 } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { type AppRouter, renderApp } from "../../tests/renderApp";
@@ -28,6 +29,18 @@ async function searchAndSelectExampleTvSeries() {
   }
   fireEvent.click(tvSeriesCard);
   return { ...utils, tvSeriesCard };
+}
+
+// Finds the person (cast / crew / creator / guest star) card with the given
+// text inside a panel.
+function findPersonCard(panel: HTMLElement, testId: string, text: string) {
+  const card = within(panel)
+    .getAllByTestId(testId)
+    .find((c) => c.textContent.includes(text));
+  if (!card) {
+    throw new Error(`${testId} containing ${text} not found`);
+  }
+  return card;
 }
 
 describe("TvSeriesPanel", () => {
@@ -440,7 +453,7 @@ describe("TvSeriesPanel", () => {
 
       render(
         <MemoryRouter>
-          <TvSeriesPanel imdbId="tt10000002" />
+          <TvSeriesPanel itemId="tt10000002" />
         </MemoryRouter>,
       );
       const panel = await screen.findByTestId("tv-series-panel");
@@ -473,7 +486,7 @@ describe("TvSeriesPanel", () => {
     it("Should not show the status", async () => {
       render(
         <MemoryRouter>
-          <TvSeriesPanel imdbId="tt10000002" />
+          <TvSeriesPanel itemId="tt10000002" />
         </MemoryRouter>,
       );
       const panel = await screen.findByTestId("tv-series-panel");
@@ -499,7 +512,7 @@ describe("TvSeriesPanel", () => {
 
       render(
         <MemoryRouter>
-          <TvSeriesPanel imdbId="tt10000002" />
+          <TvSeriesPanel itemId="tt10000002" />
         </MemoryRouter>,
       );
       const panel = await screen.findByTestId("tv-series-panel");
@@ -518,7 +531,7 @@ describe("TvSeriesPanel", () => {
     it("Should show an error message", async () => {
       render(
         <MemoryRouter>
-          <TvSeriesPanel imdbId="tt9999999" />
+          <TvSeriesPanel itemId="tt9999999" />
         </MemoryRouter>,
       );
 
@@ -527,6 +540,64 @@ describe("TvSeriesPanel", () => {
           "Loading TV series failed with status 404: Not a valid IMDB ID for mock. Please try another search.",
         ),
       ).toBeInTheDocument();
+    });
+  });
+
+  describe("When a person card inside the TV series panel is clicked", () => {
+    it.each([
+      ["Cast", "cast-card", "Example Brown", "/person/2?q=1"],
+      ["Creators", "creator-card", "Example Creator", "/person/12891?q=1"],
+      ["Directors", "crew-card", "Example Director", "/person/3?q=1"],
+      ["Writers", "crew-card", "Example Writer", "/person/4?q=1"],
+    ])(
+      "Should replace the TV series panel with the %s person's panel at their TMDB id URL",
+      async (_, testId, name, expectedUrl) => {
+        const { currentUrl, container, tvSeriesCard } =
+          await searchAndSelectExampleTvSeries();
+        const tvSeriesPanel = await screen.findByTestId("tv-series-panel");
+
+        fireEvent.click(findPersonCard(tvSeriesPanel, testId, name));
+        expect(currentUrl()).toBe(expectedUrl);
+        // The TV series' card is dropped at once rather than flying home...
+        expect(tvSeriesCard).not.toHaveClass("selected");
+        expect(tvSeriesCard).not.toHaveClass("expanded");
+        expect(tvSeriesCard).toHaveClass("deselecting");
+        expect(tvSeriesPanel).not.toBeInTheDocument();
+        // ...and the person (who is no search result) gets a stand-in card
+        // that is shown already expanded
+        const personPanel = await screen.findByTestId("person-panel");
+        const personCard = personPanel.closest("#search-card");
+        expect(personCard).not.toBe(tvSeriesCard);
+        expect(personCard).toHaveClass("selected");
+        expect(personCard).toHaveClass("expanded");
+        expect(
+          container.querySelectorAll("#search-card.selected"),
+        ).toHaveLength(1);
+        expect(
+          within(personPanel).getByRole("heading", { name }),
+        ).toBeInTheDocument();
+        expect(screen.queryByText("8 results.")).not.toBeInTheDocument();
+      },
+    );
+
+    it("Should bring the TV series panel back on browser back", async () => {
+      const { currentUrl, container, tvSeriesCard, goBack } =
+        await searchAndSelectExampleTvSeries();
+      const tvSeriesPanel = await screen.findByTestId("tv-series-panel");
+      fireEvent.click(
+        findPersonCard(tvSeriesPanel, "creator-card", "Example Creator"),
+      );
+      const personPanel = await screen.findByTestId("person-panel");
+
+      await goBack();
+      expect(currentUrl()).toBe("/tvseries/tt10000002?q=1");
+      expect(personPanel).not.toBeInTheDocument();
+      expect(tvSeriesCard).toHaveClass("selected");
+      expect(tvSeriesCard).toHaveClass("expanded");
+      expect(tvSeriesCard).toContainElement(
+        await screen.findByTestId("tv-series-panel"),
+      );
+      expect(container.querySelectorAll("#search-card")).toHaveLength(8);
     });
   });
 });

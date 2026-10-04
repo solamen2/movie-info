@@ -1,33 +1,21 @@
+import PersonCard from "../shared/PersonCard";
 import { type MovieCrew } from "./movieTypes";
-import { getTmdbImageUrl } from "../utilities/utilities";
 
 interface CrewCardProps {
   crew: MovieCrew;
+  onClick: () => void;
 }
 
-function CrewCard({ crew }: CrewCardProps) {
-  const imageUrl = getTmdbImageUrl(crew.profilePath, "w185");
-
+function CrewCard({ crew, onClick }: CrewCardProps) {
   return (
-    <div className="person-card" data-testid="crew-card">
-      {imageUrl ? (
-        <img
-          src={imageUrl}
-          alt={crew.name}
-          loading="lazy"
-          className="person-card-image"
-        />
-      ) : (
-        <div className="person-card-image person-card-image-placeholder">
-          No image
-        </div>
-      )}
-      <p className="person-card-name">{crew.name}</p>
-      {crew.originalName && crew.originalName !== crew.name && (
-        <p className="person-card-secondary">({crew.originalName})</p>
-      )}
-      {crew.job && <p className="person-card-secondary">{crew.job}</p>}
-    </div>
+    <PersonCard
+      testId="crew-card"
+      name={crew.name}
+      originalName={crew.originalName}
+      profilePath={crew.profilePath}
+      details={[crew.job]}
+      onClick={onClick}
+    />
   );
 }
 

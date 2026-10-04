@@ -1,4 +1,10 @@
-import { act, fireEvent, screen, waitFor } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { renderApp } from "../../tests/renderApp";
 
@@ -243,6 +249,30 @@ describe("SuggestionSearch routing", () => {
         expect(await findCard(name)).not.toHaveClass("expanded");
       },
     );
+  });
+
+  describe("When a detail URL with a TMDB id is loaded directly", () => {
+    it("Should show the panel in a stand-in card ahead of the results", async () => {
+      const { container } = renderApp("/person/2?q=1");
+      const panel = await screen.findByTestId("person-panel");
+      const card = panel.closest("#search-card");
+      expect(card).toHaveClass("selected");
+      expect(card).toHaveClass("expanded");
+      expect(
+        within(panel).getByRole("heading", { name: "Example Brown" }),
+      ).toBeInTheDocument();
+
+      // An item known by TMDB id matches no search result (those carry IMDB
+      // ids), so the stand-in card stays, ahead of the results.
+      await waitFor(() => {
+        expect(container.querySelectorAll("#search-card")).toHaveLength(9);
+      });
+      expect(container.querySelector("#search-card")).toBe(card);
+      expect(
+        container.querySelectorAll("#search-card.selected.expanded"),
+      ).toHaveLength(1);
+      expect(screen.getByTestId("person-panel")).toBe(panel);
+    });
   });
 
   describe("When a detail URL without a query is loaded directly", () => {

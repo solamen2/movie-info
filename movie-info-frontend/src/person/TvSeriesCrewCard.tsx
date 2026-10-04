@@ -3,9 +3,10 @@ import { type PersonTvSeriesCrew } from "./personTypes";
 
 interface TvSeriesCrewCardProps {
   credit: PersonTvSeriesCrew;
+  onClick: () => void;
 }
 
-function TvSeriesCrewCard({ credit }: TvSeriesCrewCardProps) {
+function TvSeriesCrewCard({ credit, onClick }: TvSeriesCrewCardProps) {
   return (
     <CreditCard
       testId="tv-series-crew-card"
@@ -18,6 +19,7 @@ function TvSeriesCrewCard({ credit }: TvSeriesCrewCardProps) {
         credit.firstCreditAirDate ? "First appearance" : "First air date"
       }
       episodeCount={credit.episodeCount}
+      onClick={onClick}
     />
   );
 }

@@ -61,6 +61,20 @@ function selectCard(
   };
 }
 
+// Switching straight from one expanded card to another (e.g. a person's panel
+// opened by clicking a cast card inside a movie's panel): the new card is shown
+// already expanded, with no flight, and the old card is dropped at once rather
+// than flying home. The old card is still handed over as previouslySelectedId;
+// its `.deselecting` class inside a container that still `.has-selection` is
+// what tells the CSS to drop it (see shared.css).
+function replaceCard(
+  prev: CardSelection,
+  id: string,
+  opensPanel: boolean,
+): CardSelection {
+  return { ...atOnce(id, opensPanel), previouslySelectedId: prev.selectedId };
+}
+
 // The card flies back home.
 function deselectCard(prev: CardSelection): CardSelection {
   return { ...NO_SELECTION, previouslySelectedId: prev.selectedId };
@@ -114,7 +128,11 @@ export function useCardSelection({
   } else if (targetId !== synced.targetId) {
     setSynced({ resetKey, targetId });
     if (targetId) {
-      setSelection(selectCard(selection, targetId, opensPanel));
+      setSelection(
+        selection.expandedId
+          ? replaceCard(selection, targetId, opensPanel)
+          : selectCard(selection, targetId, opensPanel),
+      );
     } else if (
       selection.expandedId &&
       selection.selectedId &&

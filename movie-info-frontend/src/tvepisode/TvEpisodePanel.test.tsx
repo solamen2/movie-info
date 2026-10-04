@@ -55,6 +55,18 @@ async function searchAndSelectExampleEpisode() {
   return { ...utils, tvSeriesCard, seasonCard, episodeCard };
 }
 
+// Finds the person (cast / crew / creator / guest star) card with the given
+// text inside a panel.
+function findPersonCard(panel: HTMLElement, testId: string, text: string) {
+  const card = within(panel)
+    .getAllByTestId(testId)
+    .find((c) => c.textContent.includes(text));
+  if (!card) {
+    throw new Error(`${testId} containing ${text} not found`);
+  }
+  return card;
+}
+
 describe("TvEpisodePanel", () => {
   afterEach(() => {
     vi.restoreAllMocks();
@@ -422,6 +434,73 @@ describe("TvEpisodePanel", () => {
           "Loading TV episode failed with status 404: Not a valid TV episode for mock. Please try another search.",
         ),
       ).toBeInTheDocument();
+    });
+  });
+
+  describe("When a person card inside the TV episode panel is clicked", () => {
+    it.each([
+      ["Cast", "cast-card", "Example Brown", "/person/2?q=1"],
+      ["Directors", "crew-card", "Example Director", "/person/3?q=1"],
+      ["Writers", "crew-card", "Example Writer", "/person/4?q=1"],
+      ["Guest Stars", "guest-star-card", "Example Guest", "/person/8?q=1"],
+    ])(
+      "Should replace the whole TV series panel with the %s person's panel, leaving the season and episode out of the URL",
+      async (_, testId, name, expectedUrl) => {
+        const { currentUrl, container, tvSeriesCard } =
+          await searchAndSelectExampleEpisode();
+        const episodePanel = await screen.findByTestId("tv-episode-panel");
+
+        fireEvent.click(findPersonCard(episodePanel, testId, name));
+        expect(currentUrl()).toBe(expectedUrl);
+        // The TV series' card is dropped at once rather than flying home,
+        // taking the season and episode panels with it...
+        expect(tvSeriesCard).not.toHaveClass("selected");
+        expect(tvSeriesCard).not.toHaveClass("expanded");
+        expect(tvSeriesCard).toHaveClass("deselecting");
+        expect(screen.queryByTestId("tv-series-panel")).not.toBeInTheDocument();
+        expect(screen.queryByTestId("tv-season-panel")).not.toBeInTheDocument();
+        expect(episodePanel).not.toBeInTheDocument();
+        // ...and the person (who is no search result) gets a stand-in card
+        // that is shown already expanded
+        const personPanel = await screen.findByTestId("person-panel");
+        const personCard = personPanel.closest("#search-card");
+        expect(personCard).not.toBe(tvSeriesCard);
+        expect(personCard).toHaveClass("selected");
+        expect(personCard).toHaveClass("expanded");
+        expect(
+          container.querySelectorAll("#search-card.selected"),
+        ).toHaveLength(1);
+        expect(
+          within(personPanel).getByRole("heading", { name }),
+        ).toBeInTheDocument();
+      },
+    );
+
+    it("Should bring the episode back inside its season and TV series on browser back", async () => {
+      const { currentUrl, tvSeriesCard, goBack } =
+        await searchAndSelectExampleEpisode();
+      const episodePanel = await screen.findByTestId("tv-episode-panel");
+      fireEvent.click(
+        findPersonCard(episodePanel, "guest-star-card", "Example Guest"),
+      );
+      const personPanel = await screen.findByTestId("person-panel");
+
+      await goBack();
+      expect(currentUrl()).toBe(EPISODE_URL);
+      expect(personPanel).not.toBeInTheDocument();
+      expect(tvSeriesCard).toHaveClass("selected");
+      expect(tvSeriesCard).toHaveClass("expanded");
+      // Everything is shown at once, as for a directly loaded episode URL
+      const panel = await screen.findByTestId("tv-episode-panel");
+      expect(tvSeriesCard).toContainElement(panel);
+      expect(screen.getByTestId("tv-season-panel")).toContainElement(panel);
+      expect(screen.getByTestId("tv-series-panel")).toContainElement(panel);
+      const episodeCard = panel.closest("[data-testid='episode-card']");
+      expect(episodeCard).toHaveClass("selected");
+      expect(episodeCard).toHaveClass("expanded");
+      expect(screen.getByTestId("tv-season-panel")).toHaveClass(
+        "has-child-selection",
+      );
     });
   });
 });

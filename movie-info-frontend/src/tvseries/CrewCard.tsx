@@ -1,39 +1,28 @@
-import { getTmdbImageUrl } from "../utilities/utilities";
+import PersonCard from "../shared/PersonCard";
 import { type TvSeriesCrew, displayEpisodeCount } from "./tvSeriesTypes";
 
 interface CrewCardProps {
   crew: TvSeriesCrew;
+  onClick: () => void;
 }
 
-function CrewCard({ crew }: CrewCardProps) {
-  const imageUrl = getTmdbImageUrl(crew.profilePath, "w185");
+function CrewCard({ crew, onClick }: CrewCardProps) {
   const jobs = crew.jobs.filter((j) => j !== "").join(", ");
 
   return (
-    <div className="person-card" data-testid="crew-card">
-      {imageUrl ? (
-        <img
-          src={imageUrl}
-          alt={crew.name}
-          loading="lazy"
-          className="person-card-image"
-        />
-      ) : (
-        <div className="person-card-image person-card-image-placeholder">
-          No image
-        </div>
-      )}
-      <p className="person-card-name">{crew.name}</p>
-      {crew.originalName && crew.originalName !== crew.name && (
-        <p className="person-card-secondary">({crew.originalName})</p>
-      )}
-      {jobs && <p className="person-card-secondary">{jobs}</p>}
-      {crew.totalEpisodeCount > 0 && (
-        <p className="person-card-secondary">
-          {displayEpisodeCount(crew.totalEpisodeCount)}
-        </p>
-      )}
-    </div>
+    <PersonCard
+      testId="crew-card"
+      name={crew.name}
+      originalName={crew.originalName}
+      profilePath={crew.profilePath}
+      details={[
+        jobs,
+        crew.totalEpisodeCount > 0
+          ? displayEpisodeCount(crew.totalEpisodeCount)
+          : "",
+      ]}
+      onClick={onClick}
+    />
   );
 }
 

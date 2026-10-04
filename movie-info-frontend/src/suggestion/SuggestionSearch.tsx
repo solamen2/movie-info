@@ -17,8 +17,9 @@ function panelKindOf(item: Suggestion): PanelKind | null {
 }
 
 // Stand-in result for a detail URL whose item isn't in the current results
-// (e.g. a movie link opened directly). It only ever renders expanded, so the
-// card's own details are never shown.
+// (e.g. a movie link opened directly, or a person opened from a movie's cast,
+// who is only known by TMDB id). It only ever renders expanded, so the card's
+// own details are never shown.
 function placeholderSuggestion(
   itemId: string,
   panelKind: PanelKind,
@@ -44,22 +45,25 @@ function placeholderSuggestion(
 
 interface SuggestionSearchProps {
   // Set by the /movie, /tvseries and /person routes; the item to show comes
-  // from the route's :imdbId param.
+  // from the route's :itemId param (an IMDB or TMDB id, see isTmdbId).
   panelKind?: PanelKind;
 }
 
 // The URL is the source of truth for the search (`?q=`) and the selected card:
-// a detail item (`/movie/:imdbId` etc.) or a merely highlighted card without a
+// a detail item (`/movie/:itemId` etc.) or a merely highlighted card without a
 // panel (`?selected=`). Submitting a search or clicking a card only navigates;
 // the component then syncs to the new URL, so browser back / forward and
-// directly loaded URLs behave exactly like clicks.
+// directly loaded URLs behave exactly like clicks. Cards inside a panel (a
+// movie's cast, say) navigate to their own detail URL the same way (see
+// useOpenDetail), so the new panel replaces the old one here, hosted by a
+// placeholder card, and browser back returns to the old one.
 function SuggestionSearch({ panelKind }: SuggestionSearchProps) {
-  const { imdbId } = useParams();
+  const { itemId } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const query = searchParams.get("q") ?? "";
   const targetItemId = panelKind
-    ? (imdbId ?? null)
+    ? (itemId ?? null)
     : searchParams.get("selected");
 
   const [searchQuery, setSearchQuery] = useState(query);

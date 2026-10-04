@@ -7,13 +7,18 @@ import "./tvseries.css";
 
 interface TvSeriesCastCollapsibleProps {
   cast: TvSeriesCast[];
+  // Called with the cast member's TMDB id when their card is clicked
+  onCastClick: (tmdbId: number) => void;
 }
 
 // The TV series Cast section: a Collapsible whose cards can hide how many
 // episodes each cast member appears in, since that can be a spoiler. The
 // checkbox defaults to hiding them and remembers the user's choice for as long
 // as this component stays mounted (it is deliberately not part of the URL).
-function TvSeriesCastCollapsible({ cast }: TvSeriesCastCollapsibleProps) {
+function TvSeriesCastCollapsible({
+  cast,
+  onCastClick,
+}: TvSeriesCastCollapsibleProps) {
   const [hideEpisodeCount, setHideEpisodeCount] = useState(true);
   const checkboxId = useId();
   const sortedCast = [...cast].sort((a, b) => a.billedOrder - b.billedOrder);
@@ -33,7 +38,14 @@ function TvSeriesCastCollapsible({ cast }: TvSeriesCastCollapsibleProps) {
       </div>
       <HorizontalList>
         {sortedCast.map((c) => (
-          <CastCard key={c.id} cast={c} showEpisodeCount={!hideEpisodeCount} />
+          <CastCard
+            key={c.id}
+            cast={c}
+            showEpisodeCount={!hideEpisodeCount}
+            onClick={() => {
+              onCastClick(c.tmdbId);
+            }}
+          />
         ))}
       </HorizontalList>
     </Collapsible>

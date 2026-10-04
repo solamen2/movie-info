@@ -10,6 +10,8 @@ interface CreditCardProps {
   date: string | null;
   dateLabel?: string;
   episodeCount?: number;
+  // Called when the card is clicked; the caller opens the credit's panel.
+  onClick: () => void;
 }
 
 // Shared layout for the movie / TV series cast / crew credit cards.
@@ -22,11 +24,12 @@ function CreditCard({
   date,
   dateLabel,
   episodeCount,
+  onClick,
 }: CreditCardProps) {
   const imageUrl = getTmdbImageUrl(posterPath, "w185");
 
   return (
-    <div className="credit-card" data-testid={testId}>
+    <div className="credit-card" data-testid={testId} onClick={onClick}>
       {imageUrl ? (
         <img
           src={imageUrl}

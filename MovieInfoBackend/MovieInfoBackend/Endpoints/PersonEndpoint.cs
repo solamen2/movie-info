@@ -20,7 +20,8 @@ public class PersonEndpoint
     {
         app.MapGet($"{ApiRoutePrefix}/person", [Authorize]
             async (
-                string imdbId,
+                string? imdbId,
+                int? tmdbId,
                 ClaimsPrincipal user,
                 [FromServices] SuggestionHttpClient suggestionHttpClient,
                 [FromServices] TmdbHttpClient tmdbHttpClient,
@@ -30,6 +31,20 @@ public class PersonEndpoint
                 
                 try
                 {
+                    if (imdbId == null)
+                    {
+                        if (tmdbId == null)
+                        {
+                            return Results.BadRequest("Either imdbId or tmdbId must be provided.");
+                        }
+                        imdbId = await GetImdbId(tmdbId.Value, tmdbHttpClient, cache);
+                        if (imdbId == null)
+                        {
+                            Log.Debug($"Person IMDB ID for TMDB ID '{tmdbId}' was null!");
+                            return Results.NotFound($"Person with TMDB ID '{tmdbId}' was not found in the TMDB, or has no IMDB ID.");
+                        }
+                    }
+
                     string personCacheKey = CachePrefix + imdbId;  // NOTE: We may not hit the cache that often for suggestions, but being a bit paranoid here to minimize impact
 
                     if (!cache.TryGetValue(personCacheKey, out personViewModelJson))
@@ -38,7 +53,7 @@ public class PersonEndpoint
                         Log.Debug($"Username: {username}");
 
                         Task<SuggestionViewModel?> suggestionTask = GetSuggestionViewModel(imdbId, suggestionHttpClient, cache);
-                        int? tmdbPersonIdNullable = await GetTmdbId(imdbId, tmdbHttpClient);
+                        int? tmdbPersonIdNullable = tmdbId ?? await GetTmdbId(imdbId, tmdbHttpClient);
                         if (tmdbPersonIdNullable == null)
                         {
                             Log.Debug($"Person TMDB ID for search '{imdbId}' was null!");
@@ -121,7 +136,7 @@ public class PersonEndpoint
             }
         )
         .WithSummary("Person")
-        .WithDescription("Searches IMDB and TMDB for detailed information on people.")
+        .WithDescription("Searches IMDB and TMDB for detailed information on people, looked up by IMDB ID or by TMDB ID.")
         .RequireAuthorization(ProgramConstants.LoggedInUsersOnlyPolicyName)  // TODO: Check that this returns appropriate error on frontend
         .RequireAuthorization(ProgramConstants.SearchUsersOnlyPolicyName)  // TODO: Check that this returns appropriate error on frontend
         .RequireRateLimiting(ProgramConstants.TokenRateLimiterPolicyName);
@@ -155,6 +170,28 @@ public class PersonEndpoint
             cache.Set(personSuggestionCacheKey, personSuggestionViewModel, cacheEntryOptions);
         }
         return personSuggestionViewModel;
+    }
+
+    public async static Task<string?> GetImdbId(int tmdbId, TmdbHttpClient tmdbHttpClient, IMemoryCache cache)
+    {
+        string imdbIdCacheKey = $"{CachePrefix}imdb-{tmdbId}";
+
+        if (!cache.TryGetValue(imdbIdCacheKey, out string? imdbId) || imdbId == null)
+        {
+            TmdbPersonExternalIdsResponseDataModel? externalIdsResponseDataModel = await tmdbHttpClient.GetPersonExternalIds(tmdbId);
+            if (externalIdsResponseDataModel == null || string.IsNullOrEmpty(externalIdsResponseDataModel.ImdbId))
+                return null;
+
+            Log.Debug($"TMDB person external IDs response:\n\n{externalIdsResponseDataModel}\n\n");
+
+            imdbId = externalIdsResponseDataModel.ImdbId;
+
+            var cacheEntryOptions = new MemoryCacheEntryOptions()
+                .SetAbsoluteExpiration(TimeSpan.FromDays(1))
+                .SetSlidingExpiration(TimeSpan.FromHours(1));
+            cache.Set(imdbIdCacheKey, imdbId, cacheEntryOptions);
+        }
+        return imdbId;
     }
 
     public async static Task<int?> GetTmdbId(string imdbId, TmdbHttpClient tmdbHttpClient)

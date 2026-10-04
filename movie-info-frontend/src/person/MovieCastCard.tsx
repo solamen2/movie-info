@@ -3,9 +3,10 @@ import { type PersonMovieCast } from "./personTypes";
 
 interface MovieCastCardProps {
   credit: PersonMovieCast;
+  onClick: () => void;
 }
 
-function MovieCastCard({ credit }: MovieCastCardProps) {
+function MovieCastCard({ credit, onClick }: MovieCastCardProps) {
   return (
     <CreditCard
       testId="movie-cast-card"
@@ -14,6 +15,7 @@ function MovieCastCard({ credit }: MovieCastCardProps) {
       originalTitle={credit.originalTitle}
       role={credit.character}
       date={credit.releaseDate}
+      onClick={onClick}
     />
   );
 }

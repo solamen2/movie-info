@@ -4,8 +4,10 @@ import {
   render,
   screen,
   waitFor,
+  within,
 } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { MemoryRouter } from "react-router-dom";
 import { type AppRouter, renderApp } from "../../tests/renderApp";
 import { http, HttpResponse } from "msw";
 import { server } from "../../tests/mocks/node.ts";
@@ -27,6 +29,18 @@ async function searchAndSelectExampleMovie() {
   }
   fireEvent.click(movieCard);
   return { ...utils, movieCard };
+}
+
+// Finds the person (cast / crew / creator / guest star) card with the given
+// text inside a panel.
+function findPersonCard(panel: HTMLElement, testId: string, text: string) {
+  const card = within(panel)
+    .getAllByTestId(testId)
+    .find((c) => c.textContent.includes(text));
+  if (!card) {
+    throw new Error(`${testId} containing ${text} not found`);
+  }
+  return card;
 }
 
 describe("MoviePanel", () => {
@@ -276,7 +290,11 @@ describe("MoviePanel", () => {
 
   describe("When the movie has been released", () => {
     it("Should not show the status", async () => {
-      render(<MoviePanel imdbId={movieDataJson1.imdbId} />);
+      render(
+        <MemoryRouter>
+          <MoviePanel itemId={movieDataJson1.imdbId} />
+        </MemoryRouter>,
+      );
       const panel = await screen.findByTestId("movie-panel");
 
       expect(screen.getByRole("heading", { level: 2 }).textContent).toBe(
@@ -295,7 +313,11 @@ describe("MoviePanel", () => {
         ),
       );
 
-      render(<MoviePanel imdbId={movieDataJson1.imdbId} />);
+      render(
+        <MemoryRouter>
+          <MoviePanel itemId={movieDataJson1.imdbId} />
+        </MemoryRouter>,
+      );
       const panel = await screen.findByTestId("movie-panel");
 
       const heading = screen.getByRole("heading", { level: 2 });
@@ -310,13 +332,95 @@ describe("MoviePanel", () => {
 
   describe("When the movie API returns an error", () => {
     it("Should show an error message", async () => {
-      render(<MoviePanel imdbId="tt9999999" />);
+      render(
+        <MemoryRouter>
+          <MoviePanel itemId="tt9999999" />
+        </MemoryRouter>,
+      );
 
       expect(
         await screen.findByText(
           "Loading movie failed with status 404: Not a valid IMDB ID for mock. Please try another search.",
         ),
       ).toBeInTheDocument();
+    });
+  });
+
+  describe("When a person card inside the movie panel is clicked", () => {
+    it.each([
+      ["Cast", "cast-card", "Example Brown", "/person/2?q=1"],
+      ["Directors", "crew-card", "Example Director", "/person/3?q=1"],
+      ["Writers", "crew-card", "Example Writer", "/person/4?q=1"],
+    ])(
+      "Should replace the movie panel with the %s person's panel at their TMDB id URL",
+      async (_, testId, name, expectedUrl) => {
+        const { currentUrl, container, movieCard } =
+          await searchAndSelectExampleMovie();
+        const moviePanel = await screen.findByTestId("movie-panel");
+
+        fireEvent.click(findPersonCard(moviePanel, testId, name));
+        expect(currentUrl()).toBe(expectedUrl);
+        // The movie's card is dropped at once rather than flying home...
+        expect(movieCard).not.toHaveClass("selected");
+        expect(movieCard).not.toHaveClass("expanded");
+        expect(movieCard).toHaveClass("deselecting");
+        expect(moviePanel).not.toBeInTheDocument();
+        // ...and the person (who is no search result) gets a stand-in card
+        // that is shown already expanded, with the results still hidden
+        const personPanel = await screen.findByTestId("person-panel");
+        const personCard = personPanel.closest("#search-card");
+        expect(personCard).not.toBe(movieCard);
+        expect(personCard).toHaveClass("selected");
+        expect(personCard).toHaveClass("expanded");
+        expect(
+          container.querySelectorAll("#search-card.selected"),
+        ).toHaveLength(1);
+        expect(container.querySelector(".results-container")).toHaveClass(
+          "has-selection",
+        );
+        expect(
+          within(personPanel).getByRole("heading", { name }),
+        ).toBeInTheDocument();
+        expect(screen.queryByText("8 results.")).not.toBeInTheDocument();
+      },
+    );
+
+    it("Should scroll to the top of the page", async () => {
+      const scrollTo = vi
+        .spyOn(window, "scrollTo")
+        .mockImplementation(() => undefined);
+      await searchAndSelectExampleMovie();
+      const moviePanel = await screen.findByTestId("movie-panel");
+
+      fireEvent.click(findPersonCard(moviePanel, "cast-card", "Example Brown"));
+      expect(scrollTo).toHaveBeenCalledWith({ top: 0 });
+    });
+
+    it("Should bring the movie panel back on browser back, and the person's panel on forward", async () => {
+      const { currentUrl, container, movieCard, goBack, goForward } =
+        await searchAndSelectExampleMovie();
+      const moviePanel = await screen.findByTestId("movie-panel");
+      fireEvent.click(findPersonCard(moviePanel, "cast-card", "Example Brown"));
+      const personPanel = await screen.findByTestId("person-panel");
+
+      await goBack();
+      expect(currentUrl()).toBe("/movie/tt0000001?q=1");
+      expect(personPanel).not.toBeInTheDocument();
+      // The movie's own card hosts its panel again, shown expanded at once,
+      // and the person's stand-in card is gone
+      expect(movieCard).toHaveClass("selected");
+      expect(movieCard).toHaveClass("expanded");
+      expect(movieCard).not.toHaveClass("deselecting");
+      expect(movieCard).toContainElement(
+        await screen.findByTestId("movie-panel"),
+      );
+      expect(container.querySelectorAll("#search-card")).toHaveLength(8);
+
+      await goForward();
+      expect(currentUrl()).toBe("/person/2?q=1");
+      expect(movieCard).toHaveClass("deselecting");
+      await screen.findByTestId("person-panel");
+      expect(container.querySelectorAll("#search-card")).toHaveLength(9);
     });
   });
 });

@@ -3,9 +3,10 @@ import { type PersonMovieCrew } from "./personTypes";
 
 interface MovieCrewCardProps {
   credit: PersonMovieCrew;
+  onClick: () => void;
 }
 
-function MovieCrewCard({ credit }: MovieCrewCardProps) {
+function MovieCrewCard({ credit, onClick }: MovieCrewCardProps) {
   return (
     <CreditCard
       testId="movie-crew-card"
@@ -14,6 +15,7 @@ function MovieCrewCard({ credit }: MovieCrewCardProps) {
       originalTitle={credit.originalTitle}
       role={credit.job}
       date={credit.releaseDate}
+      onClick={onClick}
     />
   );
 }

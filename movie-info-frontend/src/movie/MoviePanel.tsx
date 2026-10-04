@@ -4,8 +4,10 @@ import HorizontalList from "../shared/HorizontalList";
 import ImdbRow, { ImdbRowSeparator } from "../shared/ImdbRow";
 import TitleStatus from "../shared/TitleStatus";
 import WatchProviderSection from "../shared/WatchProviderSection";
+import { useOpenDetail } from "../shared/useOpenDetail";
 import {
   describeFailedLoad,
+  detailIdQuery,
   displayDate,
   displayGenres,
   displayRuntime,
@@ -26,12 +28,26 @@ function displayMoney(value: number): string {
     : "—";
 }
 
-function CrewSection({ title, crew }: { title: string; crew: MovieCrew[] }) {
+function CrewSection({
+  title,
+  crew,
+  onPersonClick,
+}: {
+  title: string;
+  crew: MovieCrew[];
+  onPersonClick: (tmdbId: number) => void;
+}) {
   return (
     <Collapsible title={title} count={crew.length}>
       <HorizontalList>
         {crew.map((c) => (
-          <CrewCard key={c.id} crew={c} />
+          <CrewCard
+            key={c.id}
+            crew={c}
+            onClick={() => {
+              onPersonClick(c.tmdbId);
+            }}
+          />
         ))}
       </HorizontalList>
     </Collapsible>
@@ -39,22 +55,25 @@ function CrewSection({ title, crew }: { title: string; crew: MovieCrew[] }) {
 }
 
 interface MoviePanelProps {
-  imdbId: string;
+  // The movie's IMDB or TMDB id (see isTmdbId)
+  itemId: string;
 }
 
-function MoviePanel({ imdbId }: MoviePanelProps) {
+// Shows a movie. Its cast and crew cards open the person's own panel in place
+// of this one (see useOpenDetail).
+function MoviePanel({ itemId }: MoviePanelProps) {
   const [movie, setMovie] = useState<Movie | null>(null);
   const [error, setError] = useState("");
+  const openDetail = useOpenDetail();
 
   useEffect(() => {
     const controller = new AbortController();
 
     async function loadMovie() {
       try {
-        const response = await fetch(
-          `/api/movie?imdbId=${encodeURIComponent(imdbId)}`,
-          { signal: controller.signal },
-        );
+        const response = await fetch(`/api/movie?${detailIdQuery(itemId)}`, {
+          signal: controller.signal,
+        });
         if (!response.ok) {
           setError(await describeFailedLoad("Loading movie", response));
           return;
@@ -76,7 +95,7 @@ function MoviePanel({ imdbId }: MoviePanelProps) {
     return () => {
       controller.abort();
     };
-  }, [imdbId]);
+  }, [itemId]);
 
   if (error) {
     return (
@@ -171,12 +190,30 @@ function MoviePanel({ imdbId }: MoviePanelProps) {
         <Collapsible title="Cast" count={movie.cast.length}>
           <HorizontalList>
             {sortedCast.map((c) => (
-              <CastCard key={c.id} cast={c} />
+              <CastCard
+                key={c.id}
+                cast={c}
+                onClick={() => {
+                  openDetail("person", c.tmdbId);
+                }}
+              />
             ))}
           </HorizontalList>
         </Collapsible>
-        <CrewSection title="Directors" crew={movie.directors} />
-        <CrewSection title="Writers" crew={movie.writers} />
+        <CrewSection
+          title="Directors"
+          crew={movie.directors}
+          onPersonClick={(tmdbId) => {
+            openDetail("person", tmdbId);
+          }}
+        />
+        <CrewSection
+          title="Writers"
+          crew={movie.writers}
+          onPersonClick={(tmdbId) => {
+            openDetail("person", tmdbId);
+          }}
+        />
         <Collapsible title="Plot (TMDB)">
           <p className="detail-prose">{displayText(movie.tmdbPlot)}</p>
         </Collapsible>

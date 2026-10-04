@@ -7,8 +7,10 @@ import ImdbRow, { ImdbRowSeparator } from "../shared/ImdbRow";
 import TitleStatus from "../shared/TitleStatus";
 import WatchProviderSection from "../shared/WatchProviderSection";
 import { useCardSelection } from "../shared/useCardSelection";
+import { useOpenDetail } from "../shared/useOpenDetail";
 import {
   describeFailedLoad,
+  detailIdQuery,
   displayDate,
   displayGenres,
   displayRuntime,
@@ -31,12 +33,26 @@ function displayEpisodeRunTimes(minutes: number[]): string {
   return runtimes.length > 0 ? runtimes.join(", ") : "—";
 }
 
-function CrewSection({ title, crew }: { title: string; crew: TvSeriesCrew[] }) {
+function CrewSection({
+  title,
+  crew,
+  onPersonClick,
+}: {
+  title: string;
+  crew: TvSeriesCrew[];
+  onPersonClick: (tmdbId: number) => void;
+}) {
   return (
     <Collapsible title={title} count={crew.length}>
       <HorizontalList>
         {crew.map((c) => (
-          <CrewCard key={c.id} crew={c} />
+          <CrewCard
+            key={c.id}
+            crew={c}
+            onClick={() => {
+              onPersonClick(c.tmdbId);
+            }}
+          />
         ))}
       </HorizontalList>
     </Collapsible>
@@ -44,19 +60,22 @@ function CrewSection({ title, crew }: { title: string; crew: TvSeriesCrew[] }) {
 }
 
 interface TvSeriesPanelProps {
-  imdbId: string;
+  // The TV series' IMDB or TMDB id (see isTmdbId)
+  itemId: string;
 }
 
 // Shows a TV series. A season within it is selected via the URL's
 // `?tmdbTvSeriesId=…&seasonNumber=…` query parameters (the same ones the
 // /api/tvseason call takes), so browser back / forward and directly loaded
-// URLs work for seasons too.
-function TvSeriesPanel({ imdbId }: TvSeriesPanelProps) {
+// URLs work for seasons too. Its cast, creator and crew cards open the
+// person's own panel in place of this one (see useOpenDetail).
+function TvSeriesPanel({ itemId }: TvSeriesPanelProps) {
   const [tvSeries, setTvSeries] = useState<TvSeries | null>(null);
   const [error, setError] = useState("");
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const navigate = useNavigate();
+  const openDetail = useOpenDetail();
   const selectedSeasonNumber = getIntParam(searchParams, "seasonNumber");
   const tmdbTvSeriesIdParam = getIntParam(searchParams, "tmdbTvSeriesId");
   const seasonSelection = useCardSelection({
@@ -72,10 +91,9 @@ function TvSeriesPanel({ imdbId }: TvSeriesPanelProps) {
 
     async function loadTvSeries() {
       try {
-        const response = await fetch(
-          `/api/tvseries?imdbId=${encodeURIComponent(imdbId)}`,
-          { signal: controller.signal },
-        );
+        const response = await fetch(`/api/tvseries?${detailIdQuery(itemId)}`, {
+          signal: controller.signal,
+        });
         if (!response.ok) {
           setError(await describeFailedLoad("Loading TV series", response));
           return;
@@ -97,7 +115,7 @@ function TvSeriesPanel({ imdbId }: TvSeriesPanelProps) {
     return () => {
       controller.abort();
     };
-  }, [imdbId]);
+  }, [itemId]);
 
   if (error) {
     return (
@@ -240,16 +258,39 @@ function TvSeriesPanel({ imdbId }: TvSeriesPanelProps) {
             })}
           </HorizontalList>
         </Collapsible>
-        <TvSeriesCastCollapsible cast={tvSeries.cast} />
+        <TvSeriesCastCollapsible
+          cast={tvSeries.cast}
+          onCastClick={(tmdbId) => {
+            openDetail("person", tmdbId);
+          }}
+        />
         <Collapsible title="Creators" count={tvSeries.creators.length}>
           <HorizontalList>
             {tvSeries.creators.map((c) => (
-              <CreatorCard key={c.id} creator={c} />
+              <CreatorCard
+                key={c.id}
+                creator={c}
+                onClick={() => {
+                  openDetail("person", c.tmdbId);
+                }}
+              />
             ))}
           </HorizontalList>
         </Collapsible>
-        <CrewSection title="Directors" crew={tvSeries.directors} />
-        <CrewSection title="Writers" crew={tvSeries.writers} />
+        <CrewSection
+          title="Directors"
+          crew={tvSeries.directors}
+          onPersonClick={(tmdbId) => {
+            openDetail("person", tmdbId);
+          }}
+        />
+        <CrewSection
+          title="Writers"
+          crew={tvSeries.writers}
+          onPersonClick={(tmdbId) => {
+            openDetail("person", tmdbId);
+          }}
+        />
         <Collapsible title="Overview (TMDB)">
           <p className="detail-prose">{displayText(tvSeries.tmdbOverview)}</p>
         </Collapsible>

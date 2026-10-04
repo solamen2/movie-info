@@ -407,6 +407,16 @@
   display: none;
 }
 
+/* A card that is deselecting while its container still has a selection has
+   been replaced: another card was selected straight away (e.g. a person's
+   panel opened from a movie panel's cast, see useCardSelection). It has no
+   home to fly back to, since the other cards are still hidden, so it is
+   dropped at once rather than fading out beside the new panel. */
+.has-selection > .expandable-card.deselecting {
+  animation: none;
+  transition: none;
+}
+
 /* Person (cast / crew / creator) and watch provider cards shown in the
    horizontally scrolling rows */
 .person-card,
@@ -418,8 +428,15 @@
   text-align: center;
 }
 
+/* Person cards open the person's own panel when clicked (see useOpenDetail),
+   like the search result cards, so they get the same hover cue. */
 .person-card {
   width: 120px;
+  cursor: pointer;
+}
+
+.person-card:hover {
+  border-color: #888;
 }
 
 .person-card-image {

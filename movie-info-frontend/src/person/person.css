@@ -5,7 +5,9 @@
   white-space: pre-line;
 }
 
-/* Cards shown in the horizontally scrolling credit rows */
+/* Cards shown in the horizontally scrolling credit rows. They open the
+   movie's / TV series' own panel when clicked (see useOpenDetail), like the
+   search result cards, so they get the same hover cue. */
 .credit-card {
   flex: 0 0 auto;
   width: 120px;
@@ -13,6 +15,11 @@
   border-radius: 6px;
   padding: 0.5rem;
   text-align: center;
+  cursor: pointer;
+}
+
+.credit-card:hover {
+  border-color: #888;
 }
 
 .credit-card-image {

@@ -142,6 +142,24 @@ export function getTmdbImageUrl(
 // The segment doubles as the route path, e.g. "/movie/tt0111161".
 export type PanelKind = "movie" | "tvseries" | "person";
 
+// A detail panel's item is identified by IMDB id when opened from a search
+// result (e.g. "tt0111161", "nm0000151"), but by TMDB id when opened from a
+// card inside another panel (a movie's cast, a person's credits, ...), since
+// TMDB's credits only carry its own ids. Both travel in the same URL segment
+// and panel prop, told apart by their form: IMDB ids have a two-letter prefix,
+// TMDB ids are bare numbers.
+export function isTmdbId(itemId: string): boolean {
+  return /^\d+$/.test(itemId);
+}
+
+// The query string that asks a detail API (/api/movie etc.) for an item, e.g.
+// "imdbId=tt0111161" or "tmdbId=278".
+export function detailIdQuery(itemId: string): string {
+  return new URLSearchParams(
+    isTmdbId(itemId) ? { tmdbId: itemId } : { imdbId: itemId },
+  ).toString();
+}
+
 export function getPanelKind(
   searchType: number | string | null,
   mediaType: MediaType | null,
@@ -199,12 +217,14 @@ export function selectedCardPath(query: string, itemId: string): string {
   return withQueryParams("/search", querySuffix(query), { selected: itemId });
 }
 
+// The URL of an item's detail panel; `itemId` is an IMDB or TMDB id (see
+// isTmdbId).
 export function detailPath(
   panelKind: PanelKind,
-  imdbId: string,
+  itemId: string,
   query: string,
 ): string {
-  return `/${panelKind}/${encodeURIComponent(imdbId)}${querySuffix(query)}`;
+  return `/${panelKind}/${encodeURIComponent(itemId)}${querySuffix(query)}`;
 }
 
 // The message carried by an error response, if any. MovieInfoBackend returns

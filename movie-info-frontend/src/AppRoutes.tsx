@@ -10,15 +10,15 @@ function AppRoutes() {
       <Route path="/register" element={<RegisterUser />} />
       <Route path="/search" element={<SuggestionSearch />} />
       <Route
-        path="/movie/:imdbId"
+        path="/movie/:itemId"
         element={<SuggestionSearch panelKind="movie" />}
       />
       <Route
-        path="/tvseries/:imdbId"
+        path="/tvseries/:itemId"
         element={<SuggestionSearch panelKind="tvseries" />}
       />
       <Route
-        path="/person/:imdbId"
+        path="/person/:itemId"
         element={<SuggestionSearch panelKind="person" />}
       />
       <Route path="*" element={<Navigate to="/login" replace />} />

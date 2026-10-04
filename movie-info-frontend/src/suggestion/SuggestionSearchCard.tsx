@@ -67,9 +67,9 @@ function SuggestionSearchCard({
     >
       {expanded ? (
         <>
-          {panelKind === "movie" && <MoviePanel imdbId={item.itemID} />}
-          {panelKind === "tvseries" && <TvSeriesPanel imdbId={item.itemID} />}
-          {panelKind === "person" && <PersonPanel imdbId={item.itemID} />}
+          {panelKind === "movie" && <MoviePanel itemId={item.itemID} />}
+          {panelKind === "tvseries" && <TvSeriesPanel itemId={item.itemID} />}
+          {panelKind === "person" && <PersonPanel itemId={item.itemID} />}
         </>
       ) : (
         <>

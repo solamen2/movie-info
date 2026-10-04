@@ -4,8 +4,10 @@ import {
   render,
   screen,
   waitFor,
+  within,
 } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { MemoryRouter } from "react-router-dom";
 import { type AppRouter, renderApp } from "../../tests/renderApp";
 import { http, HttpResponse } from "msw";
 import { server } from "../../tests/mocks/node.ts";
@@ -27,6 +29,17 @@ async function searchAndSelectExamplePerson() {
   }
   fireEvent.click(personCard);
   return { ...utils, personCard };
+}
+
+// Finds the credit card with the given text inside the person panel.
+function findCreditCard(testId: string, text: string) {
+  const card = within(screen.getByTestId("person-panel"))
+    .getAllByTestId(testId)
+    .find((c) => c.textContent.includes(text));
+  if (!card) {
+    throw new Error(`${testId} containing ${text} not found`);
+  }
+  return card;
 }
 
 describe("PersonPanel", () => {
@@ -312,7 +325,11 @@ describe("PersonPanel", () => {
         ),
       );
 
-      render(<PersonPanel imdbId="nm9000000" />);
+      render(
+        <MemoryRouter>
+          <PersonPanel itemId="nm9000000" />
+        </MemoryRouter>,
+      );
       const panel = await screen.findByTestId("person-panel");
       expect(panel.textContent).toContain("Birthday—Deathday—");
       expect(screen.queryByTestId("person-age")).toBeNull();
@@ -328,7 +345,11 @@ describe("PersonPanel", () => {
         ),
       );
 
-      render(<PersonPanel imdbId="nm9000000" />);
+      render(
+        <MemoryRouter>
+          <PersonPanel itemId="nm9000000" />
+        </MemoryRouter>,
+      );
       const panel = await screen.findByTestId("person-panel");
       expect(panel.textContent).toContain("BirthdayJan 15, 2026 (<1)");
     });
@@ -354,7 +375,11 @@ describe("PersonPanel", () => {
         ),
       );
 
-      render(<PersonPanel imdbId="nm9000000" />);
+      render(
+        <MemoryRouter>
+          <PersonPanel itemId="nm9000000" />
+        </MemoryRouter>,
+      );
       const panel = await screen.findByTestId("person-panel");
       const text = panel.textContent;
 
@@ -376,13 +401,90 @@ describe("PersonPanel", () => {
 
   describe("When the person API returns an error", () => {
     it("Should show an error message", async () => {
-      render(<PersonPanel imdbId="nm9999999" />);
+      render(
+        <MemoryRouter>
+          <PersonPanel itemId="nm9999999" />
+        </MemoryRouter>,
+      );
 
       expect(
         await screen.findByText(
           "Loading person failed with status 404: Not a valid IMDB ID for mock. Please try another search.",
         ),
       ).toBeInTheDocument();
+    });
+  });
+
+  describe("When a credit card inside the person panel is clicked", () => {
+    it.each([
+      [
+        "Movie Cast Credits",
+        "movie-cast-card",
+        "Example Film",
+        "/movie/81002?q=1",
+        "movie-panel",
+      ],
+      [
+        "Movie Crew Credits",
+        "movie-crew-card",
+        "Example Produced Film",
+        "/movie/82001?q=1",
+        "movie-panel",
+      ],
+      [
+        "TV Series Cast Credits",
+        "tv-series-cast-card",
+        "Example Show",
+        "/tvseries/83001?q=1",
+        "tv-series-panel",
+      ],
+    ])(
+      "Should replace the person panel with the %s credit's panel at its TMDB id URL",
+      async (_, testId, title, expectedUrl, panelTestId) => {
+        const { currentUrl, container, personCard } =
+          await searchAndSelectExamplePerson();
+        await screen.findByTestId("person-panel");
+
+        fireEvent.click(findCreditCard(testId, title));
+        expect(currentUrl()).toBe(expectedUrl);
+        // The person's card is dropped at once rather than flying home...
+        expect(personCard).not.toHaveClass("selected");
+        expect(personCard).not.toHaveClass("expanded");
+        expect(personCard).toHaveClass("deselecting");
+        expect(screen.queryByTestId("person-panel")).not.toBeInTheDocument();
+        // ...and the credit (which is no search result) gets a stand-in card
+        // that is shown already expanded
+        const panel = await screen.findByTestId(panelTestId);
+        const card = panel.closest("#search-card");
+        expect(card).not.toBe(personCard);
+        expect(card).toHaveClass("selected");
+        expect(card).toHaveClass("expanded");
+        expect(
+          container.querySelectorAll("#search-card.selected"),
+        ).toHaveLength(1);
+        expect(
+          within(panel).getByRole("heading", { name: title }),
+        ).toBeInTheDocument();
+        expect(screen.queryByText("8 results.")).not.toBeInTheDocument();
+      },
+    );
+
+    it("Should bring the person panel back on browser back", async () => {
+      const { currentUrl, container, personCard, goBack } =
+        await searchAndSelectExamplePerson();
+      await screen.findByTestId("person-panel");
+      fireEvent.click(findCreditCard("tv-series-cast-card", "Example Show"));
+      const tvSeriesPanel = await screen.findByTestId("tv-series-panel");
+
+      await goBack();
+      expect(currentUrl()).toBe("/person/nm9000000?q=1");
+      expect(tvSeriesPanel).not.toBeInTheDocument();
+      expect(personCard).toHaveClass("selected");
+      expect(personCard).toHaveClass("expanded");
+      expect(personCard).toContainElement(
+        await screen.findByTestId("person-panel"),
+      );
+      expect(container.querySelectorAll("#search-card")).toHaveLength(8);
     });
   });
 });

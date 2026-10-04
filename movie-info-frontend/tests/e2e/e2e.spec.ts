@@ -112,6 +112,10 @@ const expectedMovie = useMockHttpCalls
       searchText: "1",
       title: "Example Movie",
       imdbId: "tt0000001",
+      // A cast member whose person panel is opened from the movie panel, and
+      // one of their movie cast credits to open from there in turn
+      castMember: "Example Jones",
+      castMemberMovieCredit: "Example Film",
       cardText: [
         "Example MovieSearch Type: MediaMedia Type: MovieRank: ",
         "4444Known For: Example Jones, Example BrownYear: 2016",
@@ -149,6 +153,8 @@ const expectedMovie = useMockHttpCalls
       searchText: "The Shawshank Redemption",
       title: "The Shawshank Redemption",
       imdbId: "tt0111161",
+      castMember: "Tim Robbins",
+      castMemberMovieCredit: "The Shawshank Redemption",
       cardText: [
         "The Shawshank RedemptionSearch Type: MediaMedia Type: MovieRank: ",
         "Known For: Tim Robbins, Morgan FreemanYear: 1994", // remove rank from Shawshank because it changes over time
@@ -1107,6 +1113,137 @@ test("TV episode happy path: open a TV season, expand an episode card, check the
   await expect(seasonCard).toHaveClass(/expanded/);
   await expect(episodeCard).toContainText(expectedEpisode.title);
   console.log("TV episode happy path test finished.");
+});
+
+// A card inside a panel (a movie's cast, a person's credits, ...) opens its
+// own panel in place of the one it was in. Finds the card with the given text
+// in the panel's section with the given title, opening the section.
+async function openSectionCard(
+  panel: Locator,
+  sectionTitle: string,
+  cardTestId: string,
+  cardText: string,
+): Promise<Locator> {
+  const section = panel
+    .locator(".detail-sections > details")
+    .filter({ has: panel.page().locator("summary", { hasText: sectionTitle }) })
+    .first();
+  await section.locator("summary").click();
+  const card = section.getByTestId(cardTestId).filter({ hasText: cardText });
+  await expect(card).toBeVisible();
+  return card;
+}
+
+test("Panel to panel: open a movie, open a cast member's person panel from it, open one of their movie credits from that, and go back with the browser", async ({
+  page,
+}) => {
+  console.log("Starting panel to panel test...");
+  const searchQueryInput = page.getByRole("textbox", {
+    name: "search-query-input",
+  });
+  await searchQueryInput.fill(expectedMovie.searchText);
+  await page.getByRole("button", { name: "search" }).click();
+  const movieCard = page
+    .getByText(expectedMovie.title, { exact: true })
+    .locator("ancestor=#search-card");
+  const resultsMessage = page.getByText(/^\d+ results\.$/);
+  await expect(resultsMessage).toBeVisible();
+  await movieCard.click();
+  const moviePanel = page.getByTestId("movie-panel");
+  await expect(moviePanel).toBeVisible();
+  const movieUrl = new RegExp(`/movie/${expectedMovie.imdbId}\\?q=[^/]+$`);
+  await expect(page).toHaveURL(movieUrl);
+  const expandedCard = page.locator("#search-card.selected.expanded");
+
+  console.log("Opening a cast member's person panel from the movie panel...");
+  const castCard = await openSectionCard(
+    moviePanel,
+    "Cast",
+    "cast-card",
+    expectedMovie.castMember,
+  );
+  await castCard.click();
+  // The person is only known by TMDB id, so that is what the URL carries
+  const personUrl = /\/person\/\d+\?q=[^/]+$/;
+  await expect(page).toHaveURL(personUrl);
+  await expect(moviePanel).toBeHidden();
+  const personPanel = page.getByTestId("person-panel");
+  await expect(personPanel).toBeVisible();
+  await expect(expandedCard).toHaveCount(1);
+  await expect(
+    personPanel.getByRole("heading", {
+      name: expectedMovie.castMember,
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(resultsMessage).toBeHidden();
+  expect(await page.evaluate(() => window.scrollY)).toBe(0);
+  console.log("Checking the person panel is not highlighted...");
+  await expectNeverHighlighted(page, expandedCard, personPanel);
+
+  console.log("Opening one of the person's movie credits from their panel...");
+  const creditCard = await openSectionCard(
+    personPanel,
+    "Movie Cast Credits",
+    "movie-cast-card",
+    expectedMovie.castMemberMovieCredit,
+  );
+  await creditCard.click();
+  const creditUrl = /\/movie\/\d+\?q=[^/]+$/;
+  await expect(page).toHaveURL(creditUrl);
+  await expect(personPanel).toBeHidden();
+  await expect(moviePanel).toBeVisible();
+  await expect(expandedCard).toHaveCount(1);
+  await expect(
+    moviePanel.getByRole("heading", {
+      name: expectedMovie.castMemberMovieCredit,
+      exact: true,
+    }),
+  ).toBeVisible();
+
+  console.log("Going back to the person panel with the browser...");
+  await page.goBack();
+  await expect(page).toHaveURL(personUrl);
+  await expect(moviePanel).toBeHidden();
+  await expect(personPanel).toBeVisible();
+  await expect(expandedCard).toHaveCount(1);
+  await expect(
+    personPanel.getByRole("heading", {
+      name: expectedMovie.castMember,
+      exact: true,
+    }),
+  ).toBeVisible();
+
+  console.log("Reloading the person URL directly...");
+  await page.reload();
+  await expect(page).toHaveURL(personUrl);
+  await expect(personPanel).toBeVisible();
+  await expect(expandedCard).toHaveCount(1);
+  await expect(
+    personPanel.getByRole("heading", {
+      name: expectedMovie.castMember,
+      exact: true,
+    }),
+  ).toBeVisible();
+
+  console.log("Going back to the movie panel with the browser...");
+  await page.goBack();
+  await expect(page).toHaveURL(movieUrl);
+  await expect(personPanel).toBeHidden();
+  await expect(moviePanel).toBeVisible();
+  await expect(expandedCard).toHaveCount(1);
+  await expect(
+    moviePanel.getByRole("heading", { name: expectedMovie.title, exact: true }),
+  ).toBeVisible();
+  await expect(resultsMessage).toBeHidden();
+
+  console.log("Going back to the search results with the browser...");
+  await page.goBack();
+  await expect(page).toHaveURL(/\/search\?q=[^/]+$/);
+  await expect(moviePanel).toBeHidden();
+  await expect(page.locator("#search-card.selected")).toHaveCount(0);
+  await expect(resultsMessage).toBeVisible();
+  console.log("Panel to panel test finished.");
 });
 
 function escapeRegExp(text: string): string {

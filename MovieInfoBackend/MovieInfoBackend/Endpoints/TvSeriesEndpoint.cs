@@ -22,7 +22,8 @@ public class TvSeriesEndpoint
     {
         app.MapGet($"{ApiRoutePrefix}/tvseries", [Authorize]
             async (
-                string imdbId,
+                string? imdbId,
+                int? tmdbId,
                 ClaimsPrincipal user,
                 [FromServices] SuggestionHttpClient suggestionHttpClient,
                 [FromServices] OmdbHttpClient omdbHttpClient,
@@ -33,6 +34,20 @@ public class TvSeriesEndpoint
                 
                 try
                 {
+                    if (imdbId == null)
+                    {
+                        if (tmdbId == null)
+                        {
+                            return Results.BadRequest("Either imdbId or tmdbId must be provided.");
+                        }
+                        imdbId = await GetImdbId(tmdbId.Value, tmdbHttpClient, cache);
+                        if (imdbId == null)
+                        {
+                            Log.Debug($"TV series IMDB ID for TMDB ID '{tmdbId}' was null!");
+                            return Results.NotFound($"TV series with TMDB ID '{tmdbId}' was not found in the TMDB, or has no IMDB ID.");
+                        }
+                    }
+
                     string tvSeriesCacheKey = CachePrefix + imdbId;  // NOTE: We may not hit the cache that often for suggestions, but being a bit paranoid here to minimize impact
 
                     if (!cache.TryGetValue(tvSeriesCacheKey, out tvSeriesViewModelJson))
@@ -44,7 +59,7 @@ public class TvSeriesEndpoint
                         Task<OmdbResponseDataModel?> omdbTvSeriesTask = GetOmdbResponseDataModel(imdbId, omdbHttpClient);
                         Task<ConfigurationCountriesDictionary?> tmdbCountriesTask = GetConfigurationCountriesDictionary(tmdbHttpClient);
                         Task<ConfigurationLanguagesDictionary?> tmdbLanguagesTask = GetConfigurationLanguagesDictionary(tmdbHttpClient);
-                        int? tmdbTvSeriesIdNullable = await GetTmdbId(imdbId, tmdbHttpClient);
+                        int? tmdbTvSeriesIdNullable = tmdbId ?? await GetTmdbId(imdbId, tmdbHttpClient);
                         if (tmdbTvSeriesIdNullable == null)
                         {
                             Log.Debug($"TV series TMDB ID for search '{imdbId}' was null!");
@@ -144,7 +159,7 @@ public class TvSeriesEndpoint
             }
         )
         .WithSummary("TV Series")
-        .WithDescription("Searches IMDB, TMDB, and OMDB for detailed information on TV series.")
+        .WithDescription("Searches IMDB, TMDB, and OMDB for detailed information on TV series, looked up by IMDB ID or by TMDB ID.")
         .RequireAuthorization(ProgramConstants.LoggedInUsersOnlyPolicyName)  // TODO: Check that this returns appropriate error on frontend
         .RequireAuthorization(ProgramConstants.SearchUsersOnlyPolicyName)  // TODO: Check that this returns appropriate error on frontend
         .RequireRateLimiting(ProgramConstants.TokenRateLimiterPolicyName);
@@ -207,6 +222,28 @@ public class TvSeriesEndpoint
         Log.Debug($"TMDB configuration languages dictionary:\n\n{tmdbConfigurationLanguagesDictionary}\n\n");
 
         return tmdbConfigurationLanguagesDictionary;
+    }
+
+    public async static Task<string?> GetImdbId(int tmdbId, TmdbHttpClient tmdbHttpClient, IMemoryCache cache)
+    {
+        string imdbIdCacheKey = $"{CachePrefix}imdb-{tmdbId}";
+
+        if (!cache.TryGetValue(imdbIdCacheKey, out string? imdbId) || imdbId == null)
+        {
+            TmdbTvSeriesExternalIdsResponseDataModel? externalIdsResponseDataModel = await tmdbHttpClient.GetTvSeriesExternalIds(tmdbId);
+            if (externalIdsResponseDataModel == null || string.IsNullOrEmpty(externalIdsResponseDataModel.ImdbId))
+                return null;
+
+            Log.Debug($"TMDB TV series external IDs response:\n\n{externalIdsResponseDataModel}\n\n");
+
+            imdbId = externalIdsResponseDataModel.ImdbId;
+
+            var cacheEntryOptions = new MemoryCacheEntryOptions()
+                .SetAbsoluteExpiration(TimeSpan.FromDays(1))
+                .SetSlidingExpiration(TimeSpan.FromHours(1));
+            cache.Set(imdbIdCacheKey, imdbId, cacheEntryOptions);
+        }
+        return imdbId;
     }
 
     public async static Task<int?> GetTmdbId(string imdbId, TmdbHttpClient tmdbHttpClient)
