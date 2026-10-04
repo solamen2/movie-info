@@ -12,6 +12,9 @@ export default defineConfig({
   testMatch: "*.spec.ts",
   /* Run tests in files in parallel */
   fullyParallel: true,
+  /* Each step takes several times longer on CI's Linux WebKit ("Mobile Safari")
+     than on a local machine, so up the default from 30 to 60 seconds */
+  timeout: 60_000,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
