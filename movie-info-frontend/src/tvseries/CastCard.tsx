@@ -1,15 +1,19 @@
 import PersonCard from "../shared/PersonCard";
+import { type PanelCardProps } from "../shared/usePanelCards";
 import { type TvSeriesCast, displayEpisodeCount } from "./tvSeriesTypes";
 
-interface CastCardProps {
+interface CastCardProps extends PanelCardProps {
   cast: TvSeriesCast;
   // Whether to show how many episodes the cast member appears in (default
   // true); see TvSeriesCastCollapsible for why it can be hidden.
   showEpisodeCount?: boolean;
-  onClick: () => void;
 }
 
-function CastCard({ cast, showEpisodeCount = true, onClick }: CastCardProps) {
+function CastCard({
+  cast,
+  showEpisodeCount = true,
+  ...cardProps
+}: CastCardProps) {
   const characters = cast.characters.filter((c) => c !== "").join(", ");
 
   return (
@@ -24,7 +28,7 @@ function CastCard({ cast, showEpisodeCount = true, onClick }: CastCardProps) {
           ? displayEpisodeCount(cast.totalEpisodeCount)
           : "",
       ]}
-      onClick={onClick}
+      {...cardProps}
     />
   );
 }

@@ -9,6 +9,7 @@ import {
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 import { type AppRouter, renderApp } from "../../tests/renderApp";
+import { CARD_FLY_MS } from "../shared/useCardSelection";
 import { http, HttpResponse } from "msw";
 import { server } from "../../tests/mocks/node.ts";
 import movieDataJson1 from "../../tests/mocks/data/movieData1.json" with { type: "json" };
@@ -31,9 +32,8 @@ async function searchAndSelectExampleMovie() {
   return { ...utils, movieCard };
 }
 
-// Finds the person (cast / crew / creator / guest star) card with the given
-// text inside a panel.
-function findPersonCard(panel: HTMLElement, testId: string, text: string) {
+// Finds the card with the given text (a person or a credit) inside a panel.
+function findCard(panel: HTMLElement, testId: string, text: string) {
   const card = within(panel)
     .getAllByTestId(testId)
     .find((c) => c.textContent.includes(text));
@@ -346,81 +346,249 @@ describe("MoviePanel", () => {
     });
   });
 
-  describe("When a person card inside the movie panel is clicked", () => {
+  describe("When a card inside the movie panel is clicked", () => {
     it.each([
-      ["Cast", "cast-card", "Example Brown", "/person/2?q=1"],
-      ["Directors", "crew-card", "Example Director", "/person/3?q=1"],
-      ["Writers", "crew-card", "Example Writer", "/person/4?q=1"],
+      [
+        "Cast",
+        "cast",
+        "cast-card",
+        "Example Brown",
+        2,
+        "person",
+        "person-panel",
+      ],
+      [
+        "Directors",
+        "directors",
+        "crew-card",
+        "Example Director",
+        3,
+        "person",
+        "person-panel",
+      ],
+      [
+        "Writers",
+        "writers",
+        "crew-card",
+        "Example Writer",
+        4,
+        "person",
+        "person-panel",
+      ],
     ])(
-      "Should replace the movie panel with the %s person's panel at their TMDB id URL",
-      async (_, testId, name, expectedUrl) => {
+      "Should highlight the %s card and fly it to the corner, then replace the movie panel with the card's own panel",
+      async (_, cardType, testId, name, tmdbId, targetKind, targetTestId) => {
         const { currentUrl, container, movieCard } =
           await searchAndSelectExampleMovie();
-        const moviePanel = await screen.findByTestId("movie-panel");
+        const panel = await screen.findByTestId("movie-panel");
+        const card = findCard(panel, testId, name);
+        const section = card.closest("details");
 
-        fireEvent.click(findPersonCard(moviePanel, testId, name));
-        expect(currentUrl()).toBe(expectedUrl);
-        // The movie's card is dropped at once rather than flying home...
+        fireEvent.click(card);
+        // Step 1: the URL names the card, which is selected and flies to the
+        // panel's corner while the panel hands itself over to it
+        expect(currentUrl()).toBe(
+          `/movie/tt0000001?q=1&cardType=${cardType}&cardId=${String(tmdbId)}`,
+        );
+        expect(card).toHaveClass("selected");
+        expect(card).not.toHaveClass("expanded");
+        expect(card.parentElement).toHaveClass("has-selection");
+        expect(section).toHaveClass("has-child-selection");
+        expect(section?.open).toBe(true);
+        expect(panel).toHaveClass("has-child-selection");
+        expect(movieCard).toHaveClass("expanded");
+        expect(screen.queryByTestId(targetTestId)).not.toBeInTheDocument();
+
+        // Step 2: once the card has arrived, its item's own URL replaces the
+        // movie panel with the item's panel, hosted by a stand-in card that
+        // grows out of the flown card's spot
+        const targetPanel = await screen.findByTestId(targetTestId);
+        expect(currentUrl()).toBe(`/${targetKind}/${String(tmdbId)}?q=1`);
+        expect(panel).not.toBeInTheDocument();
         expect(movieCard).not.toHaveClass("selected");
-        expect(movieCard).not.toHaveClass("expanded");
         expect(movieCard).toHaveClass("deselecting");
-        expect(moviePanel).not.toBeInTheDocument();
-        // ...and the person (who is no search result) gets a stand-in card
-        // that is shown already expanded, with the results still hidden
-        const personPanel = await screen.findByTestId("person-panel");
-        const personCard = personPanel.closest("#search-card");
-        expect(personCard).not.toBe(movieCard);
-        expect(personCard).toHaveClass("selected");
-        expect(personCard).toHaveClass("expanded");
+        const targetCard = targetPanel.closest("#search-card");
+        expect(targetCard).not.toBe(movieCard);
+        expect(targetCard).toHaveClass("selected");
+        expect(targetCard).toHaveClass("expanded");
+        expect(targetCard).toHaveClass("grow-in");
+        expect(targetCard).toHaveClass("stand-in");
         expect(
           container.querySelectorAll("#search-card.selected"),
         ).toHaveLength(1);
-        expect(container.querySelector(".results-container")).toHaveClass(
-          "has-selection",
-        );
         expect(
-          within(personPanel).getByRole("heading", { name }),
+          within(targetPanel).getByRole("heading", { name }),
         ).toBeInTheDocument();
         expect(screen.queryByText("8 results.")).not.toBeInTheDocument();
       },
     );
 
-    it("Should scroll to the top of the page", async () => {
+    it("Should scroll to the top of the page once the new panel opens", async () => {
       const scrollTo = vi
         .spyOn(window, "scrollTo")
         .mockImplementation(() => undefined);
       await searchAndSelectExampleMovie();
-      const moviePanel = await screen.findByTestId("movie-panel");
+      const panel = await screen.findByTestId("movie-panel");
 
-      fireEvent.click(findPersonCard(moviePanel, "cast-card", "Example Brown"));
+      fireEvent.click(findCard(panel, "cast-card", "Example Brown"));
+      expect(scrollTo).not.toHaveBeenCalled();
+      await screen.findByTestId("person-panel");
       expect(scrollTo).toHaveBeenCalledWith({ top: 0 });
     });
 
-    it("Should bring the movie panel back on browser back, and the person's panel on forward", async () => {
+    it("Should fly the card home instead of opening its panel when the flying card is clicked again", async () => {
+      const { currentUrl } = await searchAndSelectExampleMovie();
+      const panel = await screen.findByTestId("movie-panel");
+      const card = findCard(panel, "cast-card", "Example Brown");
+
+      fireEvent.click(card);
+      expect(card).toHaveClass("selected");
+      fireEvent.click(card);
+      await waitFor(() => {
+        expect(currentUrl()).toBe("/movie/tt0000001?q=1");
+      });
+      expect(card).not.toHaveClass("selected");
+      expect(card).not.toHaveClass("highlighted");
+      expect(card).toHaveClass("deselecting");
+      expect(panel).not.toHaveClass("has-child-selection");
+
+      // Waiting out the flight
+      await act(
+        () => new Promise((resolve) => setTimeout(resolve, CARD_FLY_MS + 100)),
+      );
+      expect(currentUrl()).toBe("/movie/tt0000001?q=1");
+      expect(screen.queryByTestId("person-panel")).not.toBeInTheDocument();
+    });
+
+    it("Should shrink the new panel back into the card on browser back, which then flies home highlighted, and unhighlight it on a second back", async () => {
       const { currentUrl, container, movieCard, goBack, goForward } =
         await searchAndSelectExampleMovie();
-      const moviePanel = await screen.findByTestId("movie-panel");
-      fireEvent.click(findPersonCard(moviePanel, "cast-card", "Example Brown"));
-      const personPanel = await screen.findByTestId("person-panel");
+      const panel = await screen.findByTestId("movie-panel");
+      fireEvent.click(findCard(panel, "cast-card", "Example Brown"));
+      const targetPanel = await screen.findByTestId("person-panel");
+      const targetCard = targetPanel.closest("#search-card");
+      const cardUrl = "/movie/tt0000001?q=1&cardType=cast&cardId=2";
+
+      await goBack();
+      expect(currentUrl()).toBe(cardUrl);
+      // The stand-in card shrinks back to card size first...
+      expect(targetCard).toHaveClass("selected");
+      expect(targetCard).not.toHaveClass("expanded");
+      expect(targetPanel).not.toBeInTheDocument();
+      expect(movieCard).not.toHaveClass("selected");
+      // ...then the movie's own card hosts its panel again at once, with
+      // the card in the corner the stand-in shrank into...
+      await waitFor(() => {
+        expect(movieCard).toHaveClass("expanded");
+      });
+      expect(targetCard).not.toBeInTheDocument();
+      const panelAgain = screen.getByTestId("movie-panel");
+      const card = findCard(panelAgain, "cast-card", "Example Brown");
+      // ...from where it flies home, highlighted, while the rest of the panel
+      // comes back into view around it
+      await waitFor(() => {
+        expect(card).toHaveClass("highlighted");
+      });
+      expect(card).toHaveClass("deselecting");
+      expect(card).not.toHaveClass("selected");
+      expect(panelAgain).not.toHaveClass("has-child-selection");
+      expect(card.parentElement).not.toHaveClass("has-selection");
+      expect(card.closest("details")).not.toHaveClass("has-child-selection");
+      expect(card.closest("details")?.open).toBe(true);
+      expect(container.querySelectorAll("#search-card")).toHaveLength(8);
 
       await goBack();
       expect(currentUrl()).toBe("/movie/tt0000001?q=1");
-      expect(personPanel).not.toBeInTheDocument();
-      // The movie's own card hosts its panel again, shown expanded at once,
-      // and the person's stand-in card is gone
-      expect(movieCard).toHaveClass("selected");
+      expect(card).not.toHaveClass("highlighted");
+      expect(card).not.toHaveClass("selected");
+      expect(card.closest("details")?.open).toBe(true);
       expect(movieCard).toHaveClass("expanded");
-      expect(movieCard).not.toHaveClass("deselecting");
-      expect(movieCard).toContainElement(
-        await screen.findByTestId("movie-panel"),
+
+      // Forward highlights the card where it is, with no flight (it's not
+      // selected, which is what flies), and without opening its panel by
+      // itself: that only ever follows a click
+      await goForward();
+      expect(currentUrl()).toBe(cardUrl);
+      expect(card).toHaveClass("highlighted");
+      expect(card).not.toHaveClass("selected");
+      expect(panelAgain).not.toHaveClass("has-child-selection");
+      await act(
+        () => new Promise((resolve) => setTimeout(resolve, CARD_FLY_MS + 100)),
       );
-      expect(container.querySelectorAll("#search-card")).toHaveLength(8);
+      expect(currentUrl()).toBe(cardUrl);
+      expect(screen.queryByTestId("person-panel")).not.toBeInTheDocument();
 
       await goForward();
       expect(currentUrl()).toBe("/person/2?q=1");
-      expect(movieCard).toHaveClass("deselecting");
       await screen.findByTestId("person-panel");
+      expect(movieCard).toHaveClass("deselecting");
       expect(container.querySelectorAll("#search-card")).toHaveLength(9);
+    });
+
+    it("Should push the URL without the card when the highlighted card is clicked, and nothing else", async () => {
+      const { currentUrl, container, movieCard, goBack, goForward } =
+        await searchAndSelectExampleMovie();
+      const panel = await screen.findByTestId("movie-panel");
+      fireEvent.click(findCard(panel, "cast-card", "Example Brown"));
+      await screen.findByTestId("person-panel");
+      await goBack();
+      await waitFor(() => {
+        expect(movieCard).toHaveClass("expanded");
+      });
+      const card = findCard(
+        screen.getByTestId("movie-panel"),
+        "cast-card",
+        "Example Brown",
+      );
+      await waitFor(() => {
+        expect(card).toHaveClass("highlighted");
+      });
+
+      fireEvent.click(card);
+      await waitFor(() => {
+        expect(currentUrl()).toBe("/movie/tt0000001?q=1");
+      });
+      expect(card).not.toHaveClass("highlighted");
+      expect(card).not.toHaveClass("selected");
+      expect(card.closest("details")?.open).toBe(true);
+      expect(container.querySelectorAll(".highlighted")).toHaveLength(0);
+
+      // The URL was pushed, not popped: the forward history (the panel that
+      // was opened from the card) is gone, and back returns to the card
+      // highlighted
+      await goForward();
+      expect(currentUrl()).toBe("/movie/tt0000001?q=1");
+      await goBack();
+      expect(currentUrl()).toBe("/movie/tt0000001?q=1&cardType=cast&cardId=2");
+    });
+  });
+
+  describe("When a movie URL naming a card is loaded directly", () => {
+    it("Should show the whole panel with the card highlighted in its place and only its section open", async () => {
+      const url = "/movie/tt0000001?q=1&cardType=writers&cardId=4";
+      const { currentUrl } = renderApp(url);
+      const panel = await screen.findByTestId("movie-panel");
+      expect(panel).not.toHaveClass("has-child-selection");
+      expect(
+        within(panel).getByRole("heading", { level: 2 }),
+      ).toBeInTheDocument();
+      const card = findCard(panel, "crew-card", "Example Writer");
+      expect(card).toHaveClass("highlighted");
+      expect(card).not.toHaveClass("selected");
+      expect(card).not.toHaveClass("deselecting");
+      expect(card.parentElement).not.toHaveClass("has-selection");
+      const section = card.closest("details");
+      expect(section).not.toHaveClass("has-child-selection");
+      expect(section?.open).toBe(true);
+      expect(screen.getByText("Directors").closest("details")?.open).toBe(
+        false,
+      );
+
+      await act(
+        () => new Promise((resolve) => setTimeout(resolve, CARD_FLY_MS + 100)),
+      );
+      expect(currentUrl()).toBe(url);
+      expect(screen.queryByTestId("person-panel")).not.toBeInTheDocument();
     });
   });
 });

@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect, useRef } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import "./shared.css";
 
 interface CollapsibleProps {
@@ -23,6 +23,10 @@ function Collapsible({
   children,
 }: CollapsibleProps) {
   const detailsRef = useRef<HTMLDetailsElement>(null);
+  // Open from the very first paint when forced open from the start (e.g. a
+  // directly loaded URL selecting a card inside); later changes go through
+  // the effect below, so the attribute itself never changes afterwards.
+  const [initiallyOpen] = useState(forceOpen ?? false);
 
   useEffect(() => {
     if (forceOpen && detailsRef.current) {
@@ -33,6 +37,7 @@ function Collapsible({
   return (
     <details
       ref={detailsRef}
+      open={initiallyOpen}
       className={`collapsible${childSelected ? " has-child-selection" : ""}`}
     >
       <summary>

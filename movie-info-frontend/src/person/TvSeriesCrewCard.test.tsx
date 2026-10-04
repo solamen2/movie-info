@@ -20,7 +20,15 @@ const credit: PersonTvSeriesCrew = {
 
 describe("TvSeriesCrewCard", () => {
   it("Should label the date of the person's first credit as their first appearance", () => {
-    render(<TvSeriesCrewCard credit={credit} onClick={() => undefined} />);
+    render(
+      <TvSeriesCrewCard
+        credit={credit}
+        selected={false}
+        deselecting={false}
+        highlighted={false}
+        onClick={() => undefined}
+      />,
+    );
     expect(screen.getByTestId("tv-series-crew-card").textContent).toBe(
       "No imageExample ShowExecutive Producer22 episodesFirst appearance:Oct 2, 2001",
     );
@@ -30,6 +38,9 @@ describe("TvSeriesCrewCard", () => {
     render(
       <TvSeriesCrewCard
         credit={{ ...credit, firstCreditAirDate: null }}
+        selected={false}
+        deselecting={false}
+        highlighted={false}
         onClick={() => undefined}
       />,
     );

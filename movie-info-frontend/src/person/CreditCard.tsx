@@ -1,6 +1,8 @@
+import ExpandableCard from "../shared/ExpandableCard";
+import { type PanelCardProps } from "../shared/usePanelCards";
 import { displayDate, getTmdbImageUrl } from "../utilities/utilities";
 
-interface CreditCardProps {
+interface CreditCardProps extends PanelCardProps {
   testId: string;
   posterPath: string | null;
   title: string;
@@ -10,11 +12,12 @@ interface CreditCardProps {
   date: string | null;
   dateLabel?: string;
   episodeCount?: number;
-  // Called when the card is clicked; the caller opens the credit's panel.
-  onClick: () => void;
 }
 
-// Shared layout for the movie / TV series cast / crew credit cards.
+// Shared layout for the movie / TV series cast / crew credit cards. The card
+// can be selected (highlighted and flown to its panel's corner) on the way to
+// the movie's / TV series' own panel, or highlighted in its place; see
+// usePanelCards.
 function CreditCard({
   testId,
   posterPath,
@@ -24,12 +27,23 @@ function CreditCard({
   date,
   dateLabel,
   episodeCount,
+  selected,
+  deselecting,
+  highlighted,
   onClick,
 }: CreditCardProps) {
   const imageUrl = getTmdbImageUrl(posterPath, "w185");
 
   return (
-    <div className="credit-card" data-testid={testId} onClick={onClick}>
+    <ExpandableCard
+      className="credit-card"
+      testId={testId}
+      selected={selected}
+      deselecting={deselecting}
+      highlighted={highlighted}
+      expanded={false}
+      onClick={onClick}
+    >
       {imageUrl ? (
         <img
           src={imageUrl}
@@ -56,7 +70,7 @@ function CreditCard({
         <p className="credit-card-secondary">{dateLabel}:</p>
       )}
       {date && <p className="credit-card-secondary">{displayDate(date)}</p>}
-    </div>
+    </ExpandableCard>
   );
 }
 

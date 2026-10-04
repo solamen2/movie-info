@@ -1151,20 +1151,30 @@ test("Panel to panel: open a movie, open a cast member's person panel from it, o
   await movieCard.click();
   const moviePanel = page.getByTestId("movie-panel");
   await expect(moviePanel).toBeVisible();
-  const movieUrl = new RegExp(`/movie/${expectedMovie.imdbId}\\?q=[^/]+$`);
+  const movieUrl = new RegExp(`/movie/${expectedMovie.imdbId}\\?q=[^/&]+$`);
   await expect(page).toHaveURL(movieUrl);
   const expandedCard = page.locator("#search-card.selected.expanded");
 
-  console.log("Opening a cast member's person panel from the movie panel...");
+  console.log("Clicking a cast card in the movie panel...");
   const castCard = await openSectionCard(
     moviePanel,
     "Cast",
     "cast-card",
     expectedMovie.castMember,
   );
+  const castUnselectedColor = await getUnselectedColor(castCard);
   await castCard.click();
-  // The person is only known by TMDB id, so that is what the URL carries
-  const personUrl = /\/person\/\d+\?q=[^/]+$/;
+  // First the URL names the card, which is highlighted and flies to the
+  // panel's corner while the panel hands itself over to it...
+  const castCardUrl = new RegExp(
+    `/movie/${expectedMovie.imdbId}\\?q=[^/&]+&cardType=cast&cardId=\\d+$`,
+  );
+  await expect(page).toHaveURL(castCardUrl);
+  await expect(castCard).toHaveClass(/selected/);
+  await expect(moviePanel).toHaveClass(/has-child-selection/);
+  // ...then the person's own URL (the person is only known by TMDB id)
+  // replaces the movie panel with their panel
+  const personUrl = /\/person\/\d+\?q=[^/&]+$/;
   await expect(page).toHaveURL(personUrl);
   await expect(moviePanel).toBeHidden();
   const personPanel = page.getByTestId("person-panel");
@@ -1178,18 +1188,26 @@ test("Panel to panel: open a movie, open a cast member's person panel from it, o
   ).toBeVisible();
   await expect(resultsMessage).toBeHidden();
   expect(await page.evaluate(() => window.scrollY)).toBe(0);
-  console.log("Checking the person panel is not highlighted...");
+  console.log(
+    "Checking the person panel's highlight faded out and stays away...",
+  );
+  await expectHighlightFadedOut(expandedCard);
   await expectNeverHighlighted(page, expandedCard, personPanel);
 
-  console.log("Opening one of the person's movie credits from their panel...");
+  console.log("Clicking one of the person's movie credits in their panel...");
   const creditCard = await openSectionCard(
     personPanel,
     "Movie Cast Credits",
     "movie-cast-card",
     expectedMovie.castMemberMovieCredit,
   );
+  const creditUnselectedColor = await getUnselectedColor(creditCard);
   await creditCard.click();
-  const creditUrl = /\/movie\/\d+\?q=[^/]+$/;
+  const creditCardUrl =
+    /\/person\/\d+\?q=[^/&]+&cardType=movie-cast-credits&cardId=\d+$/;
+  await expect(page).toHaveURL(creditCardUrl);
+  await expect(creditCard).toHaveClass(/selected/);
+  const creditUrl = /\/movie\/\d+\?q=[^/&]+$/;
   await expect(page).toHaveURL(creditUrl);
   await expect(personPanel).toBeHidden();
   await expect(moviePanel).toBeVisible();
@@ -1201,12 +1219,36 @@ test("Panel to panel: open a movie, open a cast member's person panel from it, o
     }),
   ).toBeVisible();
 
-  console.log("Going back to the person panel with the browser...");
+  console.log("Going back, which shows the credit card highlighted...");
   await page.goBack();
-  await expect(page).toHaveURL(personUrl);
+  await expect(page).toHaveURL(creditCardUrl);
   await expect(moviePanel).toBeHidden();
   await expect(personPanel).toBeVisible();
-  await expect(expandedCard).toHaveCount(1);
+  // The card flies home from the corner and rests highlighted in its row,
+  // with the rest of the panel back in view around it
+  const highlightedCredit = personPanel.locator(
+    "[data-testid='movie-cast-card'].highlighted",
+  );
+  await expect(personPanel).not.toHaveClass(/has-child-selection/);
+  await expect(
+    personPanel.getByRole("heading", {
+      name: expectedMovie.castMember,
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(personPanel.locator(".detail-panel-top")).toBeVisible();
+  await expect(highlightedCredit).toHaveCount(1);
+  await expect(highlightedCredit).toContainText(
+    expectedMovie.castMemberMovieCredit,
+  );
+  await page.waitForTimeout(HIGHLIGHT_SETTLE_MS);
+  expect(isHighlighted(await getBorderColor(highlightedCredit))).toBe(true);
+
+  console.log("Going back again, which unhighlights the credit card...");
+  await page.goBack();
+  await expect(page).toHaveURL(personUrl);
+  await expect(highlightedCredit).toHaveCount(0);
+  await expectHighlightGone(page, creditCard, creditUnselectedColor);
   await expect(
     personPanel.getByRole("heading", {
       name: expectedMovie.castMember,
@@ -1226,12 +1268,29 @@ test("Panel to panel: open a movie, open a cast member's person panel from it, o
     }),
   ).toBeVisible();
 
-  console.log("Going back to the movie panel with the browser...");
+  console.log("Going back, which shows the cast card highlighted...");
   await page.goBack();
-  await expect(page).toHaveURL(movieUrl);
+  await expect(page).toHaveURL(castCardUrl);
   await expect(personPanel).toBeHidden();
   await expect(moviePanel).toBeVisible();
-  await expect(expandedCard).toHaveCount(1);
+  const highlightedCast = moviePanel.locator(
+    "[data-testid='cast-card'].highlighted",
+  );
+  await expect(moviePanel).not.toHaveClass(/has-child-selection/);
+  await expect(
+    moviePanel.getByRole("heading", { name: expectedMovie.title, exact: true }),
+  ).toBeVisible();
+  await expect(moviePanel.locator(".detail-panel-top")).toBeVisible();
+  await expect(highlightedCast).toHaveCount(1);
+  await expect(highlightedCast).toContainText(expectedMovie.castMember);
+  await page.waitForTimeout(HIGHLIGHT_SETTLE_MS);
+  expect(isHighlighted(await getBorderColor(highlightedCast))).toBe(true);
+
+  console.log("Going back again, which unhighlights the cast card...");
+  await page.goBack();
+  await expect(page).toHaveURL(movieUrl);
+  await expect(highlightedCast).toHaveCount(0);
+  await expectHighlightGone(page, castCard, castUnselectedColor);
   await expect(
     moviePanel.getByRole("heading", { name: expectedMovie.title, exact: true }),
   ).toBeVisible();

@@ -1,12 +1,12 @@
 import CreditCard from "./CreditCard";
+import { type PanelCardProps } from "../shared/usePanelCards";
 import { type PersonTvSeriesCast } from "./personTypes";
 
-interface TvSeriesCastCardProps {
+interface TvSeriesCastCardProps extends PanelCardProps {
   credit: PersonTvSeriesCast;
-  onClick: () => void;
 }
 
-function TvSeriesCastCard({ credit, onClick }: TvSeriesCastCardProps) {
+function TvSeriesCastCard({ credit, ...cardProps }: TvSeriesCastCardProps) {
   return (
     <CreditCard
       testId="tv-series-cast-card"
@@ -19,7 +19,7 @@ function TvSeriesCastCard({ credit, onClick }: TvSeriesCastCardProps) {
         credit.firstCreditAirDate ? "First appearance" : "First air date"
       }
       episodeCount={credit.episodeCount}
-      onClick={onClick}
+      {...cardProps}
     />
   );
 }

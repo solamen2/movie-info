@@ -1,12 +1,12 @@
 import PersonCard from "../shared/PersonCard";
+import { type PanelCardProps } from "../shared/usePanelCards";
 import { type TvSeriesCrew, displayEpisodeCount } from "./tvSeriesTypes";
 
-interface CrewCardProps {
+interface CrewCardProps extends PanelCardProps {
   crew: TvSeriesCrew;
-  onClick: () => void;
 }
 
-function CrewCard({ crew, onClick }: CrewCardProps) {
+function CrewCard({ crew, ...cardProps }: CrewCardProps) {
   const jobs = crew.jobs.filter((j) => j !== "").join(", ");
 
   return (
@@ -21,7 +21,7 @@ function CrewCard({ crew, onClick }: CrewCardProps) {
           ? displayEpisodeCount(crew.totalEpisodeCount)
           : "",
       ]}
-      onClick={onClick}
+      {...cardProps}
     />
   );
 }

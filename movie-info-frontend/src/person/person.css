@@ -6,8 +6,9 @@
 }
 
 /* Cards shown in the horizontally scrolling credit rows. They open the
-   movie's / TV series' own panel when clicked (see useOpenDetail), like the
-   search result cards, so they get the same hover cue. */
+   movie's / TV series' own panel when clicked (see usePanelCards), like the
+   search result cards, so they get the same hover cue. Their select /
+   deselect animation classes come from .expandable-card in shared.css. */
 .credit-card {
   flex: 0 0 auto;
   width: 120px;
@@ -18,7 +19,7 @@
   cursor: pointer;
 }
 
-.credit-card:hover {
+.credit-card:not(.selected):not(.highlighted):hover {
   border-color: #888;
 }
 

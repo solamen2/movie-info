@@ -1,11 +1,11 @@
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode } from "react";
 import type { TmdbGender } from "../shared/sharedTypes";
 import Collapsible from "../shared/Collapsible";
 import HorizontalList from "../shared/HorizontalList";
 import ImdbRow from "../shared/ImdbRow";
-import { useOpenDetail } from "../shared/useOpenDetail";
+import { useDetailData } from "../shared/useDetailData";
+import { usePanelCards } from "../shared/usePanelCards";
 import {
-  describeFailedLoad,
   detailIdQuery,
   displayAge,
   displayDate,
@@ -17,7 +17,7 @@ import MovieCrewCard from "./MovieCrewCard";
 import ProfileImagesList from "./ProfileImagesList";
 import TvSeriesCastCard from "./TvSeriesCastCard";
 import TvSeriesCrewCard from "./TvSeriesCrewCard";
-import { type Person, imdbNameUrl, sortByDateDescending } from "./personTypes";
+import { imdbNameUrl, sortByDateDescending } from "./personTypes";
 import "../shared/shared.css";
 import "./person.css";
 
@@ -34,42 +34,20 @@ interface PersonPanelProps {
 }
 
 // Shows a person. Their movie and TV series credit cards open the movie's /
-// TV series' own panel in place of this one (see useOpenDetail).
+// TV series' own panel in place of this one (see usePanelCards).
 function PersonPanel({ itemId }: PersonPanelProps) {
-  const [person, setPerson] = useState<Person | null>(null);
-  const [error, setError] = useState("");
-  const openDetail = useOpenDetail();
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    async function loadPerson() {
-      try {
-        const response = await fetch(`/api/person?${detailIdQuery(itemId)}`, {
-          signal: controller.signal,
-        });
-        if (!response.ok) {
-          setError(await describeFailedLoad("Loading person", response));
-          return;
-        }
-        const data = (await response.json()) as Person | null; // TODO: Maybe someday make this validation more robust
-        if (data == null) {
-          setError("No person details were found.");
-          return;
-        }
-        setPerson(data);
-      } catch {
-        if (!controller.signal.aborted) {
-          setError("An unexpected error occurred while loading the person.");
-        }
-      }
-    }
-
-    void loadPerson();
-    return () => {
-      controller.abort();
-    };
-  }, [itemId]);
+  const { data: person, error } = useDetailData(
+    `/api/person?${detailIdQuery(itemId)}`,
+    "person",
+  );
+  const cards = usePanelCards({
+    cardsIn: {
+      "movie-cast-credits": person?.movieCastCredits,
+      "movie-crew-credits": person?.movieCrewCredits,
+      "tv-series-cast-credits": person?.tvSeriesCastCredits,
+      "tv-series-crew-credits": person?.tvSeriesCrewCredits,
+    },
+  });
 
   if (error) {
     return (
@@ -103,6 +81,10 @@ function PersonPanel({ itemId }: PersonPanelProps) {
     person.tvSeriesCrewCredits,
     (c) => c.firstCreditAirDate ?? c.firstAirDate,
   );
+  const movieCastSelected = cards.isSelectedIn("movie-cast-credits");
+  const movieCrewSelected = cards.isSelectedIn("movie-crew-credits");
+  const tvSeriesCastSelected = cards.isSelectedIn("tv-series-cast-credits");
+  const tvSeriesCrewSelected = cards.isSelectedIn("tv-series-crew-credits");
 
   const age = getAge(person.birthday, person.deathday);
 
@@ -138,7 +120,10 @@ function PersonPanel({ itemId }: PersonPanelProps) {
   ];
 
   return (
-    <div className="detail-panel" data-testid="person-panel">
+    <div
+      className={`detail-panel fly-origin${cards.hasSelection ? " has-child-selection" : ""}`}
+      data-testid="person-panel"
+    >
       <div className="detail-panel-top">
         {person.image ? (
           <img
@@ -173,28 +158,32 @@ function PersonPanel({ itemId }: PersonPanelProps) {
             {displayText(person.biography)}
           </p>
         </Collapsible>
-        <Collapsible title="Movie Cast Credits" count={movieCastCredits.length}>
-          <HorizontalList>
+        <Collapsible
+          title="Movie Cast Credits"
+          count={movieCastCredits.length}
+          {...cards.sectionProps("movie-cast-credits")}
+        >
+          <HorizontalList hasSelection={movieCastSelected}>
             {movieCastCredits.map((c) => (
               <MovieCastCard
                 key={c.id}
                 credit={c}
-                onClick={() => {
-                  openDetail("movie", c.tmdbId);
-                }}
+                {...cards.cardProps("movie-cast-credits", "movie", c.tmdbId)}
               />
             ))}
           </HorizontalList>
         </Collapsible>
-        <Collapsible title="Movie Crew Credits" count={movieCrewCredits.length}>
-          <HorizontalList>
+        <Collapsible
+          title="Movie Crew Credits"
+          count={movieCrewCredits.length}
+          {...cards.sectionProps("movie-crew-credits")}
+        >
+          <HorizontalList hasSelection={movieCrewSelected}>
             {movieCrewCredits.map((c) => (
               <MovieCrewCard
                 key={c.id}
                 credit={c}
-                onClick={() => {
-                  openDetail("movie", c.tmdbId);
-                }}
+                {...cards.cardProps("movie-crew-credits", "movie", c.tmdbId)}
               />
             ))}
           </HorizontalList>
@@ -202,15 +191,18 @@ function PersonPanel({ itemId }: PersonPanelProps) {
         <Collapsible
           title="TV Series Cast Credits"
           count={tvSeriesCastCredits.length}
+          {...cards.sectionProps("tv-series-cast-credits")}
         >
-          <HorizontalList>
+          <HorizontalList hasSelection={tvSeriesCastSelected}>
             {tvSeriesCastCredits.map((c) => (
               <TvSeriesCastCard
                 key={c.id}
                 credit={c}
-                onClick={() => {
-                  openDetail("tvseries", c.tmdbId);
-                }}
+                {...cards.cardProps(
+                  "tv-series-cast-credits",
+                  "tvseries",
+                  c.tmdbId,
+                )}
               />
             ))}
           </HorizontalList>
@@ -218,15 +210,18 @@ function PersonPanel({ itemId }: PersonPanelProps) {
         <Collapsible
           title="TV Series Crew Credits"
           count={tvSeriesCrewCredits.length}
+          {...cards.sectionProps("tv-series-crew-credits")}
         >
-          <HorizontalList>
+          <HorizontalList hasSelection={tvSeriesCrewSelected}>
             {tvSeriesCrewCredits.map((c) => (
               <TvSeriesCrewCard
                 key={c.id}
                 credit={c}
-                onClick={() => {
-                  openDetail("tvseries", c.tmdbId);
-                }}
+                {...cards.cardProps(
+                  "tv-series-crew-credits",
+                  "tvseries",
+                  c.tmdbId,
+                )}
               />
             ))}
           </HorizontalList>

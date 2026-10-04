@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { imdbTitleUrl } from "../movie/movieTypes";
 import Collapsible from "../shared/Collapsible";
@@ -6,9 +6,9 @@ import HorizontalList from "../shared/HorizontalList";
 import ImdbRow from "../shared/ImdbRow";
 import WatchProviderSection from "../shared/WatchProviderSection";
 import { useCardSelection } from "../shared/useCardSelection";
+import { useDetailData } from "../shared/useDetailData";
 import NetworkCard from "../tvseries/NetworkCard";
 import {
-  describeFailedLoad,
   displayDate,
   displayText,
   getIntParam,
@@ -16,7 +16,6 @@ import {
   withQueryParams,
 } from "../utilities/utilities";
 import EpisodeCard from "./EpisodeCard";
-import { type TvSeason } from "./tvSeasonTypes";
 import "../shared/shared.css";
 import "./tvseason.css";
 
@@ -36,8 +35,14 @@ function TvSeasonPanel({
   seasonNumber,
   tvSeriesImdbId,
 }: TvSeasonPanelProps) {
-  const [tvSeason, setTvSeason] = useState<TvSeason | null>(null);
-  const [error, setError] = useState("");
+  const params = new URLSearchParams({
+    tmdbTvSeriesId: String(tmdbTvSeriesId),
+    seasonNumber: String(seasonNumber),
+  });
+  const { data: tvSeason, error } = useDetailData(
+    `/api/tvseason?${params.toString()}`,
+    "TV season",
+  );
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const navigate = useNavigate();
@@ -49,41 +54,6 @@ function TvSeasonPanel({
     hasCardFor: (id) =>
       tvSeason?.episodes.some((e) => String(e.episodeNumber) === id) ?? false,
   });
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    async function loadTvSeason() {
-      try {
-        const params = new URLSearchParams({
-          tmdbTvSeriesId: String(tmdbTvSeriesId),
-          seasonNumber: String(seasonNumber),
-        });
-        const response = await fetch(`/api/tvseason?${params.toString()}`, {
-          signal: controller.signal,
-        });
-        if (!response.ok) {
-          setError(await describeFailedLoad("Loading TV season", response));
-          return;
-        }
-        const data = (await response.json()) as TvSeason | null; // TODO: Maybe someday make this validation more robust
-        if (data == null) {
-          setError("No TV season details were found.");
-          return;
-        }
-        setTvSeason(data);
-      } catch {
-        if (!controller.signal.aborted) {
-          setError("An unexpected error occurred while loading the TV season.");
-        }
-      }
-    }
-
-    void loadTvSeason();
-    return () => {
-      controller.abort();
-    };
-  }, [tmdbTvSeriesId, seasonNumber]);
 
   if (error) {
     return (

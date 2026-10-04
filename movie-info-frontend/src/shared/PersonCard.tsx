@@ -1,7 +1,9 @@
+import ExpandableCard from "./ExpandableCard";
+import { type PanelCardProps } from "./usePanelCards";
 import { getTmdbImageUrl } from "../utilities/utilities";
 import "./shared.css";
 
-interface PersonCardProps {
+interface PersonCardProps extends PanelCardProps {
   testId: string;
   name: string;
   originalName: string;
@@ -9,24 +11,36 @@ interface PersonCardProps {
   // Secondary lines shown under the name (character, job, episode count, ...);
   // empty ones are skipped.
   details: string[];
-  // Called when the card is clicked; the caller opens the person's panel.
-  onClick: () => void;
 }
 
 // Shared layout for the cast / crew / creator / guest star cards shown in the
 // horizontally scrolling rows of the movie, TV series and TV episode panels.
+// The card can be selected (highlighted and flown to its panel's corner) on
+// the way to the person's own panel, or highlighted in its place; see
+// usePanelCards.
 function PersonCard({
   testId,
   name,
   originalName,
   profilePath,
   details,
+  selected,
+  deselecting,
+  highlighted,
   onClick,
 }: PersonCardProps) {
   const imageUrl = getTmdbImageUrl(profilePath, "w185");
 
   return (
-    <div className="person-card" data-testid={testId} onClick={onClick}>
+    <ExpandableCard
+      className="person-card"
+      testId={testId}
+      selected={selected}
+      deselecting={deselecting}
+      highlighted={highlighted}
+      expanded={false}
+      onClick={onClick}
+    >
       {imageUrl ? (
         <img
           src={imageUrl}
@@ -50,7 +64,7 @@ function PersonCard({
             {detail}
           </p>
         ))}
-    </div>
+    </ExpandableCard>
   );
 }
 

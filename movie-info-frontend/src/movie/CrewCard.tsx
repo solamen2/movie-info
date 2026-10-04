@@ -1,12 +1,12 @@
 import PersonCard from "../shared/PersonCard";
+import { type PanelCardProps } from "../shared/usePanelCards";
 import { type MovieCrew } from "./movieTypes";
 
-interface CrewCardProps {
+interface CrewCardProps extends PanelCardProps {
   crew: MovieCrew;
-  onClick: () => void;
 }
 
-function CrewCard({ crew, onClick }: CrewCardProps) {
+function CrewCard({ crew, ...cardProps }: CrewCardProps) {
   return (
     <PersonCard
       testId="crew-card"
@@ -14,7 +14,7 @@ function CrewCard({ crew, onClick }: CrewCardProps) {
       originalName={crew.originalName}
       profilePath={crew.profilePath}
       details={[crew.job]}
-      onClick={onClick}
+      {...cardProps}
     />
   );
 }

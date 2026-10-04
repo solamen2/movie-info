@@ -1,12 +1,12 @@
 import CreditCard from "./CreditCard";
+import { type PanelCardProps } from "../shared/usePanelCards";
 import { type PersonMovieCast } from "./personTypes";
 
-interface MovieCastCardProps {
+interface MovieCastCardProps extends PanelCardProps {
   credit: PersonMovieCast;
-  onClick: () => void;
 }
 
-function MovieCastCard({ credit, onClick }: MovieCastCardProps) {
+function MovieCastCard({ credit, ...cardProps }: MovieCastCardProps) {
   return (
     <CreditCard
       testId="movie-cast-card"
@@ -15,7 +15,7 @@ function MovieCastCard({ credit, onClick }: MovieCastCardProps) {
       originalTitle={credit.originalTitle}
       role={credit.character}
       date={credit.releaseDate}
-      onClick={onClick}
+      {...cardProps}
     />
   );
 }

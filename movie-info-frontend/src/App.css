@@ -178,3 +178,37 @@
     opacity: 0;
   }
 }
+
+/* A stand-in card (see SuggestionSearch) is only ever seen collapsed for the
+   moment a panel shrinks back into the card inside another panel that opened
+   it (see "shrink" in useCardSelection), so it takes that card's footprint
+   rather than a result card's: a .person-card / .credit-card including its
+   padding and border, less this card's own. */
+.result-card.stand-in:not(.expanded) {
+  width: 110px;
+  min-height: 200px;
+}
+
+/* A card whose panel continues the flight a card made inside the previous
+   panel (see "grow" in useCardSelection) starts out at that card's footprint,
+   highlighted, and grows into its panel exactly as a card expanding in place
+   does. */
+@starting-style {
+  .result-card.grow-in {
+    opacity: 1;
+    width: 110px;
+    border-color: blue;
+  }
+}
+
+@media (max-width: 640px) {
+  .result-card.stand-in:not(.expanded) {
+    width: 90px;
+  }
+
+  @starting-style {
+    .result-card.grow-in {
+      width: 90px;
+    }
+  }
+}

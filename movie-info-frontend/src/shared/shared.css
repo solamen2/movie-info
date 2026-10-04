@@ -344,8 +344,11 @@
 /* Only a selected *card* is highlighted. Once it grows into a panel the
    highlight fades out as it expands, and fades back in as the panel shrinks
    to a card again. A panel is never highlighted, so one shown already
-   expanded (e.g. a directly loaded URL) never is either. */
-.expandable-card.selected:not(.expanded) {
+   expanded (e.g. a directly loaded URL) never is either. A card the URL names
+   inside a panel is highlighted where it is, flight or no flight (see
+   usePanelCards). */
+.expandable-card.selected:not(.expanded),
+.expandable-card.highlighted {
   border-color: blue;
 }
 
@@ -428,14 +431,15 @@
   text-align: center;
 }
 
-/* Person cards open the person's own panel when clicked (see useOpenDetail),
-   like the search result cards, so they get the same hover cue. */
+/* Person cards open the person's own panel when clicked (see usePanelCards),
+   like the search result cards, so they get the same hover cue. Their
+   select / deselect animation classes come from .expandable-card above. */
 .person-card {
   width: 120px;
   cursor: pointer;
 }
 
-.person-card:hover {
+.person-card:not(.selected):not(.highlighted):hover {
   border-color: #888;
 }
 

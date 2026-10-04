@@ -1,7 +1,7 @@
 import { type SubmitEvent, useEffect, useEffectEvent, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import SuggestionSearchCard, { type Suggestion } from "./SuggestionSearchCard";
-import { useCardSelection } from "../shared/useCardSelection";
+import { type ReplaceMode, useCardSelection } from "../shared/useCardSelection";
 import {
   describeFailedLoad,
   detailPath,
@@ -56,7 +56,8 @@ interface SuggestionSearchProps {
 // directly loaded URLs behave exactly like clicks. Cards inside a panel (a
 // movie's cast, say) navigate to their own detail URL the same way (see
 // useOpenDetail), so the new panel replaces the old one here, hosted by a
-// placeholder card, and browser back returns to the old one.
+// stand-in card, and browser back returns to the old one, with the clicked
+// card highlighted (`?cardType=…&cardId=…`, see usePanelCards).
 function SuggestionSearch({ panelKind }: SuggestionSearchProps) {
   const { itemId } = useParams();
   const [searchParams] = useSearchParams();
@@ -65,6 +66,14 @@ function SuggestionSearch({ panelKind }: SuggestionSearchProps) {
   const targetItemId = panelKind
     ? (itemId ?? null)
     : searchParams.get("selected");
+  // A URL that highlights a card inside the panel is where going back from a
+  // panel opened from that card lands: the panel then shrinks into the card.
+  // Any other switch between panels grows the new panel out of the card that
+  // was flown to the corner at the previous URL (see useOpenDetail).
+  const replaceMode: ReplaceMode =
+    searchParams.get("cardType") !== null && searchParams.get("cardId") !== null
+      ? "shrink"
+      : "grow";
 
   const [searchQuery, setSearchQuery] = useState(query);
   // null until a search for the current query has succeeded.
@@ -75,13 +84,15 @@ function SuggestionSearch({ panelKind }: SuggestionSearchProps) {
   // The query the results above were last synced to.
   const [syncedQuery, setSyncedQuery] = useState(query);
 
-  const { selectedId, previouslySelectedId, expandedId } = useCardSelection({
-    targetId: targetItemId,
-    opensPanel: panelKind !== undefined,
-    hasCardFor: (id) => results?.some((r) => r.itemID === id) ?? false,
-    // Every search (including re-running the same query) replaces the cards
-    resetKey: `${String(searchAttempt)}:${query}`,
-  });
+  const { selectedId, previouslySelectedId, expandedId, growingId } =
+    useCardSelection({
+      targetId: targetItemId,
+      opensPanel: panelKind !== undefined,
+      hasCardFor: (id) => results?.some((r) => r.itemID === id) ?? false,
+      // Every search (including re-running the same query) replaces the cards
+      resetKey: `${String(searchAttempt)}:${query}`,
+      replaceMode,
+    });
 
   const searchMessage =
     results === null
@@ -91,10 +102,13 @@ function SuggestionSearch({ panelKind }: SuggestionSearchProps) {
         : `${String(results.length)} results.`;
   const hasCardForSelected =
     results?.some((r) => r.itemID === selectedId) ?? false;
-  const displayedResults =
+  const standIn =
     selectedId && panelKind && !hasCardForSelected
-      ? [placeholderSuggestion(selectedId, panelKind), ...(results ?? [])]
-      : (results ?? []);
+      ? placeholderSuggestion(selectedId, panelKind)
+      : null;
+  const displayedResults = standIn
+    ? [standIn, ...(results ?? [])]
+    : (results ?? []);
 
   // A new query means a new page of results; sync during render so the very
   // next paint already reflects it (see "Adjusting some state when a prop
@@ -270,6 +284,8 @@ function SuggestionSearch({ panelKind }: SuggestionSearchProps) {
             deselecting={
               previouslySelectedId === item.itemID && selectedId !== item.itemID
             }
+            growIn={growingId === item.itemID}
+            standIn={item === standIn}
             mediaType={item.mediaType?.value ?? null}
             // The URL decides which panel the selected item opens; other cards
             // open whatever their own result type implies.

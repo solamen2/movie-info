@@ -1,12 +1,12 @@
 import PersonCard from "../shared/PersonCard";
+import { type PanelCardProps } from "../shared/usePanelCards";
 import { type MovieCast } from "./movieTypes";
 
-interface CastCardProps {
+interface CastCardProps extends PanelCardProps {
   cast: MovieCast;
-  onClick: () => void;
 }
 
-function CastCard({ cast, onClick }: CastCardProps) {
+function CastCard({ cast, ...cardProps }: CastCardProps) {
   return (
     <PersonCard
       testId="cast-card"
@@ -14,7 +14,7 @@ function CastCard({ cast, onClick }: CastCardProps) {
       originalName={cast.originalName}
       profilePath={cast.profilePath}
       details={[cast.character]}
-      onClick={onClick}
+      {...cardProps}
     />
   );
 }

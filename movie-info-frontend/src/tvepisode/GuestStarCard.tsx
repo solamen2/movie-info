@@ -1,12 +1,12 @@
 import PersonCard from "../shared/PersonCard";
+import { type PanelCardProps } from "../shared/usePanelCards";
 import { type TvEpisodeGuestStar } from "./tvEpisodeTypes";
 
-interface GuestStarCardProps {
+interface GuestStarCardProps extends PanelCardProps {
   guestStar: TvEpisodeGuestStar;
-  onClick: () => void;
 }
 
-function GuestStarCard({ guestStar, onClick }: GuestStarCardProps) {
+function GuestStarCard({ guestStar, ...cardProps }: GuestStarCardProps) {
   return (
     <PersonCard
       testId="guest-star-card"
@@ -14,7 +14,7 @@ function GuestStarCard({ guestStar, onClick }: GuestStarCardProps) {
       originalName={guestStar.originalName}
       profilePath={guestStar.profilePath}
       details={[guestStar.character]}
-      onClick={onClick}
+      {...cardProps}
     />
   );
 }

@@ -1,12 +1,12 @@
 import PersonCard from "../shared/PersonCard";
+import { type PanelCardProps } from "../shared/usePanelCards";
 import { type TvSeriesCreator } from "./tvSeriesTypes";
 
-interface CreatorCardProps {
+interface CreatorCardProps extends PanelCardProps {
   creator: TvSeriesCreator;
-  onClick: () => void;
 }
 
-function CreatorCard({ creator, onClick }: CreatorCardProps) {
+function CreatorCard({ creator, ...cardProps }: CreatorCardProps) {
   return (
     <PersonCard
       testId="creator-card"
@@ -14,7 +14,7 @@ function CreatorCard({ creator, onClick }: CreatorCardProps) {
       originalName={creator.originalName}
       profilePath={creator.profilePath}
       details={[]}
-      onClick={onClick}
+      {...cardProps}
     />
   );
 }

@@ -11,6 +11,12 @@ interface ExpandableCardProps {
   // ignored so interacting with the panel doesn't deselect it — the browser's
   // back button / ESC key handle that instead.
   expanded: boolean;
+  // When true the card is shown expanded from the start but grows into its
+  // panel from card size (see "grow" in useCardSelection).
+  growIn?: boolean;
+  // When true the card is highlighted where it is, without any flight (a card
+  // inside a panel that the URL names, see usePanelCards).
+  highlighted?: boolean;
   onClick?: () => void;
   children: ReactNode;
 }
@@ -56,6 +62,8 @@ function ExpandableCard({
   selected,
   deselecting,
   expanded,
+  growIn = false,
+  highlighted = false,
   onClick,
   children,
 }: ExpandableCardProps) {
@@ -69,22 +77,29 @@ function ExpandableCard({
   // their fade-out ends), so the offset is still the card's slot. Selection
   // can be triggered by the browser's back / forward buttons as well as by a
   // click, which is why this lives here rather than in a click handler.
+  // The offset is captured again on becoming deselecting, for the flight home:
+  // the other content is back in layout by then (its `display` returns at the
+  // start of its fade-in), so this normally measures the same slot — but a
+  // card shown in the corner from the start (see usePanelCards) only now has a
+  // slot to fly home to.
   useLayoutEffect(() => {
     const card = cardRef.current;
-    if (selected && card) {
+    if ((selected || deselecting) && card) {
       const origin =
         card.parentElement?.closest<HTMLElement>(".fly-origin") ?? null;
       const { x, y } = offsetWithin(card, origin);
       card.style.setProperty("--orig-x", `${String(x)}px`);
       card.style.setProperty("--orig-y", `${String(y)}px`);
     }
-  }, [selected]);
+  }, [selected, deselecting]);
 
   const classes =
     `${className} expandable-card` +
     (selected ? " selected" : "") +
     (deselecting ? " deselecting" : "") +
-    (expanded ? " expanded" : "");
+    (expanded ? " expanded" : "") +
+    (growIn ? " grow-in" : "") +
+    (highlighted ? " highlighted" : "");
 
   return (
     <div
