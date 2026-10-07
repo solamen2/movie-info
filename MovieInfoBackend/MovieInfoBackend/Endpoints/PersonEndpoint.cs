@@ -25,6 +25,7 @@ public class PersonEndpoint
                 ClaimsPrincipal user,
                 [FromServices] SuggestionHttpClient suggestionHttpClient,
                 [FromServices] TmdbHttpClient tmdbHttpClient,
+                [FromServices] WikipediaHttpClient wikipediaHttpClient,
                 [FromServices] IMemoryCache cache) =>
             {
                 IResult? personViewModelJson;
@@ -64,15 +65,18 @@ public class PersonEndpoint
                         Task<TmdbPersonMovieCreditsResponseDataModel?> tmdbPersonMovieCreditsTask = GetTmdbPersonMovieCreditsResponseDataModel(tmdbPersonId, tmdbHttpClient);
                         Task<TmdbPersonTvSeriesCreditsResponseDataModel?> tmdbPersonTvSeriesCreditsTask = GetTmdbPersonTvSeriesCreditsResponseDataModel(tmdbPersonId, tmdbHttpClient);
                         Task<TmdbPersonImagesResponseDataModel?> tmdbPersonImagesTask = GetTmdbPersonImagesResponseDataModel(tmdbPersonId, tmdbHttpClient);
+                        // Wikipedia is searched by the name from the suggestion, so that lookup can only start once the suggestion is in
+                        SuggestionViewModel? personSuggestionViewModel = await suggestionTask;
+                        Task<string?> wikipediaLinkTask = GetWikipediaLink(personSuggestionViewModel?.Name, wikipediaHttpClient);
 
                         // NOTE: Strictly speaking, this is not needed, but it's a good marker for when all tasks have been started
-                        await Task.WhenAll(suggestionTask, tmdbPersonTask, tmdbPersonMovieCreditsTask, tmdbPersonTvSeriesCreditsTask, tmdbPersonImagesTask);
+                        await Task.WhenAll(tmdbPersonTask, tmdbPersonMovieCreditsTask, tmdbPersonTvSeriesCreditsTask, tmdbPersonImagesTask, wikipediaLinkTask);
 
-                        SuggestionViewModel? personSuggestionViewModel = await suggestionTask;
                         TmdbPersonResponseDataModel? tmdbPersonResponseDataModel = await tmdbPersonTask;
                         TmdbPersonMovieCreditsResponseDataModel? tmdbPersonMovieCreditsResponseDataModel = await tmdbPersonMovieCreditsTask;
                         TmdbPersonTvSeriesCreditsResponseDataModel? tmdbPersonTvSeriesCreditsResponseDataModel = await tmdbPersonTvSeriesCreditsTask;
                         TmdbPersonImagesResponseDataModel? tmdbPersonImagesResponseDataModel = await tmdbPersonImagesTask;
+                        string? wikipediaLink = await wikipediaLinkTask;
 
                         if (personSuggestionViewModel == null)
                         {
@@ -94,6 +98,10 @@ public class PersonEndpoint
                         {
                             Log.Debug($"Person TmdbPersonImagesResponseDataModel for search '{imdbId}' and TMDB ID '{tmdbPersonId}' was null!");
                         }
+                        if (wikipediaLink == null)
+                        {
+                            Log.Debug($"Person Wikipedia link for search '{imdbId}' was null!");
+                        }
 
                         PersonViewModel personViewModel;
                         // Null checks all happened above, but there's no good way to let the compiler know about that, so recheck here
@@ -107,7 +115,8 @@ public class PersonEndpoint
                                                                   tmdbPersonResponseDataModel,
                                                                   tmdbPersonMovieCreditsResponseDataModel,
                                                                   tmdbPersonTvSeriesCreditsResponseDataModel,
-                                                                  tmdbPersonImagesResponseDataModel);
+                                                                  tmdbPersonImagesResponseDataModel,
+                                                                  wikipediaLink);
                         }
                         else
                         {
@@ -136,7 +145,7 @@ public class PersonEndpoint
             }
         )
         .WithSummary("Person")
-        .WithDescription("Searches IMDB and TMDB for detailed information on people, looked up by IMDB ID or by TMDB ID.")
+        .WithDescription("Searches IMDB, TMDB, and Wikipedia for detailed information on people, looked up by IMDB ID or by TMDB ID.")
         .RequireAuthorization(ProgramConstants.LoggedInUsersOnlyPolicyName)  // TODO: Check that this returns appropriate error on frontend
         .RequireAuthorization(ProgramConstants.SearchUsersOnlyPolicyName)  // TODO: Check that this returns appropriate error on frontend
         .RequireRateLimiting(ProgramConstants.TokenRateLimiterPolicyName);
@@ -247,5 +256,20 @@ public class PersonEndpoint
         Log.Debug($"TMDB person images response:\n\n{tmdbPersonImagesResponseDataModel}\n\n");
 
         return tmdbPersonImagesResponseDataModel;
+    }
+
+    // Returns the person's Wikipedia page link, "" when Wikipedia has no page for them, or null when the lookup failed (or had no name to search for)
+    public async static Task<string?> GetWikipediaLink(string? name, WikipediaHttpClient wikipediaHttpClient)
+    {
+        if (name == null)
+            return null;
+
+        string? wikipediaLink = await wikipediaHttpClient.GetPersonLink(name);
+        if (wikipediaLink == null)
+            return null;
+        
+        Log.Debug($"Wikipedia person link response:\n\n{wikipediaLink}\n\n");
+
+        return wikipediaLink;
     }
 }

@@ -3,37 +3,45 @@ import "./shared.css";
 
 const COPY_FEEDBACK_MS = 1500;
 
-export function ImdbRowSeparator() {
+export function ExternalLinkRowSeparator() {
   return (
     <span
-      className="imdb-row-separator"
+      className="external-link-row-separator"
       role="separator"
       aria-orientation="vertical"
     />
   );
 }
 
-interface ImdbRowProps {
-  // The IMDB page linked to, or "" when the IMDB ID is unknown: the row then
-  // links to searchUrl as "Search Google" instead, with no copy button.
-  imdbUrl: string;
+interface ExternalLinkRowProps {
+  // The external page linked to, or "" when it is unknown: the row then links
+  // to searchUrl as "Search Google" instead, or shows a "—" placeholder when
+  // there is no searchUrl either, in both cases with no copy button.
+  url: string;
   searchUrl?: string;
   // A bold label shown right before the link, for rows that carry no data of
-  // their own (e.g. "TV Series IMDB:").
+  // their own (e.g. "TV Series IMDB:" or "Wikipedia:").
   label?: string;
   // Whether to offer copying the link as an HTML anchor (default true).
   copyButton?: boolean;
-  // The IMDB data shown ahead of the link (rating, rank, etc.)
+  // The copy button's accessible name (default "copy-link"); the rows for the
+  // same site share one, e.g. "copy-imdb-link", so tests can tell them apart.
+  copyAriaLabel?: string;
+  // Data from the external site shown ahead of the link (e.g. the IMDB rating
+  // and rank)
   children?: ReactNode;
 }
 
-function ImdbRow({
-  imdbUrl,
+// A detail panel's row for a page on an external site (IMDB, Wikipedia, …):
+// an optional label and data, the "Link" itself, and a button to copy it.
+function ExternalLinkRow({
+  url,
   searchUrl,
   label,
   copyButton = true,
+  copyAriaLabel = "copy-link",
   children,
-}: ImdbRowProps) {
+}: ExternalLinkRowProps) {
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "failed">(
     "idle",
   );
@@ -48,7 +56,7 @@ function ImdbRow({
   async function handleCopy() {
     window.clearTimeout(copyTimeoutRef.current);
     try {
-      await navigator.clipboard.writeText(`<a href="${imdbUrl}">Link</a>`);
+      await navigator.clipboard.writeText(`<a href="${url}">Link</a>`);
       setCopyStatus("copied");
     } catch {
       setCopyStatus("failed");
@@ -59,29 +67,31 @@ function ImdbRow({
   }
 
   return (
-    <p className="imdb-row">
+    <p className="external-link-row">
       <span>
-        {label && <span className="imdb-row-label">{label}</span>}
+        {label && <span className="external-link-row-label">{label}</span>}
         {children != null && (
           <>
             {children}
-            <ImdbRowSeparator />
+            <ExternalLinkRowSeparator />
           </>
         )}
-        {imdbUrl !== "" ? (
-          <a href={imdbUrl} target="_blank" rel="noopener">
+        {url !== "" ? (
+          <a href={url} target="_blank" rel="noopener">
             Link
           </a>
-        ) : (
+        ) : searchUrl !== undefined ? (
           <a href={searchUrl} target="_blank" rel="noopener">
             Search Google
           </a>
+        ) : (
+          "—"
         )}
       </span>
-      {copyButton && imdbUrl !== "" && (
+      {copyButton && url !== "" && (
         <button
           type="button"
-          aria-label="copy-imdb-link"
+          aria-label={copyAriaLabel}
           className="copy-button"
           onClick={handleCopy}
         >
@@ -96,4 +106,4 @@ function ImdbRow({
   );
 }
 
-export default ImdbRow;
+export default ExternalLinkRow;

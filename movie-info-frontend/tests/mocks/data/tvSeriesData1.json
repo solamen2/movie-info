@@ -35,6 +35,7 @@
   "firstAirDate": "2001-03-10",
   "tmdbGenres": "Comedy, Drama, Sci-Fi & Fantasy",
   "homepage": "https://example.com/example-tv-series",
+  "wikipediaLink": "https://en.wikipedia.org/wiki/Example_TV_Series",
   "tmdbId": 90002,
   "isInProduction": false,
   "languages": "English, Japanese",

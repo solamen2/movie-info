@@ -3,7 +3,7 @@ import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { imdbTitleUrl } from "../movie/movieTypes";
 import Collapsible from "../shared/Collapsible";
 import HorizontalList from "../shared/HorizontalList";
-import ImdbRow from "../shared/ImdbRow";
+import ExternalLinkRow from "../shared/ExternalLinkRow";
 import WatchProviderSection from "../shared/WatchProviderSection";
 import { useCardSelection } from "../shared/useCardSelection";
 import { useDetailData } from "../shared/useDetailData";
@@ -98,8 +98,8 @@ function TvSeasonPanel({
         )}
         <div className="detail-panel-heading">
           <h2 className="detail-title">{tvSeason.name}</h2>
-          <ImdbRow
-            imdbUrl={imdbTitleUrl(tvSeriesImdbId)}
+          <ExternalLinkRow
+            url={imdbTitleUrl(tvSeriesImdbId)}
             label="TV Series IMDB:"
             copyButton={false}
           />

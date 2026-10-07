@@ -88,6 +88,8 @@ export interface TvSeries {
   firstAirDate: string | null;
   tmdbGenres: string;
   homepage: string | null;
+  // "" when Wikipedia has no page for the TV series, null when the lookup failed
+  wikipediaLink: string | null;
   tmdbId: number;
   isInProduction: boolean;
   languages: string;

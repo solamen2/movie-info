@@ -82,7 +82,7 @@ describe("PersonPanel", () => {
       expect(screen.getByTestId("person-age").tagName).toBe("I");
 
       for (const expected of [
-        "Example SmithIMDB: Rank: 3LinkCopy",
+        "Example SmithIMDB: Rank: 3LinkCopyWikipedia:LinkCopy",
         "Known ForActress, Example Film",
         "Known For DepartmentActing",
         "Also Known AsExample Smithee, Betsy Smith",
@@ -225,7 +225,7 @@ describe("PersonPanel", () => {
       await searchAndSelectExamplePerson();
       await screen.findByTestId("person-panel");
 
-      const link = screen.getByRole("link", { name: "Link" });
+      const [link] = screen.getAllByRole("link", { name: "Link" });
       expect(link).toHaveAttribute(
         "href",
         "https://www.imdb.com/name/nm9000000",
@@ -264,6 +264,71 @@ describe("PersonPanel", () => {
       fireEvent.click(screen.getByRole("button", { name: "copy-imdb-link" }));
       expect(await screen.findByText("Failed")).toBeInTheDocument();
     });
+
+    it("Should link to the Wikipedia page in a new tab", async () => {
+      await searchAndSelectExamplePerson();
+      await screen.findByTestId("person-panel");
+
+      const links = screen.getAllByRole("link", { name: "Link" });
+      expect(links).toHaveLength(2);
+      expect(links[1]).toHaveAttribute(
+        "href",
+        "https://en.wikipedia.org/wiki/Example_Smith",
+      );
+      expect(links[1]).toHaveAttribute("target", "_blank");
+      expect(links[1]).toHaveAttribute("rel", "noopener");
+    });
+
+    it("Should copy the Wikipedia link as an HTML anchor when Copy is clicked", async () => {
+      const writeText = vi.fn().mockResolvedValue(undefined);
+      Object.defineProperty(navigator, "clipboard", {
+        value: { writeText },
+        configurable: true,
+      });
+
+      await searchAndSelectExamplePerson();
+      await screen.findByTestId("person-panel");
+
+      fireEvent.click(
+        screen.getByRole("button", { name: "copy-wikipedia-link" }),
+      );
+      expect(writeText).toHaveBeenCalledWith(
+        '<a href="https://en.wikipedia.org/wiki/Example_Smith">Link</a>',
+      );
+      expect(await screen.findByText("Copied!")).toBeInTheDocument();
+    });
+
+    it.each([
+      ["no Wikipedia page", ""],
+      ["a failed Wikipedia lookup", null],
+    ])(
+      "Should show a placeholder instead of the Wikipedia link and Copy button for %s",
+      async (_, wikipediaLink) => {
+        server.use(
+          http.get("/api/person", () =>
+            HttpResponse.json({ ...personDataJson1, wikipediaLink }),
+          ),
+        );
+
+        render(
+          <MemoryRouter>
+            <PersonPanel itemId="nm9000000" />
+          </MemoryRouter>,
+        );
+        const panel = await screen.findByTestId("person-panel");
+
+        expect(panel.textContent).toContain(
+          "Example SmithIMDB: Rank: 3LinkCopyWikipedia:—",
+        );
+        expect(screen.getAllByRole("link", { name: "Link" })).toHaveLength(1);
+        expect(
+          screen.queryByRole("button", { name: "copy-wikipedia-link" }),
+        ).toBeNull();
+        expect(
+          screen.getByRole("button", { name: "copy-imdb-link" }),
+        ).toBeInTheDocument();
+      },
+    );
 
     it("Should not deselect the card when clicking inside the panel", async () => {
       const { personCard } = await searchAndSelectExamplePerson();
@@ -370,6 +435,7 @@ describe("PersonPanel", () => {
             deathday: "2020-01-02",
             gender: "NotSetNotSpecified",
             homepage: null,
+            wikipediaLink: "",
             placeOfBirth: null,
             profileImages: [],
           }),
@@ -385,7 +451,7 @@ describe("PersonPanel", () => {
       const text = panel.textContent;
 
       for (const expected of [
-        "No imageExample SmithIMDB: Rank: —LinkCopy",
+        "No imageExample SmithIMDB: Rank: —LinkCopyWikipedia:—",
         "Known For—",
         "Also Known As—",
         "BirthdayApr 14, 1977 (42)DeathdayJan 2, 2020",

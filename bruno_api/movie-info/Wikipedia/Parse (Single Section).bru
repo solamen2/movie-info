@@ -1,0 +1,24 @@
+meta {
+  name: Parse (Single Section)
+  type: http
+  seq: 5
+}
+
+get {
+  url: https://en.wikipedia.org/w/api.php?page=The Shawshank Redemption&action=parse&prop=wikitext&section=1&format=json
+  body: none
+  auth: inherit
+}
+
+params:query {
+  page: The Shawshank Redemption
+  action: parse
+  prop: wikitext
+  section: 1
+  format: json
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

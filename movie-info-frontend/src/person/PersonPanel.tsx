@@ -2,7 +2,7 @@ import { type ReactNode } from "react";
 import type { TmdbGender } from "../shared/sharedTypes";
 import Collapsible from "../shared/Collapsible";
 import HorizontalList from "../shared/HorizontalList";
-import ImdbRow from "../shared/ImdbRow";
+import ExternalLinkRow from "../shared/ExternalLinkRow";
 import { useDetailData } from "../shared/useDetailData";
 import { usePanelCards } from "../shared/usePanelCards";
 import {
@@ -136,11 +136,19 @@ function PersonPanel({ itemId }: PersonPanelProps) {
         )}
         <div className="detail-panel-heading">
           <h2 className="detail-title">{person.name}</h2>
-          <ImdbRow imdbUrl={imdbNameUrl(person.imdbId)}>
-            <span className="imdb-row-label">IMDB:</span>{" "}
-            <span className="imdb-row-label">Rank:</span>{" "}
+          <ExternalLinkRow
+            url={imdbNameUrl(person.imdbId)}
+            copyAriaLabel="copy-imdb-link"
+          >
+            <span className="external-link-row-label">IMDB:</span>{" "}
+            <span className="external-link-row-label">Rank:</span>{" "}
             {displayText(person.imdbRank)}
-          </ImdbRow>
+          </ExternalLinkRow>
+          <ExternalLinkRow
+            url={person.wikipediaLink ?? ""}
+            label="Wikipedia:"
+            copyAriaLabel="copy-wikipedia-link"
+          />
           <dl className="detail-facts">
             {facts.map(([label, value]) => (
               <div className="detail-fact" key={label}>

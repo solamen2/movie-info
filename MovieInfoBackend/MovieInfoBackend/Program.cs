@@ -109,6 +109,12 @@ void AddServices()
                         .AddTransientHttpErrorPolicy(policyBuilder =>
                             policyBuilder.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)))
                         .SetHandlerLifetime(TimeSpan.FromMinutes(15));
+    builder.Services.AddHttpClient<WikipediaHttpClient>()
+                        .AddTransientHttpErrorPolicy(policyBuilder =>
+                            policyBuilder.WaitAndRetryAsync(3, retryNumber => TimeSpan.FromMilliseconds(600)))
+                        .AddTransientHttpErrorPolicy(policyBuilder =>
+                            policyBuilder.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)))
+                        .SetHandlerLifetime(TimeSpan.FromMinutes(15));
 
     if (builder.Environment.IsDevelopment())
     {

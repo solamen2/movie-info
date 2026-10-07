@@ -21,6 +21,7 @@
   "budget": 25000000,
   "tmdbGenres": "Mystery, Thriller, Drama, Science Fiction",
   "homepage": "https://example.com/example-movie",
+  "wikipediaLink": "https://en.wikipedia.org/wiki/Example_Movie",
   "tmdbId": 90001,
   "originCountries": "United States of America",
   "originLanguage": "English",

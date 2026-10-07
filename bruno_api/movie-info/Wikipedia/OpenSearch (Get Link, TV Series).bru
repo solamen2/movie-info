@@ -1,0 +1,24 @@
+meta {
+  name: OpenSearch (Get Link, TV Series)
+  type: http
+  seq: 3
+}
+
+get {
+  url: https://en.wikipedia.org/w/api.php?search=Buffy The Vampire Slayer (TV series)&action=opensearch&limit=1&namespace=0&format=json
+  body: none
+  auth: inherit
+}
+
+params:query {
+  search: Buffy The Vampire Slayer (TV series)
+  action: opensearch
+  limit: 1
+  namespace: 0
+  format: json
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

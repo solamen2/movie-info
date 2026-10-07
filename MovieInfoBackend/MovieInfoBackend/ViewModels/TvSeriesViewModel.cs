@@ -16,6 +16,7 @@ public record TvSeriesViewModel
                              TmdbWatchProvidersResponseDataModel tmdbWatchProvidersDataModel,
                              ConfigurationCountriesDictionary tmdbConfigurationCountriesDictionary,
                              ConfigurationLanguagesDictionary tmdbConfigurationLanguagesDictionary,
+                             string? wikipediaLink,
                              Guid? testGuid = null)
     {
         this.ID = testGuid ?? Guid.NewGuid();
@@ -58,6 +59,7 @@ public record TvSeriesViewModel
         this.TmdbGenres = String.Join(", ", tmdbTvSeriesDataModel.Genres.Select(tgdm => tgdm.Name));
         
         this.Homepage = tmdbTvSeriesDataModel.Homepage;
+        this.WikipediaLink = wikipediaLink;
         this.TmdbId = tmdbTvSeriesDataModel.Id;
         this.IsInProduction = tmdbTvSeriesDataModel.InProduction;
         FrozenDictionary<string, string>? iso6391ToEnglishLanguageNameDictionary = tmdbConfigurationLanguagesDictionary.iso6391ToEnglishLanguageNameDictionary;
@@ -186,6 +188,7 @@ public record TvSeriesViewModel
     public DateOnly? FirstAirDate { get; }
     public string TmdbGenres { get; }
     public string? Homepage { get; }
+    public string? WikipediaLink { get; }  // "" when Wikipedia has no page for the TV series, null when the lookup failed
     public int TmdbId { get; }
     public bool IsInProduction { get; }
     public string Languages { get; }
@@ -217,6 +220,6 @@ public record TvSeriesViewModel
 
     public override string ToString()
     {
-        return $"ID: {ID}\nImage:\n*****\n{Image}\n*****\nImdbId: {ImdbId}\nName: {Name}\nImdbRank: {ImdbRank}\nKnownForActors: {KnownForActors}\nFirstYear: {FirstYear}\nYears: {Years}\nRated: {Rated}\nOmdbAverageEpisodeRuntimeString: {OmdbAverageEpisodeRuntimeString}\nOmdbAverageEpisodeRuntimeNumber: {OmdbAverageEpisodeRuntimeNumber}\nOmdbGenres: {OmdbGenres}\nOmdbOverview: {OmdbOverview}\nAwards: {Awards}\nImdbRating: {ImdbRating}\nImdbVotes: {ImdbVotes}\nBackdropPath: {BackdropPath}\nCreators:\n*****\n{string.Join("\n\n", Creators)}\n*****\nTmdbEpisodeRunTimes: {string.Join(", ", TmdbEpisodeRunTimes)}\nFirstAirDateString: {FirstAirDateString}\nFirstAirDate: {FirstAirDate:MM/dd/yyy}\nTmdbGenres: {TmdbGenres}\nHomepage: {Homepage}\nTmdbId: {TmdbId}\nIsInProduction: {IsInProduction}\nLanguages: {string.Join("\n\n", Languages)}\nLastAirDateString: {LastAirDateString}\nLastAirDate: {LastAirDate:MM/dd/yyy}\nNextAirDateString: {NextAirDateString}\nNextAirDate: {NextAirDate:MM/dd/yyy}\nNetworks:\n*****\n{string.Join("\n\n", Networks)}\n*****\nNumberOfEpisodes: {NumberOfEpisodes}\nNumberOfSeasons: {NumberOfSeasons}\nOriginCountries: {OriginCountries}\nOriginLanguage: {OriginLanguage}\nOriginalName: {OriginalName}\nTmdbOverview: {TmdbOverview}\nProductionCompanies: {ProductionCompanies}\nProductionCountries: {ProductionCountries}\nSeasons:\n*****\n{string.Join("\n\n", Seasons)}\n*****\nSpokenLanguages: {SpokenLanguages}\nStatus: {Status}\nTagline: {Tagline}\nTvSeriesType: {TvSeriesType}\nCast:\n*****\n{string.Join("\n\n", Cast)}\n*****\nDirectors:\n*****\n{string.Join("\n\n", Directors)}\n*****\nWriters:\n*****\n{string.Join("\n\n", Writers)}\n*****\nProducers:\n*****\n{string.Join("\n\n", Producers)}\n*****\nWatchProvidersBuy:\n*****\n{string.Join("\n\n", WatchProvidersBuy)}\n*****\nWatchProvidersFlatrate:\n*****\n{string.Join("\n\n", WatchProvidersFlatrate)}\n*****\nWatchProvidersRent:\n*****\n{string.Join("\n\n", WatchProvidersRent)}";
+        return $"ID: {ID}\nImage:\n*****\n{Image}\n*****\nImdbId: {ImdbId}\nName: {Name}\nImdbRank: {ImdbRank}\nKnownForActors: {KnownForActors}\nFirstYear: {FirstYear}\nYears: {Years}\nRated: {Rated}\nOmdbAverageEpisodeRuntimeString: {OmdbAverageEpisodeRuntimeString}\nOmdbAverageEpisodeRuntimeNumber: {OmdbAverageEpisodeRuntimeNumber}\nOmdbGenres: {OmdbGenres}\nOmdbOverview: {OmdbOverview}\nAwards: {Awards}\nImdbRating: {ImdbRating}\nImdbVotes: {ImdbVotes}\nBackdropPath: {BackdropPath}\nCreators:\n*****\n{string.Join("\n\n", Creators)}\n*****\nTmdbEpisodeRunTimes: {string.Join(", ", TmdbEpisodeRunTimes)}\nFirstAirDateString: {FirstAirDateString}\nFirstAirDate: {FirstAirDate:MM/dd/yyy}\nTmdbGenres: {TmdbGenres}\nHomepage: {Homepage}\nWikipediaLink: {WikipediaLink}\nTmdbId: {TmdbId}\nIsInProduction: {IsInProduction}\nLanguages: {string.Join("\n\n", Languages)}\nLastAirDateString: {LastAirDateString}\nLastAirDate: {LastAirDate:MM/dd/yyy}\nNextAirDateString: {NextAirDateString}\nNextAirDate: {NextAirDate:MM/dd/yyy}\nNetworks:\n*****\n{string.Join("\n\n", Networks)}\n*****\nNumberOfEpisodes: {NumberOfEpisodes}\nNumberOfSeasons: {NumberOfSeasons}\nOriginCountries: {OriginCountries}\nOriginLanguage: {OriginLanguage}\nOriginalName: {OriginalName}\nTmdbOverview: {TmdbOverview}\nProductionCompanies: {ProductionCompanies}\nProductionCountries: {ProductionCountries}\nSeasons:\n*****\n{string.Join("\n\n", Seasons)}\n*****\nSpokenLanguages: {SpokenLanguages}\nStatus: {Status}\nTagline: {Tagline}\nTvSeriesType: {TvSeriesType}\nCast:\n*****\n{string.Join("\n\n", Cast)}\n*****\nDirectors:\n*****\n{string.Join("\n\n", Directors)}\n*****\nWriters:\n*****\n{string.Join("\n\n", Writers)}\n*****\nProducers:\n*****\n{string.Join("\n\n", Producers)}\n*****\nWatchProvidersBuy:\n*****\n{string.Join("\n\n", WatchProvidersBuy)}\n*****\nWatchProvidersFlatrate:\n*****\n{string.Join("\n\n", WatchProvidersFlatrate)}\n*****\nWatchProvidersRent:\n*****\n{string.Join("\n\n", WatchProvidersRent)}";
     }
 }

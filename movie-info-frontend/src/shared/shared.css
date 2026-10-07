@@ -92,7 +92,7 @@
   font-size: 1.3rem;
 }
 
-.imdb-row {
+.external-link-row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -101,12 +101,18 @@
   font-size: 1.2rem;
 }
 
-.imdb-row-label {
+/* Link rows that follow one another (e.g. IMDB then Wikipedia) belong together,
+   so cancel the margin between them; only the last one keeps its margin below */
+.external-link-row + .external-link-row {
+  margin-top: -0.75rem;
+}
+
+.external-link-row-label {
   font-weight: 800;
   padding-right: 0.35rem;
 }
 
-.imdb-row-separator {
+.external-link-row-separator {
   display: inline-block;
   height: 0.9em;
   margin: 0 0.7rem;
@@ -117,7 +123,7 @@
   opacity: 0.5;
 }
 
-.imdb-row-votes {
+.external-link-row-votes {
   font-size: 0.85rem;
 }
 

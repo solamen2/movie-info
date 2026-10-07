@@ -72,7 +72,7 @@ describe("MoviePanel", () => {
         "Release DateSep 23, 2016",
         "Runtime2h 22m",
         "RatedPG-13",
-        "IMDB: 7.9 (123,456)Rank: 4444LinkCopy",
+        "IMDB: 7.9 (123,456)Rank: 4444LinkCopyWikipedia:LinkCopy",
         "Known ForExample Jones, Example Brown",
         "GenresMystery, Thriller, Drama, Science Fiction, Horror",
         "Budget$25,000,000",
@@ -183,7 +183,7 @@ describe("MoviePanel", () => {
       await searchAndSelectExampleMovie();
       await screen.findByTestId("movie-panel");
 
-      const link = screen.getByRole("link", { name: "Link" });
+      const [link] = screen.getAllByRole("link", { name: "Link" });
       expect(link).toHaveAttribute(
         "href",
         "https://www.imdb.com/title/tt0000001",
@@ -208,6 +208,71 @@ describe("MoviePanel", () => {
       );
       expect(await screen.findByText("Copied!")).toBeInTheDocument();
     });
+
+    it("Should link to the Wikipedia page in a new tab", async () => {
+      await searchAndSelectExampleMovie();
+      await screen.findByTestId("movie-panel");
+
+      const links = screen.getAllByRole("link", { name: "Link" });
+      expect(links).toHaveLength(2);
+      expect(links[1]).toHaveAttribute(
+        "href",
+        "https://en.wikipedia.org/wiki/Example_Movie",
+      );
+      expect(links[1]).toHaveAttribute("target", "_blank");
+      expect(links[1]).toHaveAttribute("rel", "noopener");
+    });
+
+    it("Should copy the Wikipedia link as an HTML anchor when Copy is clicked", async () => {
+      const writeText = vi.fn().mockResolvedValue(undefined);
+      Object.defineProperty(navigator, "clipboard", {
+        value: { writeText },
+        configurable: true,
+      });
+
+      await searchAndSelectExampleMovie();
+      await screen.findByTestId("movie-panel");
+
+      fireEvent.click(
+        screen.getByRole("button", { name: "copy-wikipedia-link" }),
+      );
+      expect(writeText).toHaveBeenCalledWith(
+        '<a href="https://en.wikipedia.org/wiki/Example_Movie">Link</a>',
+      );
+      expect(await screen.findByText("Copied!")).toBeInTheDocument();
+    });
+
+    it.each([
+      ["no Wikipedia page", ""],
+      ["a failed Wikipedia lookup", null],
+    ])(
+      "Should show a placeholder instead of the Wikipedia link and Copy button for %s",
+      async (_, wikipediaLink) => {
+        server.use(
+          http.get("/api/movie", () =>
+            HttpResponse.json({ ...movieDataJson1, wikipediaLink }),
+          ),
+        );
+
+        render(
+          <MemoryRouter>
+            <MoviePanel itemId={movieDataJson1.imdbId} />
+          </MemoryRouter>,
+        );
+        const panel = await screen.findByTestId("movie-panel");
+
+        expect(panel.textContent).toContain(
+          "IMDB: 7.9 (123,456)Rank: 4444LinkCopyWikipedia:—",
+        );
+        expect(screen.getAllByRole("link", { name: "Link" })).toHaveLength(1);
+        expect(
+          screen.queryByRole("button", { name: "copy-wikipedia-link" }),
+        ).toBeNull();
+        expect(
+          screen.getByRole("button", { name: "copy-imdb-link" }),
+        ).toBeInTheDocument();
+      },
+    );
 
     it("Should not deselect the card when clicking inside the panel", async () => {
       const { movieCard } = await searchAndSelectExampleMovie();

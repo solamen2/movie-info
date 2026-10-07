@@ -1,0 +1,24 @@
+meta {
+  name: OpenSearch (Get Link, Person)
+  type: http
+  seq: 2
+}
+
+get {
+  url: https://en.wikipedia.org/w/api.php?search=Katharine Hepburn&action=opensearch&limit=1&namespace=0&format=json
+  body: none
+  auth: inherit
+}
+
+params:query {
+  search: Katharine Hepburn
+  action: opensearch
+  limit: 1
+  namespace: 0
+  format: json
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
