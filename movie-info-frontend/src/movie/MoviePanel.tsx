@@ -1,7 +1,9 @@
 import { type ReactNode } from "react";
 import Collapsible from "../shared/Collapsible";
 import HorizontalList from "../shared/HorizontalList";
-import ImdbRow, { ImdbRowSeparator } from "../shared/ImdbRow";
+import ExternalLinkRow, {
+  ExternalLinkRowSeparator,
+} from "../shared/ExternalLinkRow";
 import TitleStatus from "../shared/TitleStatus";
 import WatchProviderSection from "../shared/WatchProviderSection";
 import { useDetailData } from "../shared/useDetailData";
@@ -150,18 +152,23 @@ function MoviePanel({ itemId }: MoviePanelProps) {
             <TitleStatus status={movie.status} usualStatus="Released" />
           </div>
           {movie.tagline && <p className="detail-tagline">{movie.tagline}</p>}
-          <ImdbRow imdbUrl={imdbUrl}>
-            <span className="imdb-row-label">IMDB:</span> {imdbRating}
+          <ExternalLinkRow url={imdbUrl} copyAriaLabel="copy-imdb-link">
+            <span className="external-link-row-label">IMDB:</span> {imdbRating}
             {imdbRating !== "—" && imdbVotes !== "—" && (
               <>
                 {" "}
-                <span className="imdb-row-votes">({imdbVotes})</span>
+                <span className="external-link-row-votes">({imdbVotes})</span>
               </>
             )}
-            <ImdbRowSeparator />
-            <span className="imdb-row-label">Rank:</span>{" "}
+            <ExternalLinkRowSeparator />
+            <span className="external-link-row-label">Rank:</span>{" "}
             {displayText(movie.imdbRank)}
-          </ImdbRow>
+          </ExternalLinkRow>
+          <ExternalLinkRow
+            url={movie.wikipediaLink ?? ""}
+            label="Wikipedia:"
+            copyAriaLabel="copy-wikipedia-link"
+          />
           <dl className="detail-facts">
             {facts.map(([label, value]) => (
               <div className="detail-fact" key={label}>

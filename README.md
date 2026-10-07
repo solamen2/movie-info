@@ -74,6 +74,7 @@ This app displays info from the following sources:
 - [IMDB](https://www.imdb.com/): Movie, TV, and people info
 - [TMDB](https://www.themoviedb.org/): Movie, TV, and people info, and also watch provider information via [JustWatch](https://www.justwatch.com/)
 - [OMDB](https://www.omdbapi.com/): Movie and TV info
+- [Wikipedia](https://www.wikipedia.org/): Links to the Wikipedia pages for movies, people, and TV series
 
 ## Architecture: Frontend
 

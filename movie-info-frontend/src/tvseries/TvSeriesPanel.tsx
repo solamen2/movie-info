@@ -3,7 +3,9 @@ import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { imdbTitleUrl } from "../movie/movieTypes";
 import Collapsible from "../shared/Collapsible";
 import HorizontalList from "../shared/HorizontalList";
-import ImdbRow, { ImdbRowSeparator } from "../shared/ImdbRow";
+import ExternalLinkRow, {
+  ExternalLinkRowSeparator,
+} from "../shared/ExternalLinkRow";
 import TitleStatus from "../shared/TitleStatus";
 import WatchProviderSection from "../shared/WatchProviderSection";
 import { useCardSelection } from "../shared/useCardSelection";
@@ -139,7 +141,7 @@ function TvSeriesPanel({ itemId }: TvSeriesPanelProps) {
       "Average Runtime",
       <>
         {displayRuntime(tvSeries.omdbAverageEpisodeRuntimeNumber)}
-        <ImdbRowSeparator />
+        <ExternalLinkRowSeparator />
         {displayEpisodeRunTimes(tvSeries.tmdbEpisodeRunTimes)}
       </>,
     ],
@@ -189,18 +191,23 @@ function TvSeriesPanel({ itemId }: TvSeriesPanelProps) {
           {tvSeries.tagline && (
             <p className="detail-tagline">{tvSeries.tagline}</p>
           )}
-          <ImdbRow imdbUrl={imdbUrl}>
-            <span className="imdb-row-label">IMDB:</span> {imdbRating}
+          <ExternalLinkRow url={imdbUrl} copyAriaLabel="copy-imdb-link">
+            <span className="external-link-row-label">IMDB:</span> {imdbRating}
             {imdbRating !== "—" && imdbVotes !== "—" && (
               <>
                 {" "}
-                <span className="imdb-row-votes">({imdbVotes})</span>
+                <span className="external-link-row-votes">({imdbVotes})</span>
               </>
             )}
-            <ImdbRowSeparator />
-            <span className="imdb-row-label">Rank:</span>{" "}
+            <ExternalLinkRowSeparator />
+            <span className="external-link-row-label">Rank:</span>{" "}
             {displayText(tvSeries.imdbRank)}
-          </ImdbRow>
+          </ExternalLinkRow>
+          <ExternalLinkRow
+            url={tvSeries.wikipediaLink ?? ""}
+            label="Wikipedia:"
+            copyAriaLabel="copy-wikipedia-link"
+          />
           <dl className="detail-facts">
             {facts.map(([label, value]) => (
               <div className="detail-fact" key={label}>

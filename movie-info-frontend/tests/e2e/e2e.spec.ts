@@ -123,6 +123,7 @@ const expectedMovie = useMockHttpCalls
       tagline: "An example tagline.",
       imdbRow: /IMDB: 7\.9 \(123,456\)Rank: 4444Link/,
       imdbUrl: "https://www.imdb.com/title/tt0000001",
+      wikipediaUrl: "https://en.wikipedia.org/wiki/Example_Movie",
       facts: [
         "Original TitleExample Movie Original",
         "Release DateSep 23, 2016",
@@ -147,7 +148,7 @@ const expectedMovie = useMockHttpCalls
         ["Where to Stream", "Example Stream"],
         ["Where to Rent", "None"],
         ["Where to Buy", "Example Buy Store"],
-      ],
+      ] as [string, string | RegExp][],
     }
   : {
       searchText: "The Shawshank Redemption",
@@ -162,6 +163,8 @@ const expectedMovie = useMockHttpCalls
       tagline: "Fear can hold you prisoner. Hope can set you free.",
       imdbRow: /IMDB: \d\.\d \([\d,]+\)Rank: \d+Link/,
       imdbUrl: "https://www.imdb.com/title/tt0111161",
+      wikipediaUrl:
+        "https://en.wikipedia.org/wiki/The_Shawshank_Redemption_(1994_film)",
       facts: [
         "Original TitleThe Shawshank Redemption",
         "Release DateSep 23, 1994",
@@ -180,11 +183,12 @@ const expectedMovie = useMockHttpCalls
         ["Directors", "Frank Darabont"],
         ["Writers", "Stephen King"],
         ["Plot (TMDB)", "Shawshank"],
-        ["Plot (OMDB)", "Shawshank"],
+        // OMDB's plot text changes over time, so only check that there is one
+        ["Plot (OMDB)", /\w/],
         ["Where to Stream", ""],
         ["Where to Rent", ""],
         ["Where to Buy", ""],
-      ],
+      ] as [string, string | RegExp][],
     };
 
 test("Basic happy path: search, check results are valid, select a movie search card, check the movie panel is valid, and unselect the card", async ({
@@ -230,11 +234,27 @@ test("Basic happy path: search, check results are valid, select a movie search c
   await expectNeverHighlighted(page, selectedCard, moviePanel);
   await expect(moviePanel).toContainText(expectedMovie.tagline);
   await expect(moviePanel).toContainText(expectedMovie.imdbRow);
-  const imdbLink = moviePanel.getByRole("link", { name: "Link", exact: true });
+  // The IMDB link comes first, then the Wikipedia link
+  const movieLinks = moviePanel.getByRole("link", {
+    name: "Link",
+    exact: true,
+  });
+  await expect(movieLinks).toHaveCount(2);
+  const imdbLink = movieLinks.first();
   await expect(imdbLink).toHaveAttribute("href", expectedMovie.imdbUrl);
   await expect(imdbLink).toHaveAttribute("target", "_blank");
   await expect(
     moviePanel.getByRole("button", { name: "copy-imdb-link" }),
+  ).toBeVisible();
+  await expect(moviePanel).toContainText("Wikipedia:Link");
+  const wikipediaLink = movieLinks.last();
+  await expect(wikipediaLink).toHaveAttribute(
+    "href",
+    expectedMovie.wikipediaUrl,
+  );
+  await expect(wikipediaLink).toHaveAttribute("target", "_blank");
+  await expect(
+    moviePanel.getByRole("button", { name: "copy-wikipedia-link" }),
   ).toBeVisible();
   for (const fact of expectedMovie.facts) {
     await expect(moviePanel).toContainText(fact);
@@ -326,6 +346,7 @@ const expectedPerson = useMockHttpCalls
       ],
       imdbRow: /IMDB: Rank: 3Link/,
       imdbUrl: "https://www.imdb.com/name/nm9000000",
+      wikipediaUrl: "https://en.wikipedia.org/wiki/Example_Smith",
       facts: [
         "Known ForActress, Example Film",
         "Known For DepartmentActing",
@@ -354,6 +375,7 @@ const expectedPerson = useMockHttpCalls
       ],
       imdbRow: /IMDB: Rank: \d+Link/,
       imdbUrl: "https://www.imdb.com/name/nm0001264",
+      wikipediaUrl: "https://en.wikipedia.org/wiki/Sarah_Michelle_Gellar",
       facts: [
         "Known For DepartmentActing",
         "BirthdayApr 14, 1977",
@@ -413,11 +435,27 @@ test("Person happy path: search, check results are valid, select a person search
   await expectNeverHighlighted(page, selectedCard, personPanel);
 
   await expect(personPanel).toContainText(expectedPerson.imdbRow);
-  const imdbLink = personPanel.getByRole("link", { name: "Link", exact: true });
+  // The IMDB link comes first, then the Wikipedia link
+  const personLinks = personPanel.getByRole("link", {
+    name: "Link",
+    exact: true,
+  });
+  await expect(personLinks).toHaveCount(2);
+  const imdbLink = personLinks.first();
   await expect(imdbLink).toHaveAttribute("href", expectedPerson.imdbUrl);
   await expect(imdbLink).toHaveAttribute("target", "_blank");
   await expect(
     personPanel.getByRole("button", { name: "copy-imdb-link" }),
+  ).toBeVisible();
+  await expect(personPanel).toContainText("Wikipedia:Link");
+  const wikipediaLink = personLinks.last();
+  await expect(wikipediaLink).toHaveAttribute(
+    "href",
+    expectedPerson.wikipediaUrl,
+  );
+  await expect(wikipediaLink).toHaveAttribute("target", "_blank");
+  await expect(
+    personPanel.getByRole("button", { name: "copy-wikipedia-link" }),
   ).toBeVisible();
   for (const fact of expectedPerson.facts) {
     await expect(personPanel).toContainText(fact);
@@ -493,6 +531,7 @@ const expectedTvSeries = useMockHttpCalls
       tagline: "An example TV series tagline.",
       imdbRow: /IMDB: 8\.3 \(172,659\)Rank: 4444Link/,
       imdbUrl: "https://www.imdb.com/title/tt10000002",
+      wikipediaUrl: "https://en.wikipedia.org/wiki/Example_TV_Series",
       facts: [
         "Original NameExample TV Series Original",
         "Years2001-2003",
@@ -525,7 +564,7 @@ const expectedTvSeries = useMockHttpCalls
         ["Where to Stream", "Example Stream"],
         ["Where to Rent", "None"],
         ["Where to Buy", "Example Buy Store"],
-      ],
+      ] as [string, string | RegExp][],
       firstSeason: {
         name: "Season 1",
         overview: "An example overview for season 1.",
@@ -543,6 +582,8 @@ const expectedTvSeries = useMockHttpCalls
       tagline: "",
       imdbRow: /IMDB: \d\.\d \([\d,]+\)Rank: \d+Link/,
       imdbUrl: "https://www.imdb.com/title/tt0118276",
+      wikipediaUrl:
+        "https://en.wikipedia.org/wiki/Buffy_the_Vampire_Slayer_(TV_series)",
       facts: [
         "Original NameBuffy the Vampire Slayer",
         "Years1997-2003",
@@ -564,12 +605,13 @@ const expectedTvSeries = useMockHttpCalls
         ["Directors", "Joss Whedon"],
         ["Writers", "Joss Whedon"],
         ["Overview (TMDB)", "vampire"],
-        ["Overview (OMDB)", "vampire"],
+        // OMDB's overview text changes over time, so only check that there is one
+        ["Overview (OMDB)", /\w/],
         ["Networks", "The WB"],
         ["Where to Stream", ""],
         ["Where to Rent", ""],
         ["Where to Buy", ""],
-      ],
+      ] as [string, string | RegExp][],
       firstSeason: {
         name: "Season 1",
         overview: "",
@@ -621,14 +663,27 @@ test("TV series happy path: search, check results are valid, select a TV series 
     await expect(tvSeriesPanel).toContainText(expectedTvSeries.tagline);
   }
   await expect(tvSeriesPanel).toContainText(expectedTvSeries.imdbRow);
-  const imdbLink = tvSeriesPanel.getByRole("link", {
+  // The IMDB link comes first, then the Wikipedia link
+  const tvSeriesLinks = tvSeriesPanel.getByRole("link", {
     name: "Link",
     exact: true,
   });
+  await expect(tvSeriesLinks).toHaveCount(2);
+  const imdbLink = tvSeriesLinks.first();
   await expect(imdbLink).toHaveAttribute("href", expectedTvSeries.imdbUrl);
   await expect(imdbLink).toHaveAttribute("target", "_blank");
   await expect(
     tvSeriesPanel.getByRole("button", { name: "copy-imdb-link" }),
+  ).toBeVisible();
+  await expect(tvSeriesPanel).toContainText("Wikipedia:Link");
+  const wikipediaLink = tvSeriesLinks.last();
+  await expect(wikipediaLink).toHaveAttribute(
+    "href",
+    expectedTvSeries.wikipediaUrl,
+  );
+  await expect(wikipediaLink).toHaveAttribute("target", "_blank");
+  await expect(
+    tvSeriesPanel.getByRole("button", { name: "copy-wikipedia-link" }),
   ).toBeVisible();
   for (const fact of expectedTvSeries.facts) {
     await expect(tvSeriesPanel).toContainText(fact);

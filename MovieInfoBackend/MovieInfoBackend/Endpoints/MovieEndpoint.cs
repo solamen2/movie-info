@@ -28,6 +28,7 @@ public class MovieEndpoint
                 [FromServices] SuggestionHttpClient suggestionHttpClient,
                 [FromServices] OmdbHttpClient omdbHttpClient,
                 [FromServices] TmdbHttpClient tmdbHttpClient,
+                [FromServices] WikipediaHttpClient wikipediaHttpClient,
                 [FromServices] IMemoryCache cache) =>
             {
                 IResult? movieViewModelJson;
@@ -69,17 +70,20 @@ public class MovieEndpoint
                         Task<TmdbMovieResponseDataModel?> tmdbMovieTask = GetTmdbMovieResponseDataModel(tmdbMovieId, tmdbHttpClient);
                         Task<TmdbMovieCreditsResponseDataModel?> tmdbMovieCreditsTask = GetTmdbMovieCreditsResponseDataModel(tmdbMovieId, tmdbHttpClient);
                         Task<TmdbWatchProvidersResponseDataModel?> tmdbMovieWatchProvidersTask = GetWatchProvidersResponseDataModel(tmdbMovieId, tmdbHttpClient);
+                        // Wikipedia is searched by the title and year from the suggestion (see WikipediaHttpClient.GetMovieLink), so that lookup can only start once the suggestion is in
+                        SuggestionViewModel? movieSuggestionViewModel = await suggestionTask;
+                        Task<string?> wikipediaLinkTask = GetWikipediaLink(movieSuggestionViewModel, wikipediaHttpClient);
 
                         // NOTE: Strictly speaking, this is not needed, but it's a good marker for when all tasks have been started
-                        await Task.WhenAll(suggestionTask, omdbMovieTask, tmdbCountriesTask, tmdbLanguagesTask, tmdbMovieTask, tmdbMovieCreditsTask, tmdbMovieWatchProvidersTask);
+                        await Task.WhenAll(omdbMovieTask, tmdbCountriesTask, tmdbLanguagesTask, tmdbMovieTask, tmdbMovieCreditsTask, tmdbMovieWatchProvidersTask, wikipediaLinkTask);
 
-                        SuggestionViewModel? movieSuggestionViewModel = await suggestionTask;
                         OmdbResponseDataModel? omdbMovieResponseDataModel = await omdbMovieTask;
                         ConfigurationCountriesDictionary? tmdbConfigurationCountriesDictionary = await tmdbCountriesTask;
                         ConfigurationLanguagesDictionary? tmdbConfigurationLanguagesDictionary = await tmdbLanguagesTask;
                         TmdbMovieResponseDataModel? tmdbMovieResponseDataModel = await tmdbMovieTask;
                         TmdbMovieCreditsResponseDataModel? tmdbMovieCreditsResponseDataModel = await tmdbMovieCreditsTask;
                         TmdbWatchProvidersResponseDataModel? tmdbMovieWatchProvidersResponseDataModel = await tmdbMovieWatchProvidersTask;
+                        string? wikipediaLink = await wikipediaLinkTask;
 
                         if (movieSuggestionViewModel == null)
                         {
@@ -109,6 +113,10 @@ public class MovieEndpoint
                         {
                             Log.Debug($"Movie TmdbWatchProvidersResponseDataModel for search '{imdbId}' and TMDB ID '{tmdbMovieId}' was null!");
                         }
+                        if (wikipediaLink == null)
+                        {
+                            Log.Debug($"Movie Wikipedia link for search '{imdbId}' was null!");
+                        }
 
                         MovieViewModel movieViewModel;
                         // Null checks all happened above, but there's no good way to let the compiler know about that, so recheck here
@@ -130,7 +138,8 @@ public class MovieEndpoint
                                                                 tmdbMovieCreditsResponseDataModel,
                                                                 tmdbMovieWatchProvidersResponseDataModel,
                                                                 tmdbConfigurationCountriesDictionary,
-                                                                tmdbConfigurationLanguagesDictionary);
+                                                                tmdbConfigurationLanguagesDictionary,
+                                                                wikipediaLink);
                         }
                         else
                         {
@@ -159,7 +168,7 @@ public class MovieEndpoint
             }
         )
         .WithSummary("Movie")
-        .WithDescription("Searches IMDB, TMDB, and OMDB for detailed information on movies, looked up by IMDB ID or by TMDB ID.")
+        .WithDescription("Searches IMDB, TMDB, OMDB, and Wikipedia for detailed information on movies, looked up by IMDB ID or by TMDB ID.")
         .RequireAuthorization(ProgramConstants.LoggedInUsersOnlyPolicyName)  // TODO: Check that this returns appropriate error on frontend
         .RequireAuthorization(ProgramConstants.SearchUsersOnlyPolicyName)  // TODO: Check that this returns appropriate error on frontend
         .RequireRateLimiting(ProgramConstants.TokenRateLimiterPolicyName);
@@ -288,5 +297,20 @@ public class MovieEndpoint
         Log.Debug($"TMDB movie watch providers response:\n\n{tmdbMovieWatchProvidersResponseDataModel}\n\n");
 
         return tmdbMovieWatchProvidersResponseDataModel;
+    }
+
+    // Returns the movie's Wikipedia page link, "" when Wikipedia has no page for it, or null when the lookup failed (or had nothing to search for)
+    public async static Task<string?> GetWikipediaLink(SuggestionViewModel? movieSuggestionViewModel, WikipediaHttpClient wikipediaHttpClient)
+    {
+        if (movieSuggestionViewModel == null)
+            return null;
+
+        string? wikipediaLink = await wikipediaHttpClient.GetMovieLink(movieSuggestionViewModel.Name, movieSuggestionViewModel.Year);
+        if (wikipediaLink == null)
+            return null;
+        
+        Log.Debug($"Wikipedia movie link response:\n\n{wikipediaLink}\n\n");
+
+        return wikipediaLink;
     }
 }

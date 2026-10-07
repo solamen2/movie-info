@@ -9,6 +9,7 @@ public record PersonViewModel
                            TmdbPersonMovieCreditsResponseDataModel tmdbPersonMovieCreditsDataModel,
                            TmdbPersonTvSeriesCreditsResponseDataModel tmdbPersonTvSeriesCreditsDataModel,
                            TmdbPersonImagesResponseDataModel tmdbPersonImagesDataModel,
+                           string? wikipediaLink,
                            Guid? testGuid = null)
     {
         this.ID = testGuid ?? Guid.NewGuid();
@@ -23,6 +24,7 @@ public record PersonViewModel
         this.Deathday = tmdbPersonDataModel.Deathday;
         this.Gender = (TmdbGenderType)tmdbPersonDataModel.Gender;
         this.Homepage = tmdbPersonDataModel.Homepage;
+        this.WikipediaLink = wikipediaLink;
         this.TmdbId = tmdbPersonDataModel.TmdbId;
         this.KnownForDepartment = tmdbPersonDataModel.KnownForDepartment;
         this.PlaceOfBirth = tmdbPersonDataModel.PlaceOfBirth;
@@ -56,6 +58,7 @@ public record PersonViewModel
     public string? Deathday { get; }  // Actually a date, of course
     public TmdbGenderType Gender { get; }
     public string? Homepage { get; }
+    public string? WikipediaLink { get; }  // "" when Wikipedia has no page for the person, null when the lookup failed
     public int TmdbId { get; }
     public string KnownForDepartment { get; }
     public string PlaceOfBirth { get; }
@@ -68,6 +71,6 @@ public record PersonViewModel
 
     public override string ToString()
     {
-        return $"ID: {ID}\nImage:\n*****\n{Image}\n*****\nImdbId: {ImdbId}\nName: {Name}\nImdbRank: {ImdbRank}\nKnownForMovies: {KnownForMovies}\nAlsoKnownAs: {string.Join(", ", AlsoKnownAs)}\nBiography: {Biography}\nBirthday: {Birthday}\nDeathday: {Deathday}\nGender: {Gender}\nHomepage: {Homepage}\nTmdbId: {TmdbId}\nKnownForDepartment: {KnownForDepartment}\nPlaceOfBirth: {PlaceOfBirth}\nProfilePath: {ProfilePath}\nMovieCastCredits:\n*****\n{string.Join("\n\n", MovieCastCredits)}\n*****\nMovieCrewCredits:\n*****\n{string.Join("\n\n", MovieCrewCredits)}\n*****\nTvSeriesCastCredits:\n*****\n{string.Join("\n\n", TvSeriesCastCredits)}\n*****\nTvSeriesCrewCredits:\n*****\n{string.Join("\n\n", TvSeriesCrewCredits)}\n*****\nProfileImages:\n*****\n{string.Join("\n\n", ProfileImages)}";
+        return $"ID: {ID}\nImage:\n*****\n{Image}\n*****\nImdbId: {ImdbId}\nName: {Name}\nImdbRank: {ImdbRank}\nKnownForMovies: {KnownForMovies}\nAlsoKnownAs: {string.Join(", ", AlsoKnownAs)}\nBiography: {Biography}\nBirthday: {Birthday}\nDeathday: {Deathday}\nGender: {Gender}\nHomepage: {Homepage}\nWikipediaLink: {WikipediaLink}\nTmdbId: {TmdbId}\nKnownForDepartment: {KnownForDepartment}\nPlaceOfBirth: {PlaceOfBirth}\nProfilePath: {ProfilePath}\nMovieCastCredits:\n*****\n{string.Join("\n\n", MovieCastCredits)}\n*****\nMovieCrewCredits:\n*****\n{string.Join("\n\n", MovieCrewCredits)}\n*****\nTvSeriesCastCredits:\n*****\n{string.Join("\n\n", TvSeriesCastCredits)}\n*****\nTvSeriesCrewCredits:\n*****\n{string.Join("\n\n", TvSeriesCrewCredits)}\n*****\nProfileImages:\n*****\n{string.Join("\n\n", ProfileImages)}";
     }
 }

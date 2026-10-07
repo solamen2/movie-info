@@ -2,7 +2,9 @@ import { type ReactNode } from "react";
 import { hasImdbId, imdbTitleUrl } from "../movie/movieTypes";
 import Collapsible from "../shared/Collapsible";
 import HorizontalList from "../shared/HorizontalList";
-import ImdbRow, { ImdbRowSeparator } from "../shared/ImdbRow";
+import ExternalLinkRow, {
+  ExternalLinkRowSeparator,
+} from "../shared/ExternalLinkRow";
 import { useDetailData } from "../shared/useDetailData";
 import { type PanelCards, usePanelCards } from "../shared/usePanelCards";
 import {
@@ -127,7 +129,7 @@ function TvEpisodePanel({
       "Runtime",
       <>
         {displayRuntime(tvEpisode.omdbAverageEpisodeRuntimeNumber)}
-        <ImdbRowSeparator />
+        <ExternalLinkRowSeparator />
         {displayRuntime(tvEpisode.runtime)}
       </>,
     ],
@@ -163,20 +165,24 @@ function TvEpisodePanel({
             )}
           </p>
           {hasImdbId(tvEpisode.imdbId) ? (
-            <ImdbRow imdbUrl={imdbTitleUrl(tvEpisode.imdbId)}>
-              <span className="imdb-row-label">IMDB:</span> {imdbRating}
+            <ExternalLinkRow
+              url={imdbTitleUrl(tvEpisode.imdbId)}
+              copyAriaLabel="copy-imdb-link"
+            >
+              <span className="external-link-row-label">IMDB:</span>{" "}
+              {imdbRating}
               {imdbRating !== "—" && imdbVotes !== "—" && (
                 <>
                   {" "}
-                  <span className="imdb-row-votes">({imdbVotes})</span>
+                  <span className="external-link-row-votes">({imdbVotes})</span>
                 </>
               )}
-            </ImdbRow>
+            </ExternalLinkRow>
           ) : (
             // TMDB knows of no IMDB page for the episode (so there is no OMDB
             // rating either); offer a Google search for it instead
-            <ImdbRow
-              imdbUrl=""
+            <ExternalLinkRow
+              url=""
               searchUrl={tvEpisodeGoogleSearchUrl(
                 tvSeriesName,
                 tvEpisode.seasonNumber,
@@ -186,8 +192,8 @@ function TvEpisodePanel({
               label="IMDB:"
             />
           )}
-          <ImdbRow
-            imdbUrl={imdbTitleUrl(tvSeriesImdbId)}
+          <ExternalLinkRow
+            url={imdbTitleUrl(tvSeriesImdbId)}
             label="TV Series IMDB:"
             copyButton={false}
           />

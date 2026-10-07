@@ -1,0 +1,24 @@
+meta {
+  name: OpenSearch (Get Link, Movie)
+  type: http
+  seq: 1
+}
+
+get {
+  url: https://en.wikipedia.org/w/api.php?search=The Shawshank Redemption (1994 film)&action=opensearch&limit=1&namespace=0&format=json
+  body: none
+  auth: inherit
+}
+
+params:query {
+  search: The Shawshank Redemption (1994 film)
+  action: opensearch
+  limit: 1
+  namespace: 0
+  format: json
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

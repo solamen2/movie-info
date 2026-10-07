@@ -48,6 +48,8 @@ export interface Movie {
   budget: number;
   tmdbGenres: string;
   homepage: string | null;
+  // "" when Wikipedia has no page for the movie, null when the lookup failed
+  wikipediaLink: string | null;
   tmdbId: number;
   originCountries: string;
   originLanguage: string;

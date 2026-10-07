@@ -83,6 +83,8 @@ export interface Person {
   deathday: string | null;
   gender: TmdbGender;
   homepage: string | null;
+  // "" when Wikipedia has no page for the person, null when the lookup failed
+  wikipediaLink: string | null;
   tmdbId: number;
   knownForDepartment: string;
   placeOfBirth: string | null;

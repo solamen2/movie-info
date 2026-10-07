@@ -70,7 +70,7 @@ describe("TvSeriesPanel", () => {
         "https://example.com/example3.jpg",
       );
       for (const expected of [
-        "Example TV SeriesAn example TV series tagline.IMDB: 8.3 (172,659)Rank: 4444LinkCopy",
+        "Example TV SeriesAn example TV series tagline.IMDB: 8.3 (172,659)Rank: 4444LinkCopyWikipedia:LinkCopy",
         "Original NameExample TV Series Original",
         "Years2001-2003",
         "First Air DateMar 10, 2001",
@@ -264,7 +264,7 @@ describe("TvSeriesPanel", () => {
       await searchAndSelectExampleTvSeries();
       await screen.findByTestId("tv-series-panel");
 
-      const link = screen.getByRole("link", { name: "Link" });
+      const [link] = screen.getAllByRole("link", { name: "Link" });
       expect(link).toHaveAttribute(
         "href",
         "https://www.imdb.com/title/tt10000002",
@@ -289,6 +289,71 @@ describe("TvSeriesPanel", () => {
       );
       expect(await screen.findByText("Copied!")).toBeInTheDocument();
     });
+
+    it("Should link to the Wikipedia page in a new tab", async () => {
+      await searchAndSelectExampleTvSeries();
+      await screen.findByTestId("tv-series-panel");
+
+      const links = screen.getAllByRole("link", { name: "Link" });
+      expect(links).toHaveLength(2);
+      expect(links[1]).toHaveAttribute(
+        "href",
+        "https://en.wikipedia.org/wiki/Example_TV_Series",
+      );
+      expect(links[1]).toHaveAttribute("target", "_blank");
+      expect(links[1]).toHaveAttribute("rel", "noopener");
+    });
+
+    it("Should copy the Wikipedia link as an HTML anchor when Copy is clicked", async () => {
+      const writeText = vi.fn().mockResolvedValue(undefined);
+      Object.defineProperty(navigator, "clipboard", {
+        value: { writeText },
+        configurable: true,
+      });
+
+      await searchAndSelectExampleTvSeries();
+      await screen.findByTestId("tv-series-panel");
+
+      fireEvent.click(
+        screen.getByRole("button", { name: "copy-wikipedia-link" }),
+      );
+      expect(writeText).toHaveBeenCalledWith(
+        '<a href="https://en.wikipedia.org/wiki/Example_TV_Series">Link</a>',
+      );
+      expect(await screen.findByText("Copied!")).toBeInTheDocument();
+    });
+
+    it.each([
+      ["no Wikipedia page", ""],
+      ["a failed Wikipedia lookup", null],
+    ])(
+      "Should show a placeholder instead of the Wikipedia link and Copy button for %s",
+      async (_, wikipediaLink) => {
+        server.use(
+          http.get("/api/tvseries", () =>
+            HttpResponse.json({ ...tvSeriesDataJson1, wikipediaLink }),
+          ),
+        );
+
+        render(
+          <MemoryRouter>
+            <TvSeriesPanel itemId="tt10000002" />
+          </MemoryRouter>,
+        );
+        const panel = await screen.findByTestId("tv-series-panel");
+
+        expect(panel.textContent).toContain(
+          "Example TV SeriesAn example TV series tagline.IMDB: 8.3 (172,659)Rank: 4444LinkCopyWikipedia:—",
+        );
+        expect(screen.getAllByRole("link", { name: "Link" })).toHaveLength(1);
+        expect(
+          screen.queryByRole("button", { name: "copy-wikipedia-link" }),
+        ).toBeNull();
+        expect(
+          screen.getByRole("button", { name: "copy-imdb-link" }),
+        ).toBeInTheDocument();
+      },
+    );
 
     it("Should not deselect the card when clicking inside the panel", async () => {
       const { tvSeriesCard } = await searchAndSelectExampleTvSeries();
@@ -442,6 +507,7 @@ describe("TvSeriesPanel", () => {
             omdbGenres: "N/A",
             tmdbGenres: "",
             homepage: null,
+            wikipediaLink: "",
             seasons: [],
             creators: [],
             networks: [],
@@ -460,7 +526,7 @@ describe("TvSeriesPanel", () => {
       const text = panel.textContent;
 
       for (const expected of [
-        "No imageExample TV SeriesIMDB: —Rank: —LinkCopy",
+        "No imageExample TV SeriesIMDB: —Rank: —LinkCopyWikipedia:—",
         "Years—",
         "First Air Date—",
         "Last Air Date—",

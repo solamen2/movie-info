@@ -28,6 +28,7 @@ public class TvSeriesEndpoint
                 [FromServices] SuggestionHttpClient suggestionHttpClient,
                 [FromServices] OmdbHttpClient omdbHttpClient,
                 [FromServices] TmdbHttpClient tmdbHttpClient,
+                [FromServices] WikipediaHttpClient wikipediaHttpClient,
                 [FromServices] IMemoryCache cache) =>
             {
                 IResult? tvSeriesViewModelJson;
@@ -69,17 +70,20 @@ public class TvSeriesEndpoint
                         Task<TmdbTvSeriesResponseDataModel?> tmdbTvSeriesTask = GetTmdbTvSeriesResponseDataModel(tmdbTvSeriesId, tmdbHttpClient);
                         Task<TmdbTvSeriesAggregateCreditsResponseDataModel?> tmdbTvSeriesAggregateCreditsTask = GetTmdbTvSeriesAggregateCreditsResponseDataModel(tmdbTvSeriesId, tmdbHttpClient);
                         Task<TmdbWatchProvidersResponseDataModel?> tmdbTvSeriesWatchProvidersTask = GetWatchProvidersResponseDataModel(tmdbTvSeriesId, tmdbHttpClient);
+                        // Wikipedia is searched by the name from the suggestion, so that lookup can only start once the suggestion is in
+                        SuggestionViewModel? tvSeriesSuggestionViewModel = await suggestionTask;
+                        Task<string?> wikipediaLinkTask = GetWikipediaLink(tvSeriesSuggestionViewModel?.Name, wikipediaHttpClient);
 
                         // NOTE: Strictly speaking, this is not needed, but it's a good marker for when all tasks have been started
-                        await Task.WhenAll(suggestionTask, omdbTvSeriesTask, tmdbCountriesTask, tmdbLanguagesTask, tmdbTvSeriesTask, tmdbTvSeriesAggregateCreditsTask, tmdbTvSeriesWatchProvidersTask);
+                        await Task.WhenAll(omdbTvSeriesTask, tmdbCountriesTask, tmdbLanguagesTask, tmdbTvSeriesTask, tmdbTvSeriesAggregateCreditsTask, tmdbTvSeriesWatchProvidersTask, wikipediaLinkTask);
 
-                        SuggestionViewModel? tvSeriesSuggestionViewModel = await suggestionTask;
                         OmdbResponseDataModel? omdbTvSeriesResponseDataModel = await omdbTvSeriesTask;
                         ConfigurationCountriesDictionary? tmdbConfigurationCountriesDictionary = await tmdbCountriesTask;
                         ConfigurationLanguagesDictionary? tmdbConfigurationLanguagesDictionary = await tmdbLanguagesTask;
                         TmdbTvSeriesResponseDataModel? tmdbTvSeriesResponseDataModel = await tmdbTvSeriesTask;
                         TmdbTvSeriesAggregateCreditsResponseDataModel? tmdbTvSeriesAggregateCreditsResponseDataModel = await tmdbTvSeriesAggregateCreditsTask;
                         TmdbWatchProvidersResponseDataModel? tmdbTvSeriesWatchProvidersResponseDataModel = await tmdbTvSeriesWatchProvidersTask;
+                        string? wikipediaLink = await wikipediaLinkTask;
 
                         if (tvSeriesSuggestionViewModel == null)
                         {
@@ -109,6 +113,10 @@ public class TvSeriesEndpoint
                         {
                             Log.Debug($"TV series TmdbWatchProvidersResponseDataModel for search '{imdbId}' and TMDB ID '{tmdbTvSeriesId}' was null!");
                         }
+                        if (wikipediaLink == null)
+                        {
+                            Log.Debug($"TV series Wikipedia link for search '{imdbId}' was null!");
+                        }
 
                         TvSeriesViewModel tvSeriesViewModel;
                         // Null checks all happened above, but there's no good way to let the compiler know about that, so recheck here
@@ -130,7 +138,8 @@ public class TvSeriesEndpoint
                                                                       tmdbTvSeriesAggregateCreditsResponseDataModel,
                                                                       tmdbTvSeriesWatchProvidersResponseDataModel,
                                                                       tmdbConfigurationCountriesDictionary,
-                                                                      tmdbConfigurationLanguagesDictionary);
+                                                                      tmdbConfigurationLanguagesDictionary,
+                                                                      wikipediaLink);
                         }
                         else
                         {
@@ -159,7 +168,7 @@ public class TvSeriesEndpoint
             }
         )
         .WithSummary("TV Series")
-        .WithDescription("Searches IMDB, TMDB, and OMDB for detailed information on TV series, looked up by IMDB ID or by TMDB ID.")
+        .WithDescription("Searches IMDB, TMDB, OMDB, and Wikipedia for detailed information on TV series, looked up by IMDB ID or by TMDB ID.")
         .RequireAuthorization(ProgramConstants.LoggedInUsersOnlyPolicyName)  // TODO: Check that this returns appropriate error on frontend
         .RequireAuthorization(ProgramConstants.SearchUsersOnlyPolicyName)  // TODO: Check that this returns appropriate error on frontend
         .RequireRateLimiting(ProgramConstants.TokenRateLimiterPolicyName);
@@ -288,5 +297,20 @@ public class TvSeriesEndpoint
         Log.Debug($"TMDB TV series watch providers response:\n\n{tmdbTvSeriesWatchProvidersResponseDataModel}\n\n");
 
         return tmdbTvSeriesWatchProvidersResponseDataModel;
+    }
+
+    // Returns the TV series' Wikipedia page link, "" when Wikipedia has no page for it, or null when the lookup failed (or had no name to search for)
+    public async static Task<string?> GetWikipediaLink(string? name, WikipediaHttpClient wikipediaHttpClient)
+    {
+        if (name == null)
+            return null;
+
+        string? wikipediaLink = await wikipediaHttpClient.GetTvSeriesLink(name);
+        if (wikipediaLink == null)
+            return null;
+        
+        Log.Debug($"Wikipedia TV series link response:\n\n{wikipediaLink}\n\n");
+
+        return wikipediaLink;
     }
 }
