@@ -53,8 +53,8 @@
   display: flex;
   gap: 0.5rem;
   flex: 1;
-  /* Let the bar (and its input) shrink below the input's intrinsic width so
-     the logout button isn't pushed off narrow screens */
+  /* Let the bar (and its input) shrink below the input's intrinsic width on
+     narrow screens */
   min-width: 0;
 }
 

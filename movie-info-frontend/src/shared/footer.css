@@ -1,0 +1,29 @@
+.app-footer {
+  margin: 2rem auto;
+  padding: 0 2rem;
+  max-width: 1400px;
+}
+
+.app-footer-separator {
+  margin: 0 0 1rem;
+  border: none;
+  border-top: 1px solid #444;
+}
+
+.app-footer-links {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.app-footer-links .logout-button {
+  margin-left: auto;
+}
+
+@media (max-width: 640px) {
+  .app-footer {
+    margin: 1rem auto;
+    padding: 0 1rem;
+  }
+}

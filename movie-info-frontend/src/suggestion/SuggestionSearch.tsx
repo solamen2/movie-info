@@ -218,24 +218,6 @@ function SuggestionSearch({ panelKind }: SuggestionSearchProps) {
     );
   }
 
-  async function handleLogout() {
-    try {
-      const response = await fetch("/api/logout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({}),
-      });
-
-      if (!response.ok) {
-        setError("Logout failed. Redirecting to login page...");
-        await new Promise((f) => setTimeout(f, 5000));
-      }
-      await navigate("/login");
-    } catch {
-      setError("An unexpected logout error occurred. Please try again.");
-    }
-  }
-
   return (
     <div className="search-page">
       <div className="search-header">
@@ -253,13 +235,6 @@ function SuggestionSearch({ panelKind }: SuggestionSearchProps) {
             Search
           </button>
         </form>
-        <button
-          aria-label="logout"
-          className="logout-button"
-          onClick={handleLogout}
-        >
-          Logout
-        </button>
       </div>
 
       {error && <p className="error-message">{error}</p>}

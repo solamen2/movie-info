@@ -8,6 +8,7 @@ import {
 } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { type AppRouter, renderApp } from "../../tests/renderApp";
+import { mockClipboard } from "../../tests/mockClipboard";
 import { CARD_FLY_MS } from "../shared/useCardSelection";
 import { MemoryRouter } from "react-router-dom";
 import { http, HttpResponse } from "msw";
@@ -273,19 +274,18 @@ describe("TvSeriesPanel", () => {
       expect(link).toHaveAttribute("rel", "noopener");
     });
 
-    it("Should copy the IMDB link as an HTML anchor when Copy is clicked", async () => {
-      const writeText = vi.fn().mockResolvedValue(undefined);
-      Object.defineProperty(navigator, "clipboard", {
-        value: { writeText },
-        configurable: true,
-      });
+    it("Should copy the IMDB link as a hyperlink when Copy is clicked", async () => {
+      const clipboard = mockClipboard();
 
       await searchAndSelectExampleTvSeries();
       await screen.findByTestId("tv-series-panel");
 
       fireEvent.click(screen.getByRole("button", { name: "copy-imdb-link" }));
-      expect(writeText).toHaveBeenCalledWith(
+      expect(await clipboard.copiedHtml()).toBe(
         '<a href="https://www.imdb.com/title/tt10000002">Link</a>',
+      );
+      expect(await clipboard.copiedText()).toBe(
+        "https://www.imdb.com/title/tt10000002",
       );
       expect(await screen.findByText("Copied!")).toBeInTheDocument();
     });
@@ -304,12 +304,8 @@ describe("TvSeriesPanel", () => {
       expect(links[1]).toHaveAttribute("rel", "noopener");
     });
 
-    it("Should copy the Wikipedia link as an HTML anchor when Copy is clicked", async () => {
-      const writeText = vi.fn().mockResolvedValue(undefined);
-      Object.defineProperty(navigator, "clipboard", {
-        value: { writeText },
-        configurable: true,
-      });
+    it("Should copy the Wikipedia link as a hyperlink when Copy is clicked", async () => {
+      const clipboard = mockClipboard();
 
       await searchAndSelectExampleTvSeries();
       await screen.findByTestId("tv-series-panel");
@@ -317,8 +313,11 @@ describe("TvSeriesPanel", () => {
       fireEvent.click(
         screen.getByRole("button", { name: "copy-wikipedia-link" }),
       );
-      expect(writeText).toHaveBeenCalledWith(
+      expect(await clipboard.copiedHtml()).toBe(
         '<a href="https://en.wikipedia.org/wiki/Example_TV_Series">Link</a>',
+      );
+      expect(await clipboard.copiedText()).toBe(
+        "https://en.wikipedia.org/wiki/Example_TV_Series",
       );
       expect(await screen.findByText("Copied!")).toBeInTheDocument();
     });

@@ -75,6 +75,7 @@ This app displays info from the following sources:
 - [TMDB](https://www.themoviedb.org/): Movie, TV, and people info, and also watch provider information via [JustWatch](https://www.justwatch.com/)
 - [OMDB](https://www.omdbapi.com/): Movie and TV info
 - [Wikipedia](https://www.wikipedia.org/): Links to the Wikipedia pages for movies, people, and TV series
+- [DLu/oscar_data](https://github.com/DLu/oscar_data): Every Academy Award nomination and win, for the Oscars sections of movies and people and the Oscars By Year page (downloaded once a week)
 
 ## Architecture: Frontend
 

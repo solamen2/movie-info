@@ -1,5 +1,6 @@
 import type { TmdbGender, WatchProvider } from "../shared/sharedTypes";
 import type { SuggestionImage } from "../suggestion/SuggestionSearchCard";
+import type { OscarAward } from "../oscars/oscarTypes";
 
 // Mirrors MovieInfoBackend's MovieViewModel (and child view models) as
 // serialized by System.Text.Json: camelCase properties, enums as strings.
@@ -50,6 +51,11 @@ export interface Movie {
   homepage: string | null;
   // "" when Wikipedia has no page for the movie, null when the lookup failed
   wikipediaLink: string | null;
+  // The movie's Academy Award wins and nominations; null when the Oscars
+  // data could not be loaded
+  // Empty when the movie has none; null only when the Oscars data could not
+  // be loaded
+  oscars: OscarAward[] | null;
   tmdbId: number;
   originCountries: string;
   originLanguage: string;

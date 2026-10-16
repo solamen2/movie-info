@@ -12,6 +12,9 @@ interface CollapsibleProps {
   // panel has handed itself over to it (see .has-child-selection in
   // shared.css): the section's own heading and frame get out of the way.
   childSelected?: boolean;
+  // While true, the children are only rendered once the section has been
+  // opened (for sections that are many and rarely opened).
+  lazy?: boolean;
   children: ReactNode;
 }
 
@@ -20,6 +23,7 @@ function Collapsible({
   count,
   forceOpen,
   childSelected,
+  lazy,
   children,
 }: CollapsibleProps) {
   const detailsRef = useRef<HTMLDetailsElement>(null);
@@ -27,6 +31,8 @@ function Collapsible({
   // directly loaded URL selecting a card inside); later changes go through
   // the effect below, so the attribute itself never changes afterwards.
   const [initiallyOpen] = useState(forceOpen ?? false);
+  // Whether the section has ever been open (see lazy)
+  const [opened, setOpened] = useState(initiallyOpen);
 
   useEffect(() => {
     if (forceOpen && detailsRef.current) {
@@ -39,13 +45,20 @@ function Collapsible({
       ref={detailsRef}
       open={initiallyOpen}
       className={`collapsible${childSelected ? " has-child-selection" : ""}`}
+      onToggle={(e) => {
+        if (e.currentTarget.open) {
+          setOpened(true);
+        }
+      }}
     >
       <summary>
         <span className="chevron" aria-hidden="true" />
         {title}
         {count != null && <span className="collapsible-count">({count})</span>}
       </summary>
-      <div className="collapsible-body">{children}</div>
+      <div className="collapsible-body">
+        {lazy && !opened ? null : children}
+      </div>
     </details>
   );
 }

@@ -6,6 +6,7 @@ import personDataJson1 from "./data/personData1.json" with { type: "json" };
 import tvSeriesDataJson1 from "./data/tvSeriesData1.json" with { type: "json" };
 import tvSeasonDataJson1 from "./data/tvSeasonData1.json" with { type: "json" };
 import tvEpisodeDataJson1 from "./data/tvEpisodeData1.json" with { type: "json" };
+import oscarsDataJson1 from "./data/oscarsData1.json" with { type: "json" };
 
 type LoginPathParams = object;
 
@@ -225,6 +226,10 @@ export const handlers = [
       { error: "Not a valid TV episode for mock" },
       { status: 404 },
     );
+  }),
+
+  http.get("/api/oscars", () => {
+    return HttpResponse.json(oscarsDataJson1, { status: 200 });
   }),
 
   http.get("/api/person", ({ request }) => {

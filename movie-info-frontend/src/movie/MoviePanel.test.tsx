@@ -9,6 +9,7 @@ import {
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 import { type AppRouter, renderApp } from "../../tests/renderApp";
+import { mockClipboard } from "../../tests/mockClipboard";
 import { CARD_FLY_MS } from "../shared/useCardSelection";
 import { http, HttpResponse } from "msw";
 import { server } from "../../tests/mocks/node.ts";
@@ -107,10 +108,13 @@ describe("MoviePanel", () => {
         "$12,345,678",
         "Production Companies",
         "Example Studios",
-        "Producers",
       ]) {
         expect(text).not.toContain(hidden);
       }
+      // The producers aren't a section (they do appear in the Oscars section's Best Picture credits)
+      expect(
+        [...panel.querySelectorAll("summary")].map((s) => s.textContent),
+      ).not.toContain("Producers");
     });
 
     it("Should order the collapsed sections with credits first and watch providers last", async () => {
@@ -124,6 +128,7 @@ describe("MoviePanel", () => {
         "Cast",
         "Directors",
         "Writers",
+        "Oscars",
         "Plot (TMDB)",
         "Plot (OMDB)",
         "Where to Stream",
@@ -139,6 +144,7 @@ describe("MoviePanel", () => {
       for (const [summary, content] of [
         ["Plot (OMDB)", "An example plot from OMDB."],
         ["Plot (TMDB)", "An example plot from TMDB."],
+        ["Oscars", "Example Producer and Example Smith, Producers"],
         ["Cast", "Example Jones"],
         ["Directors", "Example Director"],
         ["Writers", "Example Writer"],
@@ -155,6 +161,69 @@ describe("MoviePanel", () => {
       expect(
         screen.getByText("Where to Rent").closest("details")?.textContent,
       ).toContain("None");
+    });
+
+    it("Should list the movie's Oscar wins, then its nominations, by category", async () => {
+      await searchAndSelectExampleMovie();
+      const panel = await screen.findByTestId("movie-panel");
+      const oscars = within(panel).getByText("Oscars").closest("details");
+      if (!oscars) {
+        throw new Error("Oscars section not found");
+      }
+
+      expect(oscars.querySelector("summary")?.textContent).toBe("Oscars(3)");
+      const wins = within(oscars).getByTestId("oscar-Wins");
+      expect(wins.querySelector("h4")?.textContent).toBe("Wins");
+      expect(
+        [...wins.querySelectorAll("li")].map((li) => li.textContent),
+      ).toEqual([
+        "Best Picture: Example Producer and Example Smith, Producers",
+        "Best Original Song: “Example Song” — Music and Lyric by Example Composer and Example Lyricist, Jr.",
+      ]);
+      const nominations = within(oscars).getByTestId("oscar-Nominations");
+      expect(nominations.querySelector("h4")?.textContent).toBe("Nominations");
+      expect(
+        [...nominations.querySelectorAll("li")].map((li) => li.textContent),
+      ).toEqual(["Best Actress*: Example Jones as Example Villain"]);
+      // The people link to their panels, keeping the search query
+      expect(
+        within(nominations).getByRole("link", { name: "Example Jones" }),
+      ).toHaveAttribute("href", "/person/nm9000002?q=1");
+    });
+
+    it("Should say when the Oscars are unavailable, but None when the movie just has none", async () => {
+      server.use(
+        http.get("/api/movie", () =>
+          HttpResponse.json({ ...movieDataJson1, oscars: null }),
+        ),
+      );
+      await searchAndSelectExampleMovie();
+      const panel = await screen.findByTestId("movie-panel");
+      const oscars = within(panel).getByText("Oscars").closest("details");
+
+      expect(oscars?.querySelector("summary")?.textContent).toBe("Oscars");
+      expect(oscars?.textContent).toContain("Oscars data unavailable");
+      expect(within(panel).queryByTestId("oscar-Wins")).toBeNull();
+    });
+
+    it("Should show None for a movie without Oscars", async () => {
+      server.use(
+        http.get("/api/movie", () =>
+          HttpResponse.json({ ...movieDataJson1, oscars: [] }),
+        ),
+      );
+      await searchAndSelectExampleMovie();
+      const panel = await screen.findByTestId("movie-panel");
+      const oscars = within(panel).getByText("Oscars").closest("details");
+
+      expect(oscars?.querySelector("summary")?.textContent).toBe("Oscars(0)");
+      expect(oscars?.textContent).not.toContain("unavailable");
+      expect(within(panel).getByTestId("oscar-Wins").textContent).toBe(
+        "WinsNone",
+      );
+      expect(within(panel).getByTestId("oscar-Nominations").textContent).toBe(
+        "NominationsNone",
+      );
     });
 
     it("Should render cast in billed order and crew / watch providers as cards", async () => {
@@ -192,19 +261,18 @@ describe("MoviePanel", () => {
       expect(link).toHaveAttribute("rel", "noopener");
     });
 
-    it("Should copy the IMDB link as an HTML anchor when Copy is clicked", async () => {
-      const writeText = vi.fn().mockResolvedValue(undefined);
-      Object.defineProperty(navigator, "clipboard", {
-        value: { writeText },
-        configurable: true,
-      });
+    it("Should copy the IMDB link as a hyperlink when Copy is clicked", async () => {
+      const clipboard = mockClipboard();
 
       await searchAndSelectExampleMovie();
       await screen.findByTestId("movie-panel");
 
       fireEvent.click(screen.getByRole("button", { name: "copy-imdb-link" }));
-      expect(writeText).toHaveBeenCalledWith(
+      expect(await clipboard.copiedHtml()).toBe(
         '<a href="https://www.imdb.com/title/tt0000001">Link</a>',
+      );
+      expect(await clipboard.copiedText()).toBe(
+        "https://www.imdb.com/title/tt0000001",
       );
       expect(await screen.findByText("Copied!")).toBeInTheDocument();
     });
@@ -223,12 +291,8 @@ describe("MoviePanel", () => {
       expect(links[1]).toHaveAttribute("rel", "noopener");
     });
 
-    it("Should copy the Wikipedia link as an HTML anchor when Copy is clicked", async () => {
-      const writeText = vi.fn().mockResolvedValue(undefined);
-      Object.defineProperty(navigator, "clipboard", {
-        value: { writeText },
-        configurable: true,
-      });
+    it("Should copy the Wikipedia link as a hyperlink when Copy is clicked", async () => {
+      const clipboard = mockClipboard();
 
       await searchAndSelectExampleMovie();
       await screen.findByTestId("movie-panel");
@@ -236,8 +300,11 @@ describe("MoviePanel", () => {
       fireEvent.click(
         screen.getByRole("button", { name: "copy-wikipedia-link" }),
       );
-      expect(writeText).toHaveBeenCalledWith(
+      expect(await clipboard.copiedHtml()).toBe(
         '<a href="https://en.wikipedia.org/wiki/Example_Movie">Link</a>',
+      );
+      expect(await clipboard.copiedText()).toBe(
+        "https://en.wikipedia.org/wiki/Example_Movie",
       );
       expect(await screen.findByText("Copied!")).toBeInTheDocument();
     });

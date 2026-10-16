@@ -9,6 +9,7 @@ import {
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 import { type AppRouter, renderApp } from "../../tests/renderApp";
+import { mockClipboard } from "../../tests/mockClipboard";
 import { CARD_FLY_MS } from "../shared/useCardSelection";
 import { http, HttpResponse } from "msw";
 import { server } from "../../tests/mocks/node.ts";
@@ -122,6 +123,7 @@ describe("PersonPanel", () => {
       );
       expect(summaries).toEqual([
         "Biography",
+        "Oscars(3)",
         "Movie Cast Credits(3)",
         "Movie Crew Credits(1)",
         "TV Series Cast Credits(2)",
@@ -136,6 +138,7 @@ describe("PersonPanel", () => {
 
       for (const [summary, content] of [
         ["Biography", "She is especially known for Example Film."],
+        ["Oscars", "Example Smith as Example Hero"],
         ["Movie Cast Credits", "Example Hero"],
         ["Movie Crew Credits", "Example Produced Film"],
         ["TV Series Cast Credits", "Example Slayer"],
@@ -156,6 +159,33 @@ describe("PersonPanel", () => {
       expect(profileImagesDetails).toContainElement(
         screen.getByTestId("profile-images-list"),
       );
+    });
+
+    it("Should list the person's Oscar wins, then their nominations, with the year and movie", async () => {
+      await searchAndSelectExamplePerson();
+      const panel = await screen.findByTestId("person-panel");
+      const oscars = within(panel).getByText("Oscars").closest("details");
+      if (!oscars) {
+        throw new Error("Oscars section not found");
+      }
+
+      const wins = within(oscars).getByTestId("oscar-Wins");
+      expect(
+        [...wins.querySelectorAll("li")].map((li) => li.textContent),
+      ).toEqual([
+        "Best Picture (2016): Example Movie — Example Producer and Example Smith, Producers",
+        "Best Actress* (2016): Example Smith as Example Hero — Example Film",
+      ]);
+      const nominations = within(oscars).getByTestId("oscar-Nominations");
+      expect(
+        [...nominations.querySelectorAll("li")].map((li) => li.textContent),
+      ).toEqual([
+        "Best Supporting Actress (2010): Example Smith as Example Sidekick — Example Old Film",
+      ]);
+      // The movies link to their panels, keeping the search query
+      expect(
+        within(wins).getByRole("link", { name: "Example Film" }),
+      ).toHaveAttribute("href", "/movie/tt0000002?q=1");
     });
 
     it("Should render movie credits as cards in horizontal lists, newest first with undated credits last", async () => {
@@ -234,29 +264,24 @@ describe("PersonPanel", () => {
       expect(link).toHaveAttribute("rel", "noopener");
     });
 
-    it("Should copy the IMDB link as an HTML anchor when Copy is clicked", async () => {
-      const writeText = vi.fn().mockResolvedValue(undefined);
-      Object.defineProperty(navigator, "clipboard", {
-        value: { writeText },
-        configurable: true,
-      });
+    it("Should copy the IMDB link as a hyperlink when Copy is clicked", async () => {
+      const clipboard = mockClipboard();
 
       await searchAndSelectExamplePerson();
       await screen.findByTestId("person-panel");
 
       fireEvent.click(screen.getByRole("button", { name: "copy-imdb-link" }));
-      expect(writeText).toHaveBeenCalledWith(
+      expect(await clipboard.copiedHtml()).toBe(
         '<a href="https://www.imdb.com/name/nm9000000">Link</a>',
+      );
+      expect(await clipboard.copiedText()).toBe(
+        "https://www.imdb.com/name/nm9000000",
       );
       expect(await screen.findByText("Copied!")).toBeInTheDocument();
     });
 
     it("Should show that the copy failed when the clipboard is unavailable", async () => {
-      const writeText = vi.fn().mockRejectedValue(new Error("denied"));
-      Object.defineProperty(navigator, "clipboard", {
-        value: { writeText },
-        configurable: true,
-      });
+      mockClipboard({ reject: true });
 
       await searchAndSelectExamplePerson();
       await screen.findByTestId("person-panel");
@@ -279,12 +304,8 @@ describe("PersonPanel", () => {
       expect(links[1]).toHaveAttribute("rel", "noopener");
     });
 
-    it("Should copy the Wikipedia link as an HTML anchor when Copy is clicked", async () => {
-      const writeText = vi.fn().mockResolvedValue(undefined);
-      Object.defineProperty(navigator, "clipboard", {
-        value: { writeText },
-        configurable: true,
-      });
+    it("Should copy the Wikipedia link as a hyperlink when Copy is clicked", async () => {
+      const clipboard = mockClipboard();
 
       await searchAndSelectExamplePerson();
       await screen.findByTestId("person-panel");
@@ -292,8 +313,11 @@ describe("PersonPanel", () => {
       fireEvent.click(
         screen.getByRole("button", { name: "copy-wikipedia-link" }),
       );
-      expect(writeText).toHaveBeenCalledWith(
+      expect(await clipboard.copiedHtml()).toBe(
         '<a href="https://en.wikipedia.org/wiki/Example_Smith">Link</a>',
+      );
+      expect(await clipboard.copiedText()).toBe(
+        "https://en.wikipedia.org/wiki/Example_Smith",
       );
       expect(await screen.findByText("Copied!")).toBeInTheDocument();
     });

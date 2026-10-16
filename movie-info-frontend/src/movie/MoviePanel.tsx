@@ -17,6 +17,7 @@ import {
 } from "../utilities/utilities";
 import CastCard from "./CastCard";
 import CrewCard from "./CrewCard";
+import MovieOscars from "./MovieOscars";
 import { type MovieCrew, imdbTitleUrl } from "./movieTypes";
 import "../shared/shared.css";
 
@@ -208,6 +209,7 @@ function MoviePanel({ itemId }: MoviePanelProps) {
           crew={movie.writers}
           cards={cards}
         />
+        <MovieOscars oscars={movie.oscars} />
         <Collapsible title="Plot (TMDB)">
           <p className="detail-prose">{displayText(movie.tmdbPlot)}</p>
         </Collapsible>

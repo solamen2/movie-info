@@ -14,6 +14,7 @@ import {
 } from "../utilities/utilities";
 import MovieCastCard from "./MovieCastCard";
 import MovieCrewCard from "./MovieCrewCard";
+import PersonOscars from "./PersonOscars";
 import ProfileImagesList from "./ProfileImagesList";
 import TvSeriesCastCard from "./TvSeriesCastCard";
 import TvSeriesCrewCard from "./TvSeriesCrewCard";
@@ -166,6 +167,7 @@ function PersonPanel({ itemId }: PersonPanelProps) {
             {displayText(person.biography)}
           </p>
         </Collapsible>
+        <PersonOscars oscars={person.oscars} />
         <Collapsible
           title="Movie Cast Credits"
           count={movieCastCredits.length}
