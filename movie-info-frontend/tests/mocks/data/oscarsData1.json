@@ -1,0 +1,443 @@
+[
+  {
+    "ceremony": 89,
+    "year": "2016",
+    "categories": [
+      {
+        "category": "Best Picture",
+        "subsections": [
+          {
+            "section": null,
+            "originalCategory": null,
+            "entries": [
+              {
+                "ceremony": 89,
+                "year": "2016",
+                "category": "Best Picture",
+                "originalCategory": null,
+                "isSpecial": false,
+                "winner": true,
+                "films": [
+                  {
+                    "title": "Example Movie",
+                    "imdbId": "tt0000001"
+                  }
+                ],
+                "name": "Example Producer and Example Smith, Producers",
+                "nominees": [
+                  {
+                    "name": "Example Producer",
+                    "imdbId": "nm9000001"
+                  },
+                  {
+                    "name": "Example Smith",
+                    "imdbId": "nm9000000"
+                  }
+                ],
+                "characters": [],
+                "song": null,
+                "note": null,
+                "citation": null
+              },
+              {
+                "ceremony": 89,
+                "year": "2016",
+                "category": "Best Picture",
+                "originalCategory": null,
+                "isSpecial": false,
+                "winner": false,
+                "films": [
+                  {
+                    "title": "Example Film",
+                    "imdbId": "tt0000002"
+                  }
+                ],
+                "name": "Another Producer, Producer",
+                "nominees": [
+                  {
+                    "name": "Another Producer",
+                    "imdbId": "nm9000003"
+                  }
+                ],
+                "characters": [],
+                "song": null,
+                "note": null,
+                "citation": null
+              },
+              {
+                "ceremony": 89,
+                "year": "2016",
+                "category": "Best Picture",
+                "originalCategory": null,
+                "isSpecial": false,
+                "winner": false,
+                "films": [
+                  {
+                    "title": "Example Old Film",
+                    "imdbId": "tt0000003"
+                  }
+                ],
+                "name": "Old Producer, Producer",
+                "nominees": [
+                  {
+                    "name": "Old Producer",
+                    "imdbId": "nm9000004"
+                  }
+                ],
+                "characters": [],
+                "song": null,
+                "note": null,
+                "citation": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "category": "Best Actress",
+        "subsections": [
+          {
+            "section": null,
+            "originalCategory": "Actress",
+            "entries": [
+              {
+                "ceremony": 89,
+                "year": "2016",
+                "category": "Best Actress",
+                "originalCategory": "Actress",
+                "isSpecial": false,
+                "winner": true,
+                "films": [
+                  {
+                    "title": "Example Film",
+                    "imdbId": "tt0000002"
+                  }
+                ],
+                "name": "Example Smith",
+                "nominees": [
+                  {
+                    "name": "Example Smith",
+                    "imdbId": "nm9000000"
+                  }
+                ],
+                "characters": ["Example Hero"],
+                "song": null,
+                "note": null,
+                "citation": null
+              },
+              {
+                "ceremony": 89,
+                "year": "2016",
+                "category": "Best Actress",
+                "originalCategory": "Actress",
+                "isSpecial": false,
+                "winner": false,
+                "films": [
+                  {
+                    "title": "Example Movie",
+                    "imdbId": "tt0000001"
+                  }
+                ],
+                "name": "Example Jones",
+                "nominees": [
+                  {
+                    "name": "Example Jones",
+                    "imdbId": "nm9000002"
+                  }
+                ],
+                "characters": ["Example Villain"],
+                "song": null,
+                "note": null,
+                "citation": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "category": "Best Original Song",
+        "subsections": [
+          {
+            "section": null,
+            "originalCategory": null,
+            "entries": [
+              {
+                "ceremony": 89,
+                "year": "2016",
+                "category": "Best Original Song",
+                "originalCategory": null,
+                "isSpecial": false,
+                "winner": true,
+                "films": [
+                  {
+                    "title": "Example Movie",
+                    "imdbId": "tt0000001"
+                  }
+                ],
+                "name": "Music and Lyric by Example Composer and Example Lyricist, Jr.",
+                "nominees": [
+                  {
+                    "name": "Example Composer",
+                    "imdbId": "nm9000005"
+                  },
+                  {
+                    "name": "Example Lyricist Jr.",
+                    "imdbId": "nm9000006"
+                  }
+                ],
+                "characters": [],
+                "song": "Example Song",
+                "note": null,
+                "citation": null
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "specialAwards": [
+      {
+        "ceremony": 89,
+        "year": "2016",
+        "category": "Honorary Award",
+        "originalCategory": null,
+        "isSpecial": true,
+        "winner": true,
+        "films": [],
+        "name": "",
+        "nominees": [
+          {
+            "name": "Example Legend",
+            "imdbId": "nm9000009"
+          }
+        ],
+        "characters": [],
+        "song": null,
+        "note": null,
+        "citation": "To Example Legend, for a lifetime of example work."
+      }
+    ]
+  },
+  {
+    "ceremony": 1,
+    "year": "1927/28",
+    "categories": [
+      {
+        "category": "Best Picture",
+        "subsections": [
+          {
+            "section": null,
+            "originalCategory": "Outstanding Picture",
+            "entries": [
+              {
+                "ceremony": 1,
+                "year": "1927/28",
+                "category": "Best Picture",
+                "originalCategory": "Outstanding Picture",
+                "isSpecial": false,
+                "winner": true,
+                "films": [
+                  {
+                    "title": "Example Silent",
+                    "imdbId": "tt0000010"
+                  }
+                ],
+                "name": "Example Studios",
+                "nominees": [
+                  {
+                    "name": "Example Studios",
+                    "imdbId": null
+                  }
+                ],
+                "characters": [],
+                "song": null,
+                "note": null,
+                "citation": null
+              },
+              {
+                "ceremony": 1,
+                "year": "1927/28",
+                "category": "Best Picture",
+                "originalCategory": "Outstanding Picture",
+                "isSpecial": false,
+                "winner": false,
+                "films": [
+                  {
+                    "title": "Example Talkie",
+                    "imdbId": "tt0000011"
+                  }
+                ],
+                "name": "Example Pictures",
+                "nominees": [
+                  {
+                    "name": "Example Pictures",
+                    "imdbId": null
+                  }
+                ],
+                "characters": [],
+                "song": null,
+                "note": "NOTE: An example note.",
+                "citation": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "category": "Best Director",
+        "subsections": [
+          {
+            "section": null,
+            "originalCategory": "Directing (Dramatic Picture)",
+            "entries": [
+              {
+                "ceremony": 1,
+                "year": "1927/28",
+                "category": "Best Director",
+                "originalCategory": "Directing (Dramatic Picture)",
+                "isSpecial": false,
+                "winner": true,
+                "films": [
+                  {
+                    "title": "Example Silent",
+                    "imdbId": "tt0000010"
+                  }
+                ],
+                "name": "Example Director",
+                "nominees": [
+                  {
+                    "name": "Example Director",
+                    "imdbId": "nm9000010"
+                  }
+                ],
+                "characters": [],
+                "song": null,
+                "note": null,
+                "citation": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "category": "Best Cinematography",
+        "subsections": [
+          {
+            "section": "Black-and-White",
+            "originalCategory": null,
+            "entries": [
+              {
+                "ceremony": 1,
+                "year": "1927/28",
+                "category": "Best Cinematography (Black-and-White)",
+                "originalCategory": null,
+                "isSpecial": false,
+                "winner": true,
+                "films": [
+                  {
+                    "title": "Example Silent",
+                    "imdbId": "tt0000010"
+                  }
+                ],
+                "name": "Example Cinematographer",
+                "nominees": [
+                  {
+                    "name": "Example Cinematographer",
+                    "imdbId": "nm9000011"
+                  }
+                ],
+                "characters": [],
+                "song": null,
+                "note": null,
+                "citation": null
+              }
+            ]
+          },
+          {
+            "section": "Color",
+            "originalCategory": "Cinematography (Color Photography)",
+            "entries": [
+              {
+                "ceremony": 1,
+                "year": "1927/28",
+                "category": "Best Cinematography (Color)",
+                "originalCategory": "Cinematography (Color Photography)",
+                "isSpecial": false,
+                "winner": true,
+                "films": [
+                  {
+                    "title": "Example Talkie",
+                    "imdbId": "tt0000011"
+                  }
+                ],
+                "name": "Example Colorist",
+                "nominees": [
+                  {
+                    "name": "Example Colorist",
+                    "imdbId": "nm9000012"
+                  }
+                ],
+                "characters": [],
+                "song": null,
+                "note": null,
+                "citation": null
+              },
+              {
+                "ceremony": 1,
+                "year": "1927/28",
+                "category": "Best Cinematography (Color)",
+                "originalCategory": "Cinematography (Color Photography)",
+                "isSpecial": false,
+                "winner": false,
+                "films": [
+                  {
+                    "title": "Example Art Film",
+                    "imdbId": "tt0000012"
+                  }
+                ],
+                "name": "Example Tinter",
+                "nominees": [
+                  {
+                    "name": "Example Tinter",
+                    "imdbId": "nm9000013"
+                  }
+                ],
+                "characters": [],
+                "song": null,
+                "note": null,
+                "citation": null
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "specialAwards": [
+      {
+        "ceremony": 1,
+        "year": "1927/28",
+        "category": "Unique and Artistic Picture",
+        "originalCategory": null,
+        "isSpecial": true,
+        "winner": true,
+        "films": [
+          {
+            "title": "Example Art Film",
+            "imdbId": "tt0000012"
+          }
+        ],
+        "name": "Example Studios",
+        "nominees": [
+          {
+            "name": "Example Studios",
+            "imdbId": null
+          }
+        ],
+        "characters": [],
+        "song": null,
+        "note": null,
+        "citation": null
+      }
+    ]
+  }
+]

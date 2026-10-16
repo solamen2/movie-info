@@ -3,6 +3,27 @@ import "./shared.css";
 
 const COPY_FEEDBACK_MS = 1500;
 
+// Puts the link on the clipboard as a real hyperlink, so that pasting into a
+// rich-text editor (Google Docs, Word, email, …) gives a clickable "Link"
+// without any editing, while pasting into a plain-text field gives the URL.
+// Browsers without the rich clipboard API just get the URL.
+async function copyLink(url: string): Promise<void> {
+  const anchor = `<a href="${url}">Link</a>`;
+  if (
+    typeof ClipboardItem === "undefined" ||
+    !("write" in navigator.clipboard)
+  ) {
+    await navigator.clipboard.writeText(url);
+    return;
+  }
+  await navigator.clipboard.write([
+    new ClipboardItem({
+      "text/html": new Blob([anchor], { type: "text/html" }),
+      "text/plain": new Blob([url], { type: "text/plain" }),
+    }),
+  ]);
+}
+
 export function ExternalLinkRowSeparator() {
   return (
     <span
@@ -22,7 +43,7 @@ interface ExternalLinkRowProps {
   // A bold label shown right before the link, for rows that carry no data of
   // their own (e.g. "TV Series IMDB:" or "Wikipedia:").
   label?: string;
-  // Whether to offer copying the link as an HTML anchor (default true).
+  // Whether to offer copying the link as a hyperlink (default true).
   copyButton?: boolean;
   // The copy button's accessible name (default "copy-link"); the rows for the
   // same site share one, e.g. "copy-imdb-link", so tests can tell them apart.
@@ -56,7 +77,7 @@ function ExternalLinkRow({
   async function handleCopy() {
     window.clearTimeout(copyTimeoutRef.current);
     try {
-      await navigator.clipboard.writeText(`<a href="${url}">Link</a>`);
+      await copyLink(url);
       setCopyStatus("copied");
     } catch {
       setCopyStatus("failed");

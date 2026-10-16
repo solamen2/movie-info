@@ -1,0 +1,20 @@
+meta {
+  name: Dataset (oscars.csv)
+  type: http
+  seq: 1
+}
+
+get {
+  url: https://raw.githubusercontent.com/DLu/oscar_data/refs/heads/main/oscars.csv
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  Every Academy Award nomination as one tab separated file (despite the .csv name), from https://github.com/DLu/oscar_data. The backend downloads and parses it once a week (see OscarsHttpClient and OscarsEndpoint).
+}

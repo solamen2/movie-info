@@ -12,6 +12,7 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.ResponseCompression;
 
 var builder = WebApplication.CreateBuilder(args);
 WebApplication app;
@@ -35,6 +36,7 @@ try
     Log.Information("Mapping endpoints...");
     AuthEndpoint.Map(app);
     MovieEndpoint.Map(app);
+    OscarsEndpoint.Map(app);
     PersonEndpoint.Map(app);
     SuggestionEndpoint.Map(app);
     TvEpisodeEndpoint.Map(app);
@@ -73,6 +75,13 @@ void AddServices()
                     });
             })
             .AddMemoryCache()
+            // The /oscars response is a few megabytes of very repetitive JSON, which compresses about tenfold
+            .AddResponseCompression(options =>
+            {
+                options.EnableForHttps = true;  // Fly.io terminates TLS, so the app only ever sees HTTP there; this is for local HTTPS
+                options.Providers.Add<BrotliCompressionProvider>();
+                options.Providers.Add<GzipCompressionProvider>();
+            })
             .ConfigureHttpJsonOptions(options =>
             {
                 options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());  // serializes enums as string, not backing int
@@ -104,6 +113,12 @@ void AddServices()
                             policyBuilder.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)))
                         .SetHandlerLifetime(TimeSpan.FromMinutes(15));
     builder.Services.AddHttpClient<TmdbHttpClient>()
+                        .AddTransientHttpErrorPolicy(policyBuilder =>
+                            policyBuilder.WaitAndRetryAsync(3, retryNumber => TimeSpan.FromMilliseconds(600)))
+                        .AddTransientHttpErrorPolicy(policyBuilder =>
+                            policyBuilder.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)))
+                        .SetHandlerLifetime(TimeSpan.FromMinutes(15));
+    builder.Services.AddHttpClient<OscarsHttpClient>()
                         .AddTransientHttpErrorPolicy(policyBuilder =>
                             policyBuilder.WaitAndRetryAsync(3, retryNumber => TimeSpan.FromMilliseconds(600)))
                         .AddTransientHttpErrorPolicy(policyBuilder =>
@@ -226,6 +241,9 @@ void SetUpApp()
     // Map authN routes
     RouteGroupBuilder apiGroup = app.MapGroup(ProgramConstants.ApiRoutePrefix);
     apiGroup.MapIdentityApi<ApplicationUser>();
+
+    // Compress responses for clients that accept it (must come before the static files and endpoints it compresses)
+    app.UseResponseCompression();
 
     // For React
     app.UseDefaultFiles();

@@ -114,11 +114,4 @@ describe("SuggestionSearch", () => {
       expect(router.state.location.key).toBe(locationKey);
     });
   });
-  describe("When valid user clicks the log out button", () => {
-    it("Should log out user successfully", () => {
-      renderApp();
-      const logoutButton = screen.getByRole("button", { name: "logout" });
-      fireEvent.click(logoutButton);
-    });
-  });
 });

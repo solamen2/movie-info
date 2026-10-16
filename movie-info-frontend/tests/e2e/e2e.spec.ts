@@ -143,6 +143,10 @@ const expectedMovie = useMockHttpCalls
         ["Cast", "Example Jones"],
         ["Directors", "Example Director"],
         ["Writers", "Example Writer"],
+        [
+          "Oscars",
+          "Best Picture: Example Producer and Example Smith, Producers",
+        ],
         ["Plot (TMDB)", "An example plot from TMDB."],
         ["Plot (OMDB)", "An example plot from OMDB."],
         ["Where to Stream", "Example Stream"],
@@ -182,6 +186,11 @@ const expectedMovie = useMockHttpCalls
         ["Cast", "Tim Robbins"],
         ["Directors", "Frank Darabont"],
         ["Writers", "Stephen King"],
+        // Seven nominations, no wins
+        [
+          "Oscars",
+          /Wins\s*None[\s\S]*Nominations[\s\S]*Best Actor: Morgan Freeman as Red/,
+        ],
         ["Plot (TMDB)", "Shawshank"],
         // OMDB's plot text changes over time, so only check that there is one
         ["Plot (OMDB)", /\w/],
@@ -359,6 +368,7 @@ const expectedPerson = useMockHttpCalls
       ],
       sections: [
         ["Biography", "She is especially known for Example Film."],
+        ["Oscars", "Best Actress* (2016): Example Smith as Example Hero"],
         ["Movie Cast Credits", "Example Hero"],
         ["Movie Crew Credits", "Executive Producer"],
         ["TV Series Cast Credits", "Example Slayer"],
@@ -385,6 +395,8 @@ const expectedPerson = useMockHttpCalls
       ],
       sections: [
         ["Biography", "Gellar"],
+        // No wins and no nominations
+        ["Oscars", "WinsNoneNominationsNone"],
         ["Movie Cast Credits", "Cruel Intentions"],
         ["Movie Crew Credits", ""],
         ["TV Series Cast Credits", "Buffy the Vampire Slayer"],
@@ -1356,6 +1368,799 @@ test("Panel to panel: open a movie, open a cast member's person panel from it, o
   await expect(page.locator("#search-card.selected")).toHaveCount(0);
   await expect(resultsMessage).toBeVisible();
   console.log("Panel to panel test finished.");
+});
+
+// ---------------------------------------------------------------------------
+// Oscars By Year
+
+interface ExpectedOscarSubsection {
+  // The subsection's title, or null when the category is undivided that year
+  title: string | null;
+  // The category's name at the time, in the popup behind the asterisk on the
+  // title, when it differed from the modern one
+  originalName?: string;
+  // The winners' lines, in order, as "<entry> (<detail>)"
+  winners: string[];
+  // The count on the collapsed "Nominees" section, or null when every entry
+  // in the subsection won
+  nominees: number | null;
+}
+
+interface ExpectedOscarCategory {
+  title: string;
+  originalName?: string;
+  subsections: ExpectedOscarSubsection[];
+}
+
+interface ExpectedOscarYear {
+  ceremony: number;
+  // The year and the ceremony's ordinal, as the section's heading reads
+  heading: string;
+  // The categories to spot check, not every category of the year
+  categories: ExpectedOscarCategory[];
+  // Substrings of each special award's line, in order, when checked
+  specialAwards?: string[][];
+}
+
+interface ExpectedOscarsPage {
+  // The most recent year's section is first; the dataset grows by a year
+  // after each ceremony, so only lower bounds are checked
+  latest: { minYear: number; minCeremony: number; everyCeremony: boolean };
+  years: ExpectedOscarYear[];
+  // The year "Jump To" scrolls to
+  jumpTo: number;
+  // A winner whose film and one of whose nominees link to their panels, and a
+  // winner whose nominee is a studio or a country, which doesn't
+  movieLink: {
+    ceremony: number;
+    category: string;
+    title: string;
+    imdbId: string;
+  };
+  personLink: {
+    ceremony: number;
+    category: string;
+    name: string;
+    imdbId: string;
+  };
+  plainText: { ceremony: number; category: string; text: string };
+  // An entry with a note behind its ⓘ mark
+  note: {
+    ceremony: number;
+    category: string;
+    subsection: string | null;
+    inNominees: boolean;
+    line: string;
+    text: string;
+  };
+}
+
+const expectedOscars: ExpectedOscarsPage = useMockHttpCalls
+  ? {
+      latest: { minYear: 2016, minCeremony: 89, everyCeremony: false },
+      years: [
+        {
+          ceremony: 89,
+          heading: "201689th Academy Awards",
+          categories: [
+            {
+              title: "Best Picture",
+              subsections: [
+                {
+                  title: null,
+                  winners: [
+                    "Example Movie (Example Producer and Example Smith, Producers)",
+                  ],
+                  nominees: 2,
+                },
+              ],
+            },
+            {
+              title: "Best Actress",
+              originalName: "Actress",
+              subsections: [
+                {
+                  title: null,
+                  originalName: "Actress",
+                  winners: ["Example Smith as Example Hero (Example Film)"],
+                  nominees: 1,
+                },
+              ],
+            },
+            {
+              title: "Best Original Song",
+              subsections: [
+                {
+                  title: null,
+                  winners: [
+                    "Example Movie (“Example Song” — Music and Lyric by Example Composer and Example Lyricist, Jr.)",
+                  ],
+                  nominees: null,
+                },
+              ],
+            },
+          ],
+          specialAwards: [
+            [
+              "Honorary Award",
+              "To Example Legend, for a lifetime of example work.",
+            ],
+          ],
+        },
+        {
+          ceremony: 1,
+          heading: "1927/281st Academy Awards",
+          categories: [
+            {
+              title: "Best Picture",
+              originalName: "Outstanding Picture",
+              subsections: [
+                {
+                  title: null,
+                  originalName: "Outstanding Picture",
+                  winners: ["Example Silent (Example Studios)"],
+                  nominees: 1,
+                },
+              ],
+            },
+            {
+              title: "Best Cinematography",
+              subsections: [
+                {
+                  title: "Black-and-White",
+                  winners: ["Example Silent (Example Cinematographer)"],
+                  nominees: null,
+                },
+                {
+                  title: "Color",
+                  originalName: "Cinematography (Color Photography)",
+                  winners: ["Example Talkie (Example Colorist)"],
+                  nominees: 1,
+                },
+              ],
+            },
+          ],
+          specialAwards: [
+            ["Unique and Artistic Picture: Example Art Film (Example Studios)"],
+          ],
+        },
+      ],
+      jumpTo: 1,
+      movieLink: {
+        ceremony: 89,
+        category: "Best Picture",
+        title: "Example Movie",
+        imdbId: "tt0000001",
+      },
+      personLink: {
+        ceremony: 89,
+        category: "Best Picture",
+        name: "Example Smith",
+        imdbId: "nm9000000",
+      },
+      plainText: {
+        ceremony: 1,
+        category: "Best Picture",
+        text: "Example Studios",
+      },
+      note: {
+        ceremony: 1,
+        category: "Best Picture",
+        subsection: null,
+        inNominees: true,
+        line: "Example Talkie",
+        text: "NOTE: An example note.",
+      },
+    }
+  : {
+      latest: { minYear: 2025, minCeremony: 98, everyCeremony: true },
+      years: [
+        // The first ceremony: studios as Best Picture nominees, a director
+        // award split in two, an actress nominated for three films at once,
+        // and the awards that were given only that year
+        {
+          ceremony: 1,
+          heading: "1927/281st Academy Awards",
+          categories: [
+            {
+              title: "Best Picture",
+              originalName: "Outstanding Picture",
+              subsections: [
+                {
+                  title: null,
+                  originalName: "Outstanding Picture",
+                  winners: ["Wings (Paramount Famous Lasky)"],
+                  nominees: 2,
+                },
+              ],
+            },
+            {
+              title: "Best Director",
+              subsections: [
+                {
+                  title: "Dramatic Picture",
+                  winners: ["Frank Borzage (7th Heaven)"],
+                  nominees: 2,
+                },
+                {
+                  title: "Comedy Picture",
+                  winners: ["Lewis Milestone (Two Arabian Knights)"],
+                  nominees: 1,
+                },
+              ],
+            },
+            {
+              title: "Best Actress",
+              subsections: [
+                {
+                  title: null,
+                  winners: [
+                    "Janet Gaynor as Diane, Angela, The Wife (7th Heaven, Street Angel, Sunrise)",
+                  ],
+                  nominees: 2,
+                },
+              ],
+            },
+            {
+              title: "Best Visual Effects",
+              originalName: "Engineering Effects",
+              subsections: [
+                {
+                  title: null,
+                  originalName: "Engineering Effects",
+                  winners: ["Wings (Roy Pomeroy)"],
+                  nominees: 2,
+                },
+              ],
+            },
+          ],
+          specialAwards: [
+            ["Unique and Artistic Picture: Sunrise (Fox)"],
+            ["Unique and Artistic Picture: The Crowd (Metro-Goldwyn-Mayer)"],
+            ["Unique and Artistic Picture: Chang (Paramount Famous Lasky)"],
+            ["Special Award: The Jazz Singer", "To Warner Bros."],
+            ["Special Award: The Circus", "To Charles Chaplin"],
+          ],
+        },
+        // 1942: three categories split in two, two of them with the names
+        // of the time behind asterisks on the subsections
+        {
+          ceremony: 15,
+          heading: "194215th Academy Awards",
+          categories: [
+            {
+              title: "Best Cinematography",
+              subsections: [
+                {
+                  title: "Black-and-White",
+                  winners: ["Mrs. Miniver (Joseph Ruttenberg)"],
+                  nominees: 9,
+                },
+                {
+                  title: "Color",
+                  winners: ["The Black Swan (Leon Shamroy)"],
+                  nominees: 5,
+                },
+              ],
+            },
+            {
+              title: "Best Original Screenplay",
+              subsections: [
+                {
+                  title: "Best Original Screenplay",
+                  winners: [
+                    "Woman of the Year (Ring Lardner, Jr., Michael Kanin)",
+                  ],
+                  nominees: 4,
+                },
+                {
+                  title: "Best Story",
+                  originalName: "Writing (Original Motion Picture Story)",
+                  winners: ["The Invaders (Emeric Pressburger)"],
+                  nominees: 4,
+                },
+              ],
+            },
+            {
+              title: "Best Original Score",
+              subsections: [
+                {
+                  title: "Best Original Non-Musical Score",
+                  originalName:
+                    "Music (Music Score of a Dramatic or Comedy Picture)",
+                  winners: ["Now, Voyager (Max Steiner)"],
+                  nominees: 17,
+                },
+                {
+                  title: "Best Original Musical Score",
+                  originalName: "Music (Scoring of a Musical Picture)",
+                  winners: [
+                    "Yankee Doodle Dandy (Ray Heindorf, Heinz Roemheld)",
+                  ],
+                  nominees: 7,
+                },
+              ],
+            },
+          ],
+        },
+        // 1976: no competitive visual effects award, so the two Special
+        // Achievement Awards stand in, both winners and nobody else
+        {
+          ceremony: 49,
+          heading: "197649th Academy Awards",
+          categories: [
+            {
+              title: "Best Visual Effects",
+              originalName: "Special Achievement Award (Visual Effects)",
+              subsections: [
+                {
+                  title: null,
+                  originalName: "Special Achievement Award (Visual Effects)",
+                  winners: [
+                    "King Kong (Carlo Rambaldi, Glen Robinson, Frank Van der Veer)",
+                    "Logan's Run (L. B. Abbott, Glen Robinson, Matthew Yuricich)",
+                  ],
+                  nominees: null,
+                },
+              ],
+            },
+          ],
+        },
+        // 1994: sound split into mixing and editing, under older names
+        {
+          ceremony: 67,
+          heading: "199467th Academy Awards",
+          categories: [
+            {
+              title: "Best Picture",
+              subsections: [
+                {
+                  title: null,
+                  winners: [
+                    "Forrest Gump (Wendy Finerman, Steve Tisch and Steve Starkey, Producers)",
+                  ],
+                  nominees: 4,
+                },
+              ],
+            },
+            {
+              title: "Best Sound",
+              subsections: [
+                {
+                  title: "Best Sound Mixing",
+                  originalName: "Sound",
+                  winners: [
+                    "Speed (Gregg Landaker, Steve Maslow, Bob Beemer, David R. B. MacMillan)",
+                  ],
+                  nominees: 4,
+                },
+                {
+                  title: "Best Sound Editing",
+                  originalName: "Sound Effects Editing",
+                  winners: ["Speed (Stephen Hunter Flick)"],
+                  nominees: 2,
+                },
+              ],
+            },
+          ],
+        },
+        // 2012: a tie, so two winners and three nominees
+        {
+          ceremony: 85,
+          heading: "201285th Academy Awards",
+          categories: [
+            {
+              title: "Best Sound",
+              subsections: [
+                {
+                  title: "Best Sound Mixing",
+                  winners: [
+                    "Les Misérables (Andy Nelson, Mark Paterson and Simon Hayes)",
+                  ],
+                  nominees: 4,
+                },
+                {
+                  title: "Best Sound Editing",
+                  winners: [
+                    "Skyfall (Per Hallberg and Karen Baker Landers)",
+                    "Zero Dark Thirty (Paul N.J. Ottosson)",
+                  ],
+                  nominees: 3,
+                },
+              ],
+            },
+          ],
+        },
+        // 2023: a recent year with an acting award's character, a song, a
+        // country as the nominee, and honorary awards
+        {
+          ceremony: 96,
+          heading: "202396th Academy Awards",
+          categories: [
+            {
+              title: "Best Picture",
+              subsections: [
+                {
+                  title: null,
+                  winners: [
+                    "Oppenheimer (Emma Thomas, Charles Roven and Christopher Nolan, Producers)",
+                  ],
+                  nominees: 9,
+                },
+              ],
+            },
+            {
+              title: "Best Actor",
+              subsections: [
+                {
+                  title: null,
+                  winners: [
+                    "Cillian Murphy as J. Robert Oppenheimer (Oppenheimer)",
+                  ],
+                  nominees: 4,
+                },
+              ],
+            },
+            {
+              title: "Best International Feature Film",
+              subsections: [
+                {
+                  title: null,
+                  winners: ["The Zone of Interest (United Kingdom)"],
+                  nominees: 4,
+                },
+              ],
+            },
+            {
+              title: "Best Original Song",
+              subsections: [
+                {
+                  title: null,
+                  winners: [
+                    "Barbie (“What Was I Made For?” — Music and Lyric by Billie Eilish and Finneas O'Connell)",
+                  ],
+                  nominees: 4,
+                },
+              ],
+            },
+          ],
+          specialAwards: [
+            ["Jean Hersholt Humanitarian Award: Michelle Satter"],
+            ["Honorary Award", "To Angela Bassett"],
+            ["Honorary Award", "To Mel Brooks"],
+            ["Honorary Award", "To Carol Littleton"],
+          ],
+        },
+      ],
+      jumpTo: 67,
+      movieLink: {
+        ceremony: 96,
+        category: "Best Picture",
+        title: "Oppenheimer",
+        imdbId: "tt15398776",
+      },
+      personLink: {
+        ceremony: 96,
+        category: "Best Picture",
+        name: "Christopher Nolan",
+        imdbId: "nm0634240",
+      },
+      plainText: {
+        ceremony: 96,
+        category: "Best International Feature Film",
+        text: "United Kingdom",
+      },
+      note: {
+        ceremony: 85,
+        category: "Best Sound",
+        subsection: "Best Sound Editing",
+        inNominees: false,
+        line: "Skyfall",
+        text: "A tie.",
+      },
+    };
+
+async function openOscarsPage(page: Page): Promise<Locator> {
+  await page.getByRole("link", { name: "Oscars By Year" }).click();
+  await expect(page).toHaveURL(/\/oscars$/);
+  const oscarsPage = page.getByTestId("oscars-page");
+  await expect(
+    oscarsPage.getByRole("heading", { name: "Oscars By Year" }),
+  ).toBeVisible();
+  // Every year starts collapsed
+  await expect(page.locator("details.oscar-year").first()).toBeVisible();
+  await expect(page.locator("details.oscar-year[open]")).toHaveCount(0);
+  return oscarsPage;
+}
+
+function oscarYear(page: Page, ceremony: number): Locator {
+  return page.locator(`#oscars-year-${String(ceremony)}`);
+}
+
+async function openOscarYear(page: Page, ceremony: number): Promise<Locator> {
+  const year = oscarYear(page, ceremony);
+  await year.locator("> summary").click();
+  await expect(year).toHaveAttribute("open", "");
+  await expect(year.getByTestId("oscar-category").first()).toBeVisible();
+  return year;
+}
+
+// A title reads "<name>*" when the name at the time is behind an asterisk,
+// and "<name>*Original Category Name: <name at the time>" while its popup
+// is open
+type Asterisk = "yes" | "no" | "either";
+
+function oscarTitle(name: string, asterisk: Asterisk): RegExp {
+  const popup = "\\*(Original Category Name: .*)?";
+  const suffix = { yes: popup, no: "", either: `(${popup})?` }[asterisk];
+  return new RegExp(`^${escapeRegExp(name)}${suffix}$`);
+}
+
+function asteriskFor(originalName: string | undefined): Asterisk {
+  return originalName === undefined ? "no" : "yes";
+}
+
+function oscarCategory(year: Locator, title: string, asterisk: Asterisk) {
+  return year.getByTestId("oscar-category").filter({
+    has: year.page().locator("h3.oscar-category-title", {
+      hasText: oscarTitle(title, asterisk),
+    }),
+  });
+}
+
+// The element holding a subsection's winners and nominees: the subsection
+// itself, or the category when it is undivided that year
+function oscarSubsection(
+  category: Locator,
+  subsection: ExpectedOscarSubsection,
+): Locator {
+  if (subsection.title === null) return category;
+  return category.getByTestId("oscar-category-subsection").filter({
+    has: category.page().locator("h4.oscar-category-subsection-title", {
+      hasText: oscarTitle(
+        subsection.title,
+        asteriskFor(subsection.originalName),
+      ),
+    }),
+  });
+}
+
+async function checkOscarAsterisk(
+  page: Page,
+  container: Locator,
+  originalName: string | undefined,
+) {
+  const asterisk = container
+    .locator("> h3.oscar-category-title, > h4.oscar-category-subsection-title")
+    .getByRole("button", { name: "original category name" });
+  if (originalName === undefined) {
+    await expect(asterisk).toHaveCount(0);
+    return;
+  }
+  await asterisk.click();
+  await expect(container.getByRole("tooltip")).toHaveText(
+    `Original Category Name: ${originalName}`,
+  );
+  await page.keyboard.press("Escape");
+  await expect(container.getByRole("tooltip")).toHaveCount(0);
+}
+
+async function checkOscarYear(page: Page, expected: ExpectedOscarYear) {
+  console.log(`Checking the ${expected.heading.slice(0, 7)} section...`);
+  const year = await openOscarYear(page, expected.ceremony);
+  await expect(year.locator("> summary h2")).toHaveText(expected.heading);
+  for (const expectedCategory of expected.categories) {
+    const category = oscarCategory(
+      year,
+      expectedCategory.title,
+      asteriskFor(expectedCategory.originalName),
+    );
+    await expect(category).toHaveCount(1);
+    // Subsections only when the category was split that year
+    const split = expectedCategory.subsections[0].title !== null;
+    await expect(category.getByTestId("oscar-category-subsection")).toHaveCount(
+      split ? expectedCategory.subsections.length : 0,
+    );
+    await checkOscarAsterisk(
+      page,
+      category,
+      split ? undefined : expectedCategory.originalName,
+    );
+    for (const expectedSubsection of expectedCategory.subsections) {
+      const subsection = oscarSubsection(category, expectedSubsection);
+      await expect(subsection).toHaveCount(1);
+      if (split) {
+        await checkOscarAsterisk(
+          page,
+          subsection,
+          expectedSubsection.originalName,
+        );
+      }
+      const winners = subsection.getByTestId("oscar-winners").locator("> li");
+      await expect(winners).toHaveCount(expectedSubsection.winners.length);
+      await expect(winners).toContainText(expectedSubsection.winners);
+      const nominees = subsection.locator("details.collapsible > summary");
+      if (expectedSubsection.nominees === null) {
+        await expect(nominees).toHaveCount(0);
+      } else {
+        await expect(nominees).toHaveText(
+          `Nominees(${String(expectedSubsection.nominees)})`,
+        );
+      }
+    }
+  }
+  if (expected.specialAwards !== undefined) {
+    const specialAwards = year
+      .getByTestId("oscar-special-awards")
+      .locator("li");
+    await expect(specialAwards).toHaveCount(expected.specialAwards.length);
+    for (const [index, substrings] of expected.specialAwards.entries()) {
+      for (const substring of substrings) {
+        await expect(specialAwards.nth(index)).toContainText(substring);
+      }
+    }
+  }
+  await year.locator("> summary").click();
+  await expect(year).not.toHaveAttribute("open", "");
+}
+
+test("Oscars By Year spot checks: open the page from the footer, check the most recent year, then the winners, nominees, subsections, asterisks, and special awards of a few years", async ({
+  page,
+}) => {
+  test.slow(); // Many small checks over several years
+  console.log("Starting Oscars By Year spot checks test...");
+  await openOscarsPage(page);
+
+  console.log("Checking the most recent year...");
+  const years = page.locator("details.oscar-year");
+  const yearCount = await years.count();
+  expect(yearCount).toBeGreaterThanOrEqual(expectedOscars.years.length);
+  const latestHeading = (await years.first().locator("h2").textContent()) ?? "";
+  const latestMatch = /^(\d{4})(\d+)(?:st|nd|rd|th) Academy Awards$/.exec(
+    latestHeading,
+  );
+  expect(latestMatch).not.toBeNull();
+  const [, latestYear, latestCeremony] = latestMatch ?? [];
+  expect(Number(latestYear)).toBeGreaterThanOrEqual(
+    expectedOscars.latest.minYear,
+  );
+  expect(Number(latestCeremony)).toBeGreaterThanOrEqual(
+    expectedOscars.latest.minCeremony,
+  );
+  if (expectedOscars.latest.everyCeremony) {
+    expect(Number(latestCeremony)).toBe(yearCount);
+  }
+  // The first ceremony is last, and "Jump To" lists every year in order
+  await expect(years.last().locator("h2")).toHaveText(
+    "1927/281st Academy Awards",
+  );
+  const jumpToOptions = page
+    .getByRole("combobox", { name: "jump-to-year" })
+    .locator("option:not([disabled])");
+  await expect(jumpToOptions).toHaveCount(yearCount);
+  await expect(jumpToOptions.first()).toHaveText(latestYear);
+  await expect(jumpToOptions.last()).toHaveText("1927/28");
+  // The most recent year has a single Best Picture winner, first of all
+  const latest = await openOscarYear(page, Number(latestCeremony));
+  const latestCategories = latest.getByTestId("oscar-category");
+  await expect(latestCategories.first().locator("h3")).toHaveText(
+    "Best Picture",
+  );
+  await expect(
+    latestCategories.first().getByTestId("oscar-winners").locator("> li"),
+  ).toHaveCount(1);
+  await expect(
+    latestCategories.first().locator("details.collapsible > summary"),
+  ).toHaveText(/^Nominees\(\d+\)$/);
+  await latest.locator("> summary").click();
+
+  for (const expectedYear of expectedOscars.years) {
+    await checkOscarYear(page, expectedYear);
+  }
+  console.log("Oscars By Year spot checks test finished.");
+});
+
+test("Oscars By Year interactions: expand and collapse all years, jump to a year, read a note, follow a link to a movie panel, and come back", async ({
+  page,
+}) => {
+  console.log("Starting Oscars By Year interactions test...");
+  await openOscarsPage(page);
+  const years = page.locator("details.oscar-year");
+  const yearCount = await years.count();
+
+  console.log("Expanding and collapsing all years...");
+  await page.getByRole("button", { name: "Expand All" }).click();
+  await expect(page.locator("details.oscar-year[open]")).toHaveCount(yearCount);
+  await expect(
+    years.last().getByTestId("oscar-category").first(),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Collapse All" }).click();
+  await expect(page.locator("details.oscar-year[open]")).toHaveCount(0);
+
+  console.log("Jumping to a year...");
+  await page
+    .getByRole("combobox", { name: "jump-to-year" })
+    .selectOption(String(expectedOscars.jumpTo));
+  const jumpedTo = oscarYear(page, expectedOscars.jumpTo);
+  await expect(jumpedTo).toHaveAttribute("open", "");
+  await expect(jumpedTo.locator("> summary")).toBeInViewport();
+  await expect(page.locator("details.oscar-year[open]")).toHaveCount(1);
+  await jumpedTo.locator("> summary").click();
+
+  console.log("Reading a note...");
+  const { note } = expectedOscars;
+  const noteYear = await openOscarYear(page, note.ceremony);
+  const noteCategory = oscarCategory(noteYear, note.category, "either");
+  let noteContainer =
+    note.subsection === null
+      ? noteCategory
+      : noteCategory.getByTestId("oscar-category-subsection").filter({
+          has: page.locator("h4", {
+            hasText: oscarTitle(note.subsection, "either"),
+          }),
+        });
+  if (note.inNominees) {
+    await noteContainer.locator("details.collapsible > summary").click();
+    noteContainer = noteContainer.getByTestId("oscar-nominees");
+  } else {
+    noteContainer = noteContainer.getByTestId("oscar-winners");
+  }
+  const noteLine = noteContainer.locator("> li").filter({ hasText: note.line });
+  await expect(noteLine).toHaveCount(1);
+  await noteLine.getByRole("button", { name: "note" }).click();
+  await expect(noteLine.getByRole("tooltip")).toContainText(note.text);
+  await page.keyboard.press("Escape");
+  await expect(noteLine.getByRole("tooltip")).toHaveCount(0);
+  await noteYear.locator("> summary").click();
+
+  console.log("Checking what links and what doesn't...");
+  const { plainText } = expectedOscars;
+  const plainTextYear = await openOscarYear(page, plainText.ceremony);
+  const plainTextWinners = oscarCategory(
+    plainTextYear,
+    plainText.category,
+    "either",
+  ).getByTestId("oscar-winners");
+  await expect(plainTextWinners).toContainText(plainText.text);
+  await expect(
+    plainTextWinners.getByRole("link", { name: plainText.text }),
+  ).toHaveCount(0);
+  await plainTextYear.locator("> summary").click();
+  const { personLink, movieLink } = expectedOscars;
+  const linkYear = await openOscarYear(page, personLink.ceremony);
+  await expect(
+    oscarCategory(linkYear, personLink.category, "either")
+      .getByTestId("oscar-winners")
+      .getByRole("link", { name: personLink.name, exact: true }),
+  ).toHaveAttribute("href", `/person/${personLink.imdbId}`);
+  if (movieLink.ceremony !== personLink.ceremony) {
+    await linkYear.locator("> summary").click();
+    await openOscarYear(page, movieLink.ceremony);
+  }
+  const movieLinkElement = oscarCategory(
+    oscarYear(page, movieLink.ceremony),
+    movieLink.category,
+    "either",
+  )
+    .getByTestId("oscar-winners")
+    .getByRole("link", { name: movieLink.title, exact: true });
+  await expect(movieLinkElement).toHaveAttribute(
+    "href",
+    `/movie/${movieLink.imdbId}`,
+  );
+
+  console.log("Following the movie link and coming back...");
+  await movieLinkElement.click();
+  await expect(page).toHaveURL(new RegExp(`/movie/${movieLink.imdbId}$`));
+  const moviePanel = page.getByTestId("movie-panel");
+  await expect(moviePanel).toBeVisible();
+  await expect(
+    moviePanel.getByRole("heading", { name: movieLink.title, exact: true }),
+  ).toBeVisible();
+  await page.goBack();
+  await expect(page).toHaveURL(/\/oscars$/);
+  await expect(page.getByTestId("oscars-page")).toBeVisible();
+  console.log("Oscars By Year interactions test finished.");
 });
 
 function escapeRegExp(text: string): string {

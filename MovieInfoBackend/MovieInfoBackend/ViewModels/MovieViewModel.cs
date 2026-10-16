@@ -16,6 +16,7 @@ public record MovieViewModel
                           ConfigurationCountriesDictionary tmdbConfigurationCountriesDictionary,
                           ConfigurationLanguagesDictionary tmdbConfigurationLanguagesDictionary,
                           string? wikipediaLink,
+                          List<OscarAwardViewModel>? oscars,
                           Guid? testGuid = null)
     {
         this.ID = testGuid ?? Guid.NewGuid();
@@ -45,6 +46,7 @@ public record MovieViewModel
         
         this.Homepage = tmdbMovieDataModel.Homepage;
         this.WikipediaLink = wikipediaLink;
+        this.Oscars = oscars;
         this.TmdbId = tmdbMovieDataModel.TmdbId;
         this.OriginCountries = "";
         FrozenDictionary<string, string>? iso31661ToEnglishCountryNameDictionary = tmdbConfigurationCountriesDictionary.iso31661ToEnglishCountryNameDictionary;
@@ -139,6 +141,7 @@ public record MovieViewModel
     public string TmdbGenres { get; }
     public string? Homepage { get; }
     public string? WikipediaLink { get; }  // "" when Wikipedia has no page for the movie, null when the lookup failed
+    public List<OscarAwardViewModel>? Oscars { get; }  // The movie's Academy Award wins and nominations: empty when it has none, null only when the Oscars data could not be loaded
     public int TmdbId { get; }
     public string OriginCountries { get; }
     public string OriginLanguage { get; }
@@ -162,6 +165,6 @@ public record MovieViewModel
 
     public override string ToString()
     {
-        return $"ID: {ID}\nImage:\n*****\n{Image}\n*****\nImdbId: {ImdbId}\nTitle: {Title}\nImdbRank: {ImdbRank}\nKnownForActors: {KnownForActors}\nYear: {Year}\nRated: {Rated}\nOmdbGenres: {OmdbGenres}\nOmdbPlot: {OmdbPlot}\nAwards: {Awards}\nImdbRating: {ImdbRating}\nImdbVotes: {ImdbVotes}\nBoxOfficeString: {BoxOfficeString}\nBoxOfficeNumber: {BoxOfficeNumber}\nBudget: {Budget}\nTmdbGenres: {TmdbGenres}\nHomepage: {Homepage}\nWikipediaLink: {WikipediaLink}\nTmdbId: {TmdbId}\nOriginCountries: {OriginCountries}\nOriginLanguage: {OriginLanguage}\nOriginalTitle: {OriginalTitle}\nTmdbPlot: {TmdbPlot}\nProductionCompanies: {ProductionCompanies}\nProductionCountries: {ProductionCountries}\nReleaseDate: {ReleaseDate}\nRevenue: {Revenue}\nRuntime: {Runtime}\nSpokenLanguages: {SpokenLanguages}\nStatus: {Status}\nTagline: {Tagline}\nCast:\n*****\n{string.Join("\n\n", Cast)}\n*****\nDirectors:\n*****\n{string.Join("\n\n", Directors)}\n*****\nWriters:\n*****\n{string.Join("\n\n", Writers)}\n*****\nProducers:\n*****\n{string.Join("\n\n", Producers)}\n*****\nWatchProvidersBuy:\n*****\n{string.Join("\n\n", WatchProvidersBuy)}\n*****\nWatchProvidersFlatrate:\n*****\n{string.Join("\n\n", WatchProvidersFlatrate)}\n*****\nWatchProvidersRent:\n*****\n{string.Join("\n\n", WatchProvidersRent)}";
+        return $"ID: {ID}\nImage:\n*****\n{Image}\n*****\nImdbId: {ImdbId}\nTitle: {Title}\nImdbRank: {ImdbRank}\nKnownForActors: {KnownForActors}\nYear: {Year}\nRated: {Rated}\nOmdbGenres: {OmdbGenres}\nOmdbPlot: {OmdbPlot}\nAwards: {Awards}\nImdbRating: {ImdbRating}\nImdbVotes: {ImdbVotes}\nBoxOfficeString: {BoxOfficeString}\nBoxOfficeNumber: {BoxOfficeNumber}\nBudget: {Budget}\nTmdbGenres: {TmdbGenres}\nHomepage: {Homepage}\nWikipediaLink: {WikipediaLink}\nOscars:\n*****\n{(Oscars == null ? "" : string.Join("\n\n", Oscars))}\n*****\nTmdbId: {TmdbId}\nOriginCountries: {OriginCountries}\nOriginLanguage: {OriginLanguage}\nOriginalTitle: {OriginalTitle}\nTmdbPlot: {TmdbPlot}\nProductionCompanies: {ProductionCompanies}\nProductionCountries: {ProductionCountries}\nReleaseDate: {ReleaseDate}\nRevenue: {Revenue}\nRuntime: {Runtime}\nSpokenLanguages: {SpokenLanguages}\nStatus: {Status}\nTagline: {Tagline}\nCast:\n*****\n{string.Join("\n\n", Cast)}\n*****\nDirectors:\n*****\n{string.Join("\n\n", Directors)}\n*****\nWriters:\n*****\n{string.Join("\n\n", Writers)}\n*****\nProducers:\n*****\n{string.Join("\n\n", Producers)}\n*****\nWatchProvidersBuy:\n*****\n{string.Join("\n\n", WatchProvidersBuy)}\n*****\nWatchProvidersFlatrate:\n*****\n{string.Join("\n\n", WatchProvidersFlatrate)}\n*****\nWatchProvidersRent:\n*****\n{string.Join("\n\n", WatchProvidersRent)}";
     }
 }

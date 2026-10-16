@@ -1,5 +1,6 @@
 import type { TmdbGender } from "../shared/sharedTypes";
 import type { SuggestionImage } from "../suggestion/SuggestionSearchCard";
+import type { OscarAward } from "../oscars/oscarTypes";
 
 // Mirrors MovieInfoBackend's PersonViewModel (and child view models) as
 // serialized by System.Text.Json: camelCase properties, enums as strings.
@@ -85,6 +86,9 @@ export interface Person {
   homepage: string | null;
   // "" when Wikipedia has no page for the person, null when the lookup failed
   wikipediaLink: string | null;
+  // Empty when the person has none; null only when the Oscars data could not
+  // be loaded
+  oscars: OscarAward[] | null;
   tmdbId: number;
   knownForDepartment: string;
   placeOfBirth: string | null;

@@ -22,6 +22,91 @@
   "tmdbGenres": "Mystery, Thriller, Drama, Science Fiction",
   "homepage": "https://example.com/example-movie",
   "wikipediaLink": "https://en.wikipedia.org/wiki/Example_Movie",
+  "oscars": [
+    {
+      "ceremony": 89,
+      "year": "2016",
+      "category": "Best Picture",
+      "originalCategory": null,
+      "isSpecial": false,
+      "winner": true,
+      "films": [
+        {
+          "title": "Example Movie",
+          "imdbId": "tt0000001"
+        }
+      ],
+      "name": "Example Producer and Example Smith, Producers",
+      "nominees": [
+        {
+          "name": "Example Producer",
+          "imdbId": "nm9000001"
+        },
+        {
+          "name": "Example Smith",
+          "imdbId": "nm9000000"
+        }
+      ],
+      "characters": [],
+      "song": null,
+      "note": null,
+      "citation": null
+    },
+    {
+      "ceremony": 89,
+      "year": "2016",
+      "category": "Best Actress",
+      "originalCategory": "Actress",
+      "isSpecial": false,
+      "winner": false,
+      "films": [
+        {
+          "title": "Example Movie",
+          "imdbId": "tt0000001"
+        }
+      ],
+      "name": "Example Jones",
+      "nominees": [
+        {
+          "name": "Example Jones",
+          "imdbId": "nm9000002"
+        }
+      ],
+      "characters": ["Example Villain"],
+      "song": null,
+      "note": null,
+      "citation": null
+    },
+    {
+      "ceremony": 89,
+      "year": "2016",
+      "category": "Best Original Song",
+      "originalCategory": null,
+      "isSpecial": false,
+      "winner": true,
+      "films": [
+        {
+          "title": "Example Movie",
+          "imdbId": "tt0000001"
+        }
+      ],
+      "name": "Music and Lyric by Example Composer and Example Lyricist, Jr.",
+      "nominees": [
+        {
+          "name": "Example Composer",
+          "imdbId": "nm9000005"
+        },
+        {
+          "name": "Example Lyricist Jr.",
+          "imdbId": "nm9000006"
+        }
+      ],
+      "characters": [],
+      "song": "Example Song",
+      "note": null,
+      "citation": null
+    }
+  ],
   "tmdbId": 90001,
   "originCountries": "United States of America",
   "originLanguage": "English",

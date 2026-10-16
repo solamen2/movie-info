@@ -10,6 +10,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 import { http, HttpResponse } from "msw";
 import { type AppRouter, renderApp } from "../../tests/renderApp";
+import { mockClipboard } from "../../tests/mockClipboard";
 import { server } from "../../tests/mocks/node.ts";
 import tvEpisodeDataJson1 from "../../tests/mocks/data/tvEpisodeData1.json" with { type: "json" };
 import TvEpisodePanel from "./TvEpisodePanel";
@@ -265,12 +266,8 @@ describe("TvEpisodePanel", () => {
       ).toHaveLength(1);
     });
 
-    it("Should copy the episode's IMDB link as an HTML anchor when Copy is clicked", async () => {
-      const writeText = vi.fn().mockResolvedValue(undefined);
-      Object.defineProperty(navigator, "clipboard", {
-        value: { writeText },
-        configurable: true,
-      });
+    it("Should copy the episode's IMDB link as a hyperlink when Copy is clicked", async () => {
+      const clipboard = mockClipboard();
 
       await searchAndSelectExampleEpisode();
       const panel = await screen.findByTestId("tv-episode-panel");
@@ -278,8 +275,11 @@ describe("TvEpisodePanel", () => {
       fireEvent.click(
         within(panel).getByRole("button", { name: "copy-imdb-link" }),
       );
-      expect(writeText).toHaveBeenCalledWith(
+      expect(await clipboard.copiedHtml()).toBe(
         '<a href="https://www.imdb.com/title/tt20000001">Link</a>',
+      );
+      expect(await clipboard.copiedText()).toBe(
+        "https://www.imdb.com/title/tt20000001",
       );
       expect(await within(panel).findByText("Copied!")).toBeInTheDocument();
     });

@@ -29,6 +29,7 @@ public class MovieEndpoint
                 [FromServices] OmdbHttpClient omdbHttpClient,
                 [FromServices] TmdbHttpClient tmdbHttpClient,
                 [FromServices] WikipediaHttpClient wikipediaHttpClient,
+                [FromServices] OscarsHttpClient oscarsHttpClient,
                 [FromServices] IMemoryCache cache) =>
             {
                 IResult? movieViewModelJson;
@@ -60,6 +61,7 @@ public class MovieEndpoint
                         Task<OmdbResponseDataModel?> omdbMovieTask = GetOmdbResponseDataModel(imdbId, omdbHttpClient);
                         Task<ConfigurationCountriesDictionary?> tmdbCountriesTask = GetConfigurationCountriesDictionary(tmdbHttpClient);
                         Task<ConfigurationLanguagesDictionary?> tmdbLanguagesTask = GetConfigurationLanguagesDictionary(tmdbHttpClient);
+                        Task<OscarsViewModel?> oscarsTask = GetOscarsViewModel(oscarsHttpClient);
                         int? tmdbMovieIdNullable = tmdbId ?? await GetTmdbId(imdbId, tmdbHttpClient);
                         if (tmdbMovieIdNullable == null)
                         {
@@ -75,7 +77,7 @@ public class MovieEndpoint
                         Task<string?> wikipediaLinkTask = GetWikipediaLink(movieSuggestionViewModel, wikipediaHttpClient);
 
                         // NOTE: Strictly speaking, this is not needed, but it's a good marker for when all tasks have been started
-                        await Task.WhenAll(omdbMovieTask, tmdbCountriesTask, tmdbLanguagesTask, tmdbMovieTask, tmdbMovieCreditsTask, tmdbMovieWatchProvidersTask, wikipediaLinkTask);
+                        await Task.WhenAll(omdbMovieTask, tmdbCountriesTask, tmdbLanguagesTask, oscarsTask, tmdbMovieTask, tmdbMovieCreditsTask, tmdbMovieWatchProvidersTask, wikipediaLinkTask);
 
                         OmdbResponseDataModel? omdbMovieResponseDataModel = await omdbMovieTask;
                         ConfigurationCountriesDictionary? tmdbConfigurationCountriesDictionary = await tmdbCountriesTask;
@@ -84,6 +86,7 @@ public class MovieEndpoint
                         TmdbMovieCreditsResponseDataModel? tmdbMovieCreditsResponseDataModel = await tmdbMovieCreditsTask;
                         TmdbWatchProvidersResponseDataModel? tmdbMovieWatchProvidersResponseDataModel = await tmdbMovieWatchProvidersTask;
                         string? wikipediaLink = await wikipediaLinkTask;
+                        OscarsViewModel? oscarsViewModel = await oscarsTask;
 
                         if (movieSuggestionViewModel == null)
                         {
@@ -117,6 +120,10 @@ public class MovieEndpoint
                         {
                             Log.Debug($"Movie Wikipedia link for search '{imdbId}' was null!");
                         }
+                        if (oscarsViewModel == null)
+                        {
+                            Log.Warning($"Oscars data unavailable for the /movie request '{imdbId}'.");
+                        }
 
                         MovieViewModel movieViewModel;
                         // Null checks all happened above, but there's no good way to let the compiler know about that, so recheck here
@@ -131,7 +138,10 @@ public class MovieEndpoint
                             {
                                 omdbMovieResponseDataModel = OmdbResponseDataModel.GetEmptyOmdbResponseDataModel();
                             }
-                            
+                            // Null only when the Oscars data is unavailable; a movie without awards gets an empty list
+                            List<OscarAwardViewModel>? movieOscars =
+                                oscarsViewModel == null ? null : OscarAwardsHelper.ForMovie(oscarsViewModel, movieSuggestionViewModel.ItemID, movieSuggestionViewModel.Name);
+
                             movieViewModel = new MovieViewModel(movieSuggestionViewModel,
                                                                 omdbMovieResponseDataModel,
                                                                 tmdbMovieResponseDataModel,
@@ -139,7 +149,8 @@ public class MovieEndpoint
                                                                 tmdbMovieWatchProvidersResponseDataModel,
                                                                 tmdbConfigurationCountriesDictionary,
                                                                 tmdbConfigurationLanguagesDictionary,
-                                                                wikipediaLink);
+                                                                wikipediaLink,
+                                                                movieOscars);
                         }
                         else
                         {
@@ -168,7 +179,7 @@ public class MovieEndpoint
             }
         )
         .WithSummary("Movie")
-        .WithDescription("Searches IMDB, TMDB, OMDB, and Wikipedia for detailed information on movies, looked up by IMDB ID or by TMDB ID.")
+        .WithDescription("Searches IMDB, TMDB, OMDB, Wikipedia, and the Academy Awards for detailed information on movies, looked up by IMDB ID or by TMDB ID.")
         .RequireAuthorization(ProgramConstants.LoggedInUsersOnlyPolicyName)  // TODO: Check that this returns appropriate error on frontend
         .RequireAuthorization(ProgramConstants.SearchUsersOnlyPolicyName)  // TODO: Check that this returns appropriate error on frontend
         .RequireRateLimiting(ProgramConstants.TokenRateLimiterPolicyName);
@@ -213,6 +224,33 @@ public class MovieEndpoint
         Log.Debug($"OMDB movie data response:\n\n{omdbMovieDataModelResponse}\n\n");
 
         return omdbMovieDataModelResponse;
+    }
+
+    // Null when the dataset couldn't be downloaded or parsed, which the callers treat as the Oscars being unavailable
+    // rather than as an error
+    public async static Task<OscarsViewModel?> GetOscarsViewModel(OscarsHttpClient oscarsHttpClient)
+    {
+        OscarsViewModel? oscarsViewModel;
+        try
+        {
+            oscarsViewModel = await oscarsHttpClient.GetOscars();
+        }
+        catch (Exception e) when (e is HttpRequestException || e is TaskCanceledException || e is Polly.CircuitBreaker.BrokenCircuitException)
+        {
+            Log.Warning(e, "Downloading the Academy Awards data failed.");
+            return null;
+        }
+
+        if (oscarsViewModel == null)
+        {
+            Log.Warning("Oscars data unavailable: the Academy Awards dataset could not be downloaded or parsed.");
+        }
+        else
+        {
+            Log.Debug($"Oscars ceremonies: {oscarsViewModel.Years.Count}");
+        }
+
+        return oscarsViewModel;
     }
 
     public async static Task<ConfigurationCountriesDictionary?> GetConfigurationCountriesDictionary(TmdbHttpClient tmdbHttpClient)
