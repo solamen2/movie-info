@@ -368,7 +368,7 @@ const expectedPerson = useMockHttpCalls
       ],
       sections: [
         ["Biography", "She is especially known for Example Film."],
-        ["Oscars", "Best Actress* (2016): Example Smith as Example Hero"],
+        ["Oscars", "Best Actress* (2016): Example Film as Example Hero"],
         ["Movie Cast Credits", "Example Hero"],
         ["Movie Crew Credits", "Executive Producer"],
         ["TV Series Cast Credits", "Example Slayer"],

@@ -107,17 +107,23 @@ function OscarAwardLine({ award, context }: OscarAwardLineProps) {
   const isActing = award.characters.length > 0;
   // Acting and directing awards name the person before the film
   const personFirst = isActing || award.category.startsWith("Best Director");
-  // Under a screenplay heading on the Oscars By Year page, "Written by" and
-  // the like are left off the credit
+  // Under a screenplay category, "Written by" and the like are left off the
+  // credit
   const isWriting =
     award.category.includes("Screenplay") || award.category === "Best Story";
-  const creditName =
-    context === "year" && isWriting
-      ? stripWritingCredit(award.name)
-      : award.name;
+  const creditName = isWriting ? stripWritingCredit(award.name) : award.name;
 
   const pieces: ReactNode[] = [];
-  if (personFirst) {
+  if (personFirst && context === "person") {
+    // In the actor's or director's own panel their name goes without saying:
+    // "The Revenant as Hugh Glass", "Oppenheimer"
+    pieces.push(
+      <span key="films">
+        <Films award={award} />
+        {isActing && ` as ${award.characters.join(", ")}`}
+      </span>,
+    );
+  } else if (personFirst) {
     // "Cillian Murphy as J. Robert Oppenheimer — Oppenheimer",
     // "Christopher Nolan — Oppenheimer"
     pieces.push(

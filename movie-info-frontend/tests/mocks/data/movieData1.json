@@ -105,6 +105,31 @@
       "song": "Example Song",
       "note": null,
       "citation": null
+    },
+    {
+      "ceremony": 89,
+      "year": "2016",
+      "category": "Best Adapted Screenplay",
+      "originalCategory": null,
+      "isSpecial": false,
+      "winner": false,
+      "films": [
+        {
+          "title": "Example Movie",
+          "imdbId": "tt0000001"
+        }
+      ],
+      "name": "Written for the screen by Example Writer",
+      "nominees": [
+        {
+          "name": "Example Writer",
+          "imdbId": "nm9000007"
+        }
+      ],
+      "characters": [],
+      "song": null,
+      "note": null,
+      "citation": null
     }
   ],
   "tmdbId": 90001,
