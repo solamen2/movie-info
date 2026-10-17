@@ -49,6 +49,31 @@
     {
       "ceremony": 89,
       "year": "2016",
+      "category": "Best Director",
+      "originalCategory": null,
+      "isSpecial": false,
+      "winner": false,
+      "films": [
+        {
+          "title": "Example Movie",
+          "imdbId": "tt0000001"
+        }
+      ],
+      "name": "Example Smith",
+      "nominees": [
+        {
+          "name": "Example Smith",
+          "imdbId": "nm9000000"
+        }
+      ],
+      "characters": [],
+      "song": null,
+      "note": null,
+      "citation": null
+    },
+    {
+      "ceremony": 89,
+      "year": "2016",
       "category": "Best Actress",
       "originalCategory": "Actress",
       "isSpecial": false,

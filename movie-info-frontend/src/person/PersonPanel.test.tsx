@@ -123,7 +123,7 @@ describe("PersonPanel", () => {
       );
       expect(summaries).toEqual([
         "Biography",
-        "Oscars(3)",
+        "Oscars(4)",
         "Movie Cast Credits(3)",
         "Movie Crew Credits(1)",
         "TV Series Cast Credits(2)",
@@ -138,7 +138,7 @@ describe("PersonPanel", () => {
 
       for (const [summary, content] of [
         ["Biography", "She is especially known for Example Film."],
-        ["Oscars", "Example Smith as Example Hero"],
+        ["Oscars", "Example Film as Example Hero"],
         ["Movie Cast Credits", "Example Hero"],
         ["Movie Crew Credits", "Example Produced Film"],
         ["TV Series Cast Credits", "Example Slayer"],
@@ -174,13 +174,15 @@ describe("PersonPanel", () => {
         [...wins.querySelectorAll("li")].map((li) => li.textContent),
       ).toEqual([
         "Best Picture (2016): Example Movie — Example Producer and Example Smith, Producers",
-        "Best Actress* (2016): Example Smith as Example Hero — Example Film",
+        "Best Actress* (2016): Example Film as Example Hero",
       ]);
       const nominations = within(oscars).getByTestId("oscar-Nominations");
       expect(
         [...nominations.querySelectorAll("li")].map((li) => li.textContent),
       ).toEqual([
-        "Best Supporting Actress (2010): Example Smith as Example Sidekick — Example Old Film",
+        // Their own name goes without saying, for directing as for acting
+        "Best Director (2016): Example Movie",
+        "Best Supporting Actress (2010): Example Old Film as Example Sidekick",
       ]);
       // The movies link to their panels, keeping the search query
       expect(

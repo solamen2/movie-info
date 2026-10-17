@@ -171,7 +171,7 @@ describe("MoviePanel", () => {
         throw new Error("Oscars section not found");
       }
 
-      expect(oscars.querySelector("summary")?.textContent).toBe("Oscars(3)");
+      expect(oscars.querySelector("summary")?.textContent).toBe("Oscars(4)");
       const wins = within(oscars).getByTestId("oscar-Wins");
       expect(wins.querySelector("h4")?.textContent).toBe("Wins");
       expect(
@@ -184,11 +184,18 @@ describe("MoviePanel", () => {
       expect(nominations.querySelector("h4")?.textContent).toBe("Nominations");
       expect(
         [...nominations.querySelectorAll("li")].map((li) => li.textContent),
-      ).toEqual(["Best Actress*: Example Jones as Example Villain"]);
+      ).toEqual([
+        "Best Actress*: Example Jones as Example Villain",
+        // "Written for the screen by" is left off, as on the Oscars By Year page
+        "Best Adapted Screenplay: Example Writer",
+      ]);
       // The people link to their panels, keeping the search query
       expect(
         within(nominations).getByRole("link", { name: "Example Jones" }),
       ).toHaveAttribute("href", "/person/nm9000002?q=1");
+      expect(
+        within(nominations).getByRole("link", { name: "Example Writer" }),
+      ).toHaveAttribute("href", "/person/nm9000007?q=1");
     });
 
     it("Should say when the Oscars are unavailable, but None when the movie just has none", async () => {
