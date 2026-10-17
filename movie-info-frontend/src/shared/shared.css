@@ -92,13 +92,13 @@
   font-size: 1.3rem;
 }
 
+/* Text that wraps like a sentence, with the Copy button flowing along after
+   the "Link" (so on a narrow screen it shares the link's line whenever it
+   fits, rather than always dropping to a line of its own) */
 .external-link-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem;
   margin: 0 0 0.75rem;
   font-size: 1.2rem;
+  line-height: 1.6;
 }
 
 /* Link rows that follow one another (e.g. IMDB then Wikipedia) belong together,
@@ -127,7 +127,16 @@
   font-size: 0.85rem;
 }
 
+/* The separator (when there is data before the link) and the link never
+   split across lines; the row wraps before them instead */
+.external-link-row-link {
+  white-space: nowrap;
+}
+
 .copy-button {
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 0.5rem;
   padding: 0.2em 0.7em;
   font-size: 0.8rem;
   min-width: 4.5rem;

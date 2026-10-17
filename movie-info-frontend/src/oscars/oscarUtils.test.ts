@@ -3,7 +3,40 @@ import {
   ordinal,
   oscarYearElementId,
   splitNameIntoNominees,
+  stripWritingCredit,
 } from "./oscarUtils";
+
+describe("stripWritingCredit", () => {
+  it.each([
+    ["Written by Ryan Coogler", "Ryan Coogler"],
+    ["Screenplay by Will Tracy", "Will Tracy"],
+    ["Written for the screen by Cord Jefferson", "Cord Jefferson"],
+    ["Written for the Screen by Guillermo del Toro", "Guillermo del Toro"],
+    [
+      "Adapted for the screen by Debra Granik & Anne Rosellini",
+      "Debra Granik & Anne Rosellini",
+    ],
+    ["Story by Ben Hecht", "Ben Hecht"],
+    [
+      "Story and Screenplay by Jean-Charles Tacchella",
+      "Jean-Charles Tacchella",
+    ],
+  ])("Should drop the lead-in of %j", (name, expected) => {
+    expect(stripWritingCredit(name)).toBe(expected);
+  });
+
+  it.each([
+    "Story by Nancy Dowd; Screenplay by Waldo Salt, Robert C. Jones",
+    "Screenplay by Daniel Petrie, Jr.; Story by Danilo Bach, Daniel Petrie, Jr.",
+    "Screenplay and Dialogue by George Bernard Shaw; Adaptation by W. P. Lipscomb",
+    "Alan Ball",
+    "Ring Lardner, Jr., Michael Kanin",
+    "Screenplay - Justine Triet and Arthur Harari",
+    "",
+  ])("Should keep %j, which has several roles or no lead-in", (name) => {
+    expect(stripWritingCredit(name)).toBe(name);
+  });
+});
 
 describe("splitNameIntoNominees", () => {
   it("Should mark each nominee's name in the credit text", () => {
