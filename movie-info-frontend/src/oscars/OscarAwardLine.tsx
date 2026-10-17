@@ -2,7 +2,7 @@ import { type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { detailPath, type PanelKind } from "../utilities/utilities";
 import InfoPopup from "./InfoPopup";
-import { splitNameIntoNominees } from "./oscarUtils";
+import { splitNameIntoNominees, stripWritingCredit } from "./oscarUtils";
 import type { OscarAward } from "./oscarTypes";
 import "./oscars.css";
 
@@ -44,9 +44,9 @@ export function CategoryAsterisk({
   );
 }
 
-function Credit({ award }: { award: OscarAward }) {
+function Credit({ award, name }: { award: OscarAward; name: string }) {
   const parts = splitNameIntoNominees(
-    award.name,
+    name,
     award.nominees.map((n) => n.name),
   );
   const imdbIdOf = (nominee: string) =>
@@ -107,6 +107,14 @@ function OscarAwardLine({ award, context }: OscarAwardLineProps) {
   const isActing = award.characters.length > 0;
   // Acting and directing awards name the person before the film
   const personFirst = isActing || award.category.startsWith("Best Director");
+  // Under a screenplay heading on the Oscars By Year page, "Written by" and
+  // the like are left off the credit
+  const isWriting =
+    award.category.includes("Screenplay") || award.category === "Best Story";
+  const creditName =
+    context === "year" && isWriting
+      ? stripWritingCredit(award.name)
+      : award.name;
 
   const pieces: ReactNode[] = [];
   if (personFirst) {
@@ -114,7 +122,7 @@ function OscarAwardLine({ award, context }: OscarAwardLineProps) {
     // "Christopher Nolan — Oppenheimer"
     pieces.push(
       <span key="credit">
-        <Credit award={award} />
+        <Credit award={award} name={creditName} />
         {isActing && ` as ${award.characters.join(", ")}`}
       </span>,
     );
@@ -128,7 +136,7 @@ function OscarAwardLine({ award, context }: OscarAwardLineProps) {
     if (hasCredit) {
       pieces.push(
         <span key="credit">
-          <Credit award={award} />
+          <Credit award={award} name={creditName} />
         </span>,
       );
     }

@@ -83,7 +83,7 @@
 
 .oscar-category-title {
   margin: 0 0 0.25rem;
-  font-size: 1.2rem;
+  font-size: 1.25rem;
 }
 
 /* A category split that year (black-and-white and color, say) has a titled
@@ -94,7 +94,7 @@
 
 .oscar-category-subsection-title {
   margin: 0 0 0.2rem;
-  font-size: 1.02rem;
+  font-size: 1.15rem;
 }
 
 /* The "Nominees" section of a category is less prominent than a year, and
@@ -106,7 +106,7 @@
 .oscar-category .collapsible summary {
   padding: 0.3rem 0.25rem;
   font-weight: 500;
-  font-size: 0.9rem;
+  font-size: 1.1rem;
 }
 
 .oscar-category .collapsible-body {
@@ -130,9 +130,16 @@
 }
 
 /* On the Oscars By Year page: the entry itself, then its detail in
-   parentheses, set a little further apart than a space */
+   parentheses, set a little further apart than a space. The sizes step down
+   from the year (1.9rem) through the category (1.25rem), subsection (1.15rem)
+   and "Nominees" (1.1rem) headings to a winner's entry (about 1.08rem), a
+   nominee's (about 0.96rem) and the detail (about 0.77rem) */
+.oscar-award-primary {
+  font-size: 1.07em;
+}
+
 .oscar-award-primary-winner {
-  font-size: 1.1em;
+  font-size: 1.2em;
 }
 
 .oscar-award-secondary {

@@ -61,7 +61,7 @@ describe("OscarsByYear", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Expand All" }));
     expect(isOpen()).toEqual([true, true]);
-    expect(screen.getAllByTestId("oscar-category")).toHaveLength(6);
+    expect(screen.getAllByTestId("oscar-category")).toHaveLength(7);
 
     // A year closed by hand is opened again by "Expand All"
     fireEvent.click(within(years[0]).getByText("2016"));
@@ -85,6 +85,7 @@ describe("OscarsByYear", () => {
       "Best Picture",
       "Best Actress*",
       "Best Original Song",
+      "Best Adapted Screenplay",
     ]);
     expect(
       categories.map((c) => within(c).getByTestId("oscar-winners").textContent),
@@ -92,6 +93,7 @@ describe("OscarsByYear", () => {
       "Example Movie (Example Producer and Example Smith, Producers)",
       "Example Smith as Example Hero (Example Film)",
       "Example Movie (“Example Song” — Music and Lyric by Example Composer and Example Lyricist, Jr.)",
+      "Example Movie (Example Writer)",
     ]);
   });
 
@@ -120,7 +122,7 @@ describe("OscarsByYear", () => {
     ]);
   });
 
-  it("Should set a winner's entry a little larger than its detail, but a nominee's should not be increased this way", async () => {
+  it("Should mark a winner's entry, which is set larger than a nominee's, and both larger than their detail", async () => {
     const { years } = await renderOscarsPage();
     const bestPicture = categoriesOf(years[0])[0];
     const winner = within(bestPicture).getByTestId("oscar-winners");
@@ -265,6 +267,35 @@ describe("OscarsByYear", () => {
         .getAllByRole("link")
         .map((link) => link.textContent),
     ).toEqual(["Example Silent"]);
+  });
+
+  it("Should leave 'Written by' and 'Screenplay by' off screenplay credits, except when a credit names several roles", async () => {
+    const { years } = await renderOscarsPage();
+    const categories = categoriesOf(years[0]);
+    const screenplay = categories.find(
+      (category) =>
+        category.querySelector("h3")?.textContent === "Best Adapted Screenplay",
+    );
+    if (!screenplay) throw new Error("Best Adapted Screenplay not found");
+
+    expect(within(screenplay).getByTestId("oscar-winners").textContent).toBe(
+      "Example Movie (Example Writer)",
+    );
+    fireEvent.click(within(screenplay).getByText("Nominees"));
+    expect(
+      [
+        ...(
+          await within(screenplay).findByTestId("oscar-nominees")
+        ).querySelectorAll("li"),
+      ].map((li) => li.textContent),
+    ).toEqual([
+      "Example Film (Example Scribe)",
+      "Example Old Film (Story by Example Author; Screenplay by Example Scribe)",
+    ]);
+    // The writer still links to their panel
+    expect(
+      within(screenplay).getByRole("link", { name: "Example Writer" }),
+    ).toHaveAttribute("href", "/person/nm9000007");
   });
 
   it("Should show a category split that year as subsections, like black-and-white and color", async () => {

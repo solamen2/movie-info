@@ -77,6 +77,20 @@ export function splitNameIntoNominees(
 }
 
 // e.g. 1 -> "1st", 22 -> "22nd", 96 -> "96th"
+// Writing awards are credited as "Written by X", "Screenplay by X", "Written
+// for the screen by X", … which says nothing under a screenplay category's
+// heading, so the Oscars By Year page drops that lead-in. A credit naming
+// several roles ("Story by X; Screenplay by Y") keeps them all.
+const WRITING_CREDIT_LEAD_IN =
+  /^(?:written|screenplay|story|adapted)\b[^;]*?\bby\s+/i;
+
+export function stripWritingCredit(name: string): string {
+  const match = WRITING_CREDIT_LEAD_IN.exec(name);
+  if (match === null) return name;
+  const rest = name.slice(match[0].length);
+  return /\bby\b/i.test(rest) ? name : rest;
+}
+
 export function ordinal(n: number): string {
   const lastTwo = n % 100;
   if (lastTwo >= 11 && lastTwo <= 13) return `${String(n)}th`;

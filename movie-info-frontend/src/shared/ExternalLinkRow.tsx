@@ -91,22 +91,24 @@ function ExternalLinkRow({
     <p className="external-link-row">
       <span>
         {label && <span className="external-link-row-label">{label}</span>}
-        {children != null && (
-          <>
-            {children}
-            <ExternalLinkRowSeparator />
-          </>
-        )}
+        {children}
         {url !== "" ? (
-          <a href={url} target="_blank" rel="noopener">
-            Link
-          </a>
+          // The separator and the link stay together on a line (see the CSS)
+          <span className="external-link-row-link">
+            {children != null && <ExternalLinkRowSeparator />}
+            <a href={url} target="_blank" rel="noopener">
+              Link
+            </a>
+          </span>
         ) : searchUrl !== undefined ? (
-          <a href={searchUrl} target="_blank" rel="noopener">
-            Search Google
-          </a>
+          <>
+            {children != null && <ExternalLinkRowSeparator />}
+            <a href={searchUrl} target="_blank" rel="noopener">
+              Search Google
+            </a>
+          </>
         ) : (
-          "—"
+          <>{children != null && <ExternalLinkRowSeparator />}—</>
         )}
       </span>
       {copyButton && url !== "" && (
