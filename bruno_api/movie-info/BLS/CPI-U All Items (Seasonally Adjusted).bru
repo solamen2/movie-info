@@ -1,0 +1,24 @@
+meta {
+  name: CPI-U All Items (Seasonally Adjusted)
+  type: http
+  seq: 1
+}
+
+get {
+  url: https://data.bls.gov/timeseries/CUSR0000SA0?years_option=all_years
+  body: none
+  auth: inherit
+}
+
+params:query {
+  years_option: all_years
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  Series CUSR0000SA0: all items in U.S. city average, all urban consumers, seasonally adjusted, from Jan 1947, as an HTML page with one table row per year. The backend parses the table (see InflationHttpClient).
+}

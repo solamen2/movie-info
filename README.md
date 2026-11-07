@@ -75,7 +75,8 @@ This app displays info from the following sources:
 - [TMDB](https://www.themoviedb.org/): Movie, TV, and people info, and also watch provider information via [JustWatch](https://www.justwatch.com/)
 - [OMDB](https://www.omdbapi.com/): Movie and TV info
 - [Wikipedia](https://www.wikipedia.org/): Links to the Wikipedia pages for movies, people, and TV series
-- [DLu/oscar_data](https://github.com/DLu/oscar_data): Every Academy Award nomination and win, for the Oscars sections of movies and people and the Oscars By Year page (downloaded once a week)
+- [DLu/oscar_data](https://github.com/DLu/oscar_data): Every Academy Award nomination and win, for the Oscars sections of movies and people, and also for the Oscars By Year page (cached but updated weekly)
+- [U.S. Bureau of Labor Statistics](https://www.bls.gov/cpi/): The [seasonally-adjusted Consumer Price Index](https://data.bls.gov/timeseries/CUSR0000SA0?years_option=all_years) (for values from 1947 onward) and the [not-seasonally-adjusted Consumer Price Index](https://data.bls.gov/timeseries/CUUR0000SA0?years_option=all_years) (for values from Jan 1913 to Dec 1946, inclusive), which adjust movie budgets and revenues for inflation (cached but updated weekly)
 
 ## Architecture: Frontend
 

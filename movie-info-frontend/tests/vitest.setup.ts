@@ -1,6 +1,7 @@
 import { beforeAll, afterEach, afterAll } from "vitest";
 import { server } from "./mocks/node.ts";
 import { clearDetailDataCache } from "../src/shared/useDetailData.ts";
+import { clearInflationDataCache } from "../src/movie/useInflationData.ts";
 import "@testing-library/jest-dom/vitest";
 
 beforeAll(() => {
@@ -10,6 +11,7 @@ afterEach(() => {
   server.resetHandlers();
   // Tests mock different responses for the same URL
   clearDetailDataCache();
+  clearInflationDataCache();
 });
 afterAll(() => {
   server.close();

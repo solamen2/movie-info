@@ -12,24 +12,17 @@ import {
   detailIdQuery,
   displayDate,
   displayGenres,
+  displayMoney,
   displayRuntime,
   displayText,
 } from "../utilities/utilities";
 import CastCard from "./CastCard";
 import CrewCard from "./CrewCard";
+import InflationAdjustedMoney from "./InflationAdjustedMoney";
+import { parseYearMonth } from "./inflationUtils";
 import MovieOscars from "./MovieOscars";
 import { type MovieCrew, imdbTitleUrl } from "./movieTypes";
 import "../shared/shared.css";
-
-function displayMoney(value: number): string {
-  return value > 0
-    ? new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-        maximumFractionDigits: 0,
-      }).format(value)
-    : "—";
-}
 
 function CrewSection({
   title,
@@ -107,6 +100,22 @@ function MoviePanel({ itemId }: MoviePanelProps) {
   );
   const castSelected = cards.isSelectedIn("cast");
 
+  // A budget or revenue with its inflation adjustment, which needs the
+  // release month and year; just the amount (or "—") without them. Keyed by
+  // the movie so the adjustment's month and year start over with a new one.
+  const releaseMonth = parseYearMonth(movie.releaseDate);
+  const moneyFact = (amount: number, name: string): ReactNode =>
+    amount <= 0 || releaseMonth === null ? (
+      displayMoney(amount)
+    ) : (
+      <InflationAdjustedMoney
+        key={movie.imdbId}
+        amount={amount}
+        releaseDate={releaseMonth}
+        name={name}
+      />
+    );
+
   const facts: [string, ReactNode][] = [
     ["Original Title", displayText(movie.originalTitle)],
     ["Release Date", displayDate(movie.releaseDate)],
@@ -114,8 +123,8 @@ function MoviePanel({ itemId }: MoviePanelProps) {
     ["Rated", displayText(movie.rated)],
     ["Known For", displayText(movie.knownForActors)],
     ["Genres", displayGenres(movie.tmdbGenres, movie.omdbGenres)],
-    ["Budget", displayMoney(movie.budget)],
-    ["Revenue", displayMoney(movie.revenue)],
+    ["Budget", moneyFact(movie.budget, "budget")],
+    ["Revenue", moneyFact(movie.revenue, "revenue")],
     [
       "Homepage",
       movie.homepage ? (

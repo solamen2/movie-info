@@ -35,6 +35,7 @@ try
 
     Log.Information("Mapping endpoints...");
     AuthEndpoint.Map(app);
+    InflationEndpoint.Map(app);
     MovieEndpoint.Map(app);
     OscarsEndpoint.Map(app);
     PersonEndpoint.Map(app);
@@ -125,6 +126,12 @@ void AddServices()
                             policyBuilder.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)))
                         .SetHandlerLifetime(TimeSpan.FromMinutes(15));
     builder.Services.AddHttpClient<WikipediaHttpClient>()
+                        .AddTransientHttpErrorPolicy(policyBuilder =>
+                            policyBuilder.WaitAndRetryAsync(3, retryNumber => TimeSpan.FromMilliseconds(600)))
+                        .AddTransientHttpErrorPolicy(policyBuilder =>
+                            policyBuilder.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)))
+                        .SetHandlerLifetime(TimeSpan.FromMinutes(15));
+    builder.Services.AddHttpClient<InflationHttpClient>()
                         .AddTransientHttpErrorPolicy(policyBuilder =>
                             policyBuilder.WaitAndRetryAsync(3, retryNumber => TimeSpan.FromMilliseconds(600)))
                         .AddTransientHttpErrorPolicy(policyBuilder =>
