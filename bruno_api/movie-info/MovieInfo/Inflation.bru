@@ -1,0 +1,20 @@
+meta {
+  name: Inflation
+  type: http
+  seq: 14
+}
+
+get {
+  url: {{base-url}}/api/inflation
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  The two Consumer Price Index series (seasonally adjusted from Jan 1947, and not seasonally adjusted from Jan 1913) that the frontend adjusts movie budgets and revenues for inflation with. Downloaded from the BLS and cached for a week (see InflationHttpClient and InflationEndpoint).
+}

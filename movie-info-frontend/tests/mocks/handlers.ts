@@ -7,6 +7,7 @@ import tvSeriesDataJson1 from "./data/tvSeriesData1.json" with { type: "json" };
 import tvSeasonDataJson1 from "./data/tvSeasonData1.json" with { type: "json" };
 import tvEpisodeDataJson1 from "./data/tvEpisodeData1.json" with { type: "json" };
 import oscarsDataJson1 from "./data/oscarsData1.json" with { type: "json" };
+import inflationDataJson1 from "./data/inflationData1.json" with { type: "json" };
 
 type LoginPathParams = object;
 
@@ -230,6 +231,15 @@ export const handlers = [
 
   http.get("/api/oscars", () => {
     return HttpResponse.json(oscarsDataJson1, { status: 200 });
+  }),
+
+  // Synthetic Consumer Price Index series: a month's value is
+  // (year - 1900) * 10 + month (e.g. Sep 2016 = 1169), so adjusted amounts can
+  // be worked out by hand. As in the real series, Oct 2025 has no value (and
+  // Nov 2025 is 1263 rather than 1261, so that averaging the two months around
+  // Oct 2025 shows) and the months after Sep 2026 aren't published yet.
+  http.get("/api/inflation", () => {
+    return HttpResponse.json(inflationDataJson1, { status: 200 });
   }),
 
   http.get("/api/person", ({ request }) => {

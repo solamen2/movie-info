@@ -5,6 +5,7 @@ import {
   detailIdQuery,
   detailPath,
   displayAge,
+  displayMoney,
   getAge,
   getErrorResponseMessage,
   isTmdbId,
@@ -151,6 +152,25 @@ describe("displayAge", () => {
 
   it("Should show '(<1)' for someone less than a year old", () => {
     expect(displayAge(0)).toBe("(<1)");
+  });
+});
+
+describe("displayMoney", () => {
+  it("Should format whole US dollars with thousands separators", () => {
+    expect(displayMoney(25000000)).toBe("$25,000,000");
+    expect(displayMoney(1)).toBe("$1");
+  });
+
+  it("Should round to whole dollars", () => {
+    expect(displayMoney(25684345.59)).toBe("$25,684,346");
+    expect(displayMoney(0.4)).toBe("$0");
+  });
+
+  it.each([
+    ["no amount", 0],
+    ["a negative amount", -5],
+  ])("Should show a placeholder for %s", (_, value) => {
+    expect(displayMoney(value)).toBe("—");
   });
 });
 

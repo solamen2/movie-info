@@ -45,6 +45,18 @@ export function displayText(value: string | number | null | undefined): string {
   return text === "" || text === "N/A" ? "—" : text;
 }
 
+// A whole number of US dollars, e.g. "$25,000,000"; "—" when there is no
+// amount (TMDB sends 0 for an unknown budget or revenue).
+export function displayMoney(value: number): string {
+  return value > 0
+    ? new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+        maximumFractionDigits: 0,
+      }).format(value)
+    : "—";
+}
+
 export function displayRuntime(minutes: number): string {
   if (minutes <= 0) return "—";
   const hours = Math.floor(minutes / 60);

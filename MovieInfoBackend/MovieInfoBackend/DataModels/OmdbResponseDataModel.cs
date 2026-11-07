@@ -82,8 +82,6 @@ public record OmdbResponseDataModel
     [JsonPropertyName("BoxOffice")]
     public string? BoxOffice { get; init; }
 
-    // TODO: Adjusted box office for current year
-
     [JsonPropertyName("Production")]  // Note for ViewModel: this used to be a production company list, but now always seems to be "N/A"
     public string? Production { get; init; }
 

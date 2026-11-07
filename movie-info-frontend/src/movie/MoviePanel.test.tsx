@@ -358,6 +358,344 @@ describe("MoviePanel", () => {
     });
   });
 
+  // The budget and revenue, each with the month and year it is adjusted to
+  // (see InflationAdjustedMoney). The mock inflation series give a month the
+  // value (year - 1900) * 10 + month, e.g. Sep 2016 = 1169 and Jan 2020 = 1201
+  // (see tests/mocks/handlers.ts).
+  describe("When the movie has a budget, a revenue, and a release date", () => {
+    function getFact(panel: HTMLElement, label: string): HTMLElement {
+      const fact = [
+        ...panel.querySelectorAll<HTMLElement>(".detail-fact"),
+      ].find((f) => f.querySelector("dt")?.textContent === label);
+      if (!fact) {
+        throw new Error(`${label} fact not found`);
+      }
+      return fact;
+    }
+
+    function getSelects(fact: HTMLElement, name: string) {
+      return {
+        month: within(fact).getByRole<HTMLSelectElement>("combobox", {
+          name: `${name}-month`,
+        }),
+        year: within(fact).getByRole<HTMLSelectElement>("combobox", {
+          name: `${name}-year`,
+        }),
+      };
+    }
+
+    // Renders the panel and waits for the inflation data (the dropdowns) too
+    async function renderMovieFacts(waitFor = "budget-month") {
+      render(
+        <MemoryRouter>
+          <MoviePanel itemId={movieDataJson1.imdbId} />
+        </MemoryRouter>,
+      );
+      const panel = await screen.findByTestId("movie-panel");
+      await within(panel).findByRole("combobox", { name: waitFor });
+      return {
+        panel,
+        budget: getFact(panel, "Budget"),
+        revenue: getFact(panel, "Revenue"),
+      };
+    }
+
+    it("Should show the amounts as they are, with the release month and year selected", async () => {
+      const { budget, revenue } = await renderMovieFacts();
+
+      for (const [fact, name, amount] of [
+        [budget, "budget", "$25,000,000"],
+        [revenue, "revenue", "$58,000,000"],
+      ] as const) {
+        const line = fact.querySelector(".inflation-money-line");
+        expect(line?.firstChild?.textContent).toBe(amount);
+        expect(line?.querySelector("strong")).toBeNull();
+        expect(line?.querySelector("a")).toBeNull();
+        const { month, year } = getSelects(fact, name);
+        expect(month.value).toBe("9");
+        expect(month.selectedOptions[0].textContent).toBe("Sep");
+        expect(year.value).toBe("2016");
+        expect(
+          within(fact).queryByRole("button", { name: `reset-${name}-date` }),
+        ).toBeNull();
+        expect(fact.textContent).not.toContain("not available");
+      }
+    });
+
+    it("Should offer every month and the years from 1913 to the latest with data", async () => {
+      const { budget } = await renderMovieFacts();
+      const { month, year } = getSelects(budget, "budget");
+
+      expect([...month.options].map((o) => o.textContent)).toEqual([
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ]);
+      expect([...month.options].every((o) => !o.disabled)).toBe(true);
+      expect(year.options[0].textContent).toBe("1913");
+      expect(year.options[year.options.length - 1].textContent).toBe("2026");
+      expect(year.options).toHaveLength(2026 - 1913 + 1);
+    });
+
+    it("Should show the amount in the latest month's dollars underneath, with that month and year", async () => {
+      const { budget, revenue } = await renderMovieFacts();
+
+      // The amount isn't checked, since it changes as the data does
+      for (const fact of [budget, revenue]) {
+        const now = fact.querySelector(".inflation-money-now");
+        expect(now?.textContent).toMatch(
+          /^\$[\d,]+ \([A-Z][a-z]{2} \d{4}\) \(seasonally adj\.\)$/,
+        );
+        expect(now?.querySelector("select")).toBeNull();
+        expect(now?.querySelector("button")).toBeNull();
+        const link = now?.querySelector("a");
+        expect(link).toHaveAttribute(
+          "href",
+          "https://en.wikipedia.org/wiki/Seasonal_adjustment",
+        );
+        expect(link).toHaveAttribute("target", "_blank");
+        expect(link).toHaveAttribute("rel", "noopener");
+      }
+    });
+
+    it("Should adjust the amount, in bold, when another month and year are picked, and reset with the X button", async () => {
+      const { budget, revenue } = await renderMovieFacts();
+      const budgetSelects = getSelects(budget, "budget");
+
+      fireEvent.change(budgetSelects.year, { target: { value: "2020" } });
+      fireEvent.change(budgetSelects.month, { target: { value: "1" } });
+
+      // 25,000,000 × 1201 / 1169
+      const line = budget.querySelector<HTMLElement>(".inflation-money-line");
+      if (!line) {
+        throw new Error("Budget line not found");
+      }
+      const bold = line.querySelector("strong");
+      expect(bold?.textContent).toBe("$25,684,346");
+      const label = within(line).getByRole("link", {
+        name: "(seasonally adj.)",
+      });
+      expect(bold?.nextElementSibling).toBe(label);
+      expect(label).toHaveAttribute(
+        "href",
+        "https://en.wikipedia.org/wiki/Seasonal_adjustment",
+      );
+      expect(label).toHaveAttribute("target", "_blank");
+      expect(label).toHaveAttribute("rel", "noopener");
+      expect(budgetSelects.month.value).toBe("1");
+      expect(budgetSelects.year.value).toBe("2020");
+      // The revenue is adjusted on its own
+      expect(revenue.querySelector("strong")).toBeNull();
+      expect(getSelects(revenue, "revenue").year.value).toBe("2016");
+      expect(
+        within(revenue).queryByRole("button", { name: "reset-revenue-date" }),
+      ).toBeNull();
+
+      fireEvent.click(
+        within(budget).getByRole("button", { name: "reset-budget-date" }),
+      );
+      expect(budget.querySelector("strong")).toBeNull();
+      expect(line.firstChild?.textContent).toBe("$25,000,000");
+      expect(
+        within(line).queryByRole("link", { name: "(seasonally adj.)" }),
+      ).toBeNull();
+      expect(budgetSelects.month.value).toBe("9");
+      expect(budgetSelects.year.value).toBe("2016");
+      expect(
+        within(budget).queryByRole("button", { name: "reset-budget-date" }),
+      ).toBeNull();
+    });
+
+    it("Should show the amount as it is again when the release month and year are picked by hand", async () => {
+      const { revenue } = await renderMovieFacts();
+      const { month, year } = getSelects(revenue, "revenue");
+
+      fireEvent.change(month, { target: { value: "12" } });
+      // 58,000,000 × 1172 / 1169
+      expect(revenue.querySelector("strong")?.textContent).toBe("$58,148,845");
+      fireEvent.change(month, { target: { value: "9" } });
+      expect(revenue.querySelector("strong")).toBeNull();
+      expect(
+        within(revenue).queryByRole("button", { name: "reset-revenue-date" }),
+      ).toBeNull();
+      expect(year.value).toBe("2016");
+    });
+
+    it("Should use the not seasonally adjusted series for a month before 1947", async () => {
+      const { budget } = await renderMovieFacts();
+      const { month, year } = getSelects(budget, "budget");
+
+      fireEvent.change(year, { target: { value: "1940" } });
+      fireEvent.change(month, { target: { value: "1" } });
+
+      // 25,000,000 × 401 / 1169
+      expect(budget.querySelector("strong")?.textContent).toBe("$8,575,706");
+      expect(
+        within(budget).getByRole("link", { name: "(not seasonally adj.)" }),
+      ).toHaveAttribute(
+        "href",
+        "https://en.wikipedia.org/wiki/Seasonal_adjustment",
+      );
+    });
+
+    it("Should average the neighbouring months for a month without data", async () => {
+      const { budget } = await renderMovieFacts();
+      const { month, year } = getSelects(budget, "budget");
+
+      fireEvent.change(year, { target: { value: "2025" } });
+      fireEvent.change(month, { target: { value: "10" } });
+
+      // Oct 2025 has no value: (1259 + 1263) / 2 = 1261, so 25,000,000 × 1261 / 1169
+      expect(budget.querySelector("strong")?.textContent).toBe("$26,967,494");
+    });
+
+    it("Should not offer the months after the latest with data, and move an unavailable month back to it", async () => {
+      const { budget } = await renderMovieFacts();
+      const { month, year } = getSelects(budget, "budget");
+
+      fireEvent.change(month, { target: { value: "12" } });
+      fireEvent.change(year, { target: { value: "2026" } });
+
+      expect(year.value).toBe("2026");
+      expect(month.value).toBe("9");
+      expect(
+        [...month.options].filter((o) => o.disabled).map((o) => o.textContent),
+      ).toEqual(["Oct", "Nov", "Dec"]);
+      // 25,000,000 × 1269 / 1169
+      expect(budget.querySelector("strong")?.textContent).toBe("$27,138,580");
+
+      fireEvent.change(year, { target: { value: "2016" } });
+      expect([...month.options].every((o) => !o.disabled)).toBe(true);
+    });
+
+    it("Should adjust a release before 1913 as if it were Jan 1913", async () => {
+      server.use(
+        http.get("/api/movie", () =>
+          HttpResponse.json({ ...movieDataJson1, releaseDate: "1905-06-01" }),
+        ),
+      );
+      const { budget } = await renderMovieFacts();
+      const { month, year } = getSelects(budget, "budget");
+
+      expect(month.value).toBe("1");
+      expect(year.value).toBe("1913");
+      expect(budget.querySelector("strong")).toBeNull();
+      expect(
+        budget.querySelector(".inflation-money-line")?.firstChild?.textContent,
+      ).toBe("$25,000,000");
+      expect(budget.querySelector(".inflation-money-now")?.textContent).toMatch(
+        /\(not seasonally adj\.\)$/,
+      );
+    });
+
+    it("Should not adjust a missing amount", async () => {
+      server.use(
+        http.get("/api/movie", () =>
+          HttpResponse.json({ ...movieDataJson1, budget: 0 }),
+        ),
+      );
+      const { panel, budget } = await renderMovieFacts("revenue-month");
+
+      expect(budget.closest("dd")?.textContent ?? budget.textContent).toContain(
+        "—",
+      );
+      expect(within(budget).queryByRole("combobox")).toBeNull();
+      expect(within(panel).getAllByRole("combobox")).toHaveLength(2);
+    });
+  });
+
+  describe("When the movie has no release date", () => {
+    it.each([
+      ["an empty release date", ""],
+      ["no release date", null],
+    ])(
+      "Should show the amounts without any adjustment for %s",
+      async (_, releaseDate) => {
+        server.use(
+          http.get("/api/movie", () =>
+            HttpResponse.json({ ...movieDataJson1, releaseDate }),
+          ),
+        );
+        render(
+          <MemoryRouter>
+            <MoviePanel itemId={movieDataJson1.imdbId} />
+          </MemoryRouter>,
+        );
+        const panel = await screen.findByTestId("movie-panel");
+        await new Promise((resolve) => setTimeout(resolve, 50));
+
+        expect(panel.textContent).toContain(
+          "Budget$25,000,000Revenue$58,000,000",
+        );
+        expect(within(panel).queryByRole("combobox")).toBeNull();
+        expect(panel.querySelector(".inflation-money-now")).toBeNull();
+        expect(panel.textContent).not.toContain("not available");
+      },
+    );
+  });
+
+  describe("When the inflation data cannot be loaded", () => {
+    it("Should show the amounts as they are, each followed by a note in red", async () => {
+      server.use(
+        http.get("/api/inflation", () =>
+          HttpResponse.json(
+            { detail: "The inflation data could not be loaded." },
+            { status: 503 },
+          ),
+        ),
+      );
+      render(
+        <MemoryRouter>
+          <MoviePanel itemId={movieDataJson1.imdbId} />
+        </MemoryRouter>,
+      );
+      const panel = await screen.findByTestId("movie-panel");
+      const notes = await within(panel).findAllByText(
+        "(inflation data not available)",
+      );
+
+      expect(notes).toHaveLength(2);
+      expect(notes[0].className).toBe("inflation-unavailable");
+      expect(panel.textContent).toContain(
+        "Budget$25,000,000 (inflation data not available)Revenue$58,000,000 (inflation data not available)",
+      );
+      expect(within(panel).queryByRole("combobox")).toBeNull();
+      expect(panel.querySelector(".inflation-money-now")).toBeNull();
+    });
+
+    it("Should not add the note to a missing amount", async () => {
+      server.use(
+        http.get("/api/inflation", () =>
+          HttpResponse.json({}, { status: 503 }),
+        ),
+        http.get("/api/movie", () =>
+          HttpResponse.json({ ...movieDataJson1, revenue: 0 }),
+        ),
+      );
+      render(
+        <MemoryRouter>
+          <MoviePanel itemId={movieDataJson1.imdbId} />
+        </MemoryRouter>,
+      );
+      const panel = await screen.findByTestId("movie-panel");
+      const notes = await within(panel).findAllByText(
+        "(inflation data not available)",
+      );
+
+      expect(notes).toHaveLength(1);
+      expect(panel.textContent).toContain("Revenue—Homepage");
+    });
+  });
+
   describe("When a card is selected", () => {
     it("Should hide the results message", async () => {
       await searchAndSelectExampleMovie();

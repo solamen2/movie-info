@@ -1,0 +1,53 @@
+/* Movie-specific styles; the shared panel layout lives in ../shared/shared.css */
+
+/* A budget or revenue with its inflation adjustment (see
+   InflationAdjustedMoney): the amount, the month and year it is adjusted to,
+   and a button back to the release month and year on the first line, and the
+   amount in the current month's dollars on the second */
+.inflation-money {
+  display: block;
+}
+
+.inflation-money-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 0.35rem;
+  row-gap: 0.2rem;
+}
+
+/* The month and year dropdowns never split across lines */
+.inflation-money-dates {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+}
+
+.inflation-money select {
+  font-family: inherit;
+  font-size: 0.8rem;
+  padding: 0.1em 0.15em;
+  border-radius: 4px;
+}
+
+.inflation-reset-button {
+  padding: 0 0.5em;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.inflation-adjustment-label {
+  font-size: 0.8rem;
+}
+
+.inflation-money-now {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+
+.inflation-unavailable {
+  color: #e74c3c;
+}
