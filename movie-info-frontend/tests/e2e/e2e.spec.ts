@@ -1181,20 +1181,26 @@ test("TV episode happy path: open a TV season, expand an episode card, check the
 });
 
 // A card inside a panel (a movie's cast, a person's credits, ...) opens its
-// own panel in place of the one it was in. Finds the card with the given text
-// in the panel's section with the given title, opening the section.
+// own panel in place of the one it was in. Finds the card with the given name
+// (a person's name or a title) in the panel's section with the given title,
+// opening the section. The name has to match a card's own name line exactly,
+// since another card's name can contain it (e.g. "Hope Springs Eternal: A
+// Look Back at The Shawshank Redemption" among the credits of its cast).
 async function openSectionCard(
   panel: Locator,
   sectionTitle: string,
   cardTestId: string,
-  cardText: string,
+  cardName: string,
 ): Promise<Locator> {
+  const page = panel.page();
   const section = panel
     .locator(".detail-sections > details")
-    .filter({ has: panel.page().locator("summary", { hasText: sectionTitle }) })
+    .filter({ has: page.locator("summary", { hasText: sectionTitle }) })
     .first();
   await section.locator("summary").click();
-  const card = section.getByTestId(cardTestId).filter({ hasText: cardText });
+  const card = section
+    .getByTestId(cardTestId)
+    .filter({ has: page.getByText(cardName, { exact: true }) });
   await expect(card).toBeVisible();
   return card;
 }
