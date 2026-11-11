@@ -36,6 +36,22 @@
   "tmdbGenres": "Comedy, Drama, Sci-Fi & Fantasy",
   "homepage": "https://example.com/example-tv-series",
   "wikipediaLink": "https://en.wikipedia.org/wiki/Example_TV_Series",
+  "aspectRatios": [
+    {
+      "ratio": "4:3",
+      "decimal": "1.33",
+      "name": "Fullscreen",
+      "description": "The shape of silent films and of television before HD. A modern widescreen TV shows it with black bars on the left and right.",
+      "wikipediaLink": "https://en.wikipedia.org/wiki/Fullscreen_(aspect_ratio)"
+    },
+    {
+      "ratio": "16:9",
+      "decimal": "1.78",
+      "name": "Widescreen",
+      "description": "The shape of HDTVs, and of nearly all television made since the 2000s. It fills a modern TV screen exactly.",
+      "wikipediaLink": "https://en.wikipedia.org/wiki/16:9_aspect_ratio"
+    }
+  ],
   "tmdbId": 90002,
   "isInProduction": false,
   "languages": "English, Japanese",

@@ -5,6 +5,7 @@ import type { TvEpisode } from "../tvepisode/tvEpisodeTypes";
 import type { TvSeason } from "../tvseason/tvSeasonTypes";
 import type { TvSeries } from "../tvseries/tvSeriesTypes";
 import type { OscarYear } from "../oscars/oscarTypes";
+import type { AspectRatio } from "./sharedTypes";
 import { describeFailedLoad } from "../utilities/utilities";
 
 // The kinds of detail a panel can load, by the name used for them in messages
@@ -16,6 +17,7 @@ export interface DetailKinds {
   "TV season": TvSeason;
   "TV episode": TvEpisode;
   Oscars: OscarYear[];
+  "aspect ratios": AspectRatio[];
 }
 
 // Responses by URL, for as long as the page is open. A panel the user comes

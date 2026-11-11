@@ -164,6 +164,63 @@
   overflow-wrap: anywhere;
 }
 
+/* The popup behind a small mark in the text (an asterisk, a note or info
+   mark): see InfoPopup */
+.info-popup {
+  position: relative;
+  display: inline-block;
+}
+
+.info-popup-trigger {
+  padding: 0 0.2rem;
+  border: none;
+  border-radius: 4px;
+  background: none;
+  font: inherit;
+  font-weight: 700;
+  color: #646cff;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.info-popup-trigger:hover {
+  border-color: transparent;
+  text-decoration: underline;
+}
+
+.info-popup-content {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  z-index: 10;
+  min-width: 12rem;
+  max-width: min(24rem, 80vw);
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #666;
+  border-radius: 6px;
+  background: #2e2e2e;
+  color: rgba(255, 255, 255, 0.87);
+  font-size: 0.85rem;
+  font-weight: 400;
+  line-height: 1.4;
+  white-space: normal;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+@media (prefers-color-scheme: light) {
+  .info-popup-content {
+    background: #fff;
+    color: #213547;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+}
+
+/* Each aspect ratio stays on one line with its info mark; a list of them wraps
+   between ratios */
+.aspect-ratio {
+  display: inline-block;
+}
+
 /* Collapsible sections */
 .detail-sections {
   margin-top: 1rem;
@@ -569,5 +626,45 @@
 @media (prefers-reduced-motion: reduce) {
   .detail-panel {
     animation: none;
+  }
+}
+
+/* Simple pages of reference material (IMDB Lists, Aspect Ratio Reference) */
+.reference-page {
+  margin: 2rem auto;
+  padding: 0 2rem;
+  max-width: 1400px;
+}
+
+.reference-page h1 {
+  font-size: 2.5rem;
+  margin: 0 0 1rem;
+}
+
+.reference-list {
+  margin: 0;
+  padding-left: 1.5rem;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.reference-list li + li {
+  margin-top: 0.6rem;
+}
+
+.reference-list-title {
+  font-weight: 800;
+}
+
+.reference-list-description {
+  margin: 0;
+  max-width: 60rem;
+  font-size: 0.95rem;
+}
+
+@media (max-width: 640px) {
+  .reference-page {
+    margin: 1rem auto;
+    padding: 0 1rem;
   }
 }

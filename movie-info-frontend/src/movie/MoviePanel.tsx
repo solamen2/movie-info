@@ -1,4 +1,9 @@
 import { type ReactNode } from "react";
+import AspectRatios from "../shared/AspectRatios";
+import {
+  aspectRatioGoogleSearchUrl,
+  aspectRatiosLabel,
+} from "../shared/aspectRatioUtils";
 import Collapsible from "../shared/Collapsible";
 import HorizontalList from "../shared/HorizontalList";
 import ExternalLinkRow, {
@@ -121,6 +126,16 @@ function MoviePanel({ itemId }: MoviePanelProps) {
     ["Release Date", displayDate(movie.releaseDate)],
     ["Runtime", displayRuntime(movie.runtime)],
     ["Rated", displayText(movie.rated)],
+    [
+      aspectRatiosLabel(movie.aspectRatios),
+      <AspectRatios
+        aspectRatios={movie.aspectRatios}
+        searchUrl={aspectRatioGoogleSearchUrl(
+          movie.title,
+          movie.year === null ? "film" : `(${String(movie.year)} film)`,
+        )}
+      />,
+    ],
     ["Known For", displayText(movie.knownForActors)],
     ["Genres", displayGenres(movie.tmdbGenres, movie.omdbGenres)],
     ["Budget", moneyFact(movie.budget, "budget")],

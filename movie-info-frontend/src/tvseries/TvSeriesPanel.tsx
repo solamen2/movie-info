@@ -1,6 +1,11 @@
 import { type ReactNode } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { imdbTitleUrl } from "../movie/movieTypes";
+import AspectRatios from "../shared/AspectRatios";
+import {
+  aspectRatioGoogleSearchUrl,
+  aspectRatiosLabel,
+} from "../shared/aspectRatioUtils";
 import Collapsible from "../shared/Collapsible";
 import HorizontalList from "../shared/HorizontalList";
 import ExternalLinkRow, {
@@ -146,6 +151,13 @@ function TvSeriesPanel({ itemId }: TvSeriesPanelProps) {
       </>,
     ],
     ["Rated", displayText(tvSeries.rated)],
+    [
+      aspectRatiosLabel(tvSeries.aspectRatios),
+      <AspectRatios
+        aspectRatios={tvSeries.aspectRatios}
+        searchUrl={aspectRatioGoogleSearchUrl(tvSeries.name, "TV series")}
+      />,
+    ],
     ["In Production", tvSeries.isInProduction ? "Yes" : "No"],
     ["Type", displayText(tvSeries.tvSeriesType)],
     ["Number of Seasons", displayText(tvSeries.numberOfSeasons)],

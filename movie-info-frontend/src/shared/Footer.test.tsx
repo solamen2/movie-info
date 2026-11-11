@@ -28,6 +28,41 @@ describe("Footer", () => {
     ).toBeNull();
   });
 
+  it("Should open the IMDB Lists and Aspect Ratio Reference pages", async () => {
+    const { currentUrl } = renderApp();
+
+    fireEvent.click(screen.getByRole("link", { name: "IMDB Lists" }));
+    expect(currentUrl()).toBe("/imdb-lists");
+    expect(
+      screen.getByRole("heading", { name: "IMDB Lists" }),
+    ).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("link", { name: "Aspect Ratio Info" }));
+    expect(currentUrl()).toBe("/aspect-ratios");
+    expect(
+      screen.getByRole("heading", { name: "Aspect Ratio Reference" }),
+    ).toBeInTheDocument();
+    expect(await screen.findAllByTestId("aspect-ratio")).not.toHaveLength(0);
+  });
+
+  it("Should list its links in order, all inside the app", () => {
+    renderApp();
+
+    const links = [...footer().querySelectorAll("a")];
+    expect(links.map((link) => link.textContent)).toEqual([
+      "Search",
+      "Oscars By Year",
+      "IMDB Lists",
+      "Aspect Ratio Info",
+    ]);
+    expect(links.map((link) => link.getAttribute("href"))).toEqual([
+      "/search",
+      "/oscars",
+      "/imdb-lists",
+      "/aspect-ratios",
+    ]);
+  });
+
   it("Should not show at all on the login and register pages, which are seen while logged out", async () => {
     const { router } = renderApp("/login");
 

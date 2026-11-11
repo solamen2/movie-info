@@ -1,4 +1,8 @@
-import type { TmdbGender, WatchProvider } from "../shared/sharedTypes";
+import type {
+  AspectRatio,
+  TmdbGender,
+  WatchProvider,
+} from "../shared/sharedTypes";
 import type { SuggestionImage } from "../suggestion/SuggestionSearchCard";
 
 // Mirrors MovieInfoBackend's TvSeriesViewModel (and child view models) as
@@ -90,6 +94,9 @@ export interface TvSeries {
   homepage: string | null;
   // "" when Wikipedia has no page for the TV series, null when the lookup failed
   wikipediaLink: string | null;
+  // From Wikidata: empty when it lists none for the TV series, null when the
+  // lookup failed
+  aspectRatios: AspectRatio[] | null;
   tmdbId: number;
   isInProduction: boolean;
   languages: string;

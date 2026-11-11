@@ -29,6 +29,7 @@ public class MovieEndpoint
                 [FromServices] OmdbHttpClient omdbHttpClient,
                 [FromServices] TmdbHttpClient tmdbHttpClient,
                 [FromServices] WikipediaHttpClient wikipediaHttpClient,
+                [FromServices] WikidataHttpClient wikidataHttpClient,
                 [FromServices] OscarsHttpClient oscarsHttpClient,
                 [FromServices] IMemoryCache cache) =>
             {
@@ -62,6 +63,7 @@ public class MovieEndpoint
                         Task<ConfigurationCountriesDictionary?> tmdbCountriesTask = GetConfigurationCountriesDictionary(tmdbHttpClient);
                         Task<ConfigurationLanguagesDictionary?> tmdbLanguagesTask = GetConfigurationLanguagesDictionary(tmdbHttpClient);
                         Task<OscarsViewModel?> oscarsTask = GetOscarsViewModel(oscarsHttpClient);
+                        Task<List<AspectRatioViewModel>?> aspectRatiosTask = GetAspectRatios(imdbId, wikidataHttpClient);
                         int? tmdbMovieIdNullable = tmdbId ?? await GetTmdbId(imdbId, tmdbHttpClient);
                         if (tmdbMovieIdNullable == null)
                         {
@@ -77,7 +79,7 @@ public class MovieEndpoint
                         Task<string?> wikipediaLinkTask = GetWikipediaLink(movieSuggestionViewModel, wikipediaHttpClient);
 
                         // NOTE: Strictly speaking, this is not needed, but it's a good marker for when all tasks have been started
-                        await Task.WhenAll(omdbMovieTask, tmdbCountriesTask, tmdbLanguagesTask, oscarsTask, tmdbMovieTask, tmdbMovieCreditsTask, tmdbMovieWatchProvidersTask, wikipediaLinkTask);
+                        await Task.WhenAll(omdbMovieTask, tmdbCountriesTask, tmdbLanguagesTask, oscarsTask, aspectRatiosTask, tmdbMovieTask, tmdbMovieCreditsTask, tmdbMovieWatchProvidersTask, wikipediaLinkTask);
 
                         OmdbResponseDataModel? omdbMovieResponseDataModel = await omdbMovieTask;
                         ConfigurationCountriesDictionary? tmdbConfigurationCountriesDictionary = await tmdbCountriesTask;
@@ -87,6 +89,7 @@ public class MovieEndpoint
                         TmdbWatchProvidersResponseDataModel? tmdbMovieWatchProvidersResponseDataModel = await tmdbMovieWatchProvidersTask;
                         string? wikipediaLink = await wikipediaLinkTask;
                         OscarsViewModel? oscarsViewModel = await oscarsTask;
+                        List<AspectRatioViewModel>? aspectRatios = await aspectRatiosTask;
 
                         if (movieSuggestionViewModel == null)
                         {
@@ -120,6 +123,10 @@ public class MovieEndpoint
                         {
                             Log.Debug($"Movie Wikipedia link for search '{imdbId}' was null!");
                         }
+                        if (aspectRatios == null)
+                        {
+                            Log.Debug($"Movie aspect ratios for search '{imdbId}' were null!");
+                        }
                         if (oscarsViewModel == null)
                         {
                             Log.Warning($"Oscars data unavailable for the /movie request '{imdbId}'.");
@@ -150,7 +157,8 @@ public class MovieEndpoint
                                                                 tmdbConfigurationCountriesDictionary,
                                                                 tmdbConfigurationLanguagesDictionary,
                                                                 wikipediaLink,
-                                                                movieOscars);
+                                                                movieOscars,
+                                                                aspectRatios);
                         }
                         else
                         {
@@ -179,7 +187,7 @@ public class MovieEndpoint
             }
         )
         .WithSummary("Movie")
-        .WithDescription("Searches IMDB, TMDB, OMDB, Wikipedia, and the Academy Awards for detailed information on movies, looked up by IMDB ID or by TMDB ID.")
+        .WithDescription("Searches IMDB, TMDB, OMDB, Wikipedia, Wikidata, and the Academy Awards for detailed information on movies, looked up by IMDB ID or by TMDB ID.")
         .RequireAuthorization(ProgramConstants.LoggedInUsersOnlyPolicyName)  // TODO: Check that this returns appropriate error on frontend
         .RequireAuthorization(ProgramConstants.SearchUsersOnlyPolicyName)  // TODO: Check that this returns appropriate error on frontend
         .RequireRateLimiting(ProgramConstants.TokenRateLimiterPolicyName);
@@ -251,6 +259,28 @@ public class MovieEndpoint
         }
 
         return oscarsViewModel;
+    }
+
+    // The title's aspect ratios from Wikidata: empty when it lists none, null when the lookup failed. They are an extra,
+    // so a failed lookup is never an error for the page as a whole. (Also used for TV series.)
+    public async static Task<List<AspectRatioViewModel>?> GetAspectRatios(string imdbId, WikidataHttpClient wikidataHttpClient)
+    {
+        WikidataSparqlResponseDataModel? wikidataResponseDataModel;
+        try
+        {
+            wikidataResponseDataModel = await wikidataHttpClient.GetAspectRatios(imdbId);
+        }
+        catch (Exception e) when (e is HttpRequestException || e is TaskCanceledException || e is Polly.CircuitBreaker.BrokenCircuitException || e is System.Text.Json.JsonException)
+        {
+            Log.Warning(e, $"Looking up the Wikidata aspect ratios for '{imdbId}' failed.");
+            return null;
+        }
+        if (wikidataResponseDataModel == null)
+            return null;
+
+        Log.Debug($"Wikidata aspect ratios response:\n\n{wikidataResponseDataModel}\n\n");
+
+        return AspectRatiosHelper.FromWikidata(wikidataResponseDataModel);
     }
 
     public async static Task<ConfigurationCountriesDictionary?> GetConfigurationCountriesDictionary(TmdbHttpClient tmdbHttpClient)

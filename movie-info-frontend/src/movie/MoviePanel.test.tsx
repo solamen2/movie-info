@@ -73,6 +73,7 @@ describe("MoviePanel", () => {
         "Release DateSep 23, 2016",
         "Runtime2h 22m",
         "RatedPG-13",
+        "Aspect Ratio2.39:1 - Scope ⓘ",
         "IMDB: 7.9 (123,456)Rank: 4444LinkCopyWikipedia:LinkCopy",
         "Known ForExample Jones, Example Brown",
         "GenresMystery, Thriller, Drama, Science Fiction, Horror",
@@ -315,6 +316,61 @@ describe("MoviePanel", () => {
       );
       expect(await screen.findByText("Copied!")).toBeInTheDocument();
     });
+
+    it("Should pop up a description of the aspect ratio from its info mark", async () => {
+      await searchAndSelectExampleMovie();
+      const panel = await screen.findByTestId("movie-panel");
+
+      fireEvent.click(
+        within(panel).getByRole("button", { name: "about 2.39:1" }),
+      );
+      expect(within(panel).getByRole("tooltip").textContent).toBe(
+        movieDataJson1.aspectRatios[0].description,
+      );
+    });
+
+    it("Should link the aspect ratio's name to its Wikipedia page", async () => {
+      await searchAndSelectExampleMovie();
+      const panel = await screen.findByTestId("movie-panel");
+
+      expect(
+        within(panel).getByRole("link", { name: "Scope" }),
+      ).toHaveAttribute(
+        "href",
+        "https://en.wikipedia.org/wiki/Anamorphic_format",
+      );
+    });
+
+    it.each([
+      ["no aspect ratios in Wikidata", []],
+      ["a failed Wikidata lookup", null],
+    ])(
+      "Should link to a Google search for the aspect ratio for %s",
+      async (_, aspectRatios) => {
+        server.use(
+          http.get("/api/movie", () =>
+            HttpResponse.json({ ...movieDataJson1, aspectRatios }),
+          ),
+        );
+
+        render(
+          <MemoryRouter>
+            <MoviePanel itemId={movieDataJson1.imdbId} />
+          </MemoryRouter>,
+        );
+        const panel = await screen.findByTestId("movie-panel");
+
+        expect(panel.textContent).toContain(
+          "RatedPG-13Aspect RatioSearch GoogleKnown For",
+        );
+        expect(
+          within(panel).getByRole("link", { name: "Search Google" }),
+        ).toHaveAttribute(
+          "href",
+          "https://www.google.com/search?q=%22Example+Movie%22+%282016+film%29+aspect+ratio",
+        );
+      },
+    );
 
     it.each([
       ["no Wikipedia page", ""],

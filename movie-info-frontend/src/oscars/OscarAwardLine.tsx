@@ -1,7 +1,7 @@
 import { type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { detailPath, type PanelKind } from "../utilities/utilities";
-import InfoPopup from "./InfoPopup";
+import InfoPopup from "../shared/InfoPopup";
 import { splitNameIntoNominees, stripWritingCredit } from "./oscarUtils";
 import type { OscarAward } from "./oscarTypes";
 import "./oscars.css";

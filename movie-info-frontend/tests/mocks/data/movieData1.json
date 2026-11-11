@@ -22,6 +22,15 @@
   "tmdbGenres": "Mystery, Thriller, Drama, Science Fiction",
   "homepage": "https://example.com/example-movie",
   "wikipediaLink": "https://en.wikipedia.org/wiki/Example_Movie",
+  "aspectRatios": [
+    {
+      "ratio": "2.39:1",
+      "decimal": "2.39",
+      "name": "Scope",
+      "description": "The modern anamorphic widescreen standard since 1970. Often rounded to 2.40:1, which is also how widescreen films are framed on Blu-ray. A TV shows it with black bars above and below.",
+      "wikipediaLink": "https://en.wikipedia.org/wiki/Anamorphic_format"
+    }
+  ],
   "oscars": [
     {
       "ceremony": 89,
