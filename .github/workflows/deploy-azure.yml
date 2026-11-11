@@ -1,0 +1,148 @@
+# Manually triggered deploy of the already-pushed Docker Hub image to Azure Container Apps.
+# Resolves the linux/amd64 digest of solamen2/movie-info:<stage|prod>, publishes that exact
+# image under an immutable tag (<stage|prod>-<first 12 hex of the digest>), and PATCHes the
+# Container App to that tag. A reused tag like :stage is cached by Azure and never re-pulled;
+# a digest reference works but breaks the portal's container editor, so a unique tag is used.
+#
+# Trigger: GitHub -> Actions -> "Deploy to Azure Container Apps" -> Run workflow.
+#
+# One-time setup:
+#   Repository secrets: AZURE_CLIENT_ID, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID,
+#                       DOCKERHUB_USERNAME, DOCKERHUB_TOKEN (access token with Read & Write,
+#                       needed to publish the immutable tag)
+#   Azure: an app registration with federated credentials for the GitHub environments
+#          "stage" and "prod", and Contributor on the two Container Apps.
+
+name: Deploy to Azure Container Apps
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        type: choice
+        required: true
+        default: stage
+        options:
+          - stage
+          - prod
+
+permissions:
+  id-token: write   # needed for OIDC login to Azure
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env:
+      RESOURCE_GROUP: movieinfo
+      IMAGE_REPO: solamen2/movie-info
+      APP_NAME: movie-info-${{ inputs.environment }}
+      IMAGE_TAG: ${{ inputs.environment }}
+      API_VERSION: "2025-01-01"
+
+    steps:
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Resolve linux/amd64 digest for ${{ env.IMAGE_REPO }}:${{ env.IMAGE_TAG }}
+        id: digest
+        run: |
+          set -euo pipefail
+          DIGEST=$(docker buildx imagetools inspect "$IMAGE_REPO:$IMAGE_TAG" --raw \
+            | jq -r '.manifests[] | select(.platform.os=="linux" and .platform.architecture=="amd64") | .digest')
+          if [ -z "$DIGEST" ]; then
+            echo "::error::Could not find a linux/amd64 manifest for $IMAGE_REPO:$IMAGE_TAG"
+            exit 1
+          fi
+          SHORT=${DIGEST#sha256:}
+          DEPLOY_TAG="$IMAGE_TAG-${SHORT:0:12}"
+          echo "Resolved $IMAGE_REPO:$IMAGE_TAG -> $DIGEST (deploy tag: $DEPLOY_TAG)"
+          echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
+          echo "deploy_tag=$DEPLOY_TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Publish immutable tag ${{ env.IMAGE_REPO }}:${{ steps.digest.outputs.deploy_tag }}
+        env:
+          DIGEST: ${{ steps.digest.outputs.digest }}
+          DEPLOY_TAG: ${{ steps.digest.outputs.deploy_tag }}
+        run: |
+          set -euo pipefail
+          # Manifest-only operation: no layers are pulled or pushed. Re-running with the same digest is a no-op.
+          docker buildx imagetools create --tag "$IMAGE_REPO:$DEPLOY_TAG" "$IMAGE_REPO@$DIGEST"
+
+      - name: Log in to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Update Container App to the new tag
+        id: patch
+        env:
+          DEPLOY_TAG: ${{ steps.digest.outputs.deploy_tag }}
+        run: |
+          set -euo pipefail
+          URL="https://management.azure.com/subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.App/containerApps/$APP_NAME?api-version=$API_VERSION"
+          IMAGE="registry.hub.docker.com/$IMAGE_REPO:$DEPLOY_TAG"
+
+          CURRENT=$(az rest --method get --url "$URL" --query "properties.template.containers[0].image" -o tsv)
+          if [ "$CURRENT" = "$IMAGE" ]; then
+            echo "::notice::$APP_NAME is already running $IMAGE. Nothing to deploy."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Body keeps the registry credential entry and the full container spec (env, resources),
+          # only swapping the image. It contains env values, so it is never printed.
+          az rest --method get --url "$URL" -o json \
+            | jq --arg img "$IMAGE" '{properties:{configuration:{registries:.properties.configuration.registries},template:{containers:[(.properties.template.containers[0] | del(.imageType) | .image=$img)]}}}' \
+            > "$RUNNER_TEMP/body.json"
+
+          az rest --method patch --url "$URL" --body "@$RUNNER_TEMP/body.json" \
+            --query "{provisioningState:properties.provisioningState,image:properties.template.containers[0].image}" -o yaml
+          rm -f "$RUNNER_TEMP/body.json"
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+          echo "fqdn=$(az rest --method get --url "$URL" --query "properties.configuration.ingress.fqdn" -o tsv)" >> "$GITHUB_OUTPUT"
+
+      - name: Wait for the new revision
+        if: steps.patch.outputs.changed == 'true'
+        env:
+          DEPLOY_TAG: ${{ steps.digest.outputs.deploy_tag }}
+        run: |
+          set -euo pipefail
+          URL="https://management.azure.com/subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.App/containerApps/$APP_NAME/revisions?api-version=$API_VERSION"
+          IMAGE="registry.hub.docker.com/$IMAGE_REPO:$DEPLOY_TAG"
+          for i in $(seq 1 40); do
+            REV=$(az rest --method get --url "$URL" -o json \
+              | jq -c --arg img "$IMAGE" '[.value[] | select(.properties.template.containers[0].image==$img)] | last | {name, state:.properties.provisioningState, running:.properties.runningState, error:.properties.provisioningError}')
+            echo "$REV"
+            STATE=$(echo "$REV" | jq -r '.state // empty')
+            case "$STATE" in
+              Provisioned|Succeeded) exit 0 ;;
+              Failed)
+                echo "::error::Revision failed: $(echo "$REV" | jq -r '.error')"
+                exit 1 ;;
+            esac
+            sleep 15
+          done
+          echo "::error::Timed out waiting for the new revision to provision"
+          exit 1
+
+      - name: Check what the site is serving
+        if: steps.patch.outputs.changed == 'true'
+        env:
+          FQDN: ${{ steps.patch.outputs.fqdn }}
+        run: |
+          set -euo pipefail
+          sleep 10
+          ASSET=$(curl -fsS "https://$FQDN/" | grep -o 'assets/index-[A-Za-z0-9_-]*\.js' | head -1 || true)
+          echo "https://$FQDN/ is serving: ${ASSET:-<no asset hash found>}"
+          echo "### Deployed ${{ env.APP_NAME }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- image: \`${{ env.IMAGE_REPO }}:${{ steps.digest.outputs.deploy_tag }}\` (digest \`${{ steps.digest.outputs.digest }}\`)" >> "$GITHUB_STEP_SUMMARY"
+          echo "- frontend bundle: \`${ASSET:-unknown}\`" >> "$GITHUB_STEP_SUMMARY"
