@@ -29,6 +29,7 @@ public class TvSeriesEndpoint
                 [FromServices] OmdbHttpClient omdbHttpClient,
                 [FromServices] TmdbHttpClient tmdbHttpClient,
                 [FromServices] WikipediaHttpClient wikipediaHttpClient,
+                [FromServices] WikidataHttpClient wikidataHttpClient,
                 [FromServices] IMemoryCache cache) =>
             {
                 IResult? tvSeriesViewModelJson;
@@ -60,6 +61,7 @@ public class TvSeriesEndpoint
                         Task<OmdbResponseDataModel?> omdbTvSeriesTask = GetOmdbResponseDataModel(imdbId, omdbHttpClient);
                         Task<ConfigurationCountriesDictionary?> tmdbCountriesTask = GetConfigurationCountriesDictionary(tmdbHttpClient);
                         Task<ConfigurationLanguagesDictionary?> tmdbLanguagesTask = GetConfigurationLanguagesDictionary(tmdbHttpClient);
+                        Task<List<AspectRatioViewModel>?> aspectRatiosTask = MovieEndpoint.GetAspectRatios(imdbId, wikidataHttpClient);
                         int? tmdbTvSeriesIdNullable = tmdbId ?? await GetTmdbId(imdbId, tmdbHttpClient);
                         if (tmdbTvSeriesIdNullable == null)
                         {
@@ -75,7 +77,7 @@ public class TvSeriesEndpoint
                         Task<string?> wikipediaLinkTask = GetWikipediaLink(tvSeriesSuggestionViewModel?.Name, wikipediaHttpClient);
 
                         // NOTE: Strictly speaking, this is not needed, but it's a good marker for when all tasks have been started
-                        await Task.WhenAll(omdbTvSeriesTask, tmdbCountriesTask, tmdbLanguagesTask, tmdbTvSeriesTask, tmdbTvSeriesAggregateCreditsTask, tmdbTvSeriesWatchProvidersTask, wikipediaLinkTask);
+                        await Task.WhenAll(omdbTvSeriesTask, tmdbCountriesTask, tmdbLanguagesTask, aspectRatiosTask, tmdbTvSeriesTask, tmdbTvSeriesAggregateCreditsTask, tmdbTvSeriesWatchProvidersTask, wikipediaLinkTask);
 
                         OmdbResponseDataModel? omdbTvSeriesResponseDataModel = await omdbTvSeriesTask;
                         ConfigurationCountriesDictionary? tmdbConfigurationCountriesDictionary = await tmdbCountriesTask;
@@ -84,6 +86,7 @@ public class TvSeriesEndpoint
                         TmdbTvSeriesAggregateCreditsResponseDataModel? tmdbTvSeriesAggregateCreditsResponseDataModel = await tmdbTvSeriesAggregateCreditsTask;
                         TmdbWatchProvidersResponseDataModel? tmdbTvSeriesWatchProvidersResponseDataModel = await tmdbTvSeriesWatchProvidersTask;
                         string? wikipediaLink = await wikipediaLinkTask;
+                        List<AspectRatioViewModel>? aspectRatios = await aspectRatiosTask;
 
                         if (tvSeriesSuggestionViewModel == null)
                         {
@@ -117,6 +120,10 @@ public class TvSeriesEndpoint
                         {
                             Log.Debug($"TV series Wikipedia link for search '{imdbId}' was null!");
                         }
+                        if (aspectRatios == null)
+                        {
+                            Log.Debug($"TV series aspect ratios for search '{imdbId}' were null!");
+                        }
 
                         TvSeriesViewModel tvSeriesViewModel;
                         // Null checks all happened above, but there's no good way to let the compiler know about that, so recheck here
@@ -139,7 +146,8 @@ public class TvSeriesEndpoint
                                                                       tmdbTvSeriesWatchProvidersResponseDataModel,
                                                                       tmdbConfigurationCountriesDictionary,
                                                                       tmdbConfigurationLanguagesDictionary,
-                                                                      wikipediaLink);
+                                                                      wikipediaLink,
+                                                                      aspectRatios);
                         }
                         else
                         {
@@ -168,7 +176,7 @@ public class TvSeriesEndpoint
             }
         )
         .WithSummary("TV Series")
-        .WithDescription("Searches IMDB, TMDB, OMDB, and Wikipedia for detailed information on TV series, looked up by IMDB ID or by TMDB ID.")
+        .WithDescription("Searches IMDB, TMDB, OMDB, Wikipedia, and Wikidata for detailed information on TV series, looked up by IMDB ID or by TMDB ID.")
         .RequireAuthorization(ProgramConstants.LoggedInUsersOnlyPolicyName)  // TODO: Check that this returns appropriate error on frontend
         .RequireAuthorization(ProgramConstants.SearchUsersOnlyPolicyName)  // TODO: Check that this returns appropriate error on frontend
         .RequireRateLimiting(ProgramConstants.TokenRateLimiterPolicyName);

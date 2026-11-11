@@ -1,0 +1,18 @@
+{
+  "head" : {
+    "vars" : [ "aspectRatio", "aspectRatioLabel" ]
+  },
+  "results" : {
+    "bindings" : [ {
+      "aspectRatio" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1383069"
+      },
+      "aspectRatioLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "16:9"
+      }
+    } ]
+  }
+}

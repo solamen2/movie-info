@@ -34,6 +34,7 @@ try
     SetUpApp();
 
     Log.Information("Mapping endpoints...");
+    AspectRatiosEndpoint.Map(app);
     AuthEndpoint.Map(app);
     InflationEndpoint.Map(app);
     MovieEndpoint.Map(app);
@@ -128,6 +129,12 @@ void AddServices()
     builder.Services.AddHttpClient<WikipediaHttpClient>()
                         .AddTransientHttpErrorPolicy(policyBuilder =>
                             policyBuilder.WaitAndRetryAsync(3, retryNumber => TimeSpan.FromMilliseconds(600)))
+                        .AddTransientHttpErrorPolicy(policyBuilder =>
+                            policyBuilder.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)))
+                        .SetHandlerLifetime(TimeSpan.FromMinutes(15));
+    builder.Services.AddHttpClient<WikidataHttpClient>()
+                        .AddTransientHttpErrorPolicy(policyBuilder =>
+                            policyBuilder.WaitAndRetryAsync(1, retryNumber => TimeSpan.FromMilliseconds(600)))  // Only one retry: it shares the client's short timeout (see WikidataHttpClient)
                         .AddTransientHttpErrorPolicy(policyBuilder =>
                             policyBuilder.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)))
                         .SetHandlerLifetime(TimeSpan.FromMinutes(15));

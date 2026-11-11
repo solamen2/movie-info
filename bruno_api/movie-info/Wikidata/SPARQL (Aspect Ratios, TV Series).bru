@@ -1,0 +1,30 @@
+meta {
+  name: SPARQL (Aspect Ratios, TV Series)
+  type: http
+  seq: 2
+}
+
+get {
+  url: https://query.wikidata.org/sparql?format=json&query=SELECT DISTINCT ?aspectRatio ?aspectRatioLabel WHERE { ?item wdt:P345 "tt0903747" ; wdt:P2061 ?aspectRatio . SERVICE wikibase:label { bd:serviceParam wikibase:language "en" . } }
+  body: none
+  auth: inherit
+}
+
+params:query {
+  format: json
+  query: SELECT DISTINCT ?aspectRatio ?aspectRatioLabel WHERE { ?item wdt:P345 "tt0903747" ; wdt:P2061 ?aspectRatio . SERVICE wikibase:label { bd:serviceParam wikibase:language "en" . } }
+}
+
+headers {
+  Accept: application/sparql-results+json
+  User-Agent: movie-info/1.0 (https://movieinfo.dev/)
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  The aspect ratios (property P2061) of the TV series with the given IMDB ID (property P345), each as a Wikidata item with its English label, e.g. "1.85:1", "16:9" or "Academy ratio". No bindings come back when Wikidata has no item with that IMDB ID, or the item has no aspect ratio.
+}

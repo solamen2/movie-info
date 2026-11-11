@@ -79,6 +79,7 @@ describe("TvSeriesPanel", () => {
         "Next Air Date—",
         "Average Runtime44m42m, 44m",
         "RatedTV-14",
+        "Aspect Ratios4:3 / 1.33 - Fullscreen ⓘ, 16:9 / 1.78 - Widescreen ⓘ",
         "In ProductionNo",
         "TypeScripted",
         "Number of Seasons2",

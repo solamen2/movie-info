@@ -3,6 +3,8 @@ import LoginUser from "./user/LoginUser";
 import RegisterUser from "./user/RegisterUser";
 import SuggestionSearch from "./suggestion/SuggestionSearch";
 import OscarsByYear from "./oscars/OscarsByYear";
+import ImdbLists from "./imdb/ImdbLists";
+import AspectRatioReference from "./aspectratio/AspectRatioReference";
 import Footer from "./shared/Footer";
 
 function AppRoutes() {
@@ -25,6 +27,8 @@ function AppRoutes() {
           element={<SuggestionSearch panelKind="person" />}
         />
         <Route path="/oscars" element={<OscarsByYear />} />
+        <Route path="/imdb-lists" element={<ImdbLists />} />
+        <Route path="/aspect-ratios" element={<AspectRatioReference />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
       <Footer />

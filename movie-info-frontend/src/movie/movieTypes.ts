@@ -1,4 +1,8 @@
-import type { TmdbGender, WatchProvider } from "../shared/sharedTypes";
+import type {
+  AspectRatio,
+  TmdbGender,
+  WatchProvider,
+} from "../shared/sharedTypes";
 import type { SuggestionImage } from "../suggestion/SuggestionSearchCard";
 import type { OscarAward } from "../oscars/oscarTypes";
 
@@ -56,6 +60,9 @@ export interface Movie {
   // Empty when the movie has none; null only when the Oscars data could not
   // be loaded
   oscars: OscarAward[] | null;
+  // From Wikidata: empty when it lists none for the movie, null when the
+  // lookup failed
+  aspectRatios: AspectRatio[] | null;
   tmdbId: number;
   originCountries: string;
   originLanguage: string;

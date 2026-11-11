@@ -129,6 +129,7 @@ const expectedMovie = useMockHttpCalls
         "Release DateSep 23, 2016",
         "Runtime2h 22m",
         "RatedPG-13",
+        "Aspect Ratio2.39:1 - Scope ⓘ",
         "Known ForExample Jones, Example Brown",
         "GenresMystery, Thriller, Drama, Science Fiction, Horror",
         "Budget$25,000,000",
@@ -174,6 +175,7 @@ const expectedMovie = useMockHttpCalls
         "Release DateSep 23, 1994",
         "Runtime2h 22m",
         "RatedR",
+        "Aspect Ratio", // the value comes from Wikidata, which anyone can edit
         "Known ForTim Robbins, Morgan Freeman",
         "GenresDrama, Crime",
         "Budget$25,000,000",
@@ -552,6 +554,7 @@ const expectedTvSeries = useMockHttpCalls
         "Next Air Date—",
         "Average Runtime44m42m, 44m",
         "RatedTV-14",
+        "Aspect Ratios4:3 / 1.33 - Fullscreen ⓘ, 16:9 / 1.78 - Widescreen ⓘ",
         "In ProductionNo",
         "TypeScripted",
         "Number of Seasons2",
@@ -603,6 +606,7 @@ const expectedTvSeries = useMockHttpCalls
         "Last Air DateMay 20, 2003",
         "Next Air Date—",
         "RatedTV-14",
+        "Aspect Ratio", // the value comes from Wikidata, which anyone can edit
         "In ProductionNo",
         "TypeScripted",
         "Number of Seasons7",
@@ -2172,3 +2176,66 @@ test("Oscars By Year interactions: expand and collapse all years, jump to a year
 function escapeRegExp(text: string): string {
   return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
+
+// IMDB Lists and Aspect Ratio Reference
+
+test("Reference pages: open IMDB Lists and the Aspect Ratio Reference from the footer, and check their links and list", async ({
+  page,
+}) => {
+  console.log("Starting reference pages test...");
+
+  console.log("Checking the IMDB Lists page...");
+  await page.getByRole("link", { name: "IMDB Lists", exact: true }).click();
+  await expect(page).toHaveURL(/\/imdb-lists$/);
+  const imdbListsPage = page.getByTestId("imdb-lists-page");
+  await expect(
+    imdbListsPage.getByRole("heading", { name: "IMDB Lists" }),
+  ).toBeVisible();
+  const imdbLinks = imdbListsPage.getByRole("listitem").getByRole("link");
+  await expect(imdbLinks).toHaveText([
+    "IMDB Top 1000 Movies",
+    "IMDB Bottom 1000 Movies",
+    "IMDB Top 250 TV Shows",
+  ]);
+  for (const [i, href] of [
+    "https://www.imdb.com/search/title/?groups=top_1000&sort=user_rating,desc",
+    "https://www.imdb.com/search/title/?groups=bottom_1000&sort=user_rating,asc",
+    "https://www.imdb.com/chart/toptv/",
+  ].entries()) {
+    await expect(imdbLinks.nth(i)).toHaveAttribute("href", href);
+    await expect(imdbLinks.nth(i)).toHaveAttribute("target", "_blank");
+  }
+
+  console.log("Checking the Aspect Ratio Reference page...");
+  await page
+    .getByRole("link", { name: "Aspect Ratio Info", exact: true })
+    .click();
+  await expect(page).toHaveURL(/\/aspect-ratios$/);
+  const referencePage = page.getByTestId("aspect-ratio-reference-page");
+  await expect(
+    referencePage.getByRole("heading", { name: "Aspect Ratio Reference" }),
+  ).toBeVisible();
+  const aspectRatios = referencePage.getByTestId("aspect-ratio");
+  await expect(aspectRatios.first()).toContainText("9:16 / 0.56 - Vertical");
+  expect(await aspectRatios.count()).toBeGreaterThanOrEqual(29);
+  const fullscreen = aspectRatios.filter({ hasText: "4:3 / 1.33" });
+  await expect(fullscreen).toContainText(
+    "4:3 / 1.33 - FullscreenThe shape of silent films and of television before HD.",
+  );
+  await expect(
+    fullscreen.getByRole("link", { name: "Fullscreen" }),
+  ).toHaveAttribute(
+    "href",
+    "https://en.wikipedia.org/wiki/Fullscreen_(aspect_ratio)",
+  );
+
+  console.log("Checking the page does not scroll horizontally...");
+  const hasHorizontalScrollbar = await page.evaluate(
+    () =>
+      document.documentElement.scrollWidth >
+      document.documentElement.clientWidth,
+  );
+  expect(hasHorizontalScrollbar).toBe(false);
+
+  console.log("Reference pages test finished.");
+});

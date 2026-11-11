@@ -7,6 +7,7 @@ import tvSeriesDataJson1 from "./data/tvSeriesData1.json" with { type: "json" };
 import tvSeasonDataJson1 from "./data/tvSeasonData1.json" with { type: "json" };
 import tvEpisodeDataJson1 from "./data/tvEpisodeData1.json" with { type: "json" };
 import oscarsDataJson1 from "./data/oscarsData1.json" with { type: "json" };
+import aspectRatiosDataJson1 from "./data/aspectRatiosData1.json" with { type: "json" };
 import inflationDataJson1 from "./data/inflationData1.json" with { type: "json" };
 
 type LoginPathParams = object;
@@ -231,6 +232,9 @@ export const handlers = [
 
   http.get("/api/oscars", () => {
     return HttpResponse.json(oscarsDataJson1, { status: 200 });
+  }),
+  http.get("/api/aspectratios", () => {
+    return HttpResponse.json(aspectRatiosDataJson1, { status: 200 });
   }),
 
   // Synthetic Consumer Price Index series: a month's value is

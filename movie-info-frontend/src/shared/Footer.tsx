@@ -40,6 +40,8 @@ function Footer() {
       <nav className="app-footer-links" aria-label="footer">
         <Link to="/search">Search</Link>
         <Link to="/oscars">Oscars By Year</Link>
+        <Link to="/imdb-lists">IMDB Lists</Link>
+        <Link to="/aspect-ratios">Aspect Ratio Info</Link>
         <button
           aria-label="logout"
           className="logout-button"

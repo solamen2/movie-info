@@ -1,0 +1,205 @@
+[
+  {
+    "ratio": "9:16",
+    "decimal": "0.56",
+    "name": "Vertical",
+    "description": "Widescreen HD turned on its side: the shape of a phone held upright, used for video made to be watched on phones.",
+    "wikipediaLink": "https://en.wikipedia.org/wiki/Vertical_video"
+  },
+  {
+    "ratio": "3:4",
+    "decimal": "0.75",
+    "name": null,
+    "description": "The old 4:3 television shape turned on its side, used for some vertical video.",
+    "wikipediaLink": null
+  },
+  {
+    "ratio": "1.19:1",
+    "decimal": "1.19",
+    "name": "Movietone",
+    "description": "The nearly square frame of early sound films (about 1926 to 1932), left over when an optical soundtrack was added beside the silent-era picture. Seen in Sunrise (1927) and M (1931), and revived for The Lighthouse (2019).",
+    "wikipediaLink": "https://en.wikipedia.org/wiki/Movietone_sound_system"
+  },
+  {
+    "ratio": "5:4",
+    "decimal": "1.25",
+    "name": null,
+    "description": "Slightly squarer than a classic TV picture: the shape of early 405-line television broadcasts, and later of many computer monitors.",
+    "wikipediaLink": null
+  },
+  {
+    "ratio": "4:3",
+    "decimal": "1.33",
+    "name": "Fullscreen",
+    "description": "The shape of silent films and of television before HD. A modern widescreen TV shows it with black bars on the left and right.",
+    "wikipediaLink": "https://en.wikipedia.org/wiki/Fullscreen_(aspect_ratio)"
+  },
+  {
+    "ratio": "1.37:1",
+    "decimal": "1.37",
+    "name": "Academy ratio",
+    "description": "The Hollywood standard set by the Academy in 1932, used for nearly all films until widescreen took over in 1953. Almost identical to 4:3.",
+    "wikipediaLink": "https://en.wikipedia.org/wiki/Academy_ratio"
+  },
+  {
+    "ratio": "1.43:1",
+    "decimal": "1.43",
+    "name": "IMAX",
+    "description": "The tall frame of IMAX 70 mm film, which only the largest IMAX theaters can show at its full height.",
+    "wikipediaLink": "https://en.wikipedia.org/wiki/IMAX"
+  },
+  {
+    "ratio": "3:2",
+    "decimal": "1.50",
+    "name": null,
+    "description": "The shape of a 35 mm still photograph and of the VistaVision film frame. Uncommon for a finished film or show.",
+    "wikipediaLink": null
+  },
+  {
+    "ratio": "14:9",
+    "decimal": "1.56",
+    "name": null,
+    "description": "A compromise between 4:3 and 16:9, devised after BBC audience tests, that broadcasters used to show a picture acceptably on both old and widescreen TVs.",
+    "wikipediaLink": "https://en.wikipedia.org/wiki/14:9_aspect_ratio"
+  },
+  {
+    "ratio": "16:10",
+    "decimal": "1.60",
+    "name": null,
+    "description": "The shape of many widescreen computer monitors and laptops of the 2000s, before they moved to 16:9. Rare for a film or show.",
+    "wikipediaLink": "https://en.wikipedia.org/wiki/16:10_aspect_ratio"
+  },
+  {
+    "ratio": "1.66:1",
+    "decimal": "1.66",
+    "name": "European widescreen",
+    "description": "An early widescreen shape introduced by Paramount, which became the standard for theatrical films in several European countries. Also the native shape of Super 16 film.",
+    "wikipediaLink": null
+  },
+  {
+    "ratio": "5:3",
+    "decimal": "1.67",
+    "name": "European widescreen",
+    "description": "Usually written 1.66:1: an early widescreen shape introduced by Paramount, which became the standard for theatrical films in several European countries. Also the native shape of Super 16 film.",
+    "wikipediaLink": null
+  },
+  {
+    "ratio": "1.75:1",
+    "decimal": "1.75",
+    "name": null,
+    "description": "An early widescreen shape used by MGM and Warner Bros. from 1953 to 1955, and for the widescreen versions of some Disney films, before 1.85:1 became the norm.",
+    "wikipediaLink": null
+  },
+  {
+    "ratio": "16:9",
+    "decimal": "1.78",
+    "name": "Widescreen",
+    "description": "The shape of HDTVs, and of nearly all television made since the 2000s. It fills a modern TV screen exactly.",
+    "wikipediaLink": "https://en.wikipedia.org/wiki/16:9_aspect_ratio"
+  },
+  {
+    "ratio": "1.85:1",
+    "decimal": "1.85",
+    "name": "Flat",
+    "description": "The standard non-anamorphic (\"flat\") widescreen shape for theatrical films in the US and UK, introduced by Universal in 1953. Only slightly wider than a TV screen.",
+    "wikipediaLink": "https://en.wikipedia.org/wiki/Aspect_ratio_(image)#1.85:1"
+  },
+  {
+    "ratio": "17:9",
+    "decimal": "1.89",
+    "name": null,
+    "description": "Close to the full frame of a digital cinema projector (256:135, for example 4096 × 2160), a little wider than a TV screen.",
+    "wikipediaLink": "https://en.wikipedia.org/wiki/Digital_Cinema_Initiatives"
+  },
+  {
+    "ratio": "1.90:1",
+    "decimal": "1.90",
+    "name": "IMAX Digital",
+    "description": "The shape of digital IMAX screens, introduced in 2008, and of the full frame of a digital cinema projector. A little taller than standard theatrical widescreen, and often used only for selected scenes of a film.",
+    "wikipediaLink": "https://en.wikipedia.org/wiki/IMAX"
+  },
+  {
+    "ratio": "2:1",
+    "decimal": "2.00",
+    "name": "Univisium",
+    "description": "First used for RKO's Superscope in the 1950s, then proposed by cinematographer Vittorio Storaro in 1998 as a single shape for both cinema and television. Now common in streaming series.",
+    "wikipediaLink": "https://en.wikipedia.org/wiki/Univisium"
+  },
+  {
+    "ratio": "2.20:1",
+    "decimal": "2.20",
+    "name": "70 mm",
+    "description": "The shape of standard 70 mm film prints, introduced with Todd-AO in 1955 and used for many roadshow epics.",
+    "wikipediaLink": "https://en.wikipedia.org/wiki/70_mm_film"
+  },
+  {
+    "ratio": "21:9",
+    "decimal": "2.33",
+    "name": "Ultrawide",
+    "description": "The marketing name for ultra-wide TVs and monitors (really about 2.37:1), close to the shape of scope films.",
+    "wikipediaLink": "https://en.wikipedia.org/wiki/21:9_aspect_ratio"
+  },
+  {
+    "ratio": "2.35:1",
+    "decimal": "2.35",
+    "name": "CinemaScope",
+    "description": "The anamorphic widescreen shape of CinemaScope and early Panavision films, standard until 1970. Often still used as a label for later films that are really 2.39:1.",
+    "wikipediaLink": "https://en.wikipedia.org/wiki/CinemaScope"
+  },
+  {
+    "ratio": "2.37:1",
+    "decimal": "2.37",
+    "name": "Ultrawide",
+    "description": "The true shape of \"21:9\" ultra-wide TVs and monitors (64:27), close to the shape of scope films.",
+    "wikipediaLink": "https://en.wikipedia.org/wiki/21:9_aspect_ratio"
+  },
+  {
+    "ratio": "2.39:1",
+    "decimal": "2.39",
+    "name": "Scope",
+    "description": "The modern anamorphic widescreen standard since 1970, often rounded to 2.40:1. A TV shows it with black bars above and below.",
+    "wikipediaLink": "https://en.wikipedia.org/wiki/Anamorphic_format"
+  },
+  {
+    "ratio": "2.40:1",
+    "decimal": "2.40",
+    "name": "Scope",
+    "description": "A rounded way of writing 2.39:1, the modern anamorphic widescreen standard, and the shape widescreen films are given on Blu-ray (1920 × 800). A TV shows it with black bars above and below.",
+    "wikipediaLink": "https://en.wikipedia.org/wiki/Anamorphic_format"
+  },
+  {
+    "ratio": "2.55:1",
+    "decimal": "2.55",
+    "name": "Early CinemaScope",
+    "description": "The CinemaScope frame of 1954 to 1956 (and of CinemaScope 55), before an optical soundtrack on the film narrowed it to 2.35:1.",
+    "wikipediaLink": "https://en.wikipedia.org/wiki/CinemaScope"
+  },
+  {
+    "ratio": "2.59:1",
+    "decimal": "2.59",
+    "name": "Cinerama",
+    "description": "The 1950s process that used three 35 mm projectors side by side to fill a huge, deeply curved screen.",
+    "wikipediaLink": "https://en.wikipedia.org/wiki/Cinerama"
+  },
+  {
+    "ratio": "2.66:1",
+    "decimal": "2.66",
+    "name": "Original CinemaScope",
+    "description": "The full width of the first CinemaScope films of 1953, before soundtracks were added to the film itself in 1954.",
+    "wikipediaLink": "https://en.wikipedia.org/wiki/CinemaScope"
+  },
+  {
+    "ratio": "2.76:1",
+    "decimal": "2.76",
+    "name": "Ultra Panavision 70",
+    "description": "One of the widest formats ever in regular use: anamorphic 70 mm (first called MGM Camera 65), used for about ten films from 1957 to 1966, such as Ben-Hur (1959), and revived for The Hateful Eight (2015).",
+    "wikipediaLink": "https://en.wikipedia.org/wiki/Ultra_Panavision_70"
+  },
+  {
+    "ratio": "4:1",
+    "decimal": "4.00",
+    "name": "Polyvision",
+    "description": "Three ordinary 35 mm pictures projected side by side, first used for Abel Gance's Napoléon (1927).",
+    "wikipediaLink": "https://en.wikipedia.org/wiki/Polyvision"
+  }
+]
