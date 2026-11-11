@@ -2217,7 +2217,7 @@ test("Reference pages: open IMDB Lists and the Aspect Ratio Reference from the f
   ).toBeVisible();
   const aspectRatios = referencePage.getByTestId("aspect-ratio");
   await expect(aspectRatios.first()).toContainText("9:16 / 0.56 - Vertical");
-  expect(await aspectRatios.count()).toBeGreaterThanOrEqual(29);
+  expect(await aspectRatios.count()).toBeGreaterThanOrEqual(26);
   const fullscreen = aspectRatios.filter({ hasText: "4:3 / 1.33" });
   await expect(fullscreen).toContainText(
     "4:3 / 1.33 - FullscreenThe shape of silent films and of television before HD.",
