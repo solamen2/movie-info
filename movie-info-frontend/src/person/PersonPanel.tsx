@@ -1,8 +1,10 @@
-import { type ReactNode } from "react";
 import type { TmdbGender } from "../shared/sharedTypes";
 import Collapsible from "../shared/Collapsible";
+import DetailFacts, { type DetailFact } from "../shared/DetailFacts";
 import HorizontalList from "../shared/HorizontalList";
 import ExternalLinkRow from "../shared/ExternalLinkRow";
+import ImdbLinkRow from "../shared/ImdbLinkRow";
+import { knownForCreditFact } from "../shared/linkFacts";
 import { useDetailData } from "../shared/useDetailData";
 import { usePanelCards } from "../shared/usePanelCards";
 import {
@@ -89,21 +91,58 @@ function PersonPanel({ itemId }: PersonPanelProps) {
 
   const age = getAge(person.birthday, person.deathday);
 
-  const facts: [string, ReactNode][] = [
-    ["Known For", displayText(person.knownForMovies)],
+  const facts: DetailFact[] = [
+    knownForCreditFact(
+      person.knownForMovies,
+      [
+        ...movieCastCredits.map((c) => ({
+          cardType: "movie-cast-credits",
+          panelKind: "movie" as const,
+          tmdbId: c.tmdbId,
+          title: c.title,
+          date: c.releaseDate,
+        })),
+        ...movieCrewCredits.map((c) => ({
+          cardType: "movie-crew-credits",
+          panelKind: "movie" as const,
+          tmdbId: c.tmdbId,
+          title: c.title,
+          date: c.releaseDate,
+        })),
+        ...tvSeriesCastCredits.map((c) => ({
+          cardType: "tv-series-cast-credits",
+          panelKind: "tvseries" as const,
+          tmdbId: c.tmdbId,
+          title: c.name,
+          date: c.firstAirDate,
+        })),
+        ...tvSeriesCrewCredits.map((c) => ({
+          cardType: "tv-series-crew-credits",
+          panelKind: "tvseries" as const,
+          tmdbId: c.tmdbId,
+          title: c.name,
+          date: c.firstAirDate,
+        })),
+      ],
+      cards,
+    ),
     ["Known For Department", displayText(person.knownForDepartment)],
     ["Also Known As", displayText(person.alsoKnownAs.join(", "))],
     [
       "Birthday",
-      <>
-        {displayDate(person.birthday)}
-        {age !== null && (
-          <>
-            {" "}
-            <i data-testid="person-age">{displayAge(age)}</i>
-          </>
-        )}
-      </>,
+      displayDate(person.birthday) === "—" ? (
+        "—"
+      ) : (
+        <>
+          {displayDate(person.birthday)}
+          {age !== null && (
+            <>
+              {" "}
+              <i data-testid="person-age">{displayAge(age)}</i>
+            </>
+          )}
+        </>
+      ),
     ],
     ["Deathday", displayDate(person.deathday)],
     ["Place of Birth", displayText(person.placeOfBirth)],
@@ -137,36 +176,25 @@ function PersonPanel({ itemId }: PersonPanelProps) {
         )}
         <div className="detail-panel-heading">
           <h2 className="detail-title">{person.name}</h2>
-          <ExternalLinkRow
+          <ImdbLinkRow
             url={imdbNameUrl(person.imdbId)}
-            copyAriaLabel="copy-imdb-link"
-          >
-            <span className="external-link-row-label">IMDB:</span>{" "}
-            <span className="external-link-row-label">Rank:</span>{" "}
-            {displayText(person.imdbRank)}
-          </ExternalLinkRow>
+            rank={person.imdbRank}
+          />
           <ExternalLinkRow
             url={person.wikipediaLink ?? ""}
             label="Wikipedia:"
             copyAriaLabel="copy-wikipedia-link"
           />
-          <dl className="detail-facts">
-            {facts.map(([label, value]) => (
-              <div className="detail-fact" key={label}>
-                <dt>{label}</dt>
-                <dd>{value}</dd>
-              </div>
-            ))}
-          </dl>
+          <DetailFacts facts={facts} />
         </div>
       </div>
 
       <div className="detail-sections">
-        <Collapsible title="Biography">
-          <p className="detail-prose person-biography">
-            {displayText(person.biography)}
-          </p>
-        </Collapsible>
+        {displayText(person.biography) !== "—" && (
+          <Collapsible title="Biography">
+            <p className="detail-prose person-biography">{person.biography}</p>
+          </Collapsible>
+        )}
         <PersonOscars oscars={person.oscars} />
         <Collapsible
           title="Movie Cast Credits"

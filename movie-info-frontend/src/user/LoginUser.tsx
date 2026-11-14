@@ -68,6 +68,28 @@ function LoginUser() {
           )}
         </div>
       </form>
+      <p className="data-credits">
+        Uses data from:
+        <a href="https://www.imdb.com/" target="_blank" rel="noopener">
+          <img src="/imdb-logo.svg" alt="IMDb" />
+        </a>
+        <a href="https://www.themoviedb.org/" target="_blank" rel="noopener">
+          <img src="/tmdb-logo.svg" alt="TMDB" />
+        </a>
+        {/* OMDB has no logo of its own */}
+        <a href="https://www.omdbapi.com/" target="_blank" rel="noopener">
+          OMDb API
+        </a>
+        <a href="https://www.wikipedia.org/" target="_blank" rel="noopener">
+          <img src="/wikipedia-logo.svg" alt="Wikipedia" />
+        </a>
+        <a href="https://www.wikidata.org/" target="_blank" rel="noopener">
+          <img src="/wikidata-logo.svg" alt="Wikidata" />
+        </a>
+        <a href="https://www.bls.gov/" target="_blank" rel="noopener">
+          <img src="/bls-logo.svg" alt="U.S. Bureau of Labor Statistics" />
+        </a>
+      </p>
     </div>
   );
 }

@@ -83,11 +83,11 @@ describe("PersonPanel", () => {
       expect(screen.getByTestId("person-age").tagName).toBe("I");
 
       for (const expected of [
-        "Example SmithIMDB: Rank: 3LinkCopyWikipedia:LinkCopy",
+        "Example SmithIMDB:LinkCopyRank: 3Wikipedia:LinkCopy",
         "Known ForActress, Example Film",
         "Known For DepartmentActing",
         "Also Known AsExample Smithee, Betsy Smith",
-        "BirthdayApr 14, 1977 (49)Deathday—",
+        "BirthdayApr 14, 1977 (49)Place of Birth",
         "Place of BirthNew York City, New York, USA",
         "GenderFemale",
         "Homepagehttps://example.com/example-smith",
@@ -127,7 +127,6 @@ describe("PersonPanel", () => {
         "Movie Cast Credits(3)",
         "Movie Crew Credits(1)",
         "TV Series Cast Credits(2)",
-        "TV Series Crew Credits(0)",
         "Profile Images(2)",
       ]);
     });
@@ -142,7 +141,6 @@ describe("PersonPanel", () => {
         ["Movie Cast Credits", "Example Hero"],
         ["Movie Crew Credits", "Example Produced Film"],
         ["TV Series Cast Credits", "Example Slayer"],
-        ["TV Series Crew Credits", "None"],
       ]) {
         const details = screen.getByText(summary).closest("details");
         if (!details) {
@@ -328,7 +326,7 @@ describe("PersonPanel", () => {
       ["no Wikipedia page", ""],
       ["a failed Wikipedia lookup", null],
     ])(
-      "Should show a placeholder instead of the Wikipedia link and Copy button for %s",
+      "Should leave out the Wikipedia row for %s",
       async (_, wikipediaLink) => {
         server.use(
           http.get("/api/person", () =>
@@ -344,8 +342,9 @@ describe("PersonPanel", () => {
         const panel = await screen.findByTestId("person-panel");
 
         expect(panel.textContent).toContain(
-          "Example SmithIMDB: Rank: 3LinkCopyWikipedia:—",
+          "Example SmithIMDB:LinkCopyRank: 3Known For",
         );
+        expect(panel.textContent).not.toContain("Wikipedia");
         expect(screen.getAllByRole("link", { name: "Link" })).toHaveLength(1);
         expect(
           screen.queryByRole("button", { name: "copy-wikipedia-link" }),
@@ -363,12 +362,6 @@ describe("PersonPanel", () => {
       fireEvent.click(panel);
       expect(personCard.classList.contains("selected")).toBe(true);
       expect(personCard.classList.contains("expanded")).toBe(true);
-    });
-
-    it("Should hide the results message", async () => {
-      await searchAndSelectExamplePerson();
-
-      expect(screen.queryByText("8 results.")).not.toBeInTheDocument();
     });
   });
 
@@ -405,12 +398,11 @@ describe("PersonPanel", () => {
           .querySelector(".results-container")
           ?.classList.contains("has-selection"),
       ).toBe(false);
-      expect(screen.getByText("8 results.")).toBeInTheDocument();
     });
   });
 
   describe("When the person has no birthday", () => {
-    it("Should not show an age", async () => {
+    it("Should leave out the birthday and the age", async () => {
       server.use(
         http.get("/api/person", () =>
           HttpResponse.json({ ...personDataJson1, birthday: null }),
@@ -423,7 +415,7 @@ describe("PersonPanel", () => {
         </MemoryRouter>,
       );
       const panel = await screen.findByTestId("person-panel");
-      expect(panel.textContent).toContain("Birthday—Deathday—");
+      expect(panel.textContent).not.toContain("Birthday");
       expect(screen.queryByTestId("person-age")).toBeNull();
     });
   });
@@ -448,7 +440,7 @@ describe("PersonPanel", () => {
   });
 
   describe("When the person has missing data", () => {
-    it("Should show placeholders instead of the missing values", async () => {
+    it("Should leave out the missing values, and the sections with nothing in them", async () => {
       server.use(
         http.get("/api/person", () =>
           HttpResponse.json({
@@ -477,18 +469,28 @@ describe("PersonPanel", () => {
       const text = panel.textContent;
 
       for (const expected of [
-        "No imageExample SmithIMDB: Rank: —LinkCopyWikipedia:—",
-        "Known For—",
-        "Also Known As—",
-        "BirthdayApr 14, 1977 (42)DeathdayJan 2, 2020",
-        "Place of Birth—",
-        "GenderNot specified",
-        "Homepage—",
-        "Biography—",
-        "Profile Images(0)None",
+        "No imageExample SmithIMDB:LinkCopyKnown For DepartmentActing",
+        "BirthdayApr 14, 1977 (42)DeathdayJan 2, 2020GenderNot specified",
       ]) {
         expect(text).toContain(expected);
       }
+      expect(
+        panel.querySelector(".detail-panel-top")?.textContent,
+      ).not.toContain("—");
+      for (const leftOut of [
+        "Rank",
+        "Wikipedia",
+        "Also Known As",
+        "Place of Birth",
+        "Homepage",
+        "Biography",
+        "Profile Images",
+        "None",
+      ]) {
+        expect(text).not.toContain(leftOut);
+      }
+      // "Known For" itself is left out; only "Known For Department" remains
+      expect(text.match(/Known For/g)).toHaveLength(1);
     });
   });
 
@@ -581,7 +583,6 @@ describe("PersonPanel", () => {
         expect(
           within(targetPanel).getByRole("heading", { name }),
         ).toBeInTheDocument();
-        expect(screen.queryByText("8 results.")).not.toBeInTheDocument();
       },
     );
 

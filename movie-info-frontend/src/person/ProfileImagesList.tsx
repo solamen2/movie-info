@@ -7,10 +7,6 @@ interface ProfileImagesListProps {
 }
 
 function ProfileImagesList({ name, images }: ProfileImagesListProps) {
-  if (images.length === 0) {
-    return <p className="detail-empty">None</p>;
-  }
-
   return (
     <ul className="profile-images-list" data-testid="profile-images-list">
       {images.map((image, index) => (

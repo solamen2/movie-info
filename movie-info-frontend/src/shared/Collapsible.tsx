@@ -3,6 +3,8 @@ import "./shared.css";
 
 interface CollapsibleProps {
   title: string;
+  // How many items the section holds, shown beside its title. A section
+  // with none has nothing to show, so it isn't rendered at all.
   count?: number;
   // While true the section is kept open (e.g. because a card inside it is
   // selected via the URL). It is never closed automatically, so the user can
@@ -39,6 +41,8 @@ function Collapsible({
       detailsRef.current.open = true;
     }
   }, [forceOpen]);
+
+  if (count === 0) return null;
 
   return (
     <details

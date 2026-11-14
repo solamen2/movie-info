@@ -95,11 +95,12 @@ async function expectNeverHighlighted(
 ) {
   const panelColor = await getBorderColor(panelCard);
   expect(isHighlighted(panelColor)).toBe(false);
-  for (const target of [
-    panel.getByRole("heading").first(),
-    page.locator(".results-toolbar"),
+  for (const click of [
+    () => panel.getByRole("heading").first().click(),
+    // An empty spot of the page: the corner of its left margin
+    () => page.locator(".search-page").click({ position: { x: 1, y: 1 } }),
   ]) {
-    await target.click();
+    await click();
     await page.waitForTimeout(HIGHLIGHT_SETTLE_MS);
     expect(await getBorderColor(panelCard)).toBe(panelColor);
   }
@@ -121,7 +122,7 @@ const expectedMovie = useMockHttpCalls
         "4444Known For: Example Jones, Example BrownYear: 2016",
       ],
       tagline: "An example tagline.",
-      imdbRow: /IMDB: 7\.9 \(123,456\)Rank: 4444Link/,
+      imdbRow: /IMDB: 7\.9 \(123,456\)Link\s*Copy\s*Rank: 4444/,
       imdbUrl: "https://www.imdb.com/title/tt0000001",
       wikipediaUrl: "https://en.wikipedia.org/wiki/Example_Movie",
       facts: [
@@ -130,6 +131,8 @@ const expectedMovie = useMockHttpCalls
         "Runtime2h 22m",
         "RatedPG-13",
         "Aspect Ratio2.39:1 - Scope ⓘ",
+        "DirectorExample Director",
+        "WriterExample Writer",
         "Known ForExample Jones, Example Brown",
         "GenresMystery, Thriller, Drama, Science Fiction, Horror",
         "Budget$25,000,000",
@@ -142,18 +145,14 @@ const expectedMovie = useMockHttpCalls
       ],
       sections: [
         ["Cast", "Example Jones"],
-        ["Directors", "Example Director"],
-        ["Writers", "Example Writer"],
         [
           "Oscars",
           "Best Picture: Example Producer and Example Smith, Producers",
         ],
-        ["Plot (TMDB)", "An example plot from TMDB."],
-        ["Plot (OMDB)", "An example plot from OMDB."],
-        ["Where to Stream", "Example Stream"],
-        ["Where to Rent", "None"],
-        ["Where to Buy", "Example Buy Store"],
-      ] as [string, string | RegExp][],
+        ["Plot", "An example plot from TMDB."],
+        ["Where to Watch", "Example Stream"],
+      ] as ExpectedSection[],
+      omdbPlot: "An example plot from OMDB." as string | RegExp,
     }
   : {
       searchText: "The Shawshank Redemption",
@@ -166,7 +165,7 @@ const expectedMovie = useMockHttpCalls
         "Known For: Tim Robbins, Morgan FreemanYear: 1994", // remove rank from Shawshank because it changes over time
       ],
       tagline: "Fear can hold you prisoner. Hope can set you free.",
-      imdbRow: /IMDB: \d\.\d \([\d,]+\)Rank: \d+Link/,
+      imdbRow: /IMDB: \d\.\d \([\d,]+\)Link\s*Copy\s*Rank: \d+/,
       imdbUrl: "https://www.imdb.com/title/tt0111161",
       wikipediaUrl:
         "https://en.wikipedia.org/wiki/The_Shawshank_Redemption_(1994_film)",
@@ -176,6 +175,8 @@ const expectedMovie = useMockHttpCalls
         "Runtime2h 22m",
         "RatedR",
         "Aspect Ratio", // the value comes from Wikidata, which anyone can edit
+        "DirectorFrank Darabont",
+        "Stephen King", // one of the writers
         "Known ForTim Robbins, Morgan Freeman",
         "GenresDrama, Crime",
         "Budget$25,000,000",
@@ -186,20 +187,13 @@ const expectedMovie = useMockHttpCalls
       ],
       sections: [
         ["Cast", "Tim Robbins"],
-        ["Directors", "Frank Darabont"],
-        ["Writers", "Stephen King"],
         // Seven nominations, no wins
-        [
-          "Oscars",
-          /Wins\s*None[\s\S]*Nominations[\s\S]*Best Actor: Morgan Freeman as Red/,
-        ],
-        ["Plot (TMDB)", "Shawshank"],
-        // OMDB's plot text changes over time, so only check that there is one
-        ["Plot (OMDB)", /\w/],
-        ["Where to Stream", ""],
-        ["Where to Rent", ""],
-        ["Where to Buy", ""],
-      ] as [string, string | RegExp][],
+        ["Oscars", /^\s*Nominations[\s\S]*Best Actor: Morgan Freeman as Red/],
+        ["Plot", "Shawshank"],
+        ["Where to Watch", ""],
+      ] as ExpectedSection[],
+      // OMDB's plot text changes over time, so only check that there is one
+      omdbPlot: /\w/ as string | RegExp,
     };
 
 test("Basic happy path: search, check results are valid, select a movie search card, check the movie panel is valid, and unselect the card", async ({
@@ -220,13 +214,16 @@ test("Basic happy path: search, check results are valid, select a movie search c
   for (const cardText of expectedMovie.cardText) {
     expect(await movieCard.textContent()).toContain(cardText);
   }
-  const resultsMessage = page.getByText(/^\d+ results\.$/);
-  await expect(resultsMessage).toBeVisible();
+  // The number of results is only ever mentioned when it is zero
+  await expect(page.getByText(/results\./)).toHaveCount(0);
+  // Set while a card is selected, which hides the other results
+  const resultsWithSelection = page.locator(".results-container.has-selection");
+  await expect(resultsWithSelection).toHaveCount(0);
 
   console.log("Selecting the movie search card...");
   const unselectedColor = await getUnselectedColor(movieCard);
   await movieCard.click();
-  await expect(resultsMessage).toBeHidden();
+  await expect(resultsWithSelection).toHaveCount(1);
   const detailUrl = new RegExp(
     `/movie/${expectedMovie.imdbId}\\?q=${encodeURIComponent(expectedMovie.searchText).replace(/%20/g, "\\+")}$`,
   );
@@ -272,27 +269,29 @@ test("Basic happy path: search, check results are valid, select a movie search c
   }
 
   console.log("Checking the collapsible sections...");
-  const sections = moviePanel.locator("details");
-  await expect(sections.locator("summary")).toHaveText(
-    expectedMovie.sections.map(
-      ([title]) => new RegExp(`^${escapeRegExp(title)}`),
-    ),
+  await checkCollapsibleSections(moviePanel, expectedMovie.sections);
+
+  console.log("Switching the plot to OMDB's...");
+  const plotSection = moviePanel
+    .locator(".detail-sections > details")
+    .filter({ has: page.locator("> summary", { hasText: /^Plot/ }) });
+  await expect(
+    plotSection.getByRole("button", { name: "TMDB" }),
+  ).toHaveAttribute("aria-pressed", "true");
+  await plotSection.getByRole("button", { name: "OMDB" }).click();
+  await expect(
+    plotSection.getByRole("button", { name: "OMDB" }),
+  ).toHaveAttribute("aria-pressed", "true");
+  await expect(plotSection.locator(".detail-prose")).toHaveText(
+    expectedMovie.omdbPlot,
   );
-  for (const [index, [, content]] of expectedMovie.sections.entries()) {
-    const section = sections.nth(index);
-    const sectionBody = section.locator(".collapsible-body");
-    await expect(sectionBody).toBeHidden();
-    await section.locator("summary").click();
-    await expect(sectionBody).toBeVisible();
-    await expect(sectionBody).toContainText(content);
-  }
 
   console.log("Unselecting the movie search card...");
   await page.goBack();
   await expect(moviePanel).toBeHidden();
   await expect(page.locator("#search-card.selected")).toHaveCount(0);
   await expectHighlightGone(page, movieCard, unselectedColor);
-  await expect(resultsMessage).toBeVisible();
+  await expect(resultsWithSelection).toHaveCount(0);
   for (const cardText of expectedMovie.cardText) {
     expect(await movieCard.textContent()).toContain(cardText);
   }
@@ -307,7 +306,7 @@ test("Basic happy path: search, check results are valid, select a movie search c
   await expect(page).toHaveURL(searchUrl);
   await expect(moviePanel).toBeHidden();
   await expect(page.locator("#search-card.selected")).toHaveCount(0);
-  await expect(resultsMessage).toBeVisible();
+  await expect(resultsWithSelection).toHaveCount(0);
 
   console.log("Using the browser forward button...");
   await page.goForward();
@@ -338,7 +337,7 @@ test("Basic happy path: search, check results are valid, select a movie search c
   await page.goBack();
   await expect(page).toHaveURL(searchUrl);
   await expect(moviePanel).toBeHidden();
-  await expect(resultsMessage).toBeVisible();
+  await expect(resultsWithSelection).toHaveCount(0);
   for (const cardText of expectedMovie.cardText) {
     expect(await movieCard.textContent()).toContain(cardText);
   }
@@ -355,7 +354,7 @@ const expectedPerson = useMockHttpCalls
         "Example SmithSearch Type: PersonRank: ",
         "3Known For: Actress, Example Film",
       ],
-      imdbRow: /IMDB: Rank: 3Link/,
+      imdbRow: /IMDB:\s*Link\s*Copy\s*Rank: 3/,
       imdbUrl: "https://www.imdb.com/name/nm9000000",
       wikipediaUrl: "https://en.wikipedia.org/wiki/Example_Smith",
       facts: [
@@ -363,7 +362,6 @@ const expectedPerson = useMockHttpCalls
         "Known For DepartmentActing",
         "Also Known AsExample Smithee, Betsy Smith",
         "BirthdayApr 14, 1977",
-        "Deathday—",
         "Place of BirthNew York City, New York, USA",
         "GenderFemale",
         "Homepagehttps://example.com/example-smith",
@@ -374,9 +372,8 @@ const expectedPerson = useMockHttpCalls
         ["Movie Cast Credits", "Example Hero"],
         ["Movie Crew Credits", "Executive Producer"],
         ["TV Series Cast Credits", "Example Slayer"],
-        ["TV Series Crew Credits", "None"],
         ["Profile Images", ""],
-      ],
+      ] as ExpectedSection[],
     }
   : {
       searchText: "Sarah Michelle Gellar",
@@ -385,26 +382,24 @@ const expectedPerson = useMockHttpCalls
         "Sarah Michelle GellarSearch Type: PersonRank: ",
         "Known For: ",
       ],
-      imdbRow: /IMDB: Rank: \d+Link/,
+      imdbRow: /IMDB:\s*Link\s*Copy\s*Rank: \d+/,
       imdbUrl: "https://www.imdb.com/name/nm0001264",
       wikipediaUrl: "https://en.wikipedia.org/wiki/Sarah_Michelle_Gellar",
       facts: [
         "Known For DepartmentActing",
         "BirthdayApr 14, 1977",
-        "Deathday—",
         "Place of BirthNew York City, New York, USA",
         "GenderFemale",
       ],
       sections: [
+        // (No Oscars section: no wins and no nominations)
         ["Biography", "Gellar"],
-        // No wins and no nominations
-        ["Oscars", "WinsNoneNominationsNone"],
         ["Movie Cast Credits", "Cruel Intentions"],
         ["Movie Crew Credits", ""],
         ["TV Series Cast Credits", "Buffy the Vampire Slayer"],
         ["TV Series Crew Credits", "Ringer"],
         ["Profile Images", ""],
-      ],
+      ] as ExpectedSection[],
     };
 
 test("Person happy path: search, check results are valid, select a person search card, check the person panel is valid, and unselect the card", async ({
@@ -425,13 +420,14 @@ test("Person happy path: search, check results are valid, select a person search
   for (const cardText of expectedPerson.cardText) {
     expect(await personCard.textContent()).toContain(cardText);
   }
-  const resultsMessage = page.getByText(/^\d+ results\.$/);
-  await expect(resultsMessage).toBeVisible();
+  // Set while a card is selected, which hides the other results
+  const resultsWithSelection = page.locator(".results-container.has-selection");
+  await expect(resultsWithSelection).toHaveCount(0);
 
   console.log("Selecting the person search card...");
   const unselectedColor = await getUnselectedColor(personCard);
   await personCard.click();
-  await expect(resultsMessage).toBeHidden();
+  await expect(resultsWithSelection).toHaveCount(1);
 
   const personPanel = page.getByTestId("person-panel");
   await expect(personPanel).toBeVisible();
@@ -476,7 +472,7 @@ test("Person happy path: search, check results are valid, select a person search
   }
   // The age depends on today's date, so only its form is checked
   await expect(personPanel).toContainText(
-    /BirthdayApr 14, 1977 \(\d+\)Deathday—/,
+    /BirthdayApr 14, 1977 \(\d+\)Place of Birth/,
   );
   await expect(personPanel.getByTestId("person-age")).toHaveCSS(
     "font-style",
@@ -484,20 +480,7 @@ test("Person happy path: search, check results are valid, select a person search
   );
 
   console.log("Checking the collapsible sections...");
-  const sections = personPanel.locator("details");
-  await expect(sections.locator("summary")).toHaveText(
-    expectedPerson.sections.map(
-      ([title]) => new RegExp(`^${escapeRegExp(title)}`),
-    ),
-  );
-  for (const [index, [, content]] of expectedPerson.sections.entries()) {
-    const section = sections.nth(index);
-    const sectionBody = section.locator(".collapsible-body");
-    await expect(sectionBody).toBeHidden();
-    await section.locator("summary").click();
-    await expect(sectionBody).toBeVisible();
-    await expect(sectionBody).toContainText(content);
-  }
+  await checkCollapsibleSections(personPanel, expectedPerson.sections);
 
   console.log("Checking the page does not scroll horizontally...");
   const hasHorizontalScrollbar = await page.evaluate(
@@ -522,7 +505,7 @@ test("Person happy path: search, check results are valid, select a person search
   await expect(personPanel).toBeHidden();
   await expect(page.locator("#search-card.selected")).toHaveCount(0);
   await expectHighlightGone(page, personCard, unselectedColor);
-  await expect(resultsMessage).toBeVisible();
+  await expect(resultsWithSelection).toHaveCount(0);
   for (const cardText of expectedPerson.cardText) {
     expect(await personCard.textContent()).toContain(cardText);
   }
@@ -543,7 +526,7 @@ const expectedTvSeries = useMockHttpCalls
         "4444Known For: John Smith, James JohnsonYears: 2001-2003",
       ],
       tagline: "An example TV series tagline.",
-      imdbRow: /IMDB: 8\.3 \(172,659\)Rank: 4444Link/,
+      imdbRow: /IMDB: 8\.3 \(172,659\)Link\s*Copy\s*Rank: 4444/,
       imdbUrl: "https://www.imdb.com/title/tt10000002",
       wikipediaUrl: "https://en.wikipedia.org/wiki/Example_TV_Series",
       facts: [
@@ -551,14 +534,13 @@ const expectedTvSeries = useMockHttpCalls
         "Years2001-2003",
         "First Air DateMar 10, 2001",
         "Last Air DateMay 20, 2003",
-        "Next Air Date—",
         "Average Runtime44m42m, 44m",
         "RatedTV-14",
         "Aspect Ratios4:3 / 1.33 - Fullscreen ⓘ, 16:9 / 1.78 - Widescreen ⓘ",
-        "In ProductionNo",
         "TypeScripted",
         "Number of Seasons2",
         "Number of Episodes37",
+        "CreatorExample Creator",
         "Known ForJohn Smith, James Johnson",
         "GenresComedy, Drama, Sci-Fi & Fantasy, Action, Adventure",
         "Homepagehttps://example.com/example-tv-series",
@@ -570,16 +552,10 @@ const expectedTvSeries = useMockHttpCalls
       sections: [
         ["Seasons", "Season 1"],
         ["Cast", "Example Jones"],
-        ["Creators", "Example Creator"],
-        ["Directors", "Example Director"],
-        ["Writers", "Example Writer"],
-        ["Overview (TMDB)", "An example overview from TMDB."],
-        ["Overview (OMDB)", "An example overview from OMDB."],
+        ["Overview", "An example overview from TMDB."],
         ["Networks", "Example Network"],
-        ["Where to Stream", "Example Stream"],
-        ["Where to Rent", "None"],
-        ["Where to Buy", "Example Buy Store"],
-      ] as [string, string | RegExp][],
+        ["Where to Watch", "Example Stream"],
+      ] as ExpectedSection[],
       firstSeason: {
         name: "Season 1",
         overview: "An example overview for season 1.",
@@ -595,7 +571,7 @@ const expectedTvSeries = useMockHttpCalls
         "Years: 1997-2003",
       ],
       tagline: "",
-      imdbRow: /IMDB: \d\.\d \([\d,]+\)Rank: \d+Link/,
+      imdbRow: /IMDB: \d\.\d \([\d,]+\)Link\s*Copy\s*Rank: \d+/,
       imdbUrl: "https://www.imdb.com/title/tt0118276",
       wikipediaUrl:
         "https://en.wikipedia.org/wiki/Buffy_the_Vampire_Slayer_(TV_series)",
@@ -604,30 +580,22 @@ const expectedTvSeries = useMockHttpCalls
         "Years1997-2003",
         "First Air DateMar 10, 1997",
         "Last Air DateMay 20, 2003",
-        "Next Air Date—",
         "RatedTV-14",
         "Aspect Ratio", // the value comes from Wikidata, which anyone can edit
-        "In ProductionNo",
         "TypeScripted",
         "Number of Seasons7",
         "Number of Episodes144",
+        "CreatorJoss Whedon",
         "Origin CountriesUnited States of America",
         "Origin LanguageEnglish",
       ],
       sections: [
         ["Seasons", "Season 1"],
         ["Cast", "Sarah Michelle Gellar"],
-        ["Creators", "Joss Whedon"],
-        ["Directors", "Joss Whedon"],
-        ["Writers", "Joss Whedon"],
-        ["Overview (TMDB)", "vampire"],
-        // OMDB's overview text changes over time, so only check that there is one
-        ["Overview (OMDB)", /\w/],
+        ["Overview", "vampire"],
         ["Networks", "The WB"],
-        ["Where to Stream", ""],
-        ["Where to Rent", ""],
-        ["Where to Buy", ""],
-      ] as [string, string | RegExp][],
+        ["Where to Watch", ""],
+      ] as ExpectedSection[],
       firstSeason: {
         name: "Season 1",
         overview: "",
@@ -652,13 +620,14 @@ test("TV series happy path: search, check results are valid, select a TV series 
   for (const cardText of expectedTvSeries.cardText) {
     expect(await tvSeriesCard.textContent()).toContain(cardText);
   }
-  const resultsMessage = page.getByText(/^\d+ results\.$/);
-  await expect(resultsMessage).toBeVisible();
+  // Set while a card is selected, which hides the other results
+  const resultsWithSelection = page.locator(".results-container.has-selection");
+  await expect(resultsWithSelection).toHaveCount(0);
 
   console.log("Selecting the TV series search card...");
   const unselectedColor = await getUnselectedColor(tvSeriesCard);
   await tvSeriesCard.click();
-  await expect(resultsMessage).toBeHidden();
+  await expect(resultsWithSelection).toHaveCount(1);
 
   const tvSeriesPanel = page.getByTestId("tv-series-panel");
   await expect(tvSeriesPanel).toBeVisible();
@@ -706,22 +675,7 @@ test("TV series happy path: search, check results are valid, select a TV series 
   }
 
   console.log("Checking the collapsible sections...");
-  // Season cards have their own (nested) overview collapsible, so only look at
-  // the panel's top-level sections here
-  const sections = tvSeriesPanel.locator(".detail-sections > details");
-  await expect(sections.locator("> summary")).toHaveText(
-    expectedTvSeries.sections.map(
-      ([title]) => new RegExp(`^${escapeRegExp(title)}`),
-    ),
-  );
-  for (const [index, [, content]] of expectedTvSeries.sections.entries()) {
-    const section = sections.nth(index);
-    const sectionBody = section.locator("> .collapsible-body");
-    await expect(sectionBody).toBeHidden();
-    await section.locator("> summary").click();
-    await expect(sectionBody).toBeVisible();
-    await expect(sectionBody).toContainText(content);
-  }
+  await checkCollapsibleSections(tvSeriesPanel, expectedTvSeries.sections);
 
   console.log("Checking the cast episode count checkbox...");
   const castSection = tvSeriesPanel
@@ -744,13 +698,20 @@ test("TV series happy path: search, check results are valid, select a TV series 
     .filter({ hasText: expectedTvSeries.firstSeason.name })
     .first();
   await expect(firstSeasonCard).toBeVisible();
-  const seasonOverview = firstSeasonCard.locator(".collapsible-body");
-  await expect(seasonOverview).toBeHidden();
-  await firstSeasonCard.locator("summary").click();
-  await expect(seasonOverview).toBeVisible();
-  await expect(seasonOverview).toContainText(
-    expectedTvSeries.firstSeason.overview,
-  );
+  // The card only has an overview section when the season has an overview,
+  // which real data can't be relied on for
+  if (
+    expectedTvSeries.firstSeason.overview !== "" ||
+    (await firstSeasonCard.locator("summary").count()) > 0
+  ) {
+    const seasonOverview = firstSeasonCard.locator(".collapsible-body");
+    await expect(seasonOverview).toBeHidden();
+    await firstSeasonCard.locator("summary").click();
+    await expect(seasonOverview).toBeVisible();
+    await expect(seasonOverview).toContainText(
+      expectedTvSeries.firstSeason.overview,
+    );
+  }
   await expect(
     firstSeasonCard.getByRole("button", { name: "Expand" }),
   ).toBeVisible();
@@ -768,16 +729,21 @@ test("TV series happy path: search, check results are valid, select a TV series 
   await expect(tvSeriesPanel).toBeHidden();
   await expect(page.locator("#search-card.selected")).toHaveCount(0);
   await expectHighlightGone(page, tvSeriesCard, unselectedColor);
-  await expect(resultsMessage).toBeVisible();
+  await expect(resultsWithSelection).toHaveCount(0);
   for (const cardText of expectedTvSeries.cardText) {
     expect(await tvSeriesCard.textContent()).toContain(cardText);
   }
   console.log("TV series happy path test finished.");
 });
 
-// A collapsible section's title and the content (one string, or several that
-// must all appear) expected inside it once opened.
-type ExpectedSection = [title: string, content: string | string[]];
+// A collapsible section's title and the content (one string or pattern, or
+// several that must all appear) expected inside it once opened. Sections
+// without any data aren't shown at all, so one whose content is "" (real data
+// that can't be predicted) is checked only if it is there.
+type ExpectedSection = [
+  title: string,
+  content: string | RegExp | (string | RegExp)[],
+];
 
 interface ExpectedTvSeason {
   name: string;
@@ -808,11 +774,9 @@ const expectedTvSeason: ExpectedTvSeason = useMockHttpCalls
       ],
       sections: [
         ["Episodes", "Example Pilot"],
-        ["Overview (TMDB)", "An example overview for season 1."],
+        ["Overview", "An example overview for season 1."],
         ["Networks", "Example Network"],
-        ["Where to Stream", "Example Stream"],
-        ["Where to Rent", "None"],
-        ["Where to Buy", "Example Buy Store"],
+        ["Where to Watch", "Example Stream"],
       ],
       episode: {
         episodeNumber: 1,
@@ -825,16 +789,15 @@ const expectedTvSeason: ExpectedTvSeason = useMockHttpCalls
           "Runtime44m43m",
           "RatedTV-14",
           "TypeStandard",
+          "DirectorExample Director",
+          "WriterExample Writer",
           "Known ForExample Jones, Example Brown",
           "GenresAction, Drama, Science Fiction",
         ],
         sections: [
           ["Cast", "Example Jones"],
-          ["Directors", "Example Director"],
-          ["Writers", "Example Writer"],
           ["Guest Stars", "Example Guest"],
-          ["Overview (OMDB)", "An example episode overview from OMDB."],
-          ["Overview (TMDB)", "An example episode overview from TMDB."],
+          ["Plot", "An example episode overview from OMDB."],
         ],
       },
     }
@@ -848,11 +811,9 @@ const expectedTvSeason: ExpectedTvSeason = useMockHttpCalls
       ],
       sections: [
         ["Episodes", "Once More, with Feeling"],
-        ["Overview (TMDB)", ""],
+        ["Overview", ""],
         ["Networks", ""],
-        ["Where to Stream", ""],
-        ["Where to Rent", ""],
-        ["Where to Buy", ""],
+        ["Where to Watch", ""],
       ],
       episode: {
         episodeNumber: 7,
@@ -866,14 +827,13 @@ const expectedTvSeason: ExpectedTvSeason = useMockHttpCalls
           "Runtime50m50m",
           "Rated13+",
           "TypeStandard",
+          "DirectorJoss Whedon",
+          "WriterJoss Whedon",
         ],
         sections: [
           ["Cast", ["Sarah Michelle Gellar", "James Marsters"]],
-          ["Directors", "Joss Whedon"],
-          ["Writers", "Joss Whedon"],
           ["Guest Stars", ["Hinton Battle", "Amber Benson"]],
-          ["Overview (OMDB)", ""],
-          ["Overview (TMDB)", ""],
+          ["Plot", ""],
         ],
       },
     };
@@ -948,14 +908,23 @@ async function openSeason(page: Page) {
   };
 }
 
-// Each section is [title, expected content], where the content can be a
-// single string or several strings that must all appear.
+// Checks that the panel's top-level sections (cards inside them can have
+// collapsibles of their own) are exactly the expected ones, in order, each
+// collapsed until clicked and then showing its content (see ExpectedSection).
 async function checkCollapsibleSections(
   panel: Locator,
-  expected: ExpectedSection[],
+  expectedSections: ExpectedSection[],
 ) {
   const sections = panel.locator(".detail-sections > details");
-  await expect(sections.locator("> summary")).toHaveText(
+  const summaries = sections.locator("> summary");
+  await expect(summaries.first()).toBeVisible();
+  const titles = (await summaries.allTextContents()).map((title) =>
+    title.replace(/\(\d+\)$/, ""),
+  );
+  const expected = expectedSections.filter(
+    ([title, content]) => content !== "" || titles.includes(title),
+  );
+  await expect(summaries).toHaveText(
     expected.map(([title]) => new RegExp(`^${escapeRegExp(title)}`)),
   );
   for (const [index, [, content]] of expected.entries()) {
@@ -1013,10 +982,15 @@ test("TV season happy path: open a TV series, expand a season card, check the se
   expect(await episodeCard.textContent()).toContain(
     expectedTvSeason.episode.cardText,
   );
-  const episodeOverview = episodeCard.locator(".collapsible-body");
-  await expect(episodeOverview).toBeHidden();
-  await episodeCard.locator("summary").click();
-  await expect(episodeOverview).toBeVisible();
+  // The card only has a plot section when the episode has a plot, which real
+  // data can't be relied on for
+  if (useMockHttpCalls || (await episodeCard.locator("summary").count()) > 0) {
+    const episodePlot = episodeCard.locator(".collapsible-body");
+    await expect(episodePlot).toBeHidden();
+    await expect(episodeCard.locator("summary")).toHaveText("Plot");
+    await episodeCard.locator("summary").click();
+    await expect(episodePlot).toBeVisible();
+  }
   await expect(
     episodeCard.getByRole("button", { name: "Expand" }),
   ).toBeVisible();
@@ -1221,8 +1195,9 @@ test("Panel to panel: open a movie, open a cast member's person panel from it, o
   const movieCard = page
     .getByText(expectedMovie.title, { exact: true })
     .locator("ancestor=#search-card");
-  const resultsMessage = page.getByText(/^\d+ results\.$/);
-  await expect(resultsMessage).toBeVisible();
+  // Set while a card is selected, which hides the other results
+  const resultsWithSelection = page.locator(".results-container.has-selection");
+  await expect(resultsWithSelection).toHaveCount(0);
   await movieCard.click();
   const moviePanel = page.getByTestId("movie-panel");
   await expect(moviePanel).toBeVisible();
@@ -1261,7 +1236,7 @@ test("Panel to panel: open a movie, open a cast member's person panel from it, o
       exact: true,
     }),
   ).toBeVisible();
-  await expect(resultsMessage).toBeHidden();
+  await expect(resultsWithSelection).toHaveCount(1);
   expect(await page.evaluate(() => window.scrollY)).toBe(0);
   console.log(
     "Checking the person panel's highlight faded out and stays away...",
@@ -1369,14 +1344,14 @@ test("Panel to panel: open a movie, open a cast member's person panel from it, o
   await expect(
     moviePanel.getByRole("heading", { name: expectedMovie.title, exact: true }),
   ).toBeVisible();
-  await expect(resultsMessage).toBeHidden();
+  await expect(resultsWithSelection).toHaveCount(1);
 
   console.log("Going back to the search results with the browser...");
   await page.goBack();
   await expect(page).toHaveURL(/\/search\?q=[^/]+$/);
   await expect(moviePanel).toBeHidden();
   await expect(page.locator("#search-card.selected")).toHaveCount(0);
-  await expect(resultsMessage).toBeVisible();
+  await expect(resultsWithSelection).toHaveCount(0);
   console.log("Panel to panel test finished.");
 });
 

@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import { type PanelKind, withQueryParams } from "../utilities/utilities";
+import {
+  detailPath,
+  type PanelKind,
+  withQueryParams,
+} from "../utilities/utilities";
 import { useCardSelection } from "./useCardSelection";
 import { useOpenDetail } from "./useOpenDetail";
 
@@ -52,6 +56,10 @@ export interface PanelCards {
     panelKind: PanelKind,
     tmdbId: number,
   ) => PanelCardProps;
+  // Opens the given kind of panel for the card with the given TMDB id in the
+  // given section, exactly as a first click on the card does (for links to
+  // the card's item elsewhere in the panel, see DetailLink).
+  openCard: (cardType: string, panelKind: PanelKind, tmdbId: number) => void;
 }
 
 interface PanelCardsOptions {
@@ -149,7 +157,23 @@ export function usePanelCards({
     selection.selectedId === null ? null : cardTypeOf(selection.selectedId);
   const settledType = settledKey === null ? null : cardTypeOf(settledKey);
 
+  const openCard = (type: string, panelKind: PanelKind, tmdbId: number) => {
+    const key = cardKey(type, String(tmdbId));
+    if (key === targetKey) {
+      // The URL already names the card (it is highlighted, or on its way to
+      // the corner), so there is no flight to wait for
+      void navigate(
+        detailPath(panelKind, String(tmdbId), searchParams.get("q") ?? ""),
+      );
+      window.scrollTo({ top: 0 });
+      return;
+    }
+    setClickedKey(key);
+    openDetail(panelKind, tmdbId, type, String(tmdbId));
+  };
+
   return {
+    openCard,
     hasSelection: selection.selectedId !== null,
     isSelectedIn: (type) => selectedType === type,
     sectionProps: (type) => ({
@@ -172,8 +196,7 @@ export function usePanelCards({
               }),
             );
           } else {
-            setClickedKey(key);
-            openDetail(panelKind, tmdbId, type, String(tmdbId));
+            openCard(type, panelKind, tmdbId);
           }
         },
       };

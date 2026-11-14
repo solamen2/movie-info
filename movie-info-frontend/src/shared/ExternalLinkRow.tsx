@@ -36,8 +36,9 @@ export function ExternalLinkRowSeparator() {
 
 interface ExternalLinkRowProps {
   // The external page linked to, or "" when it is unknown: the row then links
-  // to searchUrl as "Search Google" instead, or shows a "—" placeholder when
-  // there is no searchUrl either, in both cases with no copy button.
+  // to searchUrl as "Search Google" instead, or shows just its data when
+  // there is no searchUrl either (or nothing at all without any data), in
+  // both cases with no copy button.
   url: string;
   searchUrl?: string;
   // A bold label shown right before the link, for rows that carry no data of
@@ -87,6 +88,8 @@ function ExternalLinkRow({
     }, COPY_FEEDBACK_MS);
   }
 
+  if (url === "" && searchUrl === undefined && children == null) return null;
+
   return (
     <p className="external-link-row">
       <span>
@@ -107,9 +110,7 @@ function ExternalLinkRow({
               Search Google
             </a>
           </>
-        ) : (
-          <>{children != null && <ExternalLinkRowSeparator />}—</>
-        )}
+        ) : null}
       </span>
       {copyButton && url !== "" && (
         <button

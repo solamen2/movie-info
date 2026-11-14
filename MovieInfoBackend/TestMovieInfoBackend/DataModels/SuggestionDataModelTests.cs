@@ -32,6 +32,30 @@ public class SuggestionDataModelTests
         }
     }
 
+    [Theory]
+    [InlineData("tt0111161", true)]
+    [InlineData("nm0000151", true)]
+    [InlineData("/spotlight/", false)]  // editorial sections
+    [InlineData("/oscars", false)]
+    [InlineData("/festival-central/abff/", false)]
+    [InlineData("in0000248", false)]  // a franchise
+    public void IsTitleOrPerson_ItemIdIsAnImdbTitleOrNameId_OnlyThenTrue(string itemId, bool expected)
+    {
+        // Arrange
+
+        string responseJsonString = $$"""{"d":[{"id":"{{itemId}}","l":"Name"}]}""";
+
+        // Act
+
+        SuggestionsResponseDataModel? actual = SuggestionHttpClient.GetModelFromResponse(responseJsonString);
+
+        // Assert
+
+        Assert.NotNull(actual);
+        Assert.NotNull(actual.Suggestions);
+        Assert.Equal(expected, Assert.Single(actual.Suggestions).IsTitleOrPerson);
+    }
+
     [Fact]
     public void GetModelFromResponse_ValidResponse_ReturnsValidModels()
     {

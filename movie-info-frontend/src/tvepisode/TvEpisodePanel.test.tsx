@@ -182,34 +182,24 @@ describe("TvEpisodePanel", () => {
       }
     });
 
-    it("Should order the collapsed sections with credits first and overviews last", async () => {
+    it("Should order the collapsed sections with credits first and the plot last", async () => {
       await searchAndSelectExampleEpisode();
       const panel = await screen.findByTestId("tv-episode-panel");
 
       const summaries = [...panel.querySelectorAll("summary")].map((s) =>
         s.textContent.replace(/\(\d+\)$/, ""),
       );
-      expect(summaries).toEqual([
-        "Cast",
-        "Directors",
-        "Writers",
-        "Guest Stars",
-        "Overview (OMDB)",
-        "Overview (TMDB)",
-      ]);
+      expect(summaries).toEqual(["Cast", "Guest Stars", "Plot"]);
     });
 
-    it("Should hide credits and overviews behind collapsed sections", async () => {
+    it("Should hide credits and the plot behind collapsed sections", async () => {
       await searchAndSelectExampleEpisode();
       const panel = await screen.findByTestId("tv-episode-panel");
 
       for (const [summary, content] of [
         ["Cast", "Example Jones"],
-        ["Directors", "Example Director"],
-        ["Writers", "Example Writer"],
         ["Guest Stars", "Example Guest"],
-        ["Overview (OMDB)", "An example episode overview from OMDB."],
-        ["Overview (TMDB)", "An example episode overview from TMDB."],
+        ["Plot", "An example episode overview from OMDB."],
       ]) {
         const details = within(panel).getByText(summary).closest("details");
         if (!details) {
@@ -220,7 +210,61 @@ describe("TvEpisodePanel", () => {
       }
     });
 
-    it("Should render cast and guest stars in billed order and crew as cards", async () => {
+    it("Should show one plot at a time, OMDB's first, with a button per source to switch between them", async () => {
+      await searchAndSelectExampleEpisode();
+      const panel = await screen.findByTestId("tv-episode-panel");
+      const plot = within(panel).getByText("Plot").closest("details");
+      if (!plot) {
+        throw new Error("Plot section not found");
+      }
+
+      expect(
+        within(plot)
+          .getAllByRole("button")
+          .map((b) => [b.textContent, b.getAttribute("aria-pressed")]),
+      ).toEqual([
+        ["OMDB", "true"],
+        ["TMDB", "false"],
+      ]);
+      expect(plot.textContent).not.toContain(
+        "An example episode overview from TMDB.",
+      );
+
+      fireEvent.click(within(plot).getByRole("button", { name: "TMDB" }));
+      expect(plot.textContent).toContain(
+        "An example episode overview from TMDB.",
+      );
+      expect(plot.textContent).not.toContain(
+        "An example episode overview from OMDB.",
+      );
+    });
+
+    it("Should name the director and the writer among the facts, each linking to the person's panel", async () => {
+      const { currentUrl } = await searchAndSelectExampleEpisode();
+      const panel = await screen.findByTestId("tv-episode-panel");
+
+      expect(panel.textContent).toContain(
+        "DirectorExample DirectorWriterExample WriterKnown ForExample Jones, Example Brown",
+      );
+      // The directors and writers are facts, not sections
+      expect(within(panel).queryByText("Directors")).toBeNull();
+      expect(within(panel).queryByText("Writers")).toBeNull();
+      expect(
+        within(panel).getByRole("link", { name: "Example Writer" }),
+      ).toHaveAttribute("href", "/person/4?q=1");
+      // A Known For actor opens by way of their cast card
+      expect(
+        within(panel).getByRole("link", { name: "Example Brown" }),
+      ).toHaveAttribute("href", "/person/2?q=1");
+
+      fireEvent.click(
+        within(panel).getByRole("link", { name: "Example Director" }),
+      );
+      expect(currentUrl()).toBe("/person/3?q=1");
+      expect(await screen.findByTestId("person-panel")).toBeInTheDocument();
+    });
+
+    it("Should render cast and guest stars in billed order as cards", async () => {
       await searchAndSelectExampleEpisode();
       const panel = await screen.findByTestId("tv-episode-panel");
 
@@ -233,11 +277,7 @@ describe("TvEpisodePanel", () => {
         "src",
         "https://image.tmdb.org/t/p/w185/exampleJones.jpg",
       );
-      expect(
-        within(panel)
-          .getAllByTestId("crew-card")
-          .map((c) => c.textContent),
-      ).toEqual(["Example DirectorDirector", "No imageExample WriterWriter"]);
+      expect(within(panel).queryByTestId("crew-card")).toBeNull();
       expect(
         within(panel)
           .getAllByTestId("guest-star-card")
@@ -361,7 +401,7 @@ describe("TvEpisodePanel", () => {
   });
 
   describe("When the TV episode has missing data", () => {
-    it("Should show placeholders instead of the missing values", async () => {
+    it("Should leave out the missing values, and the sections with nothing in them", async () => {
       server.use(
         http.get("/api/tvepisode", () =>
           HttpResponse.json({
@@ -398,20 +438,34 @@ describe("TvEpisodePanel", () => {
       const panel = await screen.findByTestId("tv-episode-panel");
       const text = panel.textContent;
 
-      for (const expected of [
-        "No imageExample PilotSeason 1, Episode 1IMDB: —LinkCopyTV Series IMDB:Link",
-        "Air Date—",
-        "Runtime——",
-        "Rated—",
-        "Type—",
-        "Known For—",
-        "Genres—",
-        "Cast(0)None",
-        "Guest Stars(0)None",
-        "Overview (OMDB)—",
+      expect(text).toContain(
+        "No imageExample PilotSeason 1, Episode 1IMDB:LinkCopyTV Series IMDB:Link",
+      );
+      for (const leftOut of [
+        "—",
+        "Air Date",
+        "Runtime",
+        "Rated",
+        "Type",
+        "Known For",
+        "Genres",
+        "Cast",
+        "Guest Stars",
+        "None",
+        "OMDB",
       ]) {
-        expect(text).toContain(expected);
+        expect(text).not.toContain(leftOut);
       }
+      // Only the people TMDB still lists remain among the facts
+      expect(
+        [...panel.querySelectorAll(".detail-fact dt")].map(
+          (d) => d.textContent,
+        ),
+      ).toEqual(["Director", "Writer"]);
+      // The one source with a plot still gets its button
+      expect(
+        within(panel).getByRole("button", { name: "TMDB" }),
+      ).toHaveAttribute("aria-pressed", "true");
     });
   });
 
@@ -493,8 +547,6 @@ describe("TvEpisodePanel", () => {
   describe("When a card inside the TV episode panel is clicked", () => {
     it.each([
       ["Cast", "cast", "cast-card", "Example Brown", 2],
-      ["Directors", "directors", "crew-card", "Example Director", 3],
-      ["Writers", "writers", "crew-card", "Example Writer", 4],
       ["Guest Stars", "guest-stars", "guest-star-card", "Example Guest", 8],
     ])(
       "Should highlight the %s card and fly it to the episode panel's corner, then replace the whole TV series panel with the person's panel",

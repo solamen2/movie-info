@@ -1,4 +1,5 @@
-import { act, render } from "@testing-library/react";
+import { act, render, waitFor } from "@testing-library/react";
+import { expect } from "vitest";
 import { createMemoryRouter, RouterProvider } from "react-router-dom";
 import AppRoutes from "../src/AppRoutes";
 
@@ -20,4 +21,15 @@ export function renderApp(initialEntry = "/search") {
     goBack: () => act(() => router.navigate(-1)),
     goForward: () => act(() => router.navigate(1)),
   };
+}
+
+// Resolves once a search has put exactly this many result cards on the page
+// (the page itself only says anything about the number when it is zero).
+export async function findResultCards(count: number): Promise<Element[]> {
+  await waitFor(() => {
+    expect(
+      document.querySelectorAll("#search-card:not(.stand-in)"),
+    ).toHaveLength(count);
+  });
+  return [...document.querySelectorAll("#search-card:not(.stand-in)")];
 }

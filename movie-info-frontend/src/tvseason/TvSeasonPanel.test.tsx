@@ -146,11 +146,9 @@ describe("TvSeasonPanel", () => {
         .map((s) => s.textContent.replace(/\(\d+\)$/, ""));
       expect(summaries).toEqual([
         "Episodes",
-        "Overview (TMDB)",
+        "Overview",
         "Networks",
-        "Where to Stream",
-        "Where to Rent",
-        "Where to Buy",
+        "Where to Watch",
       ]);
     });
 
@@ -160,10 +158,9 @@ describe("TvSeasonPanel", () => {
 
       for (const [summary, content] of [
         ["Episodes", "Example Pilot"],
-        ["Overview (TMDB)", "An example overview for season 1."],
+        ["Overview", "An example overview for season 1."],
         ["Networks", "Example Network"],
-        ["Where to Stream", "Example Stream"],
-        ["Where to Buy", "Example Buy Store"],
+        ["Where to Watch", "Example Stream"],
       ]) {
         const details = within(panel).getByText(summary).closest("details");
         if (!details) {
@@ -172,28 +169,32 @@ describe("TvSeasonPanel", () => {
         expect(details.open).toBe(false);
         expect(details.textContent).toContain(content);
       }
+      // A section with nothing in it is left out
       expect(
-        within(panel).getByText("Where to Rent").closest("details")
-          ?.textContent,
-      ).toContain("None");
+        within(panel).getByRole("group", { name: "way to watch" }).textContent,
+      ).toBe("StreamBuy");
+      // The overview's only source still gets its button
+      expect(
+        within(panel).getByRole("button", { name: "TMDB" }),
+      ).toHaveAttribute("aria-pressed", "true");
     });
 
-    it("Should render episodes in order, each with its overview collapsed and an Expand button", async () => {
+    it("Should render episodes in order, each with its plot (if any) collapsed and an Expand button", async () => {
       await searchAndSelectExampleSeason();
       const panel = await screen.findByTestId("tv-season-panel");
 
       const episodeCards = within(panel).getAllByTestId("episode-card");
       expect(episodeCards.map((c) => c.textContent)).toEqual([
-        "1. Example PilotMar 10, 200144m · StandardDirected by Example DirectorWritten by Example WriterOverviewAn example overview for episode 1.Expand",
-        "No image2. Example Second EpisodeMar 17, 2001— · StandardOverview—Expand",
-        "3. Example FinaleMay 22, 200145m · FinaleDirected by Example DirectorWritten by Example Writer, Example DirectorOverviewAn example overview for the finale.Expand",
+        "1. Example PilotMar 10, 200144m · StandardDirected by Example DirectorWritten by Example WriterPlotAn example overview for episode 1.Expand",
+        "No image2. Example Second EpisodeMar 17, 2001StandardExpand",
+        "3. Example FinaleMay 22, 200145m · FinaleDirected by Example DirectorWritten by Example Writer, Example DirectorPlotAn example overview for the finale.Expand",
       ]);
       expect(within(panel).getByAltText("Example Pilot")).toHaveAttribute(
         "src",
         "https://image.tmdb.org/t/p/w185/exampleStill1.jpg",
       );
       for (const card of episodeCards) {
-        expect(card.querySelector("details")?.open).toBe(false);
+        expect(card.querySelector("details")?.open ?? false).toBe(false);
         expect(
           within(card).getByRole("button", { name: "Expand" }),
         ).toBeInTheDocument();
@@ -209,8 +210,9 @@ describe("TvSeasonPanel", () => {
           .getAllByTestId("network-card")
           .map((c) => c.textContent),
       ).toEqual(["Example NetworkUS", "No logoExample Network 2JP"]);
+      // Only the providers for the way to watch that is shown (streaming)
       expect(within(panel).getAllByTestId("watch-provider-card")).toHaveLength(
-        2,
+        1,
       );
       expect(within(panel).getByAltText("Example Stream logo")).toHaveAttribute(
         "src",
@@ -306,7 +308,7 @@ describe("TvSeasonPanel", () => {
   });
 
   describe("When the TV season has missing data", () => {
-    it("Should show placeholders instead of the missing values", async () => {
+    it("Should leave out the missing values, and the sections with nothing in them", async () => {
       server.use(
         http.get("/api/tvseason", () =>
           HttpResponse.json({
@@ -339,15 +341,21 @@ describe("TvSeasonPanel", () => {
       for (const expected of [
         "No imageSeason 1TV Series IMDB:Link",
         "Number of Episodes0",
-        "First Air Date—",
-        "Episodes(0)None",
-        "Overview (TMDB)—",
-        "Networks(0)None",
-        "Where to Stream(0)None",
-        "Where to Buy(0)None",
       ]) {
         expect(text).toContain(expected);
       }
+      for (const leftOut of [
+        "—",
+        "First Air Date",
+        "Episodes(",
+        "Overview",
+        "Networks",
+        "Where to",
+        "None",
+      ]) {
+        expect(text).not.toContain(leftOut);
+      }
+      expect(panel.querySelectorAll("details")).toHaveLength(0);
     });
   });
 

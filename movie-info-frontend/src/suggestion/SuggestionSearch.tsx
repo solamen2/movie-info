@@ -1,4 +1,10 @@
-import { type SubmitEvent, useEffect, useEffectEvent, useState } from "react";
+import {
+  type SubmitEvent,
+  useEffect,
+  useEffectEvent,
+  useRef,
+  useState,
+} from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import SuggestionSearchCard, { type Suggestion } from "./SuggestionSearchCard";
 import { type ReplaceMode, useCardSelection } from "../shared/useCardSelection";
@@ -94,12 +100,12 @@ function SuggestionSearch({ panelKind }: SuggestionSearchProps) {
       replaceMode,
     });
 
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Only a search that found nothing gets a message; otherwise the results
+  // speak for themselves.
   const searchMessage =
-    results === null
-      ? ""
-      : results.length === 0
-        ? "No results. Please try another search."
-        : `${String(results.length)} results.`;
+    results?.length === 0 ? "No results. Please try another search." : "";
   const hasCardForSelected =
     results?.some((r) => r.itemID === selectedId) ?? false;
   const standIn =
@@ -171,6 +177,19 @@ function SuggestionSearch({ panelKind }: SuggestionSearchProps) {
     };
   }, [searchQuery, query]);
 
+  // The page always starts out at the very top, with the search bar fully in
+  // view. Arriving from another page otherwise keeps that page's scroll
+  // position (e.g. from a footer link at the bottom of a long page, or from
+  // the login page on iOS, where the on-screen keyboard can leave the page
+  // shifted), which on iOS puts the search bar partly under Safari's
+  // translucent top edge.
+  // TODO: Check that this works
+  useEffect(() => {
+    if (window.scrollY !== 0) {
+      window.scrollTo({ top: 0 });
+    }
+  }, []);
+
   // ESC does exactly what the browser's back button does, everywhere.
   const onEscape = useEffectEvent(() => {
     void navigate(-1);
@@ -222,15 +241,33 @@ function SuggestionSearch({ panelKind }: SuggestionSearchProps) {
     <div className="search-page">
       <div className="search-header">
         <form className="search-bar" onSubmit={handleSearch}>
-          <input
-            aria-label="search-query-input"
-            type="text"
-            placeholder="Search movies, people..."
-            value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-            }}
-          />
+          <div className="search-input">
+            <input
+              ref={searchInputRef}
+              aria-label="search-query-input"
+              type="text"
+              placeholder="Search movies, people..."
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+              }}
+            />
+            {searchQuery !== "" && (
+              // Empties the box, ready for a new query; the results stay
+              // until one is submitted.
+              <button
+                aria-label="clear-query"
+                type="button"
+                className="search-clear-button"
+                onClick={() => {
+                  setSearchQuery("");
+                  searchInputRef.current?.focus();
+                }}
+              >
+                <span aria-hidden="true">✕</span>
+              </button>
+            )}
+          </div>
           <button aria-label="search" type="submit">
             Search
           </button>
@@ -238,11 +275,9 @@ function SuggestionSearch({ panelKind }: SuggestionSearchProps) {
       </div>
 
       {error && <p className="error-message">{error}</p>}
-      <div className="results-toolbar">
-        {!selectedId && searchMessage && (
-          <p className="search-message">{searchMessage}</p>
-        )}
-      </div>
+      {!selectedId && searchMessage && (
+        <p className="search-message">{searchMessage}</p>
+      )}
 
       <div
         className={`results-container fly-origin${selectedId ? " has-selection" : ""}`}

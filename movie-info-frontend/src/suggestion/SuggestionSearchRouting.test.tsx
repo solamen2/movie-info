@@ -6,7 +6,7 @@ import {
   within,
 } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { renderApp } from "../../tests/renderApp";
+import { findResultCards, renderApp } from "../../tests/renderApp";
 
 function search(text: string) {
   const searchQueryInput = screen.getByRole("textbox", {
@@ -32,7 +32,7 @@ describe("SuggestionSearch routing", () => {
       const { currentUrl } = renderApp();
       search("1");
       expect(currentUrl()).toBe("/search?q=1");
-      await screen.findByText("8 results.");
+      await findResultCards(8);
     });
 
     it("Should URL-encode the query", () => {
@@ -71,7 +71,6 @@ describe("SuggestionSearch routing", () => {
       expect(currentUrl()).toBe("/search?q=2&selected=tt0100008");
       expect(card.classList.contains("selected")).toBe(true);
       expect(card.classList.contains("expanded")).toBe(false);
-      expect(screen.queryByText("6 results.")).not.toBeInTheDocument();
 
       fireEvent.click(card);
       await waitFor(() => {
@@ -79,7 +78,6 @@ describe("SuggestionSearch routing", () => {
       });
       expect(card.classList.contains("selected")).toBe(false);
       expect(card.classList.contains("deselecting")).toBe(true);
-      expect(screen.getByText("6 results.")).toBeInTheDocument();
     });
 
     it("Should highlight the card when its URL is loaded directly", async () => {
@@ -108,7 +106,7 @@ describe("SuggestionSearch routing", () => {
       });
       expect(card.classList.contains("deselecting")).toBe(true);
       expect(screen.queryByTestId("movie-panel")).not.toBeInTheDocument();
-      await screen.findByText("8 results.");
+      await findResultCards(8);
 
       // It popped history rather than pushing, so forward returns to the
       // very same movie history entry.
@@ -137,7 +135,6 @@ describe("SuggestionSearch routing", () => {
         expect(card.classList.contains("selected")).toBe(false);
       });
       expect(card.classList.contains("deselecting")).toBe(true);
-      expect(screen.getByText("8 results.")).toBeInTheDocument();
 
       await goForward();
       expect(currentUrl()).toBe("/movie/tt0000001?q=1");
@@ -146,34 +143,33 @@ describe("SuggestionSearch routing", () => {
       expect(card.classList.contains("expanded")).toBe(false);
       await screen.findByTestId("movie-panel");
       expect(card.classList.contains("expanded")).toBe(true);
-      expect(screen.queryByText("8 results.")).not.toBeInTheDocument();
     });
 
     it("Should restore an earlier search, including the input text", async () => {
       const { currentUrl, goBack, goForward } = renderApp();
       const input = search("1");
-      await screen.findByText("8 results.");
+      await findResultCards(8);
       search("2");
-      await screen.findByText("6 results.");
+      await findResultCards(5);
       expect(currentUrl()).toBe("/search?q=2");
 
       await goBack();
       expect(currentUrl()).toBe("/search?q=1");
       expect(input).toHaveValue("1");
-      await screen.findByText("8 results.");
+      await findResultCards(8);
       expect(screen.getByText("Example Movie")).toBeInTheDocument();
 
       await goForward();
       expect(currentUrl()).toBe("/search?q=2");
       expect(input).toHaveValue("2");
-      await screen.findByText("6 results.");
+      await findResultCards(5);
       expect(screen.getByText("Example Video Game")).toBeInTheDocument();
     });
 
     it("Should drop an open panel when going back to a different search", async () => {
       const { currentUrl, goBack, container } = renderApp();
       search("2");
-      await screen.findByText("6 results.");
+      await findResultCards(5);
       search("1");
       const card = await findCard("Example Movie");
       fireEvent.click(card);
@@ -182,7 +178,7 @@ describe("SuggestionSearch routing", () => {
       await goBack();
       await goBack();
       expect(currentUrl()).toBe("/search?q=2");
-      await screen.findByText("6 results.");
+      await findResultCards(5);
       expect(screen.queryByTestId("movie-panel")).not.toBeInTheDocument();
       expect(container.querySelectorAll(".result-card.selected")).toHaveLength(
         0,
@@ -199,7 +195,7 @@ describe("SuggestionSearch routing", () => {
       expect(
         screen.getByRole("textbox", { name: "search-query-input" }),
       ).toHaveValue("1");
-      await screen.findByText("8 results.");
+      await findResultCards(8);
       expect(screen.getByText("Example Movie")).toBeInTheDocument();
     });
 
@@ -225,7 +221,6 @@ describe("SuggestionSearch routing", () => {
         const card = panel.closest("#search-card");
         expect(card?.classList.contains("selected")).toBe(true);
         expect(card?.classList.contains("expanded")).toBe(true);
-        expect(screen.queryByText("8 results.")).not.toBeInTheDocument();
 
         // Once the results arrive, the same panel is hosted by the real card,
         // and there is exactly one card for the item.
@@ -245,7 +240,6 @@ describe("SuggestionSearch routing", () => {
             container.querySelectorAll("#search-card.selected"),
           ).toHaveLength(0);
         });
-        expect(screen.getByText("8 results.")).toBeInTheDocument();
         expect(await findCard(name)).not.toHaveClass("expanded");
       },
     );

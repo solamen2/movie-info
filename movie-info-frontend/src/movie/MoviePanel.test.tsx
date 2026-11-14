@@ -74,7 +74,7 @@ describe("MoviePanel", () => {
         "Runtime2h 22m",
         "RatedPG-13",
         "Aspect Ratio2.39:1 - Scope ⓘ",
-        "IMDB: 7.9 (123,456)Rank: 4444LinkCopyWikipedia:LinkCopy",
+        "IMDB: 7.9 (123,456)LinkCopyRank: 4444Wikipedia:LinkCopy",
         "Known ForExample Jones, Example Brown",
         "GenresMystery, Thriller, Drama, Science Fiction, Horror",
         "Budget$25,000,000",
@@ -125,17 +125,7 @@ describe("MoviePanel", () => {
       const summaries = [...panel.querySelectorAll("summary")].map((s) =>
         s.textContent.replace(/\(\d+\)$/, ""),
       );
-      expect(summaries).toEqual([
-        "Cast",
-        "Directors",
-        "Writers",
-        "Oscars",
-        "Plot (TMDB)",
-        "Plot (OMDB)",
-        "Where to Stream",
-        "Where to Rent",
-        "Where to Buy",
-      ]);
+      expect(summaries).toEqual(["Cast", "Oscars", "Plot", "Where to Watch"]);
     });
 
     it("Should hide plots, credits, and watch providers behind collapsed sections", async () => {
@@ -143,14 +133,10 @@ describe("MoviePanel", () => {
       await screen.findByTestId("movie-panel");
 
       for (const [summary, content] of [
-        ["Plot (OMDB)", "An example plot from OMDB."],
-        ["Plot (TMDB)", "An example plot from TMDB."],
+        ["Plot", "An example plot from TMDB."],
         ["Oscars", "Example Producer and Example Smith, Producers"],
         ["Cast", "Example Jones"],
-        ["Directors", "Example Director"],
-        ["Writers", "Example Writer"],
-        ["Where to Buy", "Example Buy Store"],
-        ["Where to Stream", "Example Stream"],
+        ["Where to Watch", "Example Stream"],
       ]) {
         const details = screen.getByText(summary).closest("details");
         if (!details) {
@@ -159,9 +145,196 @@ describe("MoviePanel", () => {
         expect(details.open).toBe(false);
         expect(details.textContent).toContain(content);
       }
+      // A section with nothing in it is left out
       expect(
-        screen.getByText("Where to Rent").closest("details")?.textContent,
-      ).toContain("None");
+        screen.getByRole("group", { name: "way to watch" }).textContent,
+      ).toBe("StreamBuy");
+      // The directors and writers are facts, not sections
+      expect(screen.queryByText("Directors")).toBeNull();
+      expect(screen.queryByText("Writers")).toBeNull();
+    });
+
+    it("Should name the director and the writer among the facts, in the singular, each linking to the person's panel", async () => {
+      const { currentUrl } = await searchAndSelectExampleMovie();
+      const panel = await screen.findByTestId("movie-panel");
+      // (The Oscars section names some of the same people)
+      const facts = panel.querySelector<HTMLElement>(".detail-facts");
+      if (!facts) {
+        throw new Error("Facts not found");
+      }
+
+      expect(panel.textContent).toContain(
+        "DirectorExample DirectorWriterExample WriterKnown For",
+      );
+      const director = within(facts).getByRole("link", {
+        name: "Example Director",
+      });
+      expect(director).toHaveAttribute("href", "/person/3?q=1");
+      expect(
+        within(facts).getByRole("link", { name: "Example Writer" }),
+      ).toHaveAttribute("href", "/person/4?q=1");
+
+      fireEvent.click(director);
+      expect(currentUrl()).toBe("/person/3?q=1");
+      expect(await screen.findByTestId("person-panel")).toBeInTheDocument();
+    });
+
+    it("Should use the plural for several directors or writers, naming each person once", async () => {
+      const [director] = movieDataJson1.directors;
+      const [writer] = movieDataJson1.writers;
+      server.use(
+        http.get("/api/movie", () =>
+          HttpResponse.json({
+            ...movieDataJson1,
+            directors: [
+              director,
+              { ...director, tmdbId: 30, name: "Second Director" },
+            ],
+            writers: [
+              writer,
+              { ...writer, job: "Story" },
+              { ...writer, tmdbId: 40, name: "Second Writer" },
+            ],
+          }),
+        ),
+      );
+      render(
+        <MemoryRouter>
+          <MoviePanel itemId={movieDataJson1.imdbId} />
+        </MemoryRouter>,
+      );
+      const panel = await screen.findByTestId("movie-panel");
+
+      expect(panel.textContent).toContain(
+        "DirectorsExample Director, Second DirectorWritersExample Writer, Second WriterKnown For",
+      );
+    });
+
+    it("Should leave out the director and writer facts when there are none", async () => {
+      server.use(
+        http.get("/api/movie", () =>
+          HttpResponse.json({ ...movieDataJson1, directors: [], writers: [] }),
+        ),
+      );
+      render(
+        <MemoryRouter>
+          <MoviePanel itemId={movieDataJson1.imdbId} />
+        </MemoryRouter>,
+      );
+      const panel = await screen.findByTestId("movie-panel");
+
+      const facts = panel.querySelector(".detail-facts")?.textContent;
+      expect(facts).toContain("Known For");
+      expect(facts).not.toContain("Director");
+      expect(facts).not.toContain("Writer");
+    });
+
+    it("Should link each Known For actor to their panel by way of their cast card, and search for a name that isn't in the cast", async () => {
+      server.use(
+        http.get("/api/movie", () =>
+          HttpResponse.json({
+            ...movieDataJson1,
+            knownForActors: "Example Jones, Example Brown, Someone Else",
+          }),
+        ),
+      );
+      const { currentUrl } = await searchAndSelectExampleMovie();
+      const panel = await screen.findByTestId("movie-panel");
+      const fact = within(panel).getByText("Known For").closest("div");
+      if (!fact) {
+        throw new Error("Known For fact not found");
+      }
+
+      expect(fact.textContent).toBe(
+        "Known ForExample Jones, Example Brown, Someone Else",
+      );
+      expect(
+        within(fact).getByRole("link", { name: "Someone Else" }),
+      ).toHaveAttribute("href", "/search?q=Someone+Else");
+      const actor = within(fact).getByRole("link", { name: "Example Brown" });
+      expect(actor).toHaveAttribute("href", "/person/2?q=1");
+
+      // Exactly what a click on the actor's cast card does
+      fireEvent.click(actor);
+      expect(currentUrl()).toBe("/movie/tt0000001?q=1&cardType=cast&cardId=2");
+      expect(findCard(panel, "cast-card", "Example Brown")).toHaveClass(
+        "selected",
+      );
+      expect(await screen.findByTestId("person-panel")).toBeInTheDocument();
+      expect(currentUrl()).toBe("/person/2?q=1");
+    });
+
+    it("Should show one plot at a time, with a button per source to switch between them", async () => {
+      await searchAndSelectExampleMovie();
+      const panel = await screen.findByTestId("movie-panel");
+      const plot = within(panel).getByText("Plot").closest("details");
+      if (!plot) {
+        throw new Error("Plot section not found");
+      }
+      const tmdb = within(plot).getByRole("button", { name: "TMDB" });
+      const omdb = within(plot).getByRole("button", { name: "OMDB" });
+
+      expect(tmdb).toHaveAttribute("aria-pressed", "true");
+      expect(omdb).toHaveAttribute("aria-pressed", "false");
+      expect(plot.textContent).toContain("An example plot from TMDB.");
+      expect(plot.textContent).not.toContain("An example plot from OMDB.");
+
+      fireEvent.click(omdb);
+      expect(tmdb).toHaveAttribute("aria-pressed", "false");
+      expect(omdb).toHaveAttribute("aria-pressed", "true");
+      expect(plot.textContent).toContain("An example plot from OMDB.");
+      expect(plot.textContent).not.toContain("An example plot from TMDB.");
+    });
+
+    it.each([
+      ["TMDB", { omdbPlot: "N/A" }, "An example plot from TMDB."],
+      ["OMDB", { tmdbPlot: "" }, "An example plot from OMDB."],
+    ])(
+      "Should show only the %s plot and button when the other source has no plot",
+      async (source, missing, plotText) => {
+        server.use(
+          http.get("/api/movie", () =>
+            HttpResponse.json({ ...movieDataJson1, ...missing }),
+          ),
+        );
+        render(
+          <MemoryRouter>
+            <MoviePanel itemId={movieDataJson1.imdbId} />
+          </MemoryRouter>,
+        );
+        const panel = await screen.findByTestId("movie-panel");
+        const plot = within(panel).getByText("Plot").closest("details");
+        if (!plot) {
+          throw new Error("Plot section not found");
+        }
+
+        expect(
+          within(plot)
+            .getAllByRole("button")
+            .map((b) => b.textContent),
+        ).toEqual([source]);
+        expect(plot.textContent).toContain(plotText);
+      },
+    );
+
+    it("Should leave out the Plot section when no source has a plot", async () => {
+      server.use(
+        http.get("/api/movie", () =>
+          HttpResponse.json({
+            ...movieDataJson1,
+            tmdbPlot: "",
+            omdbPlot: "N/A",
+          }),
+        ),
+      );
+      render(
+        <MemoryRouter>
+          <MoviePanel itemId={movieDataJson1.imdbId} />
+        </MemoryRouter>,
+      );
+      const panel = await screen.findByTestId("movie-panel");
+
+      expect(within(panel).queryByText("Plot")).toBeNull();
     });
 
     it("Should list the movie's Oscar wins, then its nominations, by category", async () => {
@@ -214,7 +387,7 @@ describe("MoviePanel", () => {
       expect(within(panel).queryByTestId("oscar-Wins")).toBeNull();
     });
 
-    it("Should show None for a movie without Oscars", async () => {
+    it("Should leave out the Oscars section for a movie without Oscars", async () => {
       server.use(
         http.get("/api/movie", () =>
           HttpResponse.json({ ...movieDataJson1, oscars: [] }),
@@ -222,19 +395,83 @@ describe("MoviePanel", () => {
       );
       await searchAndSelectExampleMovie();
       const panel = await screen.findByTestId("movie-panel");
-      const oscars = within(panel).getByText("Oscars").closest("details");
 
-      expect(oscars?.querySelector("summary")?.textContent).toBe("Oscars(0)");
-      expect(oscars?.textContent).not.toContain("unavailable");
-      expect(within(panel).getByTestId("oscar-Wins").textContent).toBe(
-        "WinsNone",
-      );
-      expect(within(panel).getByTestId("oscar-Nominations").textContent).toBe(
-        "NominationsNone",
-      );
+      expect(within(panel).queryByText("Oscars")).toBeNull();
     });
 
-    it("Should render cast in billed order and crew / watch providers as cards", async () => {
+    it("Should leave out the Nominations heading for a movie with only Oscar wins", async () => {
+      server.use(
+        http.get("/api/movie", () =>
+          HttpResponse.json({
+            ...movieDataJson1,
+            oscars: movieDataJson1.oscars.filter((o) => o.winner),
+          }),
+        ),
+      );
+      await searchAndSelectExampleMovie();
+      const panel = await screen.findByTestId("movie-panel");
+
+      expect(within(panel).getByTestId("oscar-Wins")).toBeInTheDocument();
+      expect(within(panel).queryByTestId("oscar-Nominations")).toBeNull();
+    });
+
+    it("Should show one way to watch at a time, with a button per way that has providers to switch between them", async () => {
+      await searchAndSelectExampleMovie();
+      const panel = await screen.findByTestId("movie-panel");
+      const section = within(panel)
+        .getByText("Where to Watch")
+        .closest("details");
+      if (!section) {
+        throw new Error("Where to Watch section not found");
+      }
+
+      expect(
+        within(section)
+          .getAllByRole("button")
+          .map((b) => [b.textContent, b.getAttribute("aria-pressed")]),
+      ).toEqual([
+        ["Stream", "true"],
+        ["Buy", "false"],
+      ]);
+      expect(
+        within(section)
+          .getAllByTestId("watch-provider-card")
+          .map((c) => c.textContent),
+      ).toEqual(["Example Stream"]);
+
+      fireEvent.click(within(section).getByRole("button", { name: "Buy" }));
+      expect(
+        within(section).getByRole("button", { name: "Buy" }),
+      ).toHaveAttribute("aria-pressed", "true");
+      expect(
+        within(section)
+          .getAllByTestId("watch-provider-card")
+          .map((c) => c.textContent),
+      ).toEqual(["Example Buy Store"]);
+    });
+
+    it("Should leave out the Where to Watch section when there are no providers", async () => {
+      server.use(
+        http.get("/api/movie", () =>
+          HttpResponse.json({
+            ...movieDataJson1,
+            watchProvidersFlatrate: [],
+            watchProvidersRent: [],
+            watchProvidersBuy: [],
+          }),
+        ),
+      );
+      render(
+        <MemoryRouter>
+          <MoviePanel itemId={movieDataJson1.imdbId} />
+        </MemoryRouter>,
+      );
+      const panel = await screen.findByTestId("movie-panel");
+
+      expect(within(panel).queryByText("Where to Watch")).toBeNull();
+    });
+
+    it("Should render cast in billed order and watch providers as cards", async () => {
       await searchAndSelectExampleMovie();
       await screen.findByTestId("movie-panel");
 
@@ -248,8 +485,8 @@ describe("MoviePanel", () => {
         "https://image.tmdb.org/t/p/w185/exampleJones.jpg",
       );
 
-      expect(screen.getAllByTestId("crew-card")).toHaveLength(2);
-      expect(screen.getAllByTestId("watch-provider-card")).toHaveLength(2);
+      expect(screen.queryByTestId("crew-card")).toBeNull();
+      expect(screen.getAllByTestId("watch-provider-card")).toHaveLength(1);
       expect(screen.getByAltText("Example Stream logo")).toHaveAttribute(
         "src",
         "https://image.tmdb.org/t/p/w92/exampleStream.jpg",
@@ -361,7 +598,7 @@ describe("MoviePanel", () => {
         const panel = await screen.findByTestId("movie-panel");
 
         expect(panel.textContent).toContain(
-          "RatedPG-13Aspect RatioSearch GoogleKnown For",
+          "RatedPG-13Aspect RatioSearch GoogleDirector",
         );
         expect(
           within(panel).getByRole("link", { name: "Search Google" }),
@@ -376,7 +613,7 @@ describe("MoviePanel", () => {
       ["no Wikipedia page", ""],
       ["a failed Wikipedia lookup", null],
     ])(
-      "Should show a placeholder instead of the Wikipedia link and Copy button for %s",
+      "Should leave out the Wikipedia row for %s",
       async (_, wikipediaLink) => {
         server.use(
           http.get("/api/movie", () =>
@@ -392,8 +629,9 @@ describe("MoviePanel", () => {
         const panel = await screen.findByTestId("movie-panel");
 
         expect(panel.textContent).toContain(
-          "IMDB: 7.9 (123,456)Rank: 4444LinkCopyWikipedia:—",
+          "IMDB: 7.9 (123,456)LinkCopyRank: 4444Original Title",
         );
+        expect(panel.textContent).not.toContain("Wikipedia");
         expect(screen.getAllByRole("link", { name: "Link" })).toHaveLength(1);
         expect(
           screen.queryByRole("button", { name: "copy-wikipedia-link" }),
@@ -653,18 +891,22 @@ describe("MoviePanel", () => {
       );
     });
 
-    it("Should not adjust a missing amount", async () => {
+    it("Should leave out a missing amount", async () => {
       server.use(
         http.get("/api/movie", () =>
           HttpResponse.json({ ...movieDataJson1, budget: 0 }),
         ),
       );
-      const { panel, budget } = await renderMovieFacts("revenue-month");
-
-      expect(budget.closest("dd")?.textContent ?? budget.textContent).toContain(
-        "—",
+      render(
+        <MemoryRouter>
+          <MoviePanel itemId={movieDataJson1.imdbId} />
+        </MemoryRouter>,
       );
-      expect(within(budget).queryByRole("combobox")).toBeNull();
+      const panel = await screen.findByTestId("movie-panel");
+      await within(panel).findByRole("combobox", { name: "revenue-month" });
+
+      expect(() => getFact(panel, "Budget")).toThrow();
+      expect(getFact(panel, "Revenue")).toBeInTheDocument();
       expect(within(panel).getAllByRole("combobox")).toHaveLength(2);
     });
   });
@@ -728,7 +970,7 @@ describe("MoviePanel", () => {
       expect(panel.querySelector(".inflation-money-now")).toBeNull();
     });
 
-    it("Should not add the note to a missing amount", async () => {
+    it("Should leave out a missing amount, note and all", async () => {
       server.use(
         http.get("/api/inflation", () =>
           HttpResponse.json({}, { status: 503 }),
@@ -748,15 +990,7 @@ describe("MoviePanel", () => {
       );
 
       expect(notes).toHaveLength(1);
-      expect(panel.textContent).toContain("Revenue—Homepage");
-    });
-  });
-
-  describe("When a card is selected", () => {
-    it("Should hide the results message", async () => {
-      await searchAndSelectExampleMovie();
-
-      expect(screen.queryByText("8 results.")).not.toBeInTheDocument();
+      expect(panel.textContent).not.toContain("Revenue");
     });
   });
 
@@ -793,7 +1027,6 @@ describe("MoviePanel", () => {
           .querySelector(".results-container")
           ?.classList.contains("has-selection"),
       ).toBe(false);
-      expect(screen.getByText("8 results.")).toBeInTheDocument();
     });
   });
 
@@ -890,24 +1123,6 @@ describe("MoviePanel", () => {
         "person",
         "person-panel",
       ],
-      [
-        "Directors",
-        "directors",
-        "crew-card",
-        "Example Director",
-        3,
-        "person",
-        "person-panel",
-      ],
-      [
-        "Writers",
-        "writers",
-        "crew-card",
-        "Example Writer",
-        4,
-        "person",
-        "person-panel",
-      ],
     ])(
       "Should highlight the %s card and fly it to the corner, then replace the movie panel with the card's own panel",
       async (_, cardType, testId, name, tmdbId, targetKind, targetTestId) => {
@@ -952,7 +1167,6 @@ describe("MoviePanel", () => {
         expect(
           within(targetPanel).getByRole("heading", { name }),
         ).toBeInTheDocument();
-        expect(screen.queryByText("8 results.")).not.toBeInTheDocument();
       },
     );
 
@@ -1098,14 +1312,14 @@ describe("MoviePanel", () => {
 
   describe("When a movie URL naming a card is loaded directly", () => {
     it("Should show the whole panel with the card highlighted in its place and only its section open", async () => {
-      const url = "/movie/tt0000001?q=1&cardType=writers&cardId=4";
+      const url = "/movie/tt0000001?q=1&cardType=cast&cardId=2";
       const { currentUrl } = renderApp(url);
       const panel = await screen.findByTestId("movie-panel");
       expect(panel).not.toHaveClass("has-child-selection");
       expect(
         within(panel).getByRole("heading", { level: 2 }),
       ).toBeInTheDocument();
-      const card = findCard(panel, "crew-card", "Example Writer");
+      const card = findCard(panel, "cast-card", "Example Brown");
       expect(card).toHaveClass("highlighted");
       expect(card).not.toHaveClass("selected");
       expect(card).not.toHaveClass("deselecting");
@@ -1113,9 +1327,7 @@ describe("MoviePanel", () => {
       const section = card.closest("details");
       expect(section).not.toHaveClass("has-child-selection");
       expect(section?.open).toBe(true);
-      expect(screen.getByText("Directors").closest("details")?.open).toBe(
-        false,
-      );
+      expect(screen.getByText("Oscars").closest("details")?.open).toBe(false);
 
       await act(
         () => new Promise((resolve) => setTimeout(resolve, CARD_FLY_MS + 100)),
