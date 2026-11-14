@@ -217,24 +217,6 @@ describe("SuggestionSearchCard", () => {
       );
     });
   });
-  describe("When search card contains a spotlight", () => {
-    it("Should only show spotlight search card data fields", async () => {
-      renderApp();
-      const searchQueryInput = screen.getByRole("textbox", {
-        name: "search-query-input",
-      });
-      fireEvent.change(searchQueryInput, { target: { value: "2" } });
-      const searchButton = screen.getByRole("button", { name: "search" });
-      fireEvent.click(searchButton);
-
-      const spotlightText = await screen.findByText("Lemur History Month");
-      const spotlightCard = spotlightText.closest("#search-card");
-      expect(spotlightCard?.textContent).toMatch(
-        "Lemur History MonthSearch Type: —Media Type: —Rank: —Known For: A Celebration of Lemur Storytellers and StoriesYear: —",
-      );
-    });
-  });
-
   // Selection / deselection animation tests
 
   describe("When a search card is selected", () => {

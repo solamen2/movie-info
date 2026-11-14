@@ -71,16 +71,13 @@ describe("TvSeriesPanel", () => {
         "https://example.com/example3.jpg",
       );
       for (const expected of [
-        "Example TV SeriesAn example TV series tagline.IMDB: 8.3 (172,659)Rank: 4444LinkCopyWikipedia:LinkCopy",
+        "Example TV SeriesAn example TV series tagline.IMDB: 8.3 (172,659)LinkCopyRank: 4444Wikipedia:LinkCopy",
         "Original NameExample TV Series Original",
         "Years2001-2003",
         "First Air DateMar 10, 2001",
-        "Last Air DateMay 20, 2003",
-        "Next Air Date—",
-        "Average Runtime44m42m, 44m",
+        "Last Air DateMay 20, 2003Average Runtime44m42m, 44m",
         "RatedTV-14",
         "Aspect Ratios4:3 / 1.33 - Fullscreen ⓘ, 16:9 / 1.78 - Widescreen ⓘ",
-        "In ProductionNo",
         "TypeScripted",
         "Number of Seasons2",
         "Number of Episodes37",
@@ -154,15 +151,9 @@ describe("TvSeriesPanel", () => {
       expect(summaries).toEqual([
         "Seasons",
         "Cast",
-        "Creators",
-        "Directors",
-        "Writers",
-        "Overview (TMDB)",
-        "Overview (OMDB)",
+        "Overview",
         "Networks",
-        "Where to Stream",
-        "Where to Rent",
-        "Where to Buy",
+        "Where to Watch",
       ]);
     });
 
@@ -173,43 +164,75 @@ describe("TvSeriesPanel", () => {
       for (const [summary, content] of [
         ["Seasons", "Season 1"],
         ["Cast", "Example Jones"],
-        ["Creators", "Example Creator"],
-        ["Directors", "Example Director"],
-        ["Writers", "Example Writer"],
-        ["Overview (TMDB)", "An example overview from TMDB."],
-        ["Overview (OMDB)", "An example overview from OMDB."],
+        ["Overview", "An example overview from TMDB."],
         ["Networks", "Example Network"],
-        ["Where to Stream", "Example Stream"],
-        ["Where to Buy", "Example Buy Store"],
+        ["Where to Watch", "Example Stream"],
       ]) {
-        const details = screen.getByText(summary).closest("details");
+        // (The season cards have "Overview" sections of their own)
+        const details = screen
+          .getAllByText(summary)
+          .map((s) => s.closest("details"))
+          .find((d) => d && !d.closest("[data-testid='season-card']"));
         if (!details) {
           throw new Error(`Collapsible for ${summary} not found`);
         }
         expect(details.open).toBe(false);
         expect(details.textContent).toContain(content);
       }
+      // A section with nothing in it is left out
       expect(
-        screen.getByText("Where to Rent").closest("details")?.textContent,
-      ).toContain("None");
+        screen.getByRole("group", { name: "way to watch" }).textContent,
+      ).toBe("StreamBuy");
     });
 
-    it("Should render seasons in order with specials last, each with its overview collapsed", async () => {
+    it("Should show one overview at a time, with a button per source to switch between them", async () => {
+      await searchAndSelectExampleTvSeries();
+      const panel = await screen.findByTestId("tv-series-panel");
+      // (The season cards have "Overview" sections of their own)
+      const overview = [...panel.querySelectorAll("details")].find(
+        (d) =>
+          d.querySelector("summary")?.textContent === "Overview" &&
+          !d.closest("[data-testid='season-card']"),
+      );
+      if (!overview) {
+        throw new Error("Overview section not found");
+      }
+
+      expect(
+        within(overview)
+          .getAllByRole("button")
+          .map((b) => [b.textContent, b.getAttribute("aria-pressed")]),
+      ).toEqual([
+        ["TMDB", "true"],
+        ["OMDB", "false"],
+      ]);
+      expect(overview.textContent).not.toContain(
+        "An example overview from OMDB.",
+      );
+
+      fireEvent.click(within(overview).getByRole("button", { name: "OMDB" }));
+      expect(overview.textContent).toContain("An example overview from OMDB.");
+      expect(overview.textContent).not.toContain(
+        "An example overview from TMDB.",
+      );
+    });
+
+    it("Should render seasons in order with specials last, each with its overview (if any) collapsed", async () => {
       await searchAndSelectExampleTvSeries();
       await screen.findByTestId("tv-series-panel");
 
       const seasonCards = screen.getAllByTestId("season-card");
       expect(seasonCards.map((c) => c.textContent)).toEqual([
         "Season 112 episodesMar 10, 2001OverviewAn example overview for season 1.Expand",
-        "Season 222 episodesSep 15, 2002Overview—Expand",
-        "No imageSpecials3 episodes—OverviewExample specials overview.Expand",
+        "Season 222 episodesSep 15, 2002Expand",
+        "No imageSpecials3 episodesOverviewExample specials overview.Expand",
       ]);
       expect(screen.getByAltText("Season 1")).toHaveAttribute(
         "src",
         "https://image.tmdb.org/t/p/w185/exampleSeason1.jpg",
       );
       for (const card of seasonCards) {
-        expect(card.querySelector("details")?.open).toBe(false);
+        expect(card.querySelector("details")?.open ?? false).toBe(false);
       }
     });
 
@@ -225,7 +248,59 @@ describe("TvSeriesPanel", () => {
       }
     });
 
-    it("Should render cast in billed order and creators / crew / networks / watch providers as cards", async () => {
+    it("Should name the creator among the facts, linking to the person's panel, and have no creator or crew sections", async () => {
+      const { currentUrl } = await searchAndSelectExampleTvSeries();
+      const panel = await screen.findByTestId("tv-series-panel");
+
+      expect(panel.textContent).toContain(
+        "CreatorExample CreatorKnown ForJohn Smith, James Johnson",
+      );
+      for (const section of ["Creators", "Directors", "Writers"]) {
+        expect(within(panel).queryByText(section)).toBeNull();
+      }
+      for (const fact of ["Director", "Writer"]) {
+        expect(panel.textContent).not.toContain(fact);
+      }
+      const creator = within(panel).getByRole("link", {
+        name: "Example Creator",
+      });
+      expect(creator).toHaveAttribute("href", "/person/12891?q=1");
+      // Known For actors who aren't in the cast search for their name instead
+      expect(
+        within(panel).getByRole("link", { name: "John Smith" }),
+      ).toHaveAttribute("href", "/search?q=John+Smith");
+
+      fireEvent.click(creator);
+      expect(currentUrl()).toBe("/person/12891?q=1");
+      expect(await screen.findByTestId("person-panel")).toBeInTheDocument();
+    });
+
+    it("Should use the plural for several creators", async () => {
+      const [creator] = tvSeriesDataJson1.creators;
+      server.use(
+        http.get("/api/tvseries", () =>
+          HttpResponse.json({
+            ...tvSeriesDataJson1,
+            creators: [
+              creator,
+              { ...creator, tmdbId: 12892, name: "Second Creator" },
+            ],
+          }),
+        ),
+      );
+      render(
+        <MemoryRouter>
+          <TvSeriesPanel itemId="tt10000002" />
+        </MemoryRouter>,
+      );
+      const panel = await screen.findByTestId("tv-series-panel");
+
+      expect(panel.textContent).toContain(
+        "CreatorsExample Creator, Second CreatorKnown For",
+      );
+    });
+
+    it("Should render cast in billed order and networks / watch providers as cards", async () => {
       await searchAndSelectExampleTvSeries();
       await screen.findByTestId("tv-series-panel");
 
@@ -239,15 +314,8 @@ describe("TvSeriesPanel", () => {
         "https://image.tmdb.org/t/p/w185/exampleJones.jpg",
       );
 
-      expect(
-        screen.getAllByTestId("creator-card").map((c) => c.textContent),
-      ).toEqual(["Example Creator"]);
-      expect(
-        screen.getAllByTestId("crew-card").map((c) => c.textContent),
-      ).toEqual([
-        "Example DirectorDirector20 episodes",
-        "No imageExample WriterWriter, Story Editor15 episodes",
-      ]);
+      expect(screen.queryByTestId("creator-card")).toBeNull();
+      expect(screen.queryByTestId("crew-card")).toBeNull();
       expect(
         screen.getAllByTestId("network-card").map((c) => c.textContent),
       ).toEqual(["Example NetworkUS", "No logoExample Network 2JP"]);
@@ -255,7 +323,7 @@ describe("TvSeriesPanel", () => {
         "src",
         "https://image.tmdb.org/t/p/w92/exampleNetwork.png",
       );
-      expect(screen.getAllByTestId("watch-provider-card")).toHaveLength(2);
+      expect(screen.getAllByTestId("watch-provider-card")).toHaveLength(1);
       expect(screen.getByAltText("Example Stream logo")).toHaveAttribute(
         "src",
         "https://image.tmdb.org/t/p/w92/exampleStream.jpg",
@@ -327,7 +395,7 @@ describe("TvSeriesPanel", () => {
       ["no Wikipedia page", ""],
       ["a failed Wikipedia lookup", null],
     ])(
-      "Should show a placeholder instead of the Wikipedia link and Copy button for %s",
+      "Should leave out the Wikipedia row for %s",
       async (_, wikipediaLink) => {
         server.use(
           http.get("/api/tvseries", () =>
@@ -343,8 +411,9 @@ describe("TvSeriesPanel", () => {
         const panel = await screen.findByTestId("tv-series-panel");
 
         expect(panel.textContent).toContain(
-          "Example TV SeriesAn example TV series tagline.IMDB: 8.3 (172,659)Rank: 4444LinkCopyWikipedia:—",
+          "Example TV SeriesAn example TV series tagline.IMDB: 8.3 (172,659)LinkCopyRank: 4444Original Name",
         );
+        expect(panel.textContent).not.toContain("Wikipedia");
         expect(screen.getAllByRole("link", { name: "Link" })).toHaveLength(1);
         expect(
           screen.queryByRole("button", { name: "copy-wikipedia-link" }),
@@ -362,12 +431,6 @@ describe("TvSeriesPanel", () => {
       fireEvent.click(panel);
       expect(tvSeriesCard.classList.contains("selected")).toBe(true);
       expect(tvSeriesCard.classList.contains("expanded")).toBe(true);
-    });
-
-    it("Should hide the results message", async () => {
-      await searchAndSelectExampleTvSeries();
-
-      expect(screen.queryByText("8 results.")).not.toBeInTheDocument();
     });
   });
 
@@ -481,12 +544,11 @@ describe("TvSeriesPanel", () => {
           .querySelector(".results-container")
           ?.classList.contains("has-selection"),
       ).toBe(false);
-      expect(screen.getByText("8 results.")).toBeInTheDocument();
     });
   });
 
   describe("When the TV series has missing data", () => {
-    it("Should show placeholders instead of the missing values", async () => {
+    it("Should leave out the missing values, and the sections with nothing in them", async () => {
       server.use(
         http.get("/api/tvseries", () =>
           HttpResponse.json({
@@ -526,23 +588,30 @@ describe("TvSeriesPanel", () => {
       const text = panel.textContent;
 
       for (const expected of [
-        "No imageExample TV SeriesIMDB: —Rank: —LinkCopyWikipedia:—",
-        "Years—",
-        "First Air Date—",
-        "Last Air Date—",
+        "No imageExample TV SeriesIMDB:LinkCopyOriginal Name",
         "Next Air DateJan 2, 2030",
-        "Average Runtime——",
-        "In ProductionYes",
-        "Known For—",
-        "Genres—",
-        "Homepage—",
-        "Seasons(0)None",
-        "Creators(0)None",
-        "Networks(0)None",
-        "Where to Stream(0)None",
-        "Where to Buy(0)None",
       ]) {
         expect(text).toContain(expected);
+      }
+      for (const leftOut of [
+        "—",
+        "Rank",
+        "Wikipedia",
+        "Years",
+        "First Air Date",
+        "Last Air Date",
+        "Average Runtime",
+        "In Production",
+        "Known For",
+        "Genres",
+        "Homepage",
+        "Seasons(",
+        "Creators",
+        "Networks",
+        "Where to",
+        "None",
+      ]) {
+        expect(text).not.toContain(leftOut);
       }
       expect(text).not.toContain("An example TV series tagline.");
     });
@@ -620,33 +689,6 @@ describe("TvSeriesPanel", () => {
         "person",
         "person-panel",
       ],
-      [
-        "Creators",
-        "creators",
-        "creator-card",
-        "Example Creator",
-        12891,
-        "person",
-        "person-panel",
-      ],
-      [
-        "Directors",
-        "directors",
-        "crew-card",
-        "Example Director",
-        3,
-        "person",
-        "person-panel",
-      ],
-      [
-        "Writers",
-        "writers",
-        "crew-card",
-        "Example Writer",
-        4,
-        "person",
-        "person-panel",
-      ],
     ])(
       "Should highlight the %s card and fly it to the corner, then replace the TV series panel with the card's own panel",
       async (_, cardType, testId, name, tmdbId, targetKind, targetTestId) => {
@@ -691,7 +733,6 @@ describe("TvSeriesPanel", () => {
         expect(
           within(targetPanel).getByRole("heading", { name }),
         ).toBeInTheDocument();
-        expect(screen.queryByText("8 results.")).not.toBeInTheDocument();
       },
     );
 
@@ -839,14 +880,14 @@ describe("TvSeriesPanel", () => {
 
   describe("When a TV series URL naming a card is loaded directly", () => {
     it("Should show the whole panel with the card highlighted in its place and only its section open", async () => {
-      const url = "/tvseries/tt10000002?q=1&cardType=creators&cardId=12891";
+      const url = "/tvseries/tt10000002?q=1&cardType=cast&cardId=2";
       const { currentUrl } = renderApp(url);
       const panel = await screen.findByTestId("tv-series-panel");
       expect(panel).not.toHaveClass("has-child-selection");
       expect(
         within(panel).getByRole("heading", { level: 2 }),
       ).toBeInTheDocument();
-      const card = findCard(panel, "creator-card", "Example Creator");
+      const card = findCard(panel, "cast-card", "Example Brown");
       expect(card).toHaveClass("highlighted");
       expect(card).not.toHaveClass("selected");
       expect(card).not.toHaveClass("deselecting");
@@ -854,9 +895,7 @@ describe("TvSeriesPanel", () => {
       const section = card.closest("details");
       expect(section).not.toHaveClass("has-child-selection");
       expect(section?.open).toBe(true);
-      expect(screen.getByText("Directors").closest("details")?.open).toBe(
-        false,
-      );
+      expect(screen.getByText("Networks").closest("details")?.open).toBe(false);
 
       await act(
         () => new Promise((resolve) => setTimeout(resolve, CARD_FLY_MS + 100)),

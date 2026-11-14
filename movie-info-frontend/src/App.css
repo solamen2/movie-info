@@ -36,6 +36,33 @@
   margin-top: 1rem;
 }
 
+/* "Uses data from:" and each source's logo (or name), on the login page */
+.data-credits {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 2rem 0 0;
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+
+.data-credits a {
+  display: inline-flex;
+}
+
+/* Each logo sits on a white tile, since several of them are dark and would
+   otherwise disappear into the dark color scheme's background */
+.data-credits img {
+  display: block;
+  box-sizing: content-box;
+  height: 1.5rem;
+  width: auto;
+  padding: 0.2rem 0.3rem;
+  border-radius: 4px;
+  background: #fff;
+}
+
 .error-message {
   color: #e74c3c;
   margin: 0.5rem 0;
@@ -58,10 +85,19 @@
   min-width: 0;
 }
 
+/* The input with its clear button laid over its right end */
+.search-input {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-width: 0;
+}
+
 .search-bar input {
   flex: 1;
   min-width: 0;
-  padding: 0.5rem 0.75rem;
+  /* Room on the right for the clear button */
+  padding: 0.5rem 2.25rem 0.5rem 0.75rem;
   font-size: 1rem;
   border-radius: 6px;
   border: 1px solid #ccc;
@@ -73,21 +109,31 @@
   white-space: nowrap;
 }
 
+.search-bar .search-clear-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 2.25rem;
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: 0.9rem;
+  line-height: 1;
+  opacity: 0.6;
+}
+
+.search-bar .search-clear-button:hover {
+  opacity: 1;
+}
+
 .logout-button {
   white-space: nowrap;
 }
 
-/* Holds the "x results." message while no card is selected. A fixed
-   min-height keeps the results from jumping when it comes and goes. */
-.results-toolbar {
-  display: flex;
-  align-items: center;
-  min-height: 2.75rem;
-  margin-bottom: 0.5rem;
-}
-
-.results-toolbar .search-message {
-  margin: 0;
+/* Shown in place of the results when a search finds none */
+.search-message {
+  margin: 0 0 1rem;
 }
 
 @media (max-width: 640px) {

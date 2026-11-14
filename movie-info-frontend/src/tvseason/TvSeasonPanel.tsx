@@ -1,9 +1,10 @@
-import { type ReactNode } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { imdbTitleUrl } from "../movie/movieTypes";
 import Collapsible from "../shared/Collapsible";
+import DetailFacts, { type DetailFact } from "../shared/DetailFacts";
 import HorizontalList from "../shared/HorizontalList";
 import ExternalLinkRow from "../shared/ExternalLinkRow";
+import PlotSection from "../shared/PlotSection";
 import WatchProviderSection from "../shared/WatchProviderSection";
 import { useCardSelection } from "../shared/useCardSelection";
 import { useDetailData } from "../shared/useDetailData";
@@ -79,7 +80,7 @@ function TvSeasonPanel({
     (a, b) => a.episodeNumber - b.episodeNumber,
   );
 
-  const facts: [string, ReactNode][] = [
+  const facts: DetailFact[] = [
     ["Season Number", displayText(tvSeason.seasonNumber)],
     ["Number of Episodes", displayText(tvSeason.numberOfEpisodes)],
     ["First Air Date", displayDate(tvSeason.firstAirDate)],
@@ -103,14 +104,7 @@ function TvSeasonPanel({
             label="TV Series IMDB:"
             copyButton={false}
           />
-          <dl className="detail-facts">
-            {facts.map(([label, value]) => (
-              <div className="detail-fact" key={label}>
-                <dt>{label}</dt>
-                <dd>{value}</dd>
-              </div>
-            ))}
-          </dl>
+          <DetailFacts facts={facts} />
         </div>
       </div>
 
@@ -150,9 +144,10 @@ function TvSeasonPanel({
             })}
           </HorizontalList>
         </Collapsible>
-        <Collapsible title="Overview (TMDB)">
-          <p className="detail-prose">{displayText(tvSeason.tmdbOverview)}</p>
-        </Collapsible>
+        <PlotSection
+          title="Overview"
+          sources={[{ name: "TMDB", text: tvSeason.tmdbOverview }]}
+        />
         <Collapsible title="Networks" count={tvSeason.networks.length}>
           <HorizontalList>
             {tvSeason.networks.map((n) => (
@@ -161,16 +156,9 @@ function TvSeasonPanel({
           </HorizontalList>
         </Collapsible>
         <WatchProviderSection
-          title="Where to Stream"
-          providers={tvSeason.watchProvidersFlatrate}
-        />
-        <WatchProviderSection
-          title="Where to Rent"
-          providers={tvSeason.watchProvidersRent}
-        />
-        <WatchProviderSection
-          title="Where to Buy"
-          providers={tvSeason.watchProvidersBuy}
+          flatrate={tvSeason.watchProvidersFlatrate}
+          rent={tvSeason.watchProvidersRent}
+          buy={tvSeason.watchProvidersBuy}
         />
       </div>
     </div>

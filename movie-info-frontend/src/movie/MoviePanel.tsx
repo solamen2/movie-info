@@ -5,14 +5,16 @@ import {
   aspectRatiosLabel,
 } from "../shared/aspectRatioUtils";
 import Collapsible from "../shared/Collapsible";
+import DetailFacts, { type DetailFact } from "../shared/DetailFacts";
 import HorizontalList from "../shared/HorizontalList";
-import ExternalLinkRow, {
-  ExternalLinkRowSeparator,
-} from "../shared/ExternalLinkRow";
+import ExternalLinkRow from "../shared/ExternalLinkRow";
+import ImdbLinkRow from "../shared/ImdbLinkRow";
+import { knownForActorsFact, peopleFact } from "../shared/linkFacts";
+import PlotSection from "../shared/PlotSection";
 import TitleStatus from "../shared/TitleStatus";
 import WatchProviderSection from "../shared/WatchProviderSection";
 import { useDetailData } from "../shared/useDetailData";
-import { type PanelCards, usePanelCards } from "../shared/usePanelCards";
+import { usePanelCards } from "../shared/usePanelCards";
 import {
   detailIdQuery,
   displayDate,
@@ -22,52 +24,19 @@ import {
   displayText,
 } from "../utilities/utilities";
 import CastCard from "./CastCard";
-import CrewCard from "./CrewCard";
 import InflationAdjustedMoney from "./InflationAdjustedMoney";
 import { parseYearMonth } from "./inflationUtils";
 import MovieOscars from "./MovieOscars";
-import { type MovieCrew, imdbTitleUrl } from "./movieTypes";
+import { imdbTitleUrl } from "./movieTypes";
 import "../shared/shared.css";
-
-function CrewSection({
-  title,
-  cardType,
-  crew,
-  cards,
-}: {
-  title: string;
-  // The section's card type in the URL (see usePanelCards)
-  cardType: string;
-  crew: MovieCrew[];
-  cards: PanelCards;
-}) {
-  const selected = cards.isSelectedIn(cardType);
-  return (
-    <Collapsible
-      title={title}
-      count={crew.length}
-      {...cards.sectionProps(cardType)}
-    >
-      <HorizontalList hasSelection={selected}>
-        {crew.map((c) => (
-          <CrewCard
-            key={c.id}
-            crew={c}
-            {...cards.cardProps(cardType, "person", c.tmdbId)}
-          />
-        ))}
-      </HorizontalList>
-    </Collapsible>
-  );
-}
 
 interface MoviePanelProps {
   // The movie's IMDB or TMDB id (see isTmdbId)
   itemId: string;
 }
 
-// Shows a movie. Its cast and crew cards open the person's own panel in place
-// of this one (see usePanelCards).
+// Shows a movie. Its cast cards open the person's own panel in place of this
+// one (see usePanelCards).
 function MoviePanel({ itemId }: MoviePanelProps) {
   const { data: movie, error } = useDetailData(
     `/api/movie?${detailIdQuery(itemId)}`,
@@ -76,8 +45,6 @@ function MoviePanel({ itemId }: MoviePanelProps) {
   const cards = usePanelCards({
     cardsIn: {
       cast: movie?.cast,
-      directors: movie?.directors,
-      writers: movie?.writers,
     },
   });
 
@@ -98,8 +65,6 @@ function MoviePanel({ itemId }: MoviePanelProps) {
   }
 
   const imdbUrl = imdbTitleUrl(movie.imdbId);
-  const imdbRating = displayText(movie.imdbRating);
-  const imdbVotes = displayText(movie.imdbVotes);
   const sortedCast = [...movie.cast].sort(
     (a, b) => a.billedOrder - b.billedOrder,
   );
@@ -121,7 +86,7 @@ function MoviePanel({ itemId }: MoviePanelProps) {
       />
     );
 
-  const facts: [string, ReactNode][] = [
+  const facts: DetailFact[] = [
     ["Original Title", displayText(movie.originalTitle)],
     ["Release Date", displayDate(movie.releaseDate)],
     ["Runtime", displayRuntime(movie.runtime)],
@@ -136,7 +101,13 @@ function MoviePanel({ itemId }: MoviePanelProps) {
         )}
       />,
     ],
-    ["Known For", displayText(movie.knownForActors)],
+    peopleFact("Director", movie.directors),
+    peopleFact("Writer", movie.writers),
+    knownForActorsFact(
+      movie.knownForActors,
+      [{ cardType: "cast", people: movie.cast }],
+      cards,
+    ),
     ["Genres", displayGenres(movie.tmdbGenres, movie.omdbGenres)],
     ["Budget", moneyFact(movie.budget, "budget")],
     ["Revenue", moneyFact(movie.revenue, "revenue")],
@@ -177,31 +148,18 @@ function MoviePanel({ itemId }: MoviePanelProps) {
             <TitleStatus status={movie.status} usualStatus="Released" />
           </div>
           {movie.tagline && <p className="detail-tagline">{movie.tagline}</p>}
-          <ExternalLinkRow url={imdbUrl} copyAriaLabel="copy-imdb-link">
-            <span className="external-link-row-label">IMDB:</span> {imdbRating}
-            {imdbRating !== "—" && imdbVotes !== "—" && (
-              <>
-                {" "}
-                <span className="external-link-row-votes">({imdbVotes})</span>
-              </>
-            )}
-            <ExternalLinkRowSeparator />
-            <span className="external-link-row-label">Rank:</span>{" "}
-            {displayText(movie.imdbRank)}
-          </ExternalLinkRow>
+          <ImdbLinkRow
+            url={imdbUrl}
+            rating={movie.imdbRating}
+            votes={movie.imdbVotes}
+            rank={movie.imdbRank}
+          />
           <ExternalLinkRow
             url={movie.wikipediaLink ?? ""}
             label="Wikipedia:"
             copyAriaLabel="copy-wikipedia-link"
           />
-          <dl className="detail-facts">
-            {facts.map(([label, value]) => (
-              <div className="detail-fact" key={label}>
-                <dt>{label}</dt>
-                <dd>{value}</dd>
-              </div>
-            ))}
-          </dl>
+          <DetailFacts facts={facts} />
         </div>
       </div>
 
@@ -221,36 +179,18 @@ function MoviePanel({ itemId }: MoviePanelProps) {
             ))}
           </HorizontalList>
         </Collapsible>
-        <CrewSection
-          title="Directors"
-          cardType="directors"
-          crew={movie.directors}
-          cards={cards}
-        />
-        <CrewSection
-          title="Writers"
-          cardType="writers"
-          crew={movie.writers}
-          cards={cards}
-        />
         <MovieOscars oscars={movie.oscars} />
-        <Collapsible title="Plot (TMDB)">
-          <p className="detail-prose">{displayText(movie.tmdbPlot)}</p>
-        </Collapsible>
-        <Collapsible title="Plot (OMDB)">
-          <p className="detail-prose">{displayText(movie.omdbPlot)}</p>
-        </Collapsible>
-        <WatchProviderSection
-          title="Where to Stream"
-          providers={movie.watchProvidersFlatrate}
+        <PlotSection
+          title="Plot"
+          sources={[
+            { name: "TMDB", text: movie.tmdbPlot },
+            { name: "OMDB", text: movie.omdbPlot },
+          ]}
         />
         <WatchProviderSection
-          title="Where to Rent"
-          providers={movie.watchProvidersRent}
-        />
-        <WatchProviderSection
-          title="Where to Buy"
-          providers={movie.watchProvidersBuy}
+          flatrate={movie.watchProvidersFlatrate}
+          rent={movie.watchProvidersRent}
+          buy={movie.watchProvidersBuy}
         />
       </div>
     </div>

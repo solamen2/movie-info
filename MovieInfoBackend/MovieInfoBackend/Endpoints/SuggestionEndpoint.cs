@@ -39,6 +39,8 @@ public class SuggestionEndpoint
                             return Results.Json(suggestionViewModels);  // empty array, so the frontend can always parse the body as JSON
                         foreach (SuggestionDataModel suggestionDataModel in suggestionsResponse.Suggestions)
                         {
+                            if (!suggestionDataModel.IsTitleOrPerson)
+                                continue;
                             suggestionViewModels.Add(new SuggestionViewModel(suggestionDataModel));
                         }
 

@@ -18,26 +18,24 @@ function AwardList({
   awards: OscarAward[];
   context: "movie" | "person";
 }) {
+  if (awards.length === 0) return null;
+
   return (
     <div className="oscar-award-group" data-testid={`oscar-${title}`}>
       <h4 className="oscar-award-group-title">{title}</h4>
-      {awards.length === 0 ? (
-        <p className="detail-empty">None</p>
-      ) : (
-        <ul className="oscar-award-list">
-          {awards.map((award, i) => (
-            <li key={i}>
-              <OscarAwardLine award={award} context={context} />
-            </li>
-          ))}
-        </ul>
-      )}
+      <ul className="oscar-award-list">
+        {awards.map((award, i) => (
+          <li key={i}>
+            <OscarAwardLine award={award} context={context} />
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
 
 // The body of a movie's or person's "Oscars" section: their wins, then
-// their nominations.
+// their nominations, each left out when there are none.
 function OscarWinsAndNominations({
   awards,
   context,

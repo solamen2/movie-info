@@ -5,6 +5,7 @@ import TvSeriesPanel from "../tvseries/TvSeriesPanel";
 import { type MediaResultType, type MediaType } from "../utilities/constants";
 import {
   canHaveTvSeriesPanel,
+  displayText,
   getSearchTypeLabel,
   type PanelKind,
 } from "../utilities/utilities";
@@ -95,28 +96,35 @@ function SuggestionSearchCard({
           )}
           <div className="card-details">
             <h3 className="card-name">{item.name}</h3>
-            <p>
-              <strong>Search Type:</strong> {searchTypeLabel}
-            </p>
-            {!isPerson && (
+            {/* Lines with nothing to show are left out */}
+            {searchTypeLabel !== "—" && (
               <p>
-                <strong>Media Type:</strong> {mediaType ?? "—"}
+                <strong>Search Type:</strong> {searchTypeLabel}
               </p>
             )}
-            <p>
-              <strong>Rank:</strong> {item.rank ?? "—"}
-            </p>
-            <p>
-              <strong>Known For:</strong> {item.knownFor}
-            </p>
-            {showYear && (
+            {!isPerson && mediaType != null && (
               <p>
-                <strong>Year:</strong> {item.year ?? "—"}
+                <strong>Media Type:</strong> {mediaType}
               </p>
             )}
-            {showYears && (
+            {item.rank != null && (
               <p>
-                <strong>Years:</strong> {item.years ?? "—"}
+                <strong>Rank:</strong> {item.rank}
+              </p>
+            )}
+            {displayText(item.knownFor) !== "—" && (
+              <p>
+                <strong>Known For:</strong> {item.knownFor}
+              </p>
+            )}
+            {showYear && item.year != null && (
+              <p>
+                <strong>Year:</strong> {item.year}
+              </p>
+            )}
+            {showYears && displayText(item.years) !== "—" && (
+              <p>
+                <strong>Years:</strong> {item.years}
               </p>
             )}
           </div>

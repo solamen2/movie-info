@@ -1,4 +1,3 @@
-import { type ReactNode } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { imdbTitleUrl } from "../movie/movieTypes";
 import AspectRatios from "../shared/AspectRatios";
@@ -7,15 +6,18 @@ import {
   aspectRatiosLabel,
 } from "../shared/aspectRatioUtils";
 import Collapsible from "../shared/Collapsible";
+import DetailFacts, { type DetailFact } from "../shared/DetailFacts";
 import HorizontalList from "../shared/HorizontalList";
-import ExternalLinkRow, {
-  ExternalLinkRowSeparator,
-} from "../shared/ExternalLinkRow";
+import ExternalLinkRow from "../shared/ExternalLinkRow";
+import ImdbLinkRow from "../shared/ImdbLinkRow";
+import { knownForActorsFact, peopleFact } from "../shared/linkFacts";
+import PlotSection from "../shared/PlotSection";
+import { separatedValues } from "../shared/separatedValues";
 import TitleStatus from "../shared/TitleStatus";
 import WatchProviderSection from "../shared/WatchProviderSection";
 import { useCardSelection } from "../shared/useCardSelection";
 import { useDetailData } from "../shared/useDetailData";
-import { type PanelCards, usePanelCards } from "../shared/usePanelCards";
+import { usePanelCards } from "../shared/usePanelCards";
 import {
   detailIdQuery,
   displayDate,
@@ -25,14 +27,12 @@ import {
   getIntParam,
   withQueryParams,
 } from "../utilities/utilities";
-import CreatorCard from "./CreatorCard";
-import CrewCard from "./CrewCard";
 import NetworkCard from "./NetworkCard";
 import SeasonCard from "./SeasonCard";
 import TvSeriesCastCollapsible, {
   TV_SERIES_CAST_CARD_TYPE,
 } from "./TvSeriesCastCollapsible";
-import { type TvSeriesCrew, sortSeasons } from "./tvSeriesTypes";
+import { sortSeasons } from "./tvSeriesTypes";
 import "../shared/shared.css";
 import "./tvseries.css";
 
@@ -40,38 +40,6 @@ import "./tvseries.css";
 function displayEpisodeRunTimes(minutes: number[]): string {
   const runtimes = minutes.filter((m) => m > 0).map(displayRuntime);
   return runtimes.length > 0 ? runtimes.join(", ") : "—";
-}
-
-function CrewSection({
-  title,
-  cardType,
-  crew,
-  cards,
-}: {
-  title: string;
-  // The section's card type in the URL (see usePanelCards)
-  cardType: string;
-  crew: TvSeriesCrew[];
-  cards: PanelCards;
-}) {
-  const selected = cards.isSelectedIn(cardType);
-  return (
-    <Collapsible
-      title={title}
-      count={crew.length}
-      {...cards.sectionProps(cardType)}
-    >
-      <HorizontalList hasSelection={selected}>
-        {crew.map((c) => (
-          <CrewCard
-            key={c.id}
-            crew={c}
-            {...cards.cardProps(cardType, "person", c.tmdbId)}
-          />
-        ))}
-      </HorizontalList>
-    </Collapsible>
-  );
 }
 
 interface TvSeriesPanelProps {
@@ -82,8 +50,8 @@ interface TvSeriesPanelProps {
 // Shows a TV series. A season within it is selected via the URL's
 // `?tmdbTvSeriesId=…&seasonNumber=…` query parameters (the same ones the
 // /api/tvseason call takes), so browser back / forward and directly loaded
-// URLs work for seasons too. Its cast, creator and crew cards open the
-// person's own panel in place of this one (see usePanelCards).
+// URLs work for seasons too. Its cast cards open the person's own panel in
+// place of this one (see usePanelCards).
 function TvSeriesPanel({ itemId }: TvSeriesPanelProps) {
   const { data: tvSeries, error } = useDetailData(
     `/api/tvseries?${detailIdQuery(itemId)}`,
@@ -104,9 +72,6 @@ function TvSeriesPanel({ itemId }: TvSeriesPanelProps) {
   const cards = usePanelCards({
     cardsIn: {
       [TV_SERIES_CAST_CARD_TYPE]: tvSeries?.cast,
-      creators: tvSeries?.creators,
-      directors: tvSeries?.directors,
-      writers: tvSeries?.writers,
     },
     // With a season open, the URL's card is one of the season's / episode's
     enabled: selectedSeasonNumber === null,
@@ -130,13 +95,10 @@ function TvSeriesPanel({ itemId }: TvSeriesPanelProps) {
 
   const imdbUrl = imdbTitleUrl(tvSeries.imdbId);
   const tmdbTvSeriesId = tmdbTvSeriesIdParam ?? tvSeries.tmdbId;
-  const imdbRating = displayText(tvSeries.imdbRating);
-  const imdbVotes = displayText(tvSeries.imdbVotes);
   const sortedSeasons = sortSeasons(tvSeries.seasons);
   const seasonSelected = seasonSelection.selectedId !== null;
-  const creatorSelected = cards.isSelectedIn("creators");
 
-  const facts: [string, ReactNode][] = [
+  const facts: DetailFact[] = [
     ["Original Name", displayText(tvSeries.originalName)],
     ["Years", displayText(tvSeries.years)],
     ["First Air Date", displayDate(tvSeries.firstAirDate)],
@@ -144,11 +106,10 @@ function TvSeriesPanel({ itemId }: TvSeriesPanelProps) {
     ["Next Air Date", displayDate(tvSeries.nextAirDate)],
     [
       "Average Runtime",
-      <>
-        {displayRuntime(tvSeries.omdbAverageEpisodeRuntimeNumber)}
-        <ExternalLinkRowSeparator />
-        {displayEpisodeRunTimes(tvSeries.tmdbEpisodeRunTimes)}
-      </>,
+      separatedValues([
+        displayRuntime(tvSeries.omdbAverageEpisodeRuntimeNumber),
+        displayEpisodeRunTimes(tvSeries.tmdbEpisodeRunTimes),
+      ]),
     ],
     ["Rated", displayText(tvSeries.rated)],
     [
@@ -158,11 +119,15 @@ function TvSeriesPanel({ itemId }: TvSeriesPanelProps) {
         searchUrl={aspectRatioGoogleSearchUrl(tvSeries.name, "TV series")}
       />,
     ],
-    ["In Production", tvSeries.isInProduction ? "Yes" : "No"],
     ["Type", displayText(tvSeries.tvSeriesType)],
     ["Number of Seasons", displayText(tvSeries.numberOfSeasons)],
     ["Number of Episodes", displayText(tvSeries.numberOfEpisodes)],
-    ["Known For", displayText(tvSeries.knownForActors)],
+    peopleFact("Creator", tvSeries.creators),
+    knownForActorsFact(
+      tvSeries.knownForActors,
+      [{ cardType: TV_SERIES_CAST_CARD_TYPE, people: tvSeries.cast }],
+      cards,
+    ),
     ["Genres", displayGenres(tvSeries.tmdbGenres, tvSeries.omdbGenres)],
     [
       "Homepage",
@@ -203,31 +168,18 @@ function TvSeriesPanel({ itemId }: TvSeriesPanelProps) {
           {tvSeries.tagline && (
             <p className="detail-tagline">{tvSeries.tagline}</p>
           )}
-          <ExternalLinkRow url={imdbUrl} copyAriaLabel="copy-imdb-link">
-            <span className="external-link-row-label">IMDB:</span> {imdbRating}
-            {imdbRating !== "—" && imdbVotes !== "—" && (
-              <>
-                {" "}
-                <span className="external-link-row-votes">({imdbVotes})</span>
-              </>
-            )}
-            <ExternalLinkRowSeparator />
-            <span className="external-link-row-label">Rank:</span>{" "}
-            {displayText(tvSeries.imdbRank)}
-          </ExternalLinkRow>
+          <ImdbLinkRow
+            url={imdbUrl}
+            rating={tvSeries.imdbRating}
+            votes={tvSeries.imdbVotes}
+            rank={tvSeries.imdbRank}
+          />
           <ExternalLinkRow
             url={tvSeries.wikipediaLink ?? ""}
             label="Wikipedia:"
             copyAriaLabel="copy-wikipedia-link"
           />
-          <dl className="detail-facts">
-            {facts.map(([label, value]) => (
-              <div className="detail-fact" key={label}>
-                <dt>{label}</dt>
-                <dd>{value}</dd>
-              </div>
-            ))}
-          </dl>
+          <DetailFacts facts={facts} />
         </div>
       </div>
 
@@ -269,39 +221,13 @@ function TvSeriesPanel({ itemId }: TvSeriesPanelProps) {
           </HorizontalList>
         </Collapsible>
         <TvSeriesCastCollapsible cast={tvSeries.cast} cards={cards} />
-        <Collapsible
-          title="Creators"
-          count={tvSeries.creators.length}
-          {...cards.sectionProps("creators")}
-        >
-          <HorizontalList hasSelection={creatorSelected}>
-            {tvSeries.creators.map((c) => (
-              <CreatorCard
-                key={c.id}
-                creator={c}
-                {...cards.cardProps("creators", "person", c.tmdbId)}
-              />
-            ))}
-          </HorizontalList>
-        </Collapsible>
-        <CrewSection
-          title="Directors"
-          cardType="directors"
-          crew={tvSeries.directors}
-          cards={cards}
+        <PlotSection
+          title="Overview"
+          sources={[
+            { name: "TMDB", text: tvSeries.tmdbOverview },
+            { name: "OMDB", text: tvSeries.omdbOverview },
+          ]}
         />
-        <CrewSection
-          title="Writers"
-          cardType="writers"
-          crew={tvSeries.writers}
-          cards={cards}
-        />
-        <Collapsible title="Overview (TMDB)">
-          <p className="detail-prose">{displayText(tvSeries.tmdbOverview)}</p>
-        </Collapsible>
-        <Collapsible title="Overview (OMDB)">
-          <p className="detail-prose">{displayText(tvSeries.omdbOverview)}</p>
-        </Collapsible>
         <Collapsible title="Networks" count={tvSeries.networks.length}>
           <HorizontalList>
             {tvSeries.networks.map((n) => (
@@ -310,16 +236,9 @@ function TvSeriesPanel({ itemId }: TvSeriesPanelProps) {
           </HorizontalList>
         </Collapsible>
         <WatchProviderSection
-          title="Where to Stream"
-          providers={tvSeries.watchProvidersFlatrate}
-        />
-        <WatchProviderSection
-          title="Where to Rent"
-          providers={tvSeries.watchProvidersRent}
-        />
-        <WatchProviderSection
-          title="Where to Buy"
-          providers={tvSeries.watchProvidersBuy}
+          flatrate={tvSeries.watchProvidersFlatrate}
+          rent={tvSeries.watchProvidersRent}
+          buy={tvSeries.watchProvidersBuy}
         />
       </div>
     </div>

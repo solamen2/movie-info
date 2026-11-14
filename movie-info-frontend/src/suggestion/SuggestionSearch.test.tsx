@@ -1,6 +1,6 @@
 import { act, fireEvent, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { renderApp } from "../../tests/renderApp";
+import { findResultCards, renderApp } from "../../tests/renderApp";
 import { SEARCH_AUTO_SUBMIT_MS } from "../utilities/constants";
 
 function typeQuery(value: string) {
@@ -27,13 +27,33 @@ describe("SuggestionSearch", () => {
       fireEvent.change(searchQueryInput, { target: { value: "1" } });
       const searchButton = screen.getByRole("button", { name: "search" });
       fireEvent.click(searchButton);
-      const searchResultsNumber = await screen.findByText("8 results.");
-      expect(searchResultsNumber).toBeInTheDocument();
+      await findResultCards(8);
+      // The number of results is only ever mentioned when it is zero
+      expect(screen.queryByText(/results\./)).not.toBeInTheDocument();
 
       fireEvent.change(searchQueryInput, { target: { value: "2" } });
       fireEvent.click(searchButton);
-      const searchResultsNumber2 = await screen.findByText("6 results.");
-      expect(searchResultsNumber2).toBeInTheDocument();
+      await findResultCards(5);
+    });
+  });
+  describe("When the search box has text in it", () => {
+    it("Should offer a clear button that empties the box, focuses it, and keeps the results", async () => {
+      const { currentUrl } = renderApp();
+      const searchQueryInput = screen.getByRole("textbox", {
+        name: "search-query-input",
+      });
+      expect(screen.queryByRole("button", { name: "clear-query" })).toBeNull();
+
+      fireEvent.change(searchQueryInput, { target: { value: "1" } });
+      fireEvent.click(screen.getByRole("button", { name: "search" }));
+      await findResultCards(8);
+      fireEvent.click(screen.getByRole("button", { name: "clear-query" }));
+
+      expect(searchQueryInput).toHaveValue("");
+      expect(searchQueryInput).toHaveFocus();
+      expect(screen.queryByRole("button", { name: "clear-query" })).toBeNull();
+      await findResultCards(8);
+      expect(currentUrl()).toBe("/search?q=1");
     });
   });
   describe("When using search terms with no results", () => {
@@ -81,7 +101,7 @@ describe("SuggestionSearch", () => {
       expect(currentUrl()).toBe("/search?q=1");
 
       vi.useRealTimers();
-      expect(await screen.findByText("8 results.")).toBeInTheDocument();
+      await findResultCards(8);
     });
 
     it("Should start waiting again on every input", () => {

@@ -1,12 +1,14 @@
-import { type ReactNode } from "react";
 import { hasImdbId, imdbTitleUrl } from "../movie/movieTypes";
 import Collapsible from "../shared/Collapsible";
+import DetailFacts, { type DetailFact } from "../shared/DetailFacts";
 import HorizontalList from "../shared/HorizontalList";
-import ExternalLinkRow, {
-  ExternalLinkRowSeparator,
-} from "../shared/ExternalLinkRow";
+import ExternalLinkRow from "../shared/ExternalLinkRow";
+import ImdbLinkRow from "../shared/ImdbLinkRow";
+import { knownForActorsFact, peopleFact } from "../shared/linkFacts";
+import PlotSection from "../shared/PlotSection";
+import { separatedValues } from "../shared/separatedValues";
 import { useDetailData } from "../shared/useDetailData";
-import { type PanelCards, usePanelCards } from "../shared/usePanelCards";
+import { usePanelCards } from "../shared/usePanelCards";
 import {
   displayEpisodeType,
   displaySeasonEpisode,
@@ -19,42 +21,9 @@ import {
   getTmdbImageUrl,
 } from "../utilities/utilities";
 import CastCard from "./CastCard";
-import CrewCard from "./CrewCard";
 import GuestStarCard from "./GuestStarCard";
-import { type TvEpisodeCrew, tvEpisodeGoogleSearchUrl } from "./tvEpisodeTypes";
+import { tvEpisodeGoogleSearchUrl } from "./tvEpisodeTypes";
 import "../shared/shared.css";
-
-function CrewSection({
-  title,
-  cardType,
-  crew,
-  cards,
-}: {
-  title: string;
-  // The section's card type in the URL (see usePanelCards)
-  cardType: string;
-  crew: TvEpisodeCrew[];
-  cards: PanelCards;
-}) {
-  const selected = cards.isSelectedIn(cardType);
-  return (
-    <Collapsible
-      title={title}
-      count={crew.length}
-      {...cards.sectionProps(cardType)}
-    >
-      <HorizontalList hasSelection={selected}>
-        {crew.map((c) => (
-          <CrewCard
-            key={c.id}
-            crew={c}
-            {...cards.cardProps(cardType, "person", c.tmdbId)}
-          />
-        ))}
-      </HorizontalList>
-    </Collapsible>
-  );
-}
 
 interface TvEpisodePanelProps {
   tmdbTvSeriesId: number;
@@ -67,7 +36,7 @@ interface TvEpisodePanelProps {
 }
 
 // Shows one episode of a TV series, loaded from /api/tvepisode with the same
-// query parameters that select it in the URL. Its cast, crew and guest star
+// query parameters that select it in the URL. Its cast and guest star
 // cards open the person's own panel in place of the whole TV series panel
 // (see usePanelCards).
 function TvEpisodePanel({
@@ -89,8 +58,6 @@ function TvEpisodePanel({
   const cards = usePanelCards({
     cardsIn: {
       cast: tvEpisode?.cast,
-      directors: tvEpisode?.directors,
-      writers: tvEpisode?.writers,
       "guest-stars": tvEpisode?.guestStars,
     },
   });
@@ -112,8 +79,6 @@ function TvEpisodePanel({
   }
 
   const stillUrl = getTmdbImageUrl(tvEpisode.stillPath, "w300");
-  const imdbRating = displayText(tvEpisode.imdbRating);
-  const imdbVotes = displayText(tvEpisode.imdbVotes);
   const sortedCast = [...tvEpisode.cast].sort(
     (a, b) => a.billedOrder - b.billedOrder,
   );
@@ -123,19 +88,27 @@ function TvEpisodePanel({
   const castSelected = cards.isSelectedIn("cast");
   const guestStarSelected = cards.isSelectedIn("guest-stars");
 
-  const facts: [string, ReactNode][] = [
+  const facts: DetailFact[] = [
     ["Air Date", displayDate(tvEpisode.airDate)],
     [
       "Runtime",
-      <>
-        {displayRuntime(tvEpisode.omdbAverageEpisodeRuntimeNumber)}
-        <ExternalLinkRowSeparator />
-        {displayRuntime(tvEpisode.runtime)}
-      </>,
+      separatedValues([
+        displayRuntime(tvEpisode.omdbAverageEpisodeRuntimeNumber),
+        displayRuntime(tvEpisode.runtime),
+      ]),
     ],
     ["Rated", displayText(tvEpisode.rated)],
     ["Type", displayEpisodeType(tvEpisode.episodeType)],
-    ["Known For", displayText(tvEpisode.knownForActors)],
+    peopleFact("Director", tvEpisode.directors),
+    peopleFact("Writer", tvEpisode.writers),
+    knownForActorsFact(
+      tvEpisode.knownForActors,
+      [
+        { cardType: "cast", people: tvEpisode.cast },
+        { cardType: "guest-stars", people: tvEpisode.guestStars },
+      ],
+      cards,
+    ),
     ["Genres", displayGenres("", tvEpisode.omdbGenres)],
   ];
 
@@ -165,19 +138,11 @@ function TvEpisodePanel({
             )}
           </p>
           {hasImdbId(tvEpisode.imdbId) ? (
-            <ExternalLinkRow
+            <ImdbLinkRow
               url={imdbTitleUrl(tvEpisode.imdbId)}
-              copyAriaLabel="copy-imdb-link"
-            >
-              <span className="external-link-row-label">IMDB:</span>{" "}
-              {imdbRating}
-              {imdbRating !== "—" && imdbVotes !== "—" && (
-                <>
-                  {" "}
-                  <span className="external-link-row-votes">({imdbVotes})</span>
-                </>
-              )}
-            </ExternalLinkRow>
+              rating={tvEpisode.imdbRating}
+              votes={tvEpisode.imdbVotes}
+            />
           ) : (
             // TMDB knows of no IMDB page for the episode (so there is no OMDB
             // rating either); offer a Google search for it instead
@@ -197,14 +162,7 @@ function TvEpisodePanel({
             label="TV Series IMDB:"
             copyButton={false}
           />
-          <dl className="detail-facts">
-            {facts.map(([label, value]) => (
-              <div className="detail-fact" key={label}>
-                <dt>{label}</dt>
-                <dd>{value}</dd>
-              </div>
-            ))}
-          </dl>
+          <DetailFacts facts={facts} />
         </div>
       </div>
 
@@ -224,18 +182,6 @@ function TvEpisodePanel({
             ))}
           </HorizontalList>
         </Collapsible>
-        <CrewSection
-          title="Directors"
-          cardType="directors"
-          crew={tvEpisode.directors}
-          cards={cards}
-        />
-        <CrewSection
-          title="Writers"
-          cardType="writers"
-          crew={tvEpisode.writers}
-          cards={cards}
-        />
         <Collapsible
           title="Guest Stars"
           count={tvEpisode.guestStars.length}
@@ -251,12 +197,13 @@ function TvEpisodePanel({
             ))}
           </HorizontalList>
         </Collapsible>
-        <Collapsible title="Overview (OMDB)">
-          <p className="detail-prose">{displayText(tvEpisode.omdbOverview)}</p>
-        </Collapsible>
-        <Collapsible title="Overview (TMDB)">
-          <p className="detail-prose">{displayText(tvEpisode.tmdbOverview)}</p>
-        </Collapsible>
+        <PlotSection
+          title="Plot"
+          sources={[
+            { name: "OMDB", text: tvEpisode.omdbOverview },
+            { name: "TMDB", text: tvEpisode.tmdbOverview },
+          ]}
+        />
       </div>
     </div>
   );

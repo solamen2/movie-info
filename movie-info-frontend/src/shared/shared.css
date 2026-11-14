@@ -107,6 +107,19 @@
   margin-top: -0.75rem;
 }
 
+/* Further data from the site, as indented bullets right under its row (e.g.
+   the IMDB rank). The list takes over the row's margin below. */
+.external-link-row-details {
+  margin: -0.75rem 0 0.75rem;
+  padding-left: 1.75rem;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.external-link-row-details + .external-link-row {
+  margin-top: -0.75rem;
+}
+
 .external-link-row-label {
   font-weight: 800;
   padding-right: 0.35rem;
@@ -227,6 +240,11 @@
   border-top: 1px solid #444;
 }
 
+/* Every section can be left out for lack of data */
+.detail-sections:empty {
+  display: none;
+}
+
 .collapsible {
   border-bottom: 1px solid #444;
 }
@@ -273,6 +291,24 @@
   margin: 0;
   font-size: 0.9rem;
   line-height: 1.5;
+}
+
+/* The buttons that switch a section between several things to show (see
+   OptionToggle); the one shown is marked. */
+.option-toggle {
+  display: flex;
+  gap: 0.4rem;
+  margin: 0 0 0.6rem;
+}
+
+.option-toggle button {
+  padding: 0.2em 0.8em;
+  font-size: 0.8rem;
+}
+
+.option-toggle button[aria-pressed="true"] {
+  border-color: #646cff;
+  color: #646cff;
 }
 
 .detail-empty {

@@ -40,6 +40,14 @@ function EpisodeCard({
   const stillUrl = getTmdbImageUrl(episode.stillPath, "w185");
   const directors = displayNames(episode.directors);
   const writers = displayNames(episode.writers);
+  const airDate = displayDate(episode.airDate);
+  // Whichever of the two are known
+  const runtimeAndType = [
+    displayRuntime(episode.runtime),
+    displayEpisodeType(episode.episodeType),
+  ]
+    .filter((value) => value !== "—")
+    .join(" · ");
 
   return (
     <ExpandableCard
@@ -76,14 +84,12 @@ function EpisodeCard({
               <p className="episode-card-name">
                 {String(episode.episodeNumber)}. {episode.title}
               </p>
-              <p className="episode-card-secondary">
-                {displayDate(episode.airDate)}
-              </p>
-              <p className="episode-card-secondary">
-                {displayRuntime(episode.runtime)}
-                {" · "}
-                {displayEpisodeType(episode.episodeType)}
-              </p>
+              {airDate !== "—" && (
+                <p className="episode-card-secondary">{airDate}</p>
+              )}
+              {runtimeAndType && (
+                <p className="episode-card-secondary">{runtimeAndType}</p>
+              )}
               {directors && (
                 <p className="episode-card-secondary">
                   Directed by {directors}
@@ -94,9 +100,11 @@ function EpisodeCard({
               )}
             </div>
           </div>
-          <Collapsible title="Overview">
-            <p className="detail-prose">{displayText(episode.tmdbOverview)}</p>
-          </Collapsible>
+          {displayText(episode.tmdbOverview) !== "—" && (
+            <Collapsible title="Plot">
+              <p className="detail-prose">{episode.tmdbOverview}</p>
+            </Collapsible>
+          )}
           <button
             type="button"
             className="episode-card-expand"

@@ -88,21 +88,5 @@
     "knownFor": "Robert Garcia, Jose Williams",
     "year": 2013,
     "years": null
-  },
-  {
-    "id": "4465e689-9d21-4094-92f0-bb4234010c0b",
-    "image": {
-      "height": 1005,
-      "imageURL": "https://example.com/example14.jpg",
-      "width": 680
-    },
-    "itemID": "/spotlight/",
-    "name": "Lemur History Month",
-    "searchType": null,
-    "mediaType": null,
-    "rank": null,
-    "knownFor": "A Celebration of Lemur Storytellers and Stories",
-    "year": null,
-    "years": null
   }
 ]

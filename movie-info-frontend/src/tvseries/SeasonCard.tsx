@@ -70,14 +70,18 @@ function SeasonCard({
               <p className="season-card-secondary">
                 {displayEpisodeCount(season.episodeCount)}
               </p>
-              <p className="season-card-secondary">
-                {displayDate(season.firstAirDate)}
-              </p>
+              {displayDate(season.firstAirDate) !== "—" && (
+                <p className="season-card-secondary">
+                  {displayDate(season.firstAirDate)}
+                </p>
+              )}
             </div>
           </div>
-          <Collapsible title="Overview">
-            <p className="detail-prose">{displayText(season.overview)}</p>
-          </Collapsible>
+          {displayText(season.overview) !== "—" && (
+            <Collapsible title="Overview">
+              <p className="detail-prose">{season.overview}</p>
+            </Collapsible>
+          )}
           <button
             type="button"
             className="season-card-expand"

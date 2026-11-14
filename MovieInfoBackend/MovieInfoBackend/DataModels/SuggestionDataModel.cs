@@ -22,6 +22,13 @@ public record SuggestionDataModel
     [JsonPropertyName("yr")]
     public string? Years { get; init; }  // only for TV series or TV mini series
 
+    // IMDB mixes other things in with the titles ("tt...") and people ("nm...") it finds: links to its own editorial sections
+    // (e.g. "IMDb Spotlight", "Oscars", "Star Wars on IMDb"), whose "id" is a path on imdb.com (e.g. "/spotlight/"), and
+    // franchises (e.g. "Marvel", with an id like "in0000248"). There is nothing to show for those, so they are left out of the
+    // search results.
+    [JsonIgnore]
+    public bool IsTitleOrPerson => ItemID.StartsWith("tt") || ItemID.StartsWith("nm");
+
     public override string ToString()
     {
         return $"Image:\n*****\n{Image}\n*****\nItemID: {ItemID}\nName: {Name}\nMediaType: {MediaType}\nRank: {Rank}\nKnownFor: {KnownFor}\nYear: {Year}\nYears: {Years}";
