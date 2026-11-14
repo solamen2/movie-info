@@ -177,19 +177,6 @@ function SuggestionSearch({ panelKind }: SuggestionSearchProps) {
     };
   }, [searchQuery, query]);
 
-  // The page always starts out at the very top, with the search bar fully in
-  // view. Arriving from another page otherwise keeps that page's scroll
-  // position (e.g. from a footer link at the bottom of a long page, or from
-  // the login page on iOS, where the on-screen keyboard can leave the page
-  // shifted), which on iOS puts the search bar partly under Safari's
-  // translucent top edge.
-  // TODO: Check that this works
-  useEffect(() => {
-    if (window.scrollY !== 0) {
-      window.scrollTo({ top: 0 });
-    }
-  }, []);
-
   // ESC does exactly what the browser's back button does, everywhere.
   const onEscape = useEffectEvent(() => {
     void navigate(-1);
