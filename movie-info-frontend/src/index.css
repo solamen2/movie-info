@@ -34,21 +34,6 @@ body {
   min-width: 320px;
 }
 
-/* Since iOS 26, a web app opened from the Home Screen has a system blur over
-   the top 40px or so of the page, even with the page scrolled to the very
-   top; a Safari tab has no such blur, and nothing in a page turns it off.
-   So in that mode every page starts further down, which together with a
-   page's own top margin (1rem on a phone) keeps its first row, e.g. the
-   search bar, clear of the blur until the user scrolls.
-   -webkit-touch-callout exists only on iOS and iPadOS. */
-@supports (-webkit-touch-callout: none) {
-  @media (display-mode: standalone) {
-    body {
-      padding-top: 32px;
-    }
-  }
-}
-
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
