@@ -4,12 +4,17 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/movie-info.png" />
     <link rel="apple-touch-icon" href="/movie-info.png" />
+    <!-- Makes every page part of the Home Screen app. Without it, iOS treats
+         only the page the app was added from as the app and shows a bar with
+         the site's domain on all the others. -->
     <link rel="manifest" href="/manifest.json" />
     <meta name="apple-mobile-web-app-title" content="Movie Info" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Movie Search</title>
   </head>
   <body>
+    <!-- Styled in index.css -->
+    <div class="status-bar-strip"></div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

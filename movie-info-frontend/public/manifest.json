@@ -1,16 +1,14 @@
 {
   "name": "Movie Info",
   "short_name": "Movie Info",
-  // The manifest deliberately puts every real page outside the Home
-  // Screen app's scope: the app starts at /home-screen/, which only
-  // redirects to /login. iOS shows a bar with the site's domain on pages
-  // outside the scope, and that bar keeps the page clear of the status
-  // bar. Without it, iOS 26 slides the page under the status bar and
-  // blurs it after the first scroll or keyboard use. -->
-  "start_url": "/home-screen/",
-  "scope": "/home-screen/",
+  "start_url": "/search",
+  "scope": "/",
   "display": "standalone",
   "icons": [
-    { "src": "/movie-info.png", "sizes": "512x512", "type": "image/png" }
+    {
+      "src": "/movie-info.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
   ]
 }
