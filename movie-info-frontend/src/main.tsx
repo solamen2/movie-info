@@ -2,6 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.tsx";
+import { keepClearOfStatusBar } from "./utilities/statusBarInset";
 
 async function enableMocking() {
   if (
@@ -15,6 +16,8 @@ async function enableMocking() {
     return worker.start();
   }
 }
+
+keepClearOfStatusBar();
 
 void enableMocking().then(() => {
   createRoot(document.getElementById("root") ?? new HTMLElement()).render(
