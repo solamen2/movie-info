@@ -34,14 +34,6 @@ body {
   min-width: 320px;
 }
 
-/* Set by keepClearOfStatusBar (statusBarInset.ts) in the iOS Home Screen app.
-   Landscape has no status bar to clear. */
-@media (orientation: portrait) {
-  body {
-    padding-top: var(--lost-top-inset, 0px);
-  }
-}
-
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
