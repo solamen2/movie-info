@@ -1,0 +1,10 @@
+{
+  "name": "Movie Info",
+  "short_name": "Movie Info",
+  "start_url": "/search",
+  "scope": "/",
+  "display": "standalone",
+  "icons": [
+    { "src": "/movie-info.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
