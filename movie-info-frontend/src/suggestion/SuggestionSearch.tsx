@@ -238,22 +238,6 @@ function SuggestionSearch({ panelKind }: SuggestionSearchProps) {
               onChange={(e) => {
                 setSearchQuery(e.target.value);
               }}
-              // On a touch screen, a tap focuses the box without scrolling it
-              // into view. iOS otherwise shifts the page up when the keyboard
-              // opens (seen in the web app opened from the Home Screen, not
-              // in a Safari tab), pushing the box, which was fully visible,
-              // partly off the top of the screen. The tap then puts the
-              // caret at the end of the text rather than where it landed;
-              // further taps in the focused box behave as usual.
-              onMouseDown={(e) => {
-                if (
-                  document.activeElement !== e.currentTarget &&
-                  window.matchMedia("(pointer: coarse)").matches
-                ) {
-                  e.preventDefault();
-                  e.currentTarget.focus({ preventScroll: true });
-                }
-              }}
             />
             {searchQuery !== "" && (
               // Empties the box, ready for a new query; the results stay
