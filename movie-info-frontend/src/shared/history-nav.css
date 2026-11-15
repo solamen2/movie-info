@@ -16,8 +16,8 @@
 
   /* A round button floating over the page, pinned to the top left corner of
      the screen, where it lines up with the search box at the top of the
-     page. Its edge and shadow keep it apart from whatever scrolls
-     underneath. */
+     page. Its own shade, edge and shadow, and a blur of what is behind it,
+     keep it apart from whatever scrolls underneath. */
   .back-button {
     display: flex;
     align-items: center;
@@ -31,10 +31,13 @@
     padding: 0 0 0.1em;
     border: 1px solid rgb(128 128 128 / 0.45);
     border-radius: 50%;
-    /* Solid, with no blur of what is behind it: a blurred backdrop on a
-       pinned element is a likely cause of iOS sometimes painting a large
-       opaque block over the page after going back. */
-    background-color: var(--page-background);
+    background-color: color-mix(
+      in srgb,
+      var(--page-background) 72%,
+      transparent
+    );
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
     box-shadow: 0 2px 10px rgb(0 0 0 / 0.35);
     font-size: 1.6rem;
     line-height: 1;
