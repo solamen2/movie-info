@@ -1,0 +1,84 @@
+/* The floating back button (see HistoryNav), shown only in the app opened
+   from a phone's Home Screen. A browser has its own back button, so
+   everywhere else it stays hidden. */
+.back-button {
+  display: none;
+}
+
+@media (display-mode: standalone) {
+  :root {
+    --back-button-size: 40px;
+    /* The button plus the gap to whatever sits beside it */
+    --back-button-room: calc(var(--back-button-size) + 0.75rem);
+    /* The pages' own margin on the left and at the top */
+    --back-button-inset: 2rem;
+  }
+
+  /* A round button floating over the page, pinned to the top left corner of
+     the screen, where it lines up with the search box at the top of the
+     page. Its own shade, edge and shadow, and a blur of what is behind it,
+     keep it apart from whatever scrolls underneath. */
+  .back-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: calc(var(--back-button-inset) + 1px);
+    left: var(--back-button-inset);
+    z-index: 1001;
+    width: var(--back-button-size);
+    height: var(--back-button-size);
+    padding: 0 0 0.1em;
+    border: 1px solid rgb(128 128 128 / 0.45);
+    border-radius: 50%;
+    background-color: color-mix(
+      in srgb,
+      var(--page-background) 72%,
+      transparent
+    );
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 2px 10px rgb(0 0 0 / 0.35);
+    font-size: 1.6rem;
+    line-height: 1;
+    transition:
+      opacity 0.2s ease,
+      translate 0.2s ease,
+      visibility 0.2s;
+  }
+
+  /* Scrolling down the page tucks the button away (see HistoryNav for when);
+     it must not catch taps meant for what is underneath meanwhile. */
+  .back-button.is-tucked-away {
+    opacity: 0;
+    translate: 0 -150%;
+    visibility: hidden;
+  }
+
+  /* Nowhere to go back to */
+  .back-button:disabled {
+    color: rgb(128 128 128 / 0.6);
+    cursor: default;
+  }
+
+  /* At the top of the page, the button sits beside the first thing on it,
+     which gives up some width for it: the search box, or a page's title. */
+  .search-header,
+  .oscars-page > h1,
+  .reference-page > h1 {
+    padding-left: var(--back-button-room);
+  }
+
+  @media (max-width: 640px) {
+    /* The search page's margins shrink on a narrow screen */
+    :root {
+      --back-button-inset: 1rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .back-button {
+      transition: none;
+    }
+  }
+}

@@ -6,10 +6,12 @@ import OscarsByYear from "./oscars/OscarsByYear";
 import ImdbLists from "./imdb/ImdbLists";
 import AspectRatioReference from "./aspectratio/AspectRatioReference";
 import Footer from "./shared/Footer";
+import HistoryNav from "./shared/HistoryNav";
 
 function AppRoutes() {
   return (
     <>
+      <HistoryNav />
       <Routes>
         <Route path="/login" element={<LoginUser />} />
         <Route path="/register" element={<RegisterUser />} />
