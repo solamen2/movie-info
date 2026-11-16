@@ -6,8 +6,8 @@ import {
 } from "../shared/aspectRatioUtils";
 import Collapsible from "../shared/Collapsible";
 import DetailFacts, { type DetailFact } from "../shared/DetailFacts";
-import HorizontalList from "../shared/HorizontalList";
 import ExternalLinkRow from "../shared/ExternalLinkRow";
+import FilterablePeopleList from "../shared/FilterablePeopleList";
 import ImdbLinkRow from "../shared/ImdbLinkRow";
 import { knownForActorsFact, peopleFact } from "../shared/linkFacts";
 import PlotSection from "../shared/PlotSection";
@@ -69,7 +69,6 @@ function MoviePanel({ itemId }: MoviePanelProps) {
   const sortedCast = [...movie.cast].sort(
     (a, b) => a.billedOrder - b.billedOrder,
   );
-  const castSelected = cards.isSelectedIn("cast");
 
   // A budget or revenue with its inflation adjustment, which needs the
   // release month and year; just the amount (or "—") without them. Keyed by
@@ -170,16 +169,18 @@ function MoviePanel({ itemId }: MoviePanelProps) {
           count={movie.cast.length}
           {...cards.sectionProps("cast")}
         >
-          <HorizontalList hasSelection={castSelected}>
-            {sortedCast.map((c) => (
-              <CastCard
-                key={c.id}
-                cast={c}
-                {...cards.cardProps("cast", "person", c.tmdbId)}
-              />
-            ))}
-          </HorizontalList>
+          <FilterablePeopleList
+            label="cast"
+            people={sortedCast}
+            charactersOf={(c) => [c.character]}
+            cardType="cast"
+            cards={cards}
+            renderCard={(c, cardProps) => (
+              <CastCard key={c.id} cast={c} {...cardProps} />
+            )}
+          />
         </Collapsible>
+        <RtCriticsConsensus consensus={movie.rtCriticsConsensus} />
         <MovieOscars oscars={movie.oscars} />
         <PlotSection
           title="Plot"
@@ -196,7 +197,6 @@ function MoviePanel({ itemId }: MoviePanelProps) {
             },
           ]}
         />
-        <RtCriticsConsensus consensus={movie.rtCriticsConsensus} />
         <WatchProviderSection
           flatrate={movie.watchProvidersFlatrate}
           rent={movie.watchProvidersRent}

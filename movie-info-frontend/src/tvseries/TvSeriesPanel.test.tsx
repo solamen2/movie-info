@@ -300,7 +300,7 @@ describe("TvSeriesPanel", () => {
       );
     });
 
-    it("Should render cast in billed order and networks / watch providers as cards", async () => {
+    it("Should render cast by number of episodes and networks / watch providers as cards", async () => {
       await searchAndSelectExampleTvSeries();
       await screen.findByTestId("tv-series-panel");
 
@@ -902,6 +902,83 @@ describe("TvSeriesPanel", () => {
       );
       expect(currentUrl()).toBe(url);
       expect(screen.queryByTestId("person-panel")).not.toBeInTheDocument();
+    });
+  });
+
+  describe("When the cast appear in different numbers of episodes", () => {
+    function renderTvSeriesWithCast() {
+      const [brown, jones] = tvSeriesDataJson1.cast;
+      server.use(
+        http.get("/api/tvseries", () =>
+          HttpResponse.json({
+            ...tvSeriesDataJson1,
+            cast: [
+              brown,
+              jones,
+              {
+                ...jones,
+                id: "c3",
+                tmdbId: 90003,
+                name: "Example Green",
+                characters: ["Neighbor"],
+                totalEpisodeCount: 37,
+                billedOrder: 5,
+              },
+              {
+                ...jones,
+                id: "c4",
+                tmdbId: 90004,
+                name: "Example White",
+                characters: ["Narrator"],
+                totalEpisodeCount: 90,
+                billedOrder: 9,
+              },
+            ],
+          }),
+        ),
+      );
+      render(
+        <MemoryRouter>
+          <TvSeriesPanel itemId="tt10000002" />
+        </MemoryRouter>,
+      );
+    }
+
+    function castNames() {
+      return screen
+        .queryAllByTestId("cast-card")
+        .map((c) => c.querySelector(".person-card-name")?.textContent);
+    }
+
+    it("Should list the cast by number of episodes, most first, in billed order among equals", async () => {
+      renderTvSeriesWithCast();
+      await screen.findByTestId("tv-series-panel");
+
+      expect(castNames()).toEqual([
+        "Example White",
+        "Example Jones",
+        "Example Green",
+        "Example Brown",
+      ]);
+    });
+
+    it("Should filter the cast by actor or character name, above the episode count checkbox", async () => {
+      renderTvSeriesWithCast();
+      const panel = await screen.findByTestId("tv-series-panel");
+      const filter = within(panel).getByRole("searchbox", {
+        name: "Filter cast",
+      });
+      const body = screen.getByText("Cast").closest("details")?.lastChild;
+      expect(body?.firstChild).toBe(filter);
+      expect(filter.nextElementSibling).toContainElement(
+        screen.getByRole("checkbox", { name: "Hide number of episodes" }),
+      );
+
+      fireEvent.change(filter, { target: { value: "twin" } });
+      expect(castNames()).toEqual(["Example Jones"]);
+
+      fireEvent.change(filter, { target: { value: "gree" } });
+      expect(castNames()).toEqual(["Example Green"]);
     });
   });
 });

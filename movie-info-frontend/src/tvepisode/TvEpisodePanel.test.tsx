@@ -659,4 +659,46 @@ describe("TvEpisodePanel", () => {
       );
     });
   });
+
+  describe("When text is typed into the Cast and Guest Stars sections' filters", () => {
+    it("Should filter each section by actor or character name on its own", async () => {
+      render(
+        <MemoryRouter>
+          <TvEpisodePanel
+            tmdbTvSeriesId={90002}
+            seasonNumber={1}
+            episodeNumber={1}
+            tvSeriesImdbId="tt10000002"
+            tvSeriesName="Example TV Series"
+          />
+        </MemoryRouter>,
+      );
+      const panel = await screen.findByTestId("tv-episode-panel");
+      const names = (testId: string) =>
+        within(panel)
+          .queryAllByTestId(testId)
+          .map((c) => c.querySelector(".person-card-name")?.textContent);
+      const castFilter = within(panel).getByRole("searchbox", {
+        name: "Filter cast",
+      });
+      const guestStarFilter = within(panel).getByRole("searchbox", {
+        name: "Filter guest stars",
+      });
+      expect(
+        screen.getByText("Guest Stars").closest("details")?.lastChild
+          ?.firstChild,
+      ).toBe(guestStarFilter);
+
+      fireEvent.change(guestStarFilter, { target: { value: "VILLAIN" } });
+      expect(names("guest-star-card")).toEqual(["Example Guest"]);
+      expect(names("cast-card")).toEqual(["Example Jones", "Example Brown"]);
+
+      fireEvent.change(guestStarFilter, { target: { value: "extra" } });
+      expect(names("guest-star-card")).toEqual(["Example Extra"]);
+
+      fireEvent.change(castFilter, { target: { value: "second" } });
+      expect(names("cast-card")).toEqual(["Example Brown"]);
+      expect(names("guest-star-card")).toEqual(["Example Extra"]);
+    });
+  });
 });

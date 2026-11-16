@@ -1,8 +1,8 @@
 import { hasImdbId, imdbTitleUrl } from "../movie/movieTypes";
 import Collapsible from "../shared/Collapsible";
 import DetailFacts, { type DetailFact } from "../shared/DetailFacts";
-import HorizontalList from "../shared/HorizontalList";
 import ExternalLinkRow from "../shared/ExternalLinkRow";
+import FilterablePeopleList from "../shared/FilterablePeopleList";
 import ImdbLinkRow from "../shared/ImdbLinkRow";
 import { knownForActorsFact, peopleFact } from "../shared/linkFacts";
 import PlotSection from "../shared/PlotSection";
@@ -85,8 +85,6 @@ function TvEpisodePanel({
   const sortedGuestStars = [...tvEpisode.guestStars].sort(
     (a, b) => a.billedOrder - b.billedOrder,
   );
-  const castSelected = cards.isSelectedIn("cast");
-  const guestStarSelected = cards.isSelectedIn("guest-stars");
 
   const facts: DetailFact[] = [
     ["Air Date", displayDate(tvEpisode.airDate)],
@@ -172,30 +170,32 @@ function TvEpisodePanel({
           count={tvEpisode.cast.length}
           {...cards.sectionProps("cast")}
         >
-          <HorizontalList hasSelection={castSelected}>
-            {sortedCast.map((c) => (
-              <CastCard
-                key={c.id}
-                cast={c}
-                {...cards.cardProps("cast", "person", c.tmdbId)}
-              />
-            ))}
-          </HorizontalList>
+          <FilterablePeopleList
+            label="cast"
+            people={sortedCast}
+            charactersOf={(c) => [c.character]}
+            cardType="cast"
+            cards={cards}
+            renderCard={(c, cardProps) => (
+              <CastCard key={c.id} cast={c} {...cardProps} />
+            )}
+          />
         </Collapsible>
         <Collapsible
           title="Guest Stars"
           count={tvEpisode.guestStars.length}
           {...cards.sectionProps("guest-stars")}
         >
-          <HorizontalList hasSelection={guestStarSelected}>
-            {sortedGuestStars.map((g) => (
-              <GuestStarCard
-                key={g.id}
-                guestStar={g}
-                {...cards.cardProps("guest-stars", "person", g.tmdbId)}
-              />
-            ))}
-          </HorizontalList>
+          <FilterablePeopleList
+            label="guest stars"
+            people={sortedGuestStars}
+            charactersOf={(g) => [g.character]}
+            cardType="guest-stars"
+            cards={cards}
+            renderCard={(g, cardProps) => (
+              <GuestStarCard key={g.id} guestStar={g} {...cardProps} />
+            )}
+          />
         </Collapsible>
         <PlotSection
           title="Plot"

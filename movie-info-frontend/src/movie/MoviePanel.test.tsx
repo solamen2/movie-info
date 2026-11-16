@@ -118,7 +118,7 @@ describe("MoviePanel", () => {
       ).not.toContain("Producers");
     });
 
-    it("Should order the collapsed sections with credits first and watch providers last", async () => {
+    it("Should order the collapsed sections with the cast first, the critics consensus right under it, and watch providers last", async () => {
       await searchAndSelectExampleMovie();
       const panel = await screen.findByTestId("movie-panel");
 
@@ -127,9 +127,9 @@ describe("MoviePanel", () => {
       );
       expect(summaries).toEqual([
         "Cast",
+        "RT Critics Consensus",
         "Oscars",
         "Plot",
-        "RT Critics Consensus",
         "Where to Watch",
       ]);
     });
@@ -1501,6 +1501,84 @@ describe("MoviePanel", () => {
       );
       expect(currentUrl()).toBe(url);
       expect(screen.queryByTestId("person-panel")).not.toBeInTheDocument();
+    });
+  });
+
+  describe("When text is typed into the Cast section's filter", () => {
+    async function renderMovieAndGetFilter() {
+      render(
+        <MemoryRouter>
+          <MoviePanel itemId="tt0000001" />
+        </MemoryRouter>,
+      );
+      const panel = await screen.findByTestId("movie-panel");
+      const filter = within(panel).getByRole("searchbox", {
+        name: "Filter cast",
+      });
+      return { panel, filter };
+    }
+
+    function castNames() {
+      return screen
+        .queryAllByTestId("cast-card")
+        .map((c) => c.querySelector(".person-card-name")?.textContent);
+    }
+
+    it("Should sit just under the Cast heading, above the cards, showing everyone to begin with", async () => {
+      const { filter } = await renderMovieAndGetFilter();
+
+      const body = screen.getByText("Cast").closest("details")?.lastChild;
+      expect(body?.firstChild).toBe(filter);
+      expect(filter).toHaveValue("");
+      expect(castNames()).toEqual(["Example Jones", "Example Brown"]);
+    });
+
+    it("Should show only the cast whose actor name matches, whatever the case", async () => {
+      const { filter } = await renderMovieAndGetFilter();
+
+      fireEvent.change(filter, { target: { value: "bRoW" } });
+      expect(castNames()).toEqual(["Example Brown"]);
+
+      fireEvent.change(filter, { target: { value: "" } });
+      expect(castNames()).toEqual(["Example Jones", "Example Brown"]);
+    });
+
+    it("Should show only the cast whose character name matches", async () => {
+      const { filter } = await renderMovieAndGetFilter();
+
+      fireEvent.change(filter, { target: { value: "second" } });
+      expect(castNames()).toEqual(["Example Brown"]);
+
+      fireEvent.change(filter, { target: { value: "lead" } });
+      expect(castNames()).toEqual(["Example Jones", "Example Brown"]);
+    });
+
+    it("Should tolerate a typo in a longer word", async () => {
+      const { filter } = await renderMovieAndGetFilter();
+
+      fireEvent.change(filter, { target: { value: "exmaple jonse" } });
+      expect(castNames()).toEqual(["Example Jones"]);
+    });
+
+    it("Should say so when nobody matches", async () => {
+      const { panel, filter } = await renderMovieAndGetFilter();
+
+      fireEvent.change(filter, { target: { value: "zzzz" } });
+      expect(castNames()).toEqual([]);
+      expect(within(panel).getByText("No matches")).toBeInTheDocument();
+    });
+
+    it("Should still show a filtered out card that is opened from the Known For links", async () => {
+      const { panel, filter } = await renderMovieAndGetFilter();
+
+      fireEvent.change(filter, { target: { value: "brown" } });
+      const knownFor = within(panel).getByText("Known For").closest("div");
+      if (!knownFor) throw new Error("Known For fact not found");
+      fireEvent.click(
+        within(knownFor).getByRole("link", { name: "Example Jones" }),
+      );
+
+      expect(castNames()).toEqual(["Example Jones", "Example Brown"]);
     });
   });
 });

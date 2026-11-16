@@ -758,4 +758,180 @@ describe("PersonPanel", () => {
       expect(screen.queryByTestId("movie-panel")).not.toBeInTheDocument();
     });
   });
+
+  describe("When a crew credits section's filter buttons are used", () => {
+    async function renderPersonWithCrewCredits() {
+      const [movieCredit] = personDataJson1.movieCrewCredits;
+      const movieCrew = (
+        tmdbId: number,
+        title: string,
+        department: string,
+        job: string,
+      ) => ({
+        ...movieCredit,
+        id: `mw${String(tmdbId)}`,
+        tmdbId,
+        title,
+        originalTitle: title,
+        department,
+        job,
+      });
+      const tvSeriesCrew = (
+        tmdbId: number,
+        name: string,
+        department: string,
+        job: string,
+      ) => ({
+        id: `tw${String(tmdbId)}`,
+        backdropPath: null,
+        tmdbId,
+        originalName: name,
+        popularity: 1,
+        posterPath: null,
+        firstAirDate: "2001-01-01",
+        name,
+        department,
+        episodeCount: 1,
+        firstCreditAirDate: null,
+        job,
+      });
+      server.use(
+        http.get("/api/person", () =>
+          HttpResponse.json({
+            ...personDataJson1,
+            movieCrewCredits: [
+              movieCredit,
+              movieCrew(82002, "Directed Film", "Directing", "Director"),
+              movieCrew(
+                82003,
+                "Assisted Film",
+                "Directing",
+                "Assistant Director",
+              ),
+              movieCrew(82004, "Written Film", "Writing", "Screenplay"),
+              movieCrew(82005, "Novel Film", "Writing", "Novel"),
+            ],
+            tvSeriesCrewCredits: [
+              tvSeriesCrew(83101, "Directed Show", "Directing", "Director"),
+              tvSeriesCrew(83102, "Written Show", "Writing", "Writer"),
+              tvSeriesCrew(83103, "Created Show", "Creator", "Creator"),
+              tvSeriesCrew(83104, "Produced Show", "Production", "Producer"),
+            ],
+          }),
+        ),
+      );
+      render(
+        <MemoryRouter>
+          <PersonPanel itemId="nm9000000" />
+        </MemoryRouter>,
+      );
+      return await screen.findByTestId("person-panel");
+    }
+
+    function cardTitles(testId: string) {
+      return screen
+        .queryAllByTestId(testId)
+        .map((c) => c.querySelector(".credit-card-name")?.textContent)
+        .sort();
+    }
+
+    function filterGroup(sectionTitle: string) {
+      const body = screen.getByText(sectionTitle).closest("details")?.lastChild;
+      const group = body?.firstChild as HTMLElement;
+      expect(group).toHaveAttribute("role", "group");
+      return within(group);
+    }
+
+    it("Should offer No filter, Director and Writer just under Movie Crew Credits, each role with its number of credits, with No filter chosen", async () => {
+      await renderPersonWithCrewCredits();
+      const group = filterGroup("Movie Crew Credits");
+
+      expect(
+        group.getAllByRole("button").map((b) => [b.textContent, b.ariaPressed]),
+      ).toEqual([
+        ["No filter", "true"],
+        ["Director (1)", "false"],
+        ["Writer (2)", "false"],
+      ]);
+      expect(cardTitles("movie-crew-card")).toHaveLength(5);
+    });
+
+    it("Should show only the movies directed, or only those written, one filter at a time", async () => {
+      await renderPersonWithCrewCredits();
+      const group = filterGroup("Movie Crew Credits");
+
+      fireEvent.click(
+        group.getByRole("button", { name: /^Director \(\d+\)$/ }),
+      );
+      expect(cardTitles("movie-crew-card")).toEqual(["Directed Film"]);
+      expect(
+        group.getByRole("button", { name: /^Director \(\d+\)$/ }),
+      ).toHaveAttribute("aria-pressed", "true");
+      expect(group.getByRole("button", { name: "No filter" })).toHaveAttribute(
+        "aria-pressed",
+        "false",
+      );
+
+      fireEvent.click(group.getByRole("button", { name: /^Writer \(\d+\)$/ }));
+      expect(cardTitles("movie-crew-card")).toEqual([
+        "Novel Film",
+        "Written Film",
+      ]);
+      expect(
+        group.getByRole("button", { name: /^Director \(\d+\)$/ }),
+      ).toHaveAttribute("aria-pressed", "false");
+      // The TV series section has its own filter
+      expect(cardTitles("tv-series-crew-card")).toHaveLength(4);
+
+      fireEvent.click(group.getByRole("button", { name: "No filter" }));
+      expect(cardTitles("movie-crew-card")).toHaveLength(5);
+    });
+
+    it("Should offer Creator as well under TV Series Crew Credits, and filter by each", async () => {
+      await renderPersonWithCrewCredits();
+      const group = filterGroup("TV Series Crew Credits");
+
+      expect(group.getAllByRole("button").map((b) => b.textContent)).toEqual([
+        "No filter",
+        "Director (1)",
+        "Writer (1)",
+        "Creator (1)",
+      ]);
+
+      fireEvent.click(group.getByRole("button", { name: /^Creator \(\d+\)$/ }));
+      expect(cardTitles("tv-series-crew-card")).toEqual(["Created Show"]);
+      fireEvent.click(
+        group.getByRole("button", { name: /^Director \(\d+\)$/ }),
+      );
+      expect(cardTitles("tv-series-crew-card")).toEqual(["Directed Show"]);
+      fireEvent.click(group.getByRole("button", { name: /^Writer \(\d+\)$/ }));
+      expect(cardTitles("tv-series-crew-card")).toEqual(["Written Show"]);
+      expect(cardTitles("movie-crew-card")).toHaveLength(5);
+    });
+
+    it("Should say None when no credit passes the filter", async () => {
+      render(
+        <MemoryRouter>
+          <PersonPanel itemId="nm9000000" />
+        </MemoryRouter>,
+      );
+      await screen.findByTestId("person-panel");
+      const section = screen.getByText("Movie Crew Credits").closest("details");
+      if (!section) throw new Error("Movie Crew Credits section not found");
+      expect(cardTitles("movie-crew-card")).toEqual(["Example Produced Film"]);
+
+      fireEvent.click(
+        filterGroup("Movie Crew Credits").getByRole("button", {
+          name: /^Director \(\d+\)$/,
+        }),
+      );
+      expect(cardTitles("movie-crew-card")).toEqual([]);
+      expect(within(section).getByText("None")).toBeInTheDocument();
+      expect(
+        filterGroup("Movie Crew Credits")
+          .getAllByRole("button")
+          .map((b) => b.textContent),
+      ).toEqual(["No filter", "Director (0)", "Writer (0)"]);
+    });
+  });
 });
