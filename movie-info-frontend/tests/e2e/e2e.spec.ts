@@ -145,12 +145,12 @@ const expectedMovie = useMockHttpCalls
       ],
       sections: [
         ["Cast", "Example Jones"],
+        ["RT Critics Consensus", "An example critics consensus."],
         [
           "Oscars",
           "Best Picture: Example Producer and Example Smith, Producers",
         ],
         ["Plot", "An example plot from TMDB."],
-        ["RT Critics Consensus", "An example critics consensus."],
         ["Where to Watch", "Example Stream"],
       ] as ExpectedSection[],
       omdbPlot: "An example plot from OMDB." as string | RegExp,
@@ -189,11 +189,11 @@ const expectedMovie = useMockHttpCalls
       ],
       sections: [
         ["Cast", "Tim Robbins"],
+        // Quoted on the movie's Wikipedia page, which anyone can edit
+        ["RT Critics Consensus", ""],
         // Seven nominations, no wins
         ["Oscars", /^\s*Nominations[\s\S]*Best Actor: Morgan Freeman as Red/],
         ["Plot", "Shawshank"],
-        // Quoted on the movie's Wikipedia page, which anyone can edit
-        ["RT Critics Consensus", ""],
         ["Where to Watch", ""],
       ] as ExpectedSection[],
       // OMDB's plot text changes over time, so only check that there is one

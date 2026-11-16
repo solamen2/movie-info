@@ -316,6 +316,31 @@
   color: #646cff;
 }
 
+/* The free-text box that filters a section's row of cards as the user types
+   (see FilterablePeopleList). 16px keeps iOS from zooming in on focus. */
+.list-filter {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 20rem;
+  margin: 0 0 0.6rem;
+  padding: 0.3em 0.6em;
+  font: inherit;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: inherit;
+  color: inherit;
+}
+
+/* While a card in the section's row is selected, the section's filter and
+   option buttons get out of the way along with its heading (see
+   .has-child-selection below). */
+.collapsible.has-child-selection > .collapsible-body > .list-filter,
+.collapsible.has-child-selection > .collapsible-body > .option-toggle {
+  display: none;
+}
+
 .detail-empty {
   margin: 0;
   font-size: 0.85rem;

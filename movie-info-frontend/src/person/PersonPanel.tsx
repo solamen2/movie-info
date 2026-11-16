@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { TmdbGender } from "../shared/sharedTypes";
 import Collapsible from "../shared/Collapsible";
 import DetailFacts, { type DetailFact } from "../shared/DetailFacts";
@@ -5,8 +6,9 @@ import HorizontalList from "../shared/HorizontalList";
 import ExternalLinkRow from "../shared/ExternalLinkRow";
 import ImdbLinkRow from "../shared/ImdbLinkRow";
 import { knownForCreditFact } from "../shared/linkFacts";
+import OptionToggle from "../shared/OptionToggle";
 import { useDetailData } from "../shared/useDetailData";
-import { usePanelCards } from "../shared/usePanelCards";
+import { type PanelCardProps, usePanelCards } from "../shared/usePanelCards";
 import {
   detailIdQuery,
   displayAge,
@@ -20,6 +22,13 @@ import PersonOscars from "./PersonOscars";
 import ProfileImagesList from "./ProfileImagesList";
 import TvSeriesCastCard from "./TvSeriesCastCard";
 import TvSeriesCrewCard from "./TvSeriesCrewCard";
+import {
+  crewFilterLabel,
+  matchesCrewFilter,
+  MOVIE_CREW_FILTERS,
+  NO_CREW_FILTER,
+  TV_SERIES_CREW_FILTERS,
+} from "./crewFilters";
 import { imdbNameUrl, sortByDateDescending } from "./personTypes";
 import "../shared/shared.css";
 import "./person.css";
@@ -31,13 +40,31 @@ const GENDER_LABELS: Record<TmdbGender, string> = {
   NonBinary: "Non-binary",
 };
 
+// Whether a crew credit's card is shown under the section's filter. The URL's
+// own card is shown whatever the filter says, so a card opened from elsewhere
+// in the panel (see DetailLink) is always there to be flown and highlighted.
+function isShown(
+  filter: string,
+  credit: { department: string; job: string },
+  cardProps: PanelCardProps,
+): boolean {
+  return (
+    cardProps.selected ||
+    cardProps.deselecting ||
+    cardProps.highlighted ||
+    matchesCrewFilter(filter, credit)
+  );
+}
+
 interface PersonPanelProps {
   // The person's IMDB or TMDB id (see isTmdbId)
   itemId: string;
 }
 
 // Shows a person. Their movie and TV series credit cards open the movie's /
-// TV series' own panel in place of this one (see usePanelCards).
+// TV series' own panel in place of this one (see usePanelCards). Each crew
+// credits section can be narrowed down to one role (see crewFilters); the
+// choice lasts as long as the panel stays mounted and is not part of the URL.
 function PersonPanel({ itemId }: PersonPanelProps) {
   const { data: person, error } = useDetailData(
     `/api/person?${detailIdQuery(itemId)}`,
@@ -51,6 +78,8 @@ function PersonPanel({ itemId }: PersonPanelProps) {
       "tv-series-crew-credits": person?.tvSeriesCrewCredits,
     },
   });
+  const [movieCrewFilter, setMovieCrewFilter] = useState(NO_CREW_FILTER);
+  const [tvSeriesCrewFilter, setTvSeriesCrewFilter] = useState(NO_CREW_FILTER);
 
   if (error) {
     return (
@@ -216,14 +245,24 @@ function PersonPanel({ itemId }: PersonPanelProps) {
           count={movieCrewCredits.length}
           {...cards.sectionProps("movie-crew-credits")}
         >
+          <OptionToggle
+            label="movie crew credits filter"
+            options={MOVIE_CREW_FILTERS}
+            labelOf={(filter) => crewFilterLabel(filter, movieCrewCredits)}
+            selected={movieCrewFilter}
+            onSelect={setMovieCrewFilter}
+          />
           <HorizontalList hasSelection={movieCrewSelected}>
-            {movieCrewCredits.map((c) => (
-              <MovieCrewCard
-                key={c.id}
-                credit={c}
-                {...cards.cardProps("movie-crew-credits", "movie", c.tmdbId)}
-              />
-            ))}
+            {movieCrewCredits.flatMap((c) => {
+              const cardProps = cards.cardProps(
+                "movie-crew-credits",
+                "movie",
+                c.tmdbId,
+              );
+              return isShown(movieCrewFilter, c, cardProps)
+                ? [<MovieCrewCard key={c.id} credit={c} {...cardProps} />]
+                : [];
+            })}
           </HorizontalList>
         </Collapsible>
         <Collapsible
@@ -250,18 +289,24 @@ function PersonPanel({ itemId }: PersonPanelProps) {
           count={tvSeriesCrewCredits.length}
           {...cards.sectionProps("tv-series-crew-credits")}
         >
+          <OptionToggle
+            label="TV series crew credits filter"
+            options={TV_SERIES_CREW_FILTERS}
+            labelOf={(filter) => crewFilterLabel(filter, tvSeriesCrewCredits)}
+            selected={tvSeriesCrewFilter}
+            onSelect={setTvSeriesCrewFilter}
+          />
           <HorizontalList hasSelection={tvSeriesCrewSelected}>
-            {tvSeriesCrewCredits.map((c) => (
-              <TvSeriesCrewCard
-                key={c.id}
-                credit={c}
-                {...cards.cardProps(
-                  "tv-series-crew-credits",
-                  "tvseries",
-                  c.tmdbId,
-                )}
-              />
-            ))}
+            {tvSeriesCrewCredits.flatMap((c) => {
+              const cardProps = cards.cardProps(
+                "tv-series-crew-credits",
+                "tvseries",
+                c.tmdbId,
+              );
+              return isShown(tvSeriesCrewFilter, c, cardProps)
+                ? [<TvSeriesCrewCard key={c.id} credit={c} {...cardProps} />]
+                : [];
+            })}
           </HorizontalList>
         </Collapsible>
         <Collapsible title="Profile Images" count={person.profileImages.length}>
