@@ -1,0 +1,31 @@
+meta {
+  name: Query (Page Text, Movie)
+  type: http
+  seq: 6
+}
+
+get {
+  url: https://en.wikipedia.org/w/api.php?titles=The Shawshank Redemption (1994 film)&action=query&prop=extracts&explaintext=1&exsectionformat=wiki&redirects=1&format=json&formatversion=2
+  body: none
+  auth: inherit
+}
+
+params:query {
+  titles: The Shawshank Redemption (1994 film)
+  action: query
+  prop: extracts
+  explaintext: 1
+  exsectionformat: wiki
+  redirects: 1
+  format: json
+  formatversion: 2
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  The whole text of a page as plain text, with its section headings written as in wikitext ("== Plot =="). A movie's plot and its Rotten Tomatoes critics consensus are read out of this text.
+}

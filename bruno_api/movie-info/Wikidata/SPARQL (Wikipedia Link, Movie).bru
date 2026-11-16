@@ -1,0 +1,30 @@
+meta {
+  name: SPARQL (Wikipedia Link, Movie)
+  type: http
+  seq: 3
+}
+
+get {
+  url: https://query.wikidata.org/sparql?format=json&query=SELECT ?article WHERE { ?item wdt:P345 "tt0211915" . ?article schema:about ?item ; schema:isPartOf <https://en.wikipedia.org/> . }
+  body: none
+  auth: inherit
+}
+
+params:query {
+  format: json
+  query: SELECT ?article WHERE { ?item wdt:P345 "tt0211915" . ?article schema:about ?item ; schema:isPartOf <https://en.wikipedia.org/> . }
+}
+
+headers {
+  Accept: application/sparql-results+json
+  User-Agent: movie-info/1.0 (https://movieinfo.dev/)
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  The English Wikipedia article about the movie with the given IMDB ID (property P345). No bindings come back when Wikidata has no item with that IMDB ID, or the item has no English Wikipedia article.
+}

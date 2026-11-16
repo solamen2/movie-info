@@ -293,6 +293,11 @@
   line-height: 1.5;
 }
 
+/* The paragraphs of a longer text (a Wikipedia plot) */
+.detail-prose + .detail-prose {
+  margin-top: 0.6rem;
+}
+
 /* The buttons that switch a section between several things to show (see
    OptionToggle); the one shown is marked. */
 .option-toggle {

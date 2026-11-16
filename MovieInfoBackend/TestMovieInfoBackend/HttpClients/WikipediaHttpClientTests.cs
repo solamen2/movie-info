@@ -14,6 +14,8 @@ public class WikipediaHttpClientTests
     private string tvSeriesResponse;
     private string emptyResponse;
     private string malformedResponse;
+    private string movieExtractResponse;
+    private string missingPageExtractResponse;
 
     public WikipediaHttpClientTests(ITestOutputHelper output)
     {
@@ -25,6 +27,8 @@ public class WikipediaHttpClientTests
         tvSeriesResponse = ReadTestData("WikipediaHttpClientTvSeriesResponse.json");
         emptyResponse = ReadTestData("WikipediaHttpClientEmptyResponse.json");
         malformedResponse = ReadTestData("WikipediaHttpClientMalformedResponse.json");
+        movieExtractResponse = ReadTestData("WikipediaHttpClientMovieExtractResponse.json");
+        missingPageExtractResponse = ReadTestData("WikipediaHttpClientMissingPageExtractResponse.json");
     }
 
     private static string ReadTestData(string filename)
@@ -375,5 +379,151 @@ public class WikipediaHttpClientTests
         Assert.NotNull(requestUri);
         Assert.Equal($"https://en.wikipedia.org/w/api.php?action=opensearch&search={expectedEncodedSearch}&limit=1&namespace=0&format=json",
                      requestUri.AbsoluteUri);
+    }
+
+    [Fact]
+    public async Task GetPageText_PageFound_ReturnsItsPlainText()
+    {
+        // Arrange
+        Uri? requestUri = null;
+        WikipediaHttpClient wikipediaHttpClient = GetWikipediaHttpClient(HttpStatusCode.OK, movieExtractResponse, uri => requestUri = uri);
+
+        // Act
+        string? pageText = await wikipediaHttpClient.GetPageText("Heat (1995 film)");
+
+        // Assert
+        Assert.NotNull(pageText);
+        Assert.StartsWith("Heat is a 1995 American epic crime drama film", pageText);
+        Assert.Contains("\n== Plot ==\nNeil McCauley, a Los Angeles professional thief,", pageText);
+        Assert.Contains("\n== Reception ==\nOn Rotten Tomatoes, Heat holds an approval rating of", pageText);
+        Assert.NotNull(requestUri);
+        Assert.Equal("https://en.wikipedia.org/w/api.php?action=query&prop=extracts&explaintext=1&exsectionformat=wiki&redirects=1&titles=Heat%20%281995%20film%29&format=json&formatversion=2",
+                     requestUri.AbsoluteUri);
+    }
+
+    [Fact]
+    public async Task GetPageText_NoSuchPage_ReturnsEmptyString()
+    {
+        // Arrange
+        WikipediaHttpClient wikipediaHttpClient = GetWikipediaHttpClient(HttpStatusCode.OK, missingPageExtractResponse);
+
+        // Act
+        string? pageText = await wikipediaHttpClient.GetPageText("No Such Movie Page Xyzzy (1995 film)");
+
+        // Assert
+        Assert.Equal("", pageText);
+    }
+
+    [Theory]
+    [InlineData("What/If? & more #1", "What%2FIf%3F%20%26%20more%20%231")]
+    [InlineData("Amélie", "Am%C3%A9lie")]
+    public async Task GetPageText_SpecialCharactersInTitle_PercentEncodesTheTitle(string title, string expectedEncodedTitle)
+    {
+        // Arrange
+        Uri? requestUri = null;
+        WikipediaHttpClient wikipediaHttpClient = GetWikipediaHttpClient(HttpStatusCode.OK, missingPageExtractResponse, uri => requestUri = uri);
+
+        // Act
+        await wikipediaHttpClient.GetPageText(title);
+
+        // Assert
+        Assert.NotNull(requestUri);
+        Assert.Contains($"&titles={expectedEncodedTitle}&", requestUri.AbsoluteUri);
+    }
+
+    [Theory]
+    [InlineData(HttpStatusCode.BadRequest, "Invalid response")]
+    [InlineData(HttpStatusCode.InternalServerError, "Internal Server Error")]
+    [InlineData(HttpStatusCode.TooManyRequests, "Rate limited")]
+    public async Task GetPageText_HttpClientErrors_ReturnNull(HttpStatusCode statusCode, string content)
+    {
+        // Arrange
+        WikipediaHttpClient wikipediaHttpClient = GetWikipediaHttpClient(statusCode, content);
+
+        // Act
+        string? pageText = await wikipediaHttpClient.GetPageText("Heat (1995 film)");
+
+        // Assert
+        Assert.Null(pageText);
+    }
+
+    [Theory]
+    [InlineData("null")]
+    [InlineData("{}")]
+    [InlineData("{\"batchcomplete\":true}")]
+    [InlineData("{\"query\":{}}")]
+    [InlineData("{\"query\":{\"pages\":[]}}")]
+    // An invalid title is neither a page with text nor a missing page
+    [InlineData("{\"query\":{\"pages\":[{\"title\":\"[\",\"invalidreason\":\"The requested page title contains invalid characters.\",\"invalid\":true}]}}")]
+    public async Task GetPageText_ResponseWithoutAPage_ReturnsNull(string responseWithoutAPage)
+    {
+        // Arrange
+        WikipediaHttpClient wikipediaHttpClient = GetWikipediaHttpClient(HttpStatusCode.OK, responseWithoutAPage);
+
+        // Act
+        string? pageText = await wikipediaHttpClient.GetPageText("Heat (1995 film)");
+
+        // Assert
+        Assert.Null(pageText);
+    }
+
+    [Fact]
+    public async Task GetPageText_UnexpectedJsonObject_ReturnsNull()
+    {
+        // Arrange (an object, but not the query API's)
+        WikipediaHttpClient wikipediaHttpClient = GetWikipediaHttpClient(HttpStatusCode.OK, malformedResponse);
+
+        // Act
+        string? pageText = await wikipediaHttpClient.GetPageText("Heat (1995 film)");
+
+        // Assert
+        Assert.Null(pageText);
+    }
+
+    [Theory]
+    [InlineData("invalid json")]
+    [InlineData("[\"an array\"]")]
+    [InlineData("")]
+    public async Task GetPageText_InvalidJson_ThrowsJsonException(string invalidJson)
+    {
+        // Arrange
+        WikipediaHttpClient wikipediaHttpClient = GetWikipediaHttpClient(HttpStatusCode.OK, invalidJson);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<System.Text.Json.JsonException>(() => wikipediaHttpClient.GetPageText("Heat (1995 film)"));
+    }
+
+    [Fact]
+    public async Task GetPageText_HttpClientTimeout_ThrowsException()
+    {
+        // Arrange
+        Mock<HttpMessageHandler> httpMessageHandlerMock = new Mock<HttpMessageHandler>();
+        httpMessageHandlerMock
+            .Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>())
+            .ThrowsAsync(new TaskCanceledException("Request timed out"));
+
+        HttpClient httpClient = new HttpClient(httpMessageHandlerMock.Object);
+        WikipediaHttpClient wikipediaHttpClient = new WikipediaHttpClient(httpClient);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<TaskCanceledException>(() => wikipediaHttpClient.GetPageText("Heat (1995 film)"));
+    }
+
+    [Fact]
+    public void ExtractDataModels_ToString_SummarizeTheExtract()
+    {
+        // Act
+        WikipediaExtractResponseDataModel? model = WikipediaHttpClient.GetExtractModelFromResponse(missingPageExtractResponse);
+        WikipediaExtractResponseDataModel? movieModel = WikipediaHttpClient.GetExtractModelFromResponse("{\"query\":{\"pages\":[{\"title\":\"Example Movie\",\"extract\":\"Twelve chars\"}]}}");
+
+        // Assert
+        Assert.NotNull(model);
+        Assert.Equal("Query:\n*****\nPages:\n*****\nTitle: No Such Movie Page Xyzzy (1995 film)\nMissing: True\nExtract: \n*****\n*****", model.ToString());
+        Assert.NotNull(movieModel);
+        Assert.Equal("Query:\n*****\nPages:\n*****\nTitle: Example Movie\nMissing: False\nExtract: 12 characters\n*****\n*****", movieModel.ToString());
     }
 }
