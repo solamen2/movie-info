@@ -55,6 +55,14 @@ export interface Movie {
   homepage: string | null;
   // "" when Wikipedia has no page for the movie, null when the lookup failed
   wikipediaLink: string | null;
+  // The Plot section of the movie's English Wikipedia page, its paragraphs
+  // separated by newlines: "" when there is no page or no such section, null
+  // when the lookup failed
+  wikipediaPlot: string | null;
+  // Rotten Tomatoes' critics consensus, as quoted on the movie's English
+  // Wikipedia page: "" when there is no page or it quotes none, null when the
+  // lookup failed
+  rtCriticsConsensus: string | null;
   // The movie's Academy Award wins and nominations; null when the Oscars
   // data could not be loaded
   // Empty when the movie has none; null only when the Oscars data could not

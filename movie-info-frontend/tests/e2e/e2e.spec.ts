@@ -150,9 +150,11 @@ const expectedMovie = useMockHttpCalls
           "Best Picture: Example Producer and Example Smith, Producers",
         ],
         ["Plot", "An example plot from TMDB."],
+        ["RT Critics Consensus", "An example critics consensus."],
         ["Where to Watch", "Example Stream"],
       ] as ExpectedSection[],
       omdbPlot: "An example plot from OMDB." as string | RegExp,
+      wikipediaPlot: "An example plot from Wikipedia." as string | RegExp,
     }
   : {
       searchText: "The Shawshank Redemption",
@@ -167,8 +169,8 @@ const expectedMovie = useMockHttpCalls
       tagline: "Fear can hold you prisoner. Hope can set you free.",
       imdbRow: /IMDB: \d\.\d \([\d,]+\)Link\s*Copy\s*Rank: \d+/,
       imdbUrl: "https://www.imdb.com/title/tt0111161",
-      wikipediaUrl:
-        "https://en.wikipedia.org/wiki/The_Shawshank_Redemption_(1994_film)",
+      // The page Wikidata names for the movie's IMDB ID
+      wikipediaUrl: "https://en.wikipedia.org/wiki/The_Shawshank_Redemption",
       facts: [
         "Original TitleThe Shawshank Redemption",
         "Release DateSep 23, 1994",
@@ -190,10 +192,14 @@ const expectedMovie = useMockHttpCalls
         // Seven nominations, no wins
         ["Oscars", /^\s*Nominations[\s\S]*Best Actor: Morgan Freeman as Red/],
         ["Plot", "Shawshank"],
+        // Quoted on the movie's Wikipedia page, which anyone can edit
+        ["RT Critics Consensus", ""],
         ["Where to Watch", ""],
       ] as ExpectedSection[],
       // OMDB's plot text changes over time, so only check that there is one
       omdbPlot: /\w/ as string | RegExp,
+      // Wikipedia's does too, but it will always name the main character
+      wikipediaPlot: /Andy Dufresne/ as string | RegExp,
     };
 
 test("Basic happy path: search, check results are valid, select a movie search card, check the movie panel is valid, and unselect the card", async ({
@@ -284,6 +290,16 @@ test("Basic happy path: search, check results are valid, select a movie search c
   ).toHaveAttribute("aria-pressed", "true");
   await expect(plotSection.locator(".detail-prose")).toHaveText(
     expectedMovie.omdbPlot,
+  );
+
+  console.log("Switching the plot to Wikipedia's...");
+  await plotSection.getByRole("button", { name: "Wikipedia" }).click();
+  await expect(
+    plotSection.getByRole("button", { name: "Wikipedia" }),
+  ).toHaveAttribute("aria-pressed", "true");
+  // Wikipedia's plot runs to several paragraphs
+  await expect(plotSection.locator(".detail-prose").first()).toContainText(
+    expectedMovie.wikipediaPlot,
   );
 
   console.log("Unselecting the movie search card...");

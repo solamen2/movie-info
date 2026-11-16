@@ -27,6 +27,7 @@ import CastCard from "./CastCard";
 import InflationAdjustedMoney from "./InflationAdjustedMoney";
 import { parseYearMonth } from "./inflationUtils";
 import MovieOscars from "./MovieOscars";
+import RtCriticsConsensus from "./RtCriticsConsensus";
 import { imdbTitleUrl } from "./movieTypes";
 import "../shared/shared.css";
 
@@ -185,8 +186,17 @@ function MoviePanel({ itemId }: MoviePanelProps) {
           sources={[
             { name: "TMDB", text: movie.tmdbPlot },
             { name: "OMDB", text: movie.omdbPlot },
+            {
+              name: "Wikipedia",
+              text: movie.wikipediaPlot,
+              error:
+                movie.wikipediaPlot === null
+                  ? "Wikipedia plot data from Wikipedia not available"
+                  : undefined,
+            },
           ]}
         />
+        <RtCriticsConsensus consensus={movie.rtCriticsConsensus} />
         <WatchProviderSection
           flatrate={movie.watchProvidersFlatrate}
           rent={movie.watchProvidersRent}

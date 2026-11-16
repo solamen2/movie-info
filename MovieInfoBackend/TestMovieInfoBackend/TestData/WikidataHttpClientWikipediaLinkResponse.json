@@ -1,0 +1,13 @@
+{
+  "head" : {
+    "vars" : [ "article" ]
+  },
+  "results" : {
+    "bindings" : [ {
+      "article" : {
+        "type" : "uri",
+        "value" : "https://en.wikipedia.org/wiki/Am%C3%A9lie"
+      }
+    } ]
+  }
+}

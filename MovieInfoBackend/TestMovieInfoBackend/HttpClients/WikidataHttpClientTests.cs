@@ -12,6 +12,7 @@ public class WikidataHttpClientTests
     private string tvSeriesResponse;
     private string emptyResponse;
     private string malformedResponse;
+    private string wikipediaLinkResponse;
 
     public WikidataHttpClientTests(ITestOutputHelper output)
     {
@@ -21,6 +22,7 @@ public class WikidataHttpClientTests
         tvSeriesResponse = ReadTestData("WikidataHttpClientTvSeriesResponse.json");
         emptyResponse = ReadTestData("WikidataHttpClientEmptyResponse.json");
         malformedResponse = ReadTestData("WikidataHttpClientMalformedResponse.json");
+        wikipediaLinkResponse = ReadTestData("WikidataHttpClientWikipediaLinkResponse.json");
     }
 
     private static string ReadTestData(string filename)
@@ -197,5 +199,132 @@ public class WikidataHttpClientTests
 
         // Act & Assert
         await Assert.ThrowsAsync<System.Text.Json.JsonException>(() => wikidataHttpClient.GetAspectRatios("tt15398776"));
+    }
+
+    [Fact]
+    public async Task GetEnglishWikipediaLink_Found_ReturnsTheArticleLinkAndQueriesByImdbId()
+    {
+        // Arrange
+        List<Uri?> requestUris = new List<Uri?>();
+        WikidataHttpClient wikidataHttpClient = GetWikidataHttpClient(HttpStatusCode.OK, wikipediaLinkResponse, requestUris);
+
+        // Act
+        string? link = await wikidataHttpClient.GetEnglishWikipediaLink("tt0211915");
+
+        // Assert
+        Assert.Equal("https://en.wikipedia.org/wiki/Am%C3%A9lie", link);
+        Assert.Single(requestUris);
+        Assert.NotNull(requestUris[0]);
+        Assert.Equal("https://query.wikidata.org/sparql", requestUris[0]!.GetLeftPart(UriPartial.Path));
+        string query = Uri.UnescapeDataString(requestUris[0]!.Query);
+        Assert.Equal("?format=json&query=SELECT ?article WHERE { ?item wdt:P345 \"tt0211915\" . ?article schema:about ?item ; schema:isPartOf <https://en.wikipedia.org/> . }", query);
+    }
+
+    [Fact]
+    public async Task GetEnglishWikipediaLink_NothingInWikidata_ReturnsEmptyString()
+    {
+        // Arrange (no item with that IMDB ID, or an item without an English Wikipedia article: no rows either way)
+        WikidataHttpClient wikidataHttpClient = GetWikidataHttpClient(HttpStatusCode.OK, emptyResponse);
+
+        // Act
+        string? link = await wikidataHttpClient.GetEnglishWikipediaLink("tt0468569");
+
+        // Assert
+        Assert.Equal("", link);
+    }
+
+    [Theory]
+    [InlineData(HttpStatusCode.InternalServerError)]
+    [InlineData(HttpStatusCode.TooManyRequests)]
+    [InlineData(HttpStatusCode.NotFound)]
+    public async Task GetEnglishWikipediaLink_HttpError_ReturnsNull(HttpStatusCode statusCode)
+    {
+        // Arrange
+        WikidataHttpClient wikidataHttpClient = GetWikidataHttpClient(statusCode, "error");
+
+        // Act
+        string? link = await wikidataHttpClient.GetEnglishWikipediaLink("tt0211915");
+
+        // Assert
+        Assert.Null(link);
+    }
+
+    // The ID is put into the query text, so anything that isn't an IMDB title ID must never be sent
+    [Theory]
+    [InlineData("")]
+    [InlineData("nm0000001")]
+    [InlineData("tt")]
+    [InlineData("tt123\" ; wdt:P31 ?x . #")]
+    [InlineData("tt123 ")]
+    [InlineData("tt123\n")]
+    public async Task GetEnglishWikipediaLink_NotAnImdbTitleId_ReturnsNullWithoutARequest(string imdbId)
+    {
+        // Arrange
+        List<Uri?> requestUris = new List<Uri?>();
+        WikidataHttpClient wikidataHttpClient = GetWikidataHttpClient(HttpStatusCode.OK, wikipediaLinkResponse, requestUris);
+
+        // Act
+        string? link = await wikidataHttpClient.GetEnglishWikipediaLink(imdbId);
+
+        // Assert
+        Assert.Null(link);
+        Assert.Empty(requestUris);
+    }
+
+    [Theory]
+    [InlineData("invalid json")]
+    [InlineData("")]
+    public async Task GetEnglishWikipediaLink_InvalidJson_ThrowsJsonException(string invalidJson)
+    {
+        // Arrange
+        WikidataHttpClient wikidataHttpClient = GetWikidataHttpClient(HttpStatusCode.OK, invalidJson);
+
+        // Act & Assert
+        await Assert.ThrowsAnyAsync<System.Text.Json.JsonException>(() => wikidataHttpClient.GetEnglishWikipediaLink("tt0211915"));
+    }
+
+    [Theory]
+    [InlineData("null")]
+    [InlineData("[]")]
+    [InlineData("{}")]
+    [InlineData("{\"results\":[]}")]
+    [InlineData("{\"results\":{}}")]
+    [InlineData("{\"results\":{\"bindings\":{}}}")]
+    public void GetEnglishWikipediaLinkFromResponse_NotSparqlResults_ReturnsNull(string response)
+    {
+        Assert.Null(WikidataHttpClient.GetEnglishWikipediaLinkFromResponse(response));
+    }
+
+    [Fact]
+    public void GetEnglishWikipediaLinkFromResponse_MalformedResponse_ReturnsNull()
+    {
+        Assert.Null(WikidataHttpClient.GetEnglishWikipediaLinkFromResponse(malformedResponse));
+    }
+
+    [Theory]
+    // Rows without a usable article
+    [InlineData("{\"results\":{\"bindings\":[{}]}}")]
+    [InlineData("{\"results\":{\"bindings\":[\"text\"]}}")]
+    [InlineData("{\"results\":{\"bindings\":[{\"article\":\"text\"}]}}")]
+    [InlineData("{\"results\":{\"bindings\":[{\"article\":{\"type\":\"uri\"}}]}}")]
+    [InlineData("{\"results\":{\"bindings\":[{\"article\":{\"type\":\"uri\",\"value\":7}}]}}")]
+    // Only ever a page of English Wikipedia
+    [InlineData("{\"results\":{\"bindings\":[{\"article\":{\"type\":\"uri\",\"value\":\"https://fr.wikipedia.org/wiki/Le_Fabuleux_Destin_d%27Am%C3%A9lie_Poulain\"}}]}}")]
+    [InlineData("{\"results\":{\"bindings\":[{\"article\":{\"type\":\"uri\",\"value\":\"https://en.wikipedia.org.example.com/wiki/Am%C3%A9lie\"}}]}}")]
+    [InlineData("{\"results\":{\"bindings\":[{\"article\":{\"type\":\"uri\",\"value\":\"http://en.wikipedia.org/wiki/Am%C3%A9lie\"}}]}}")]
+    [InlineData("{\"results\":{\"bindings\":[{\"article\":{\"type\":\"uri\",\"value\":\"https://en.wikipedia.org/\"}}]}}")]
+    public void GetEnglishWikipediaLinkFromResponse_NoEnglishWikipediaArticle_ReturnsEmptyString(string response)
+    {
+        Assert.Equal("", WikidataHttpClient.GetEnglishWikipediaLinkFromResponse(response));
+    }
+
+    [Fact]
+    public void GetEnglishWikipediaLinkFromResponse_SeveralRows_ReturnsTheFirstEnglishWikipediaArticle()
+    {
+        // Arrange (as when Wikidata has two items with the same IMDB ID)
+        string response = "{\"results\":{\"bindings\":[{\"article\":{\"type\":\"uri\",\"value\":\"https://fr.wikipedia.org/wiki/Heat_(film,_1995)\"}},{\"article\":{\"type\":\"uri\",\"value\":\"https://en.wikipedia.org/wiki/Heat_(1995_film)\"}},{\"article\":{\"type\":\"uri\",\"value\":\"https://en.wikipedia.org/wiki/Heat_(soundtrack)\"}}]}}";
+
+        // Act & Assert
+        Assert.Equal("https://en.wikipedia.org/wiki/Heat_(1995_film)", WikidataHttpClient.GetEnglishWikipediaLinkFromResponse(response));
     }
 }

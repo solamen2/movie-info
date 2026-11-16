@@ -59,6 +59,34 @@ public class WikipediaHttpClient
         return openSearchResponseDataModel.Links.Length > 0 ? openSearchResponseDataModel.Links[0] : "";
     }
 
+    // The whole text of the English Wikipedia page with the given title, as plain text: no markup, references or tables,
+    // and its section headings written as in wikitext ("== Plot =="). Redirects are followed.
+    // "" when there is no such page, null when the call failed.
+    public async Task<string?> GetPageText(string title)
+    {
+        using HttpResponseMessage response = await _httpClient.GetAsync($"api.php?action=query&prop=extracts&explaintext=1&exsectionformat=wiki&redirects=1&titles={Uri.EscapeDataString(title)}&format=json&formatversion=2");
+        if (response.StatusCode != System.Net.HttpStatusCode.OK)
+        {
+            return null;
+        }
+
+        string responseJsonString = await response.Content.ReadAsStringAsync();
+
+        WikipediaExtractResponseDataModel? extractResponseDataModel = GetExtractModelFromResponse(responseJsonString);
+        WikipediaExtractPageDataModel[]? pages = extractResponseDataModel?.Query?.Pages;
+        if (pages == null || pages.Length == 0)
+        {
+            return null;
+        }
+
+        return pages[0].Missing ? "" : pages[0].Extract;
+    }
+
+    public static WikipediaExtractResponseDataModel? GetExtractModelFromResponse(string responseJsonString)
+    {
+        return JsonSerializer.Deserialize<WikipediaExtractResponseDataModel>(responseJsonString);
+    }
+
     public static WikipediaOpenSearchResponseDataModel? GetModelFromResponse(string responseJsonString)
     {
         // See WikipediaOpenSearchResponseDataModel for the shape of the response

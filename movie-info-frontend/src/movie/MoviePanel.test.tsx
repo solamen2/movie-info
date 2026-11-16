@@ -125,7 +125,13 @@ describe("MoviePanel", () => {
       const summaries = [...panel.querySelectorAll("summary")].map((s) =>
         s.textContent.replace(/\(\d+\)$/, ""),
       );
-      expect(summaries).toEqual(["Cast", "Oscars", "Plot", "Where to Watch"]);
+      expect(summaries).toEqual([
+        "Cast",
+        "Oscars",
+        "Plot",
+        "RT Critics Consensus",
+        "Where to Watch",
+      ]);
     });
 
     it("Should hide plots, credits, and watch providers behind collapsed sections", async () => {
@@ -134,6 +140,7 @@ describe("MoviePanel", () => {
 
       for (const [summary, content] of [
         ["Plot", "An example plot from TMDB."],
+        ["RT Critics Consensus", "An example critics consensus."],
         ["Oscars", "Example Producer and Example Smith, Producers"],
         ["Cast", "Example Jones"],
         ["Where to Watch", "Example Stream"],
@@ -273,9 +280,18 @@ describe("MoviePanel", () => {
       }
       const tmdb = within(plot).getByRole("button", { name: "TMDB" });
       const omdb = within(plot).getByRole("button", { name: "OMDB" });
+      const wikipedia = within(plot).getByRole("button", {
+        name: "Wikipedia",
+      });
 
+      expect(
+        within(plot)
+          .getAllByRole("button")
+          .map((b) => b.textContent),
+      ).toEqual(["TMDB", "OMDB", "Wikipedia"]);
       expect(tmdb).toHaveAttribute("aria-pressed", "true");
       expect(omdb).toHaveAttribute("aria-pressed", "false");
+      expect(wikipedia).toHaveAttribute("aria-pressed", "false");
       expect(plot.textContent).toContain("An example plot from TMDB.");
       expect(plot.textContent).not.toContain("An example plot from OMDB.");
 
@@ -284,13 +300,162 @@ describe("MoviePanel", () => {
       expect(omdb).toHaveAttribute("aria-pressed", "true");
       expect(plot.textContent).toContain("An example plot from OMDB.");
       expect(plot.textContent).not.toContain("An example plot from TMDB.");
+
+      // Wikipedia's plot is shown a paragraph at a time
+      fireEvent.click(wikipedia);
+      expect(omdb).toHaveAttribute("aria-pressed", "false");
+      expect(wikipedia).toHaveAttribute("aria-pressed", "true");
+      expect(
+        [...plot.querySelectorAll(".detail-prose")].map((p) => p.textContent),
+      ).toEqual(["An example plot from Wikipedia.", "Its second paragraph."]);
+    });
+
+    it("Should leave out the Wikipedia plot button when Wikipedia has no plot", async () => {
+      server.use(
+        http.get("/api/movie", () =>
+          HttpResponse.json({ ...movieDataJson1, wikipediaPlot: "" }),
+        ),
+      );
+      render(
+        <MemoryRouter>
+          <MoviePanel itemId={movieDataJson1.imdbId} />
+        </MemoryRouter>,
+      );
+      const panel = await screen.findByTestId("movie-panel");
+      const plot = within(panel).getByText("Plot").closest("details");
+      if (!plot) {
+        throw new Error("Plot section not found");
+      }
+
+      expect(
+        within(plot)
+          .getAllByRole("button")
+          .map((b) => b.textContent),
+      ).toEqual(["TMDB", "OMDB"]);
     });
 
     it.each([
-      ["TMDB", { omdbPlot: "N/A" }, "An example plot from TMDB."],
-      ["OMDB", { tmdbPlot: "" }, "An example plot from OMDB."],
+      ["beside the other plots", {}, ["TMDB", "OMDB", "Wikipedia"]],
+      [
+        "on its own when no other source has a plot",
+        { tmdbPlot: "", omdbPlot: "N/A" },
+        ["Wikipedia"],
+      ],
     ])(
-      "Should show only the %s plot and button when the other source has no plot",
+      "Should keep the Wikipedia plot button, showing an error, when the Wikipedia plot lookup failed (%s)",
+      async (_, otherPlots, buttons) => {
+        server.use(
+          http.get("/api/movie", () =>
+            HttpResponse.json({
+              ...movieDataJson1,
+              ...otherPlots,
+              wikipediaPlot: null,
+            }),
+          ),
+        );
+        render(
+          <MemoryRouter>
+            <MoviePanel itemId={movieDataJson1.imdbId} />
+          </MemoryRouter>,
+        );
+        const panel = await screen.findByTestId("movie-panel");
+        const plot = within(panel).getByText("Plot").closest("details");
+        if (!plot) {
+          throw new Error("Plot section not found");
+        }
+
+        expect(
+          within(plot)
+            .getAllByRole("button")
+            .map((b) => b.textContent),
+        ).toEqual(buttons);
+        fireEvent.click(
+          within(plot).getByRole("button", { name: "Wikipedia" }),
+        );
+        expect(
+          within(plot).getByText(
+            "Wikipedia plot data from Wikipedia not available",
+          ),
+        ).toBeInTheDocument();
+        expect(plot.querySelector(".detail-prose")).toBeNull();
+      },
+    );
+
+    it("Should show Rotten Tomatoes' critics consensus in its own section", async () => {
+      await searchAndSelectExampleMovie();
+      const panel = await screen.findByTestId("movie-panel");
+      const consensus = within(panel)
+        .getByText("RT Critics Consensus")
+        .closest("details");
+      if (!consensus) {
+        throw new Error("RT Critics Consensus section not found");
+      }
+
+      expect(consensus.querySelector(".detail-prose")?.textContent).toBe(
+        "An example critics consensus.",
+      );
+    });
+
+    it("Should leave out the RT Critics Consensus section when Wikipedia quotes no consensus", async () => {
+      server.use(
+        http.get("/api/movie", () =>
+          HttpResponse.json({ ...movieDataJson1, rtCriticsConsensus: "" }),
+        ),
+      );
+      render(
+        <MemoryRouter>
+          <MoviePanel itemId={movieDataJson1.imdbId} />
+        </MemoryRouter>,
+      );
+      const panel = await screen.findByTestId("movie-panel");
+
+      expect(within(panel).queryByText("RT Critics Consensus")).toBeNull();
+    });
+
+    it("Should show an error in the RT Critics Consensus section when the consensus lookup failed", async () => {
+      server.use(
+        http.get("/api/movie", () =>
+          HttpResponse.json({ ...movieDataJson1, rtCriticsConsensus: null }),
+        ),
+      );
+      render(
+        <MemoryRouter>
+          <MoviePanel itemId={movieDataJson1.imdbId} />
+        </MemoryRouter>,
+      );
+      const panel = await screen.findByTestId("movie-panel");
+      const consensus = within(panel)
+        .getByText("RT Critics Consensus")
+        .closest("details");
+      if (!consensus) {
+        throw new Error("RT Critics Consensus section not found");
+      }
+
+      expect(
+        within(consensus).getByText(
+          "Critics consensus data from Wikipedia not available",
+        ),
+      ).toBeInTheDocument();
+    });
+
+    it.each([
+      [
+        "TMDB",
+        { omdbPlot: "N/A", wikipediaPlot: "" },
+        "An example plot from TMDB.",
+      ],
+      [
+        "OMDB",
+        { tmdbPlot: "", wikipediaPlot: "" },
+        "An example plot from OMDB.",
+      ],
+      [
+        "Wikipedia",
+        { tmdbPlot: "", omdbPlot: "N/A" },
+        "An example plot from Wikipedia.",
+      ],
+    ])(
+      "Should show only the %s plot and button when the other sources have no plot",
       async (source, missing, plotText) => {
         server.use(
           http.get("/api/movie", () =>
@@ -324,6 +489,7 @@ describe("MoviePanel", () => {
             ...movieDataJson1,
             tmdbPlot: "",
             omdbPlot: "N/A",
+            wikipediaPlot: "",
           }),
         ),
       );
@@ -631,7 +797,8 @@ describe("MoviePanel", () => {
         expect(panel.textContent).toContain(
           "IMDB: 7.9 (123,456)LinkCopyRank: 4444Original Title",
         );
-        expect(panel.textContent).not.toContain("Wikipedia");
+        // (The Plot section has a "Wikipedia" button of its own)
+        expect(panel.textContent).not.toContain("Wikipedia:");
         expect(screen.getAllByRole("link", { name: "Link" })).toHaveLength(1);
         expect(
           screen.queryByRole("button", { name: "copy-wikipedia-link" }),

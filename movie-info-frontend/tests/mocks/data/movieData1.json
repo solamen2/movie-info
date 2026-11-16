@@ -22,6 +22,8 @@
   "tmdbGenres": "Mystery, Thriller, Drama, Science Fiction",
   "homepage": "https://example.com/example-movie",
   "wikipediaLink": "https://en.wikipedia.org/wiki/Example_Movie",
+  "wikipediaPlot": "An example plot from Wikipedia.\nIts second paragraph.",
+  "rtCriticsConsensus": "An example critics consensus.",
   "aspectRatios": [
     {
       "ratio": "2.39:1",
