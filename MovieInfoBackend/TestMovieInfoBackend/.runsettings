@@ -9,7 +9,9 @@
     <ResultsDirectory>./TestResults</ResultsDirectory>
     <!-- TestSessionTimeout was introduced in Visual Studio 2017 version 15.5 -->
     <!-- Specify timeout in milliseconds. A valid value should be greater than 0 -->
-    <TestSessionTimeout>10000</TestSessionTimeout>
+    <!-- The whole session counts, not just the tests: on GitHub's runners, starting the test host with code
+         coverage takes 8 to 10+ seconds before the (roughly 1 second of) tests even run -->
+    <TestSessionTimeout>60000</TestSessionTimeout>
     <!-- true or false -->
     <!-- Value that specifies the exit code when no tests are discovered -->
     <TreatNoTestsAsError>true</TreatNoTestsAsError>
