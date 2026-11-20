@@ -1,3 +1,4 @@
+import DeferredImage from "../shared/DeferredImage";
 import ExpandableCard from "../shared/ExpandableCard";
 import { type PanelCardProps } from "../shared/usePanelCards";
 import { displayDate, getTmdbImageUrl } from "../utilities/utilities";
@@ -45,11 +46,11 @@ function CreditCard({
       onClick={onClick}
     >
       {imageUrl ? (
-        <img
+        <DeferredImage
           src={imageUrl}
           alt={title}
-          loading="lazy"
           className="credit-card-image"
+          placeholderClassName="credit-card-image-placeholder"
         />
       ) : (
         <div className="credit-card-image credit-card-image-placeholder">
