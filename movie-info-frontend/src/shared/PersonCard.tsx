@@ -1,3 +1,4 @@
+import DeferredImage from "./DeferredImage";
 import ExpandableCard from "./ExpandableCard";
 import { type PanelCardProps } from "./usePanelCards";
 import { getTmdbImageUrl } from "../utilities/utilities";
@@ -42,11 +43,11 @@ function PersonCard({
       onClick={onClick}
     >
       {imageUrl ? (
-        <img
+        <DeferredImage
           src={imageUrl}
           alt={name}
-          loading="lazy"
           className="person-card-image"
+          placeholderClassName="person-card-image-placeholder"
         />
       ) : (
         <div className="person-card-image person-card-image-placeholder">
