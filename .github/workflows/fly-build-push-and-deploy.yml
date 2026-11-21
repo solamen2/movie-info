@@ -49,6 +49,26 @@ jobs:
           tags: |
             registry.fly.io/movie-info-flyio:dev2
 
+      # The Azure stage/prod images are copied from this one (see deploy-azure.yml), and need
+      # both platforms so they can also be pulled and run locally.
+      - name: Verify the pushed image has both platforms
+        env:
+          IMAGE: ${{ steps.image-name.outputs.image-to-push }}
+          DIGEST: ${{ steps.build.outputs.digest }}
+          REQUIRED_PLATFORMS: linux/amd64 linux/arm64
+        run: |
+          set -euo pipefail
+          # Inspects the exact manifest list this build pushed, not whatever the tag points to now.
+          FOUND=$(docker buildx imagetools inspect "${IMAGE%:*}@$DIGEST" --raw \
+            | jq -r '.manifests[]? | "\(.platform.os)/\(.platform.architecture)"')
+          for p in $REQUIRED_PLATFORMS; do
+            if ! grep -qx "$p" <<< "$FOUND"; then
+              echo "::error::$IMAGE has no $p manifest (found: $(echo $FOUND))"
+              exit 1
+            fi
+          done
+          echo "$IMAGE platforms: $(echo $FOUND)"
+
   deploy-image:
     name: Deploy Docker dev2 image to fly.io
     runs-on: ubuntu-latest

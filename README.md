@@ -113,7 +113,7 @@ Linting is performed by [ESLint](https://eslint.org/) using "strictTypeChecked" 
 
 ## Architecture: Environments
 
-The app has four environments: local, dev, stage, and prod. Local is run on my local machine and features hot-reloading on both the backend and frontend. Dev is automatically built (as a Docker container) and deployed to fly.io after a PR is merged. (The fly.io version has its own Azure SQL Server database, too.) Stage and prod reuse the built container from fly.io, but are released semi-manually by me as separate Azure Container Apps with their own Azure SQL Server databases. The container used for dev, stage, and prod can also be run locally if required.
+The app has four environments: local, dev, stage, and prod. Local is run on my local machine and features hot-reloading on both the backend and frontend. Dev is automatically built (as a Docker container) and deployed to fly.io after a PR is merged. (The fly.io version has its own Azure SQL Server database, too.) Stage and prod reuse the built container from fly.io, but are released semi-manually by me as separate Azure Container Apps with their own Azure SQL Server databases. ("Semi-manually" means I click a button to run the GitHub Actions Workflow to either deploy to stage (by promoting the dev image) or to prod (by promoting the stage image).) The container used for dev, stage, and prod can also be run locally if required.
 
 ## Architecture: CI/CD
 

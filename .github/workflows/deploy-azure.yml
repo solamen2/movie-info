@@ -1,15 +1,23 @@
-# Manually triggered deploy of the already-pushed Docker Hub image to Azure Container Apps.
-# Resolves the linux/amd64 digest of solamen2/movie-info:<stage|prod>, publishes that exact
-# image under an immutable tag (<stage|prod>-<first 12 hex of the digest>), and PATCHes the
-# Container App to that tag. A reused tag like :stage is cached by Azure and never re-pulled;
-# a digest reference works but breaks the portal's container editor, so a unique tag is used.
+# Manually triggered promote + deploy to Azure Container Apps.
+#
+# 1. Promotes the image on Docker Hub (manifest-only copy, nothing is rebuilt):
+#      stage: registry.fly.io/movie-info-flyio:dev2 -> solamen2/movie-info:stage
+#      prod:  solamen2/movie-info:stage             -> solamen2/movie-info:prod
+#    The dev2 image is built with buildx for linux/amd64 + linux/arm64 by
+#    fly-build-push-and-deploy.yml. The copy keeps the whole multi-platform manifest list, and
+#    the workflow fails if either platform is missing from the source or the promoted tag.
+# 2. Resolves the linux/amd64 digest of solamen2/movie-info:<stage|prod>, publishes that exact
+#    image under an immutable tag (<stage|prod>-<first 12 hex of the digest>), and PATCHes the
+#    Container App to that tag. A reused tag like :stage is cached by Azure and never re-pulled;
+#    a digest reference works but breaks the portal's container editor, so a unique tag is used.
 #
 # Trigger: GitHub -> Actions -> "Deploy to Azure Container Apps" -> Run workflow.
 #
 # One-time setup:
 #   Repository secrets: AZURE_CLIENT_ID, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID,
 #                       DOCKERHUB_USERNAME, DOCKERHUB_TOKEN (access token with Read & Write,
-#                       needed to publish the immutable tag)
+#                       needed to push the promoted and immutable tags),
+#                       FLY_API_TOKEN (to read the dev2 image from the Fly.io registry)
 #   Azure: an app registration with federated credentials for the GitHub environments
 #          "stage" and "prod", and Contributor on the two Container Apps.
 
@@ -41,6 +49,9 @@ jobs:
       IMAGE_REPO: solamen2/movie-info
       APP_NAME: movie-info-${{ inputs.environment }}
       IMAGE_TAG: ${{ inputs.environment }}
+      # Image that gets promoted to IMAGE_REPO:IMAGE_TAG before deploying
+      SOURCE_IMAGE: ${{ inputs.environment == 'prod' && 'solamen2/movie-info:stage' || 'registry.fly.io/movie-info-flyio:dev2' }}
+      REQUIRED_PLATFORMS: linux/amd64 linux/arm64
       API_VERSION: "2025-01-01"
 
     steps:
@@ -49,6 +60,39 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Log in to the Fly.io registry
+        if: inputs.environment == 'stage'
+        uses: docker/login-action@v3
+        with:
+          registry: registry.fly.io
+          username: x
+          password: ${{ secrets.FLY_API_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Promote ${{ env.SOURCE_IMAGE }} to ${{ env.IMAGE_REPO }}:${{ env.IMAGE_TAG }}
+        run: |
+          set -euo pipefail
+          # Fails unless the image is a manifest list containing every required platform.
+          check_platforms() {
+            local found
+            found=$(docker buildx imagetools inspect "$1" --raw \
+              | jq -r '.manifests[]? | "\(.platform.os)/\(.platform.architecture)"')
+            for p in $REQUIRED_PLATFORMS; do
+              if ! grep -qx "$p" <<< "$found"; then
+                echo "::error::$1 has no $p manifest (found: $(echo $found))"
+                exit 1
+              fi
+            done
+            echo "$1 platforms: $(echo $found)"
+          }
+
+          check_platforms "$SOURCE_IMAGE"
+          # Copies the full manifest list (all platforms) without pulling or rebuilding anything.
+          docker buildx imagetools create --tag "$IMAGE_REPO:$IMAGE_TAG" "$SOURCE_IMAGE"
+          check_platforms "$IMAGE_REPO:$IMAGE_TAG"
 
       - name: Resolve linux/amd64 digest for ${{ env.IMAGE_REPO }}:${{ env.IMAGE_TAG }}
         id: digest
