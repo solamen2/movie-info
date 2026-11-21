@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  oscarCountLabel,
   ordinal,
   oscarYearElementId,
   splitNameIntoNominees,
@@ -132,5 +133,29 @@ describe("ordinal", () => {
 describe("oscarYearElementId", () => {
   it("Should make an id from the ceremony number", () => {
     expect(oscarYearElementId(96)).toBe("oscars-year-96");
+  });
+});
+
+describe("oscarCountLabel", () => {
+  const awards = (wins: number, nominations: number) => [
+    ...Array.from({ length: wins }, () => ({ winner: true })),
+    ...Array.from({ length: nominations }, () => ({ winner: false })),
+  ];
+
+  it("Should count the wins and the nominations that did not win", () => {
+    expect(oscarCountLabel(awards(4, 7))).toBe("4 wins, 7 noms");
+  });
+
+  it("Should use the singular for exactly one", () => {
+    expect(oscarCountLabel(awards(1, 1))).toBe("1 win, 1 nom");
+    expect(oscarCountLabel(awards(1, 2))).toBe("1 win, 2 noms");
+    expect(oscarCountLabel(awards(2, 1))).toBe("2 wins, 1 nom");
+  });
+
+  it("Should leave out a kind there are none of", () => {
+    expect(oscarCountLabel(awards(0, 3))).toBe("3 noms");
+    expect(oscarCountLabel(awards(0, 1))).toBe("1 nom");
+    expect(oscarCountLabel(awards(2, 0))).toBe("2 wins");
+    expect(oscarCountLabel(awards(1, 0))).toBe("1 win");
   });
 });

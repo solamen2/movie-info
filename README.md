@@ -1,10 +1,10 @@
 # movie-info
 
-Small movie information querying app using info from the IMDB and OMDB / TMDB APIs (OMDB / TMDB info coming soon). Made by Ed Younskevicius (solamen2 AT gmail).
+Small movie information app using info mainly from the [TMDB](https://www.themoviedb.org/), [OMDB](https://www.omdbapi.com/), and [IMDB](https://www.imdb.com/) APIs. Made by Ed Younskevicius (solamen2 AT gmail).
 
 ## Using The App
 
-If you'd like to see how the app works, please go to [movieinfo.dev](https://movieinfo.dev) (it may take 30 seconds or so to spin up if no one has used it for a bit) and use these credentials:
+If you'd like to see how the app works, please go to [movieinfo.dev](https://movieinfo.dev) (it may take up to 30 seconds to spin up if no one has used it for a bit) and use these credentials:
 
 - Email: demo@example.com
 - Password: Moviepass2@
@@ -17,8 +17,8 @@ TODO: Display some screenshots of the app
 
 - I did not use AI at all during the setup of the project, since I wanted to have a very good understanding of the basic architecture of the app and the technical tradeoffs I was making.
 - After setting up the basic skeleton and fleshing out the backend, I have been using Claude Code to help me code the frontend React pages quickly, since I have some experience with React already. (I personally review every change it makes, and sometimes re-prompt or make small changes myself.) Commits and PRs that are totally (or even mostly) AI-created I have labeled with the prefix "AI-GENERATED:".
-- I also used AI to generate some test cases after I had set up some test cases myself, in order to increase test coverage of similar cases and to catch scenarios I had not considered.
-- Any time AI was used, I have included the prompts as a comment on the PR that merged those changes.
+- I also used AI to generate some test cases after I had set up some test cases myself, in order to test new features, increase test coverage of similar cases, and to catch scenarios I had not considered.
+- All Git commit messages and PR descriptions were written by hand, without AI.
 - I did not use AI to write any of the text in this document.
 
 ## Architecture: Backend
@@ -29,11 +29,11 @@ TODO
 
 ### API
 
-The backend APIs are served using an ASP.Net Core 10.0.2 app (written in C# 14+, of course), using [minimal APIs](https://learn.microsoft.com/en-us/aspnet/core/tutorials/min-web-api?view=aspnetcore-10.0&tabs=visual-studio). I've added some basic structure on top of those Minimal APIs to organize things, like moving the app.MapGet() calls into separate endpoint classes and having Program.cs organize its code into many functions.
+The backend APIs are served using an [ASP.Net Core](https://dotnet.microsoft.com/en-us/apps/aspnet) 10.0.2 app (written in C# 14+, of course), using [minimal APIs](https://learn.microsoft.com/en-us/aspnet/core/tutorials/min-web-api?view=aspnetcore-10.0&tabs=visual-studio). I've added some basic structure on top of those Minimal APIs to organize things, like moving the app.MapGet() calls into separate endpoint classes and having Program.cs organize its code into many functions.
 
 ### Deployment
 
-The app is deployed using Docker (both the frontend and backend live in a single Docker image, because the frontend is copied as static files into wwwroot). Currently it is running as an [Azure Container App](https://azure.microsoft.com/en-us/products/container-apps) and pulls the image from [Docker Hub](https://hub.docker.com/). (I've used Azure Container Registry before, but I wanted to learn to use Docker Hub for this project.) I've also [deployed it via Docker on Fly.io](https://fly.io/docs/languages-and-frameworks/dockerfile/#deploy-your-app) (to learn the platform and test ease of multi-platform deployment), which dictated several other architecture decisions described later.
+The app is deployed using Docker; both the frontend and backend live in a single Docker image, because the frontend is copied as static files into wwwroot. Currently it is running as an [Azure Container App](https://azure.microsoft.com/en-us/products/container-apps) and pulls the image from [Docker Hub](https://hub.docker.com/). (I've used Azure Container Registry before, but I wanted to learn to use Docker Hub for this project.) I've also [deployed it via Docker on Fly.io](https://fly.io/docs/languages-and-frameworks/dockerfile/#deploy-your-app) (to learn the platform and test ease of multi-platform deployment), which dictated several other architecture decisions described later.
 
 (For example, I've intentionally avoided using Azure Container Registry for the app registry, and avoided using a docker-compose.yaml file (and also avoided using multiple containers), since I wanted to be able to [run on Fly.io](https://fly.io/docs/languages-and-frameworks/dotnet/) or other services. fly.io does not currently support Docker Compose well, and also, not using Docker Compose has the benefit of keeping the app simple as a single image.)
 
@@ -43,7 +43,7 @@ A somewhat unusual feature of the app is that I build the Docker image using [Do
 
 Virtually all the data this app uses comes in from web requests in JSON format. None of this is ever persisted locally (though a few things are temporarily cached via [.NET's built-in IMemoryCache](https://learn.microsoft.com/en-us/aspnet/core/performance/caching/memory?view=aspnetcore-10.0)), and the data are processed via JsonPropertyName annotations and calling JsonSerializer.Deserialize() to deserialize into data models (in HttpClient-derived classes). These data models are aggregated into view models in the endpoint classes and then serialized back out to JSON for this app's API calls. TODO: Remove unused items in ViewModel classes
 
-The app uses a SQL Server database to store a tiny bit of user configration and login info. This is a bit of overkill, as it could have easily been handled using Azure Cache For Redis or SQLite (both which I have used before successfully), or other technologies as well. But I wanted to teach myself how to build an app using SQL Server from the ground up, and it works well so far.
+The app uses a [SQL Server](https://learn.microsoft.com/en-us/sql/relational-databases/databases/databases) database to store a tiny bit of user configration and login info. This is a bit of overkill, as it could have easily been handled using Azure Cache For Redis or SQLite (both which I have used before successfully), or other technologies as well. But I wanted to teach myself how to build an app using SQL Server from the ground up, and it works well so far.
 
 Database operations are handled using [Entity Framework Core](https://learn.microsoft.com/en-us/ef/core/). I'm very comfortable using SQL directly, but I like EF Core, and I think it's a great fit for many apps, especially simple apps like this one.
 
@@ -61,7 +61,7 @@ Authorization uses claims-based access control, which is added on using a [scaff
 
 ### Logging
 
-Logs are handled using [Serilog](https://serilog.net/) for structured logging. I would have liked to use [Seq](https://datalust.co/)'s structured logging, but unfortunately, [Seq does not support Azure Container Apps](https://datalust.co/docs/using-azure-websites-or-app-service).
+Logs are handled using [Serilog](https://serilog.net/) for structured logging. I would have liked to use Seq's structured logging, but unfortunately, [Seq does not support Azure Container Apps](https://datalust.co/docs/using-azure-websites-or-app-service).
 
 ### Testing
 
@@ -76,40 +76,44 @@ This app displays info from the following sources:
 - [OMDB](https://www.omdbapi.com/): Movie and TV info
 - [Wikipedia](https://www.wikipedia.org/): Links to the Wikipedia pages for movies, people, and TV series; also used for the plot and the Rotten Tomatoes' critics consensus for movies
 - [Wikidata](https://www.wikidata.org/wiki/Wikidata:Main_Page): Aspect ratios for movies and TV, and for lookups to Wikipedia pages
-- [DLu/oscar_data](https://github.com/DLu/oscar_data): Every Academy Award nomination and win, for the Oscars sections of movies and people, and also for the Oscars By Year page (cached but updated weekly)
+- [DLu/oscar_data](https://github.com/DLu/oscar_data): Every Academy Award nomination and win, for the Oscars sections of movies and people, and also for the Oscars By Year page (cached but refreshed weekly)
 - [U.S. Bureau of Labor Statistics](https://www.bls.gov/cpi/): The [seasonally-adjusted Consumer Price Index](https://data.bls.gov/timeseries/CUSR0000SA0?years_option=all_years) (for values from 1947 onward) and the [not-seasonally-adjusted Consumer Price Index](https://data.bls.gov/timeseries/CUUR0000SA0?years_option=all_years) (for values from Jan 1913 to Dec 1946, inclusive), which adjust movie budgets and revenues for inflation (cached but updated weekly)
 
 ## Architecture: Frontend
 
 ### Framework
 
-The frontend framework is React, and the app is written using Typescript in TSX files. It was [created using a basic template with Vite](https://vite.dev/guide/#scaffolding-your-first-vite-project) (version 7.3.1 to start, later updated to Vite 8.0.0) by running "npm create vite@latest", selecting "React" as the framework, and "Typescript" as the variant. Most of the UI was created using AI, as mentioned at the beginning of this document.
+The frontend framework is [React](https://react.dev/), and the app is written using Typescript in TSX files. It was [created using a basic template with Vite](https://vite.dev/guide/#scaffolding-your-first-vite-project) (version 7.3.1 to start, later updated to Vite 8.0.0) by running "npm create vite@latest", selecting "React" as the framework, and "Typescript" as the variant. Most of the UI was created using AI, as mentioned at the beginning of this document.
+
+### Mobile
+
+There is no mobile app, but the webapp has a [manifest.json](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/manifest.json) file to officially support iOS' [Add To Home Screen](https://support.apple.com/guide/shortcuts/add-a-shortcut-to-the-home-screen-apd735880972/ios) and other uses.
 
 ### Testing
 
 Frontend unit/component/integration tests are done using [Vitest](https://vitest.dev/) as the test runner, [React Testing Library](https://testing-library.com/) and [@testing-library/jest-dom](https://github.com/testing-library/jest-dom) for the tests themselves, and [MSW](https://mswjs.io/) to mock the HTTP calls. End-to-end tests are done on the frontend using [Playwright](https://playwright.dev/), with toggleable mocked HTTP calls using [mswjs/playwright](https://github.com/mswjs/playwright), and environment variables for end-to-end testing provided by [dotenv](https://github.com/motdotla/dotenv). (Yes, I am aware that, when using MSW, it's not a true end-to-end test.) Code coverage is handled on the frontend with [@vitest/coverage-v8](https://vitest.dev/guide/coverage) and reported in PRs with [vitest-coverage-report](https://github.com/marketplace/actions/vitest-coverage-report).
 
-I also do a lot of ad-hoc API tests myself; the project has a full suite of [Bruno](https://www.usebruno.com/) calls and environments for both its own APIs and all of the IMDB, TMDB, and OMDB APIs it calls. And I do some ad-hoc UI tests myself, of course.
+I also do a lot of ad-hoc API tests myself; the project has a full suite of [Bruno](https://www.usebruno.com/) calls and environments for both its own APIs and all of the APIs it calls. And I do some ad-hoc UI tests myself, of course.
 
 ### Handling Web Requests
 
-In a local dev environment, Vite handles all requests (for fast reloading / debugging), and proxies the API requests to the ASP.Net Core Kestrel server. [The proxy is configured using vite.config.ts](https://vite.dev/config/server-options#server-proxy). Outside of local development, the React files are copied to wwwroot (via a custom build step in the MovieInfoBackend.csproj file that runs when doing a "dotnet publish") and are therefore served statically, so in dev and stage and prod, ASP.Net Core handles all the requests statically instead. All traffic is over HTTPS using [Let's Encrypt](https://letsencrypt.org/) certs that renew every 3 months via [Acmebot for Microsoft Azure](https://github.com/shibayan/keyvault-acmebot). Routing is handled using [React Router](https://www.npmjs.com/package/react-router-dom).
+In a local dev environment, Vite handles all requests (for fast reloading / debugging), and proxies the API requests to the [ASP.Net Core Kestrel](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel) server. [The proxy is configured using vite.config.ts](https://vite.dev/config/server-options#server-proxy). Outside of local development, the React files are copied to wwwroot (via a custom build step in the MovieInfoBackend.csproj file that runs when doing a "dotnet publish") and are therefore served statically, so in dev and stage and prod, ASP.Net Core handles all the requests statically instead. All traffic is over HTTPS using [Let's Encrypt](https://letsencrypt.org/) certs that renew every 3 months via [Acmebot for Microsoft Azure](https://github.com/shibayan/keyvault-acmebot). Routing is handled using [React Router](https://www.npmjs.com/package/react-router-dom).
 
 ### CSS
 
-The CSS and presentation is fairly basic (and does not use Tailwind), and was determined mostly by AI. It uses Flexbox to display the search cards and extended data (which will soon come from subsequent OMDB / TMDB searches). Media queries will be used soon to render the UI as mainly vertical (mobile) or mainly horizontal (desktop). It does not support dark mode. TODO: Support dark mode and media queries soon
+The CSS and presentation is fairly basic (and does not use Tailwind), and was determined mostly by AI. It uses [Flexbox](https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/CSS_layout/Flexbox) to display the search cards and extended data. Media queries are used to render the UI as mainly vertical (mobile) or mainly horizontal (desktop). The app supports light / dark mode, with the app respecting the user's OS setting by default.
 
 ### Accessibility
 
-TODO: Make app more accessible
+The app was checked for accessibility (using AI) with [axe-core](https://github.com/dequelabs/axe-core), [Google Lighthouse](https://developer.chrome.com/docs/lighthouse), and [Pa11y](https://pa11y.org/). Many changes were made to the app as a result (also by AI, but reviewed by me), and the app currently gets 100 for Accessibility on Lighthouse.
 
 ### Linting / Formatting
 
-Linting is performed by ESLint using "strictTypeChecked" and "stylisticTypeChecked", and also Prettier.
+Linting is performed by [ESLint](https://eslint.org/) using "strictTypeChecked" and "stylisticTypeChecked", and also [Prettier](https://prettier.io/).
 
 ## Architecture: Environments
 
-The app has four environments: local, dev, stage, and prod. Local is run on my local machine and features hot-reloading on both the backend and frontend. Dev is automatically built (as a Docker container) and deployed to fly.io after the PR is merged. (The fly.io version has its own Azure SQL Server database.) Stage and prod reuse the built container from fly.io, but are released semi-manually by me as separate Azure Container Apps with their own Azure SQL Server databases. The container used for dev, stage, and prod can also be run locally if required.
+The app has four environments: local, dev, stage, and prod. Local is run on my local machine and features hot-reloading on both the backend and frontend. Dev is automatically built (as a Docker container) and deployed to fly.io after a PR is merged. (The fly.io version has its own Azure SQL Server database, too.) Stage and prod reuse the built container from fly.io, but are released semi-manually by me as separate Azure Container Apps with their own Azure SQL Server databases. The container used for dev, stage, and prod can also be run locally if required.
 
 ## Architecture: CI/CD
 

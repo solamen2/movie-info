@@ -35,7 +35,7 @@
   padding: 0.4rem 0.6rem;
   font-size: 1rem;
   border-radius: 6px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--input-border);
   background: inherit;
   color: inherit;
 }
@@ -51,7 +51,7 @@
 }
 
 .oscar-year[open] > summary {
-  border-bottom: 2px solid #444;
+  border-bottom: 2px solid var(--border);
 }
 
 .oscar-year > .collapsible-body {
@@ -74,7 +74,7 @@
 
 .oscar-category {
   padding: 0.5rem 0;
-  border-bottom: 1px solid #444;
+  border-bottom: 1px solid var(--border);
 }
 
 .oscar-category:last-child {
@@ -167,25 +167,15 @@
    look different from the blue links that leave the app: the text color, a
    shade brighter, and underlined */
 .oscar-item-link {
-  color: #fafafa;
+  color: var(--in-app-link);
   font-weight: 500;
   text-decoration: underline;
   text-underline-offset: 0.15em;
 }
 
 .oscar-item-link:hover {
-  color: #fff;
+  color: var(--in-app-link-hover);
   text-decoration-thickness: 2px;
-}
-
-@media (prefers-color-scheme: light) {
-  .oscar-item-link {
-    color: #16263a;
-  }
-
-  .oscar-item-link:hover {
-    color: #000;
-  }
 }
 
 @media (max-width: 640px) {

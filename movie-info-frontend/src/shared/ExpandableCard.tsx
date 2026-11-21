@@ -1,4 +1,4 @@
-import { type ReactNode, useLayoutEffect, useRef } from "react";
+import { type ReactNode, useEffect, useLayoutEffect, useRef } from "react";
 import "./shared.css";
 
 interface ExpandableCardProps {
@@ -93,6 +93,24 @@ function ExpandableCard({
     }
   }, [selected, deselecting]);
 
+  // A panel takes the keyboard focus as it opens, so that the keyboard and a
+  // screen reader carry on inside it rather than wherever the card that
+  // opened it was (which may be gone). The card keeps the focus as its panel
+  // closes, being the same element. Someone typing elsewhere is left alone.
+  useEffect(() => {
+    const card = cardRef.current;
+    if (!expanded || !card || card.contains(document.activeElement)) return;
+    const typing = document.activeElement?.matches("input, select, textarea");
+    if (!typing) {
+      card.focus({ preventScroll: true });
+    }
+  }, [expanded]);
+
+  // A card that does something when clicked is a button, for the keyboard
+  // and for screen readers too. (A card grown into a panel isn't any more,
+  // but can still be given the focus, see above.)
+  const isButton = !expanded && onClick !== undefined;
+
   const classes =
     `${className} expandable-card` +
     (selected ? " selected" : "") +
@@ -107,7 +125,23 @@ function ExpandableCard({
       id={id}
       data-testid={testId}
       className={classes}
+      role={isButton ? "button" : undefined}
+      tabIndex={isButton ? 0 : expanded ? -1 : undefined}
       onClick={expanded ? undefined : onClick}
+      onKeyDown={
+        isButton
+          ? (e) => {
+              // Enter and Space press the card itself, not what is inside it
+              if (
+                e.target === e.currentTarget &&
+                (e.key === "Enter" || e.key === " ")
+              ) {
+                e.preventDefault();
+                onClick();
+              }
+            }
+          : undefined
+      }
     >
       {children}
     </div>

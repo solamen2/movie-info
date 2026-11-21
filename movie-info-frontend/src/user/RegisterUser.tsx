@@ -1,5 +1,6 @@
 import { type SubmitEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { usePageTitle } from "../utilities/pageTitle";
 
 export interface RegisterResponse {
   type: string;
@@ -13,6 +14,8 @@ function RegisterUser() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+
+  usePageTitle("Register");
 
   async function handleRegister(e: SubmitEvent) {
     e.preventDefault();
@@ -49,18 +52,23 @@ function RegisterUser() {
   return (
     <div className="auth-page">
       <h1>Register</h1>
-      <h2>
+      {/* A note, not a heading */}
+      <p className="auth-note">
         Hey there! This page is technically accessible to the public, and you
         can make accounts here, but since accounts have to be manually enabled
         in the database, it's pointless for anyone but me to make them. It's
         just a convenience page for me, the admin.
-      </h2>
+      </p>
       <form onSubmit={handleRegister}>
         <div className="form-field">
           <label htmlFor="email">Email</label>
           <input
             id="email"
             type="text"
+            autoComplete="username"
+            inputMode="email"
+            autoCapitalize="none"
+            spellCheck={false}
             value={email}
             onChange={(e) => {
               setEmail(e.target.value);
@@ -73,6 +81,7 @@ function RegisterUser() {
           <input
             id="password"
             type="password"
+            autoComplete="new-password"
             value={password}
             onChange={(e) => {
               setPassword(e.target.value);
@@ -80,11 +89,13 @@ function RegisterUser() {
             required
           />
         </div>
-        {error && <p className="error-message">{error}</p>}
+        {error && (
+          <p className="error-message" role="alert">
+            {error}
+          </p>
+        )}
         <div className="form-actions">
-          <button aria-label="register" type="submit">
-            Register
-          </button>
+          <button type="submit">Register</button>
         </div>
       </form>
     </div>

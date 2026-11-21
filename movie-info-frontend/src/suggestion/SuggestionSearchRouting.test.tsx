@@ -10,16 +10,16 @@ import { findResultCards, renderApp } from "../../tests/renderApp";
 
 function search(text: string) {
   const searchQueryInput = screen.getByRole("textbox", {
-    name: "search-query-input",
+    name: "Search movies, people, and TV shows",
   });
   fireEvent.change(searchQueryInput, { target: { value: text } });
-  fireEvent.click(screen.getByRole("button", { name: "search" }));
+  fireEvent.click(screen.getByRole("button", { name: "Search" }));
   return searchQueryInput;
 }
 
 async function findCard(name: string) {
   const text = await screen.findByText(name);
-  const card = text.closest<HTMLDivElement>("#search-card");
+  const card = text.closest<HTMLDivElement>('[data-testid="search-card"]');
   if (!card) {
     throw new Error(`Search card for ${name} not found`);
   }
@@ -193,7 +193,9 @@ describe("SuggestionSearch routing", () => {
     it("Should run the search and fill in the input", async () => {
       renderApp("/search?q=1");
       expect(
-        screen.getByRole("textbox", { name: "search-query-input" }),
+        screen.getByRole("textbox", {
+          name: "Search movies, people, and TV shows",
+        }),
       ).toHaveValue("1");
       await findResultCards(8);
       expect(screen.getByText("Example Movie")).toBeInTheDocument();
@@ -202,7 +204,9 @@ describe("SuggestionSearch routing", () => {
     it("Should show an empty search page without a query", () => {
       renderApp("/search");
       expect(
-        screen.getByRole("textbox", { name: "search-query-input" }),
+        screen.getByRole("textbox", {
+          name: "Search movies, people, and TV shows",
+        }),
       ).toHaveValue("");
       expect(screen.queryByText(/results\./)).not.toBeInTheDocument();
     });
@@ -218,18 +222,22 @@ describe("SuggestionSearch routing", () => {
       async (url, panelTestId, name) => {
         const { container, currentUrl, router } = renderApp(url);
         const panel = await screen.findByTestId(panelTestId);
-        const card = panel.closest("#search-card");
+        const card = panel.closest('[data-testid="search-card"]');
         expect(card?.classList.contains("selected")).toBe(true);
         expect(card?.classList.contains("expanded")).toBe(true);
 
         // Once the results arrive, the same panel is hosted by the real card,
         // and there is exactly one card for the item.
         await waitFor(() => {
-          expect(container.querySelectorAll("#search-card")).toHaveLength(8);
+          expect(
+            container.querySelectorAll('[data-testid="search-card"]'),
+          ).toHaveLength(8);
         });
         expect(screen.getByTestId(panelTestId)).toBe(panel);
         expect(
-          container.querySelectorAll("#search-card.selected.expanded"),
+          container.querySelectorAll(
+            '[data-testid="search-card"].selected.expanded',
+          ),
         ).toHaveLength(1);
 
         // Editing the URL back to the results shows the grid.
@@ -237,7 +245,7 @@ describe("SuggestionSearch routing", () => {
         expect(currentUrl()).toBe("/search?q=1");
         await waitFor(() => {
           expect(
-            container.querySelectorAll("#search-card.selected"),
+            container.querySelectorAll('[data-testid="search-card"].selected'),
           ).toHaveLength(0);
         });
         expect(await findCard(name)).not.toHaveClass("expanded");
@@ -249,7 +257,7 @@ describe("SuggestionSearch routing", () => {
     it("Should show the panel in a stand-in card ahead of the results", async () => {
       const { container } = renderApp("/person/2?q=1");
       const panel = await screen.findByTestId("person-panel");
-      const card = panel.closest("#search-card");
+      const card = panel.closest('[data-testid="search-card"]');
       expect(card).toHaveClass("selected");
       expect(card).toHaveClass("expanded");
       expect(
@@ -259,11 +267,15 @@ describe("SuggestionSearch routing", () => {
       // An item known by TMDB id matches no search result (those carry IMDB
       // ids), so the stand-in card stays, ahead of the results.
       await waitFor(() => {
-        expect(container.querySelectorAll("#search-card")).toHaveLength(9);
+        expect(
+          container.querySelectorAll('[data-testid="search-card"]'),
+        ).toHaveLength(9);
       });
-      expect(container.querySelector("#search-card")).toBe(card);
+      expect(container.querySelector('[data-testid="search-card"]')).toBe(card);
       expect(
-        container.querySelectorAll("#search-card.selected.expanded"),
+        container.querySelectorAll(
+          '[data-testid="search-card"].selected.expanded',
+        ),
       ).toHaveLength(1);
       expect(screen.getByTestId("person-panel")).toBe(panel);
     });
@@ -273,9 +285,13 @@ describe("SuggestionSearch routing", () => {
     it("Should show the panel by itself", async () => {
       const { container } = renderApp("/movie/tt0000001");
       await screen.findByTestId("movie-panel");
-      expect(container.querySelectorAll("#search-card")).toHaveLength(1);
       expect(
-        screen.getByRole("textbox", { name: "search-query-input" }),
+        container.querySelectorAll('[data-testid="search-card"]'),
+      ).toHaveLength(1);
+      expect(
+        screen.getByRole("textbox", {
+          name: "Search movies, people, and TV shows",
+        }),
       ).toHaveValue("");
     });
 
@@ -290,7 +306,7 @@ describe("SuggestionSearch routing", () => {
     it("Should redirect to the login page", () => {
       const { currentUrl } = renderApp("/nonsense");
       expect(currentUrl()).toBe("/login");
-      expect(screen.getByRole("button", { name: "login" })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Login" })).toBeInTheDocument();
     });
   });
 });

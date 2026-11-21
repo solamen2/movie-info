@@ -19,6 +19,7 @@ import {
 import EpisodeCard from "./EpisodeCard";
 import "../shared/shared.css";
 import "./tvseason.css";
+import { usePageTitle } from "../utilities/pageTitle";
 
 interface TvSeasonPanelProps {
   tmdbTvSeriesId: number;
@@ -59,10 +60,14 @@ function TvSeasonPanel({
       tvSeason?.episodes.some((e) => String(e.episodeNumber) === id) ?? false,
   });
 
+  usePageTitle(tvSeason && `${tvSeason.name} – ${tvSeriesName}`, 2);
+
   if (error) {
     return (
       <div className="detail-panel">
-        <p className="error-message">{error}</p>
+        <p className="error-message" role="alert">
+          {error}
+        </p>
       </div>
     );
   }
@@ -70,7 +75,9 @@ function TvSeasonPanel({
   if (!tvSeason) {
     return (
       <div className="detail-panel">
-        <p className="detail-loading">Loading TV season details…</p>
+        <p className="detail-loading" role="status">
+          Loading TV season details…
+        </p>
       </div>
     );
   }
@@ -149,7 +156,7 @@ function TvSeasonPanel({
           sources={[{ name: "TMDB", text: tvSeason.tmdbOverview }]}
         />
         <Collapsible title="Networks" count={tvSeason.networks.length}>
-          <HorizontalList>
+          <HorizontalList label="Networks">
             {tvSeason.networks.map((n) => (
               <NetworkCard key={n.id} network={n} />
             ))}

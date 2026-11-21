@@ -24,6 +24,7 @@ import CastCard from "./CastCard";
 import GuestStarCard from "./GuestStarCard";
 import { tvEpisodeGoogleSearchUrl } from "./tvEpisodeTypes";
 import "../shared/shared.css";
+import { usePageTitle } from "../utilities/pageTitle";
 
 interface TvEpisodePanelProps {
   tmdbTvSeriesId: number;
@@ -62,10 +63,14 @@ function TvEpisodePanel({
     },
   });
 
+  usePageTitle(tvEpisode && `${tvEpisode.title} – ${tvSeriesName}`, 3);
+
   if (error) {
     return (
       <div className="detail-panel">
-        <p className="error-message">{error}</p>
+        <p className="error-message" role="alert">
+          {error}
+        </p>
       </div>
     );
   }
@@ -73,7 +78,9 @@ function TvEpisodePanel({
   if (!tvEpisode) {
     return (
       <div className="detail-panel">
-        <p className="detail-loading">Loading TV episode details…</p>
+        <p className="detail-loading" role="status">
+          Loading TV episode details…
+        </p>
       </div>
     );
   }

@@ -9,6 +9,7 @@ import type {
   OscarYear,
 } from "./oscarTypes";
 import { ordinal, oscarYearElementId } from "./oscarUtils";
+import { usePageTitle } from "../utilities/pageTitle";
 import "./oscars.css";
 
 function AwardList({
@@ -152,6 +153,8 @@ function OscarsByYear() {
   // The ceremonies whose sections are open
   const [openYears, setOpenYears] = useState<ReadonlySet<number>>(new Set());
 
+  usePageTitle("Oscars By Year");
+
   function setYearOpen(ceremony: number, open: boolean) {
     setOpenYears((previous) => {
       if (previous.has(ceremony) === open) return previous;
@@ -175,9 +178,15 @@ function OscarsByYear() {
   return (
     <div className="oscars-page" data-testid="oscars-page">
       <h1>Oscars By Year</h1>
-      {error && <p className="error-message">{error}</p>}
+      {error && (
+        <p className="error-message" role="alert">
+          {error}
+        </p>
+      )}
       {!years && !error && (
-        <p className="detail-loading">Loading the Oscars…</p>
+        <p className="detail-loading" role="status">
+          Loading the Oscars…
+        </p>
       )}
       {years && (
         <>
@@ -185,7 +194,7 @@ function OscarsByYear() {
             <label className="oscars-jump">
               Jump To:
               <select
-                aria-label="jump-to-year"
+                aria-label="Jump to year"
                 defaultValue=""
                 onChange={(e) => {
                   jumpTo(e.target.value);

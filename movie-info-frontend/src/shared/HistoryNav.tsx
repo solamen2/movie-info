@@ -109,7 +109,7 @@ function HistoryNav() {
 
   return (
     <button
-      aria-label="back"
+      aria-label="Back"
       type="button"
       className={`back-button${tuckedAway ? " is-tucked-away" : ""}`}
       disabled={!backIsPossible}

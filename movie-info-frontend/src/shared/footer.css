@@ -7,23 +7,90 @@
 .app-footer-separator {
   margin: 0 0 1rem;
   border: none;
-  border-top: 1px solid #444;
+  border-top: 1px solid var(--border);
 }
 
 .app-footer-links {
+  --footer-gap: 1.5rem;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 1.5rem;
+  gap: var(--footer-gap);
 }
 
-.app-footer-links .logout-button {
+/* The theme toggle and the logout button sit together at the right end */
+.app-footer-links .theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   margin-left: auto;
+}
+
+/* The theme's options, joined into one control */
+.theme-toggle .option-toggle {
+  gap: 0;
+  margin: 0;
+}
+
+.theme-toggle .option-toggle button {
+  border-radius: 0;
+}
+
+.theme-toggle .option-toggle button:first-child {
+  border-radius: 8px 0 0 8px;
+}
+
+.theme-toggle .option-toggle button:last-child {
+  border-radius: 0 8px 8px 0;
+}
+
+/* Neighbours share an edge rather than doubling it; the picked or hovered
+   option's accented edge stays on top */
+.theme-toggle .option-toggle button + button {
+  margin-left: -1px;
+}
+
+.theme-toggle .option-toggle button:hover,
+.theme-toggle .option-toggle button[aria-pressed="true"] {
+  position: relative;
+}
+
+/* Room above and below each link, for a finger */
+.app-footer-links a {
+  position: relative;
+  padding: 0.25rem 0;
+}
+
+/* A faint line between one link and the next, half way across the gap */
+.app-footer-links a + a::before {
+  content: "";
+  position: absolute;
+  top: 25%;
+  bottom: 25%;
+  left: calc(var(--footer-gap) / -2);
+  border-left: 1px solid var(--border);
 }
 
 @media (max-width: 640px) {
   .app-footer {
     margin: 1rem auto;
     padding: 0 1rem;
+  }
+
+  /* On a phone the footer is two lines: the links, then the theme toggle at
+     the left and the logout button at the right. The gaps between the links
+     shrink a little so that all four stay on one line, at full size, down to
+     a 360px wide screen. */
+  .app-footer-links {
+    --footer-gap: 0.75rem;
+    row-gap: 0.5rem;
+  }
+
+  .app-footer-links .theme-toggle {
+    margin-left: 0;
+  }
+
+  .app-footer-links .logout-button {
+    margin-left: auto;
   }
 }

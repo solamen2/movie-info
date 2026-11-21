@@ -10,6 +10,35 @@
     <link rel="manifest" href="/manifest.json" />
     <meta name="apple-mobile-web-app-title" content="Movie Info" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- The theme: light or dark, following the OS setting unless one was
+         picked in the footer (see src/utilities/theme.ts, which this must
+         stay in step with). The colours are the page background's, from
+         src/index.css, for the browser's own UI around the page. -->
+    <meta name="color-scheme" content="light dark" />
+    <meta
+      name="theme-color"
+      data-theme-color="light"
+      media="(prefers-color-scheme: light)"
+      content="#ffffff"
+    />
+    <meta
+      name="theme-color"
+      data-theme-color="dark"
+      media="(prefers-color-scheme: dark)"
+      content="#242424"
+    />
+    <!-- Applies a picked theme before the first paint, so the page never
+         flashes in the other one while the app loads -->
+    <script>
+      try {
+        var theme = localStorage.getItem("theme");
+        if (theme === "light" || theme === "dark") {
+          document.documentElement.dataset.theme = theme;
+        }
+      } catch (e) {
+        // No storage (e.g. blocked by the browser): follow the OS setting
+      }
+    </script>
     <title>Movie Search</title>
   </head>
   <body>

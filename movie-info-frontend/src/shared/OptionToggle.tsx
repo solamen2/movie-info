@@ -1,7 +1,7 @@
 import "./shared.css";
 
 interface OptionToggleProps {
-  // The group's accessible name, e.g. "plot source"
+  // The group's accessible name, e.g. "Plot source"
   label: string;
   options: string[];
   // What an option's button says, when that is more than the option itself

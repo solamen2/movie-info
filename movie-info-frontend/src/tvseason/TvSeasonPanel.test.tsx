@@ -31,13 +31,15 @@ function findSeasonCard(name: string) {
 async function searchAndSelectExampleSeason() {
   const utils = renderApp();
   const searchQueryInput = screen.getByRole("textbox", {
-    name: "search-query-input",
+    name: "Search movies, people, and TV shows",
   });
   fireEvent.change(searchQueryInput, { target: { value: "1" } });
-  fireEvent.click(screen.getByRole("button", { name: "search" }));
+  fireEvent.click(screen.getByRole("button", { name: "Search" }));
 
   const tvSeriesText = await screen.findByText("Example TV Series");
-  const tvSeriesCard = tvSeriesText.closest<HTMLDivElement>("#search-card");
+  const tvSeriesCard = tvSeriesText.closest<HTMLDivElement>(
+    '[data-testid="search-card"]',
+  );
   if (!tvSeriesCard) {
     throw new Error("TV series search card not found");
   }
@@ -171,7 +173,7 @@ describe("TvSeasonPanel", () => {
       }
       // A section with nothing in it is left out
       expect(
-        within(panel).getByRole("group", { name: "way to watch" }).textContent,
+        within(panel).getByRole("group", { name: "Way to watch" }).textContent,
       ).toBe("StreamBuy");
       // The overview's only source still gets its button
       expect(
@@ -232,7 +234,7 @@ describe("TvSeasonPanel", () => {
       expect(link).toHaveAttribute("target", "_blank");
       expect(link).toHaveAttribute("rel", "noopener");
       expect(
-        within(panel).queryByRole("button", { name: "copy-imdb-link" }),
+        within(panel).queryByRole("button", { name: "Copy IMDB link" }),
       ).not.toBeInTheDocument();
     });
 

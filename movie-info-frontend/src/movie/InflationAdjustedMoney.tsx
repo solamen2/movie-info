@@ -43,7 +43,7 @@ interface InflationAdjustedMoneyProps {
   // The movie's release month and year
   releaseDate: YearMonth;
   // "budget" or "revenue": names the controls for assistive technology (and
-  // tests), e.g. "budget-month"
+  // tests), e.g. "Budget month"
   name: string;
 }
 
@@ -62,6 +62,8 @@ function InflationAdjustedMoney({
   const { data: inflation, error } = useInflationData();
   // The month and year picked, null while the release month and year stand
   const [selected, setSelected] = useState<YearMonth | null>(null);
+  // The name, as the start of a control's: "Budget"
+  const label = name.charAt(0).toUpperCase() + name.slice(1);
 
   const latest =
     inflation === null ? null : latestAvailableFor(inflation, releaseDate);
@@ -119,7 +121,7 @@ function InflationAdjustedMoney({
             wherever the amount's width leaves them */}
         <span className="inflation-money-dates">
           <select
-            aria-label={`${name}-month`}
+            aria-label={`${label} month`}
             value={target.month}
             onChange={(e) => {
               setSelected({ year: target.year, month: Number(e.target.value) });
@@ -136,7 +138,7 @@ function InflationAdjustedMoney({
             ))}
           </select>
           <select
-            aria-label={`${name}-year`}
+            aria-label={`${label} year`}
             value={target.year}
             onChange={(e) => {
               setSelected({
@@ -155,7 +157,7 @@ function InflationAdjustedMoney({
             <button
               type="button"
               className="inflation-reset-button"
-              aria-label={`reset-${name}-date`}
+              aria-label={`Reset ${name} date`}
               title="Back to the release month and year"
               onClick={() => {
                 setSelected(null);

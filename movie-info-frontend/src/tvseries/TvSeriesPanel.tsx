@@ -35,6 +35,7 @@ import TvSeriesCastCollapsible, {
 import { sortSeasons } from "./tvSeriesTypes";
 import "../shared/shared.css";
 import "./tvseries.css";
+import { usePageTitle } from "../utilities/pageTitle";
 
 // TMDB lists every distinct episode runtime a series has had
 function displayEpisodeRunTimes(minutes: number[]): string {
@@ -77,10 +78,14 @@ function TvSeriesPanel({ itemId }: TvSeriesPanelProps) {
     enabled: selectedSeasonNumber === null,
   });
 
+  usePageTitle(tvSeries?.name, 1);
+
   if (error) {
     return (
       <div className="detail-panel">
-        <p className="error-message">{error}</p>
+        <p className="error-message" role="alert">
+          {error}
+        </p>
       </div>
     );
   }
@@ -88,7 +93,9 @@ function TvSeriesPanel({ itemId }: TvSeriesPanelProps) {
   if (!tvSeries) {
     return (
       <div className="detail-panel">
-        <p className="detail-loading">Loading TV series details…</p>
+        <p className="detail-loading" role="status">
+          Loading TV series details…
+        </p>
       </div>
     );
   }
@@ -177,7 +184,7 @@ function TvSeriesPanel({ itemId }: TvSeriesPanelProps) {
           <ExternalLinkRow
             url={tvSeries.wikipediaLink ?? ""}
             label="Wikipedia:"
-            copyAriaLabel="copy-wikipedia-link"
+            copyAriaLabel="Copy Wikipedia link"
           />
           <DetailFacts facts={facts} />
         </div>
@@ -229,7 +236,7 @@ function TvSeriesPanel({ itemId }: TvSeriesPanelProps) {
           ]}
         />
         <Collapsible title="Networks" count={tvSeries.networks.length}>
-          <HorizontalList>
+          <HorizontalList label="Networks">
             {tvSeries.networks.map((n) => (
               <NetworkCard key={n.id} network={n} />
             ))}

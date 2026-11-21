@@ -1,3 +1,4 @@
+import { usePageTitle } from "../utilities/pageTitle";
 import "../shared/shared.css";
 
 // IMDB's own pages for its ranked lists (not user-made lists). The top and
@@ -17,6 +18,8 @@ const IMDB_LISTS: [string, string][] = [
 
 // Links to IMDB's ranked lists, which open on IMDB itself.
 function ImdbLists() {
+  usePageTitle("IMDB Lists");
+
   return (
     <div className="reference-page" data-testid="imdb-lists-page">
       <h1>IMDB Lists</h1>

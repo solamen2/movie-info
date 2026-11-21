@@ -1,6 +1,7 @@
 import Collapsible from "../shared/Collapsible";
 import OscarWinsAndNominations from "../oscars/OscarWinsAndNominations";
 import type { OscarAward } from "../oscars/oscarTypes";
+import { oscarCountLabel } from "../oscars/oscarUtils";
 
 interface PersonOscarsProps {
   // The person's Academy Award wins and nominations: empty when there are
@@ -12,7 +13,11 @@ interface PersonOscarsProps {
 // the category, the year, and the movie.
 function PersonOscars({ oscars }: PersonOscarsProps) {
   return (
-    <Collapsible title="Oscars" count={oscars?.length}>
+    <Collapsible
+      title="Oscars"
+      count={oscars?.length}
+      countLabel={oscars ? oscarCountLabel(oscars) : undefined}
+    >
       <OscarWinsAndNominations awards={oscars} context="person" />
     </Collapsible>
   );

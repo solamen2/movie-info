@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import ThemeToggle from "./ThemeToggle";
 import "./footer.css";
 
 // Shown at the bottom of every page once logged in: links to the app's
-// pages, and the logout button. The login and register pages are the only
+// pages, the theme toggle, and the logout button. The login and register pages are the only
 // pages seen while logged out, and those have no footer, since everything in
 // it needs a logged in user.
 function Footer() {
@@ -37,20 +38,21 @@ function Footer() {
   return (
     <footer className="app-footer">
       <hr className="app-footer-separator" />
-      <nav className="app-footer-links" aria-label="footer">
+      <nav className="app-footer-links" aria-label="Footer">
         <Link to="/search">Search</Link>
-        <Link to="/oscars">Oscars By Year</Link>
+        <Link to="/oscars">Oscars</Link>
         <Link to="/imdb-lists">IMDB Lists</Link>
-        <Link to="/aspect-ratios">Aspect Ratio Info</Link>
-        <button
-          aria-label="logout"
-          className="logout-button"
-          onClick={handleLogout}
-        >
+        <Link to="/aspect-ratios">Aspect Ratios</Link>
+        <ThemeToggle />
+        <button className="logout-button" onClick={handleLogout}>
           Logout
         </button>
       </nav>
-      {error && <p className="error-message">{error}</p>}
+      {error && (
+        <p className="error-message" role="alert">
+          {error}
+        </p>
+      )}
     </footer>
   );
 }

@@ -5,7 +5,7 @@ import process from "node:process";
 test.beforeEach(async ({ page }) => {
   console.log("Logging in...");
   await page.goto("");
-  await expect(page).toHaveTitle("Movie Search");
+  await expect(page).toHaveTitle("Login – Movie Search");
   const email = page.getByLabel("Email");
   const emailText = process.env.CI
     ? process.env.E2E_TEST_USERNAME
@@ -30,15 +30,31 @@ test.afterEach(async ({ page }) => {
 
 const useMockHttpCalls = process.env.VITE_USE_MOCK_HTTP_CALLS === "true";
 
+// The name of a "Link" that opens in a new tab: browsers that can give the
+// link's arrow a text alternative (see index.css) add it to the name.
+const EXTERNAL_LINK_NAME = /^Link\s*(\(opens in new tab\))?$/;
+
+// The blue highlight of a selected card, in the light and in the dark theme
+// (--highlight in index.css), as [red, green, blue].
+const HIGHLIGHT_COLORS = [
+  [0, 0, 255],
+  [77, 163, 255],
+];
+
 // Whether a computed border color is (all but) the blue highlight of a
 // selected card. "All but", since the fade towards the highlight can be cut
 // short a frame early by the next phase of the animation.
 function isHighlighted(color: string): boolean {
   const match = /^rgba?\((\d+), (\d+), (\d+)(?:, ([\d.]+))?\)$/.exec(color);
   if (!match) return false;
-  const [red, green, blue] = match.slice(1, 4).map(Number);
+  const channels = match.slice(1, 4).map(Number);
   const alpha = Number((match[4] as string | undefined) ?? 1);
-  return red <= 25 && green <= 25 && blue >= 230 && alpha >= 0.9;
+  return (
+    alpha >= 0.9 &&
+    HIGHLIGHT_COLORS.some((highlight) =>
+      highlight.every((value, i) => Math.abs(value - channels[i]) <= 25),
+    )
+  );
 }
 
 async function getBorderColor(card: Locator): Promise<string> {
@@ -207,16 +223,21 @@ test("Basic happy path: search, check results are valid, select a movie search c
 }) => {
   console.log("Starting basic happy path test...");
   const searchQueryInput = page.getByRole("textbox", {
-    name: "search-query-input",
+    name: "Search movies, people, and TV shows",
   });
   await searchQueryInput.fill(expectedMovie.searchText);
-  const searchButton = page.getByRole("button", { name: "search" });
+  const searchButton = page.getByRole("button", {
+    name: "Search",
+    exact: true,
+  });
   await searchButton.click();
 
   const movieTextElement = page.getByText(expectedMovie.title, {
     exact: true,
   });
-  const movieCard = movieTextElement.locator("ancestor=#search-card");
+  const movieCard = movieTextElement.locator(
+    'ancestor=[data-testid="search-card"]',
+  );
   for (const cardText of expectedMovie.cardText) {
     expect(await movieCard.textContent()).toContain(cardText);
   }
@@ -237,7 +258,9 @@ test("Basic happy path: search, check results are valid, select a movie search c
 
   const moviePanel = page.getByTestId("movie-panel");
   await expect(moviePanel).toBeVisible();
-  const selectedCard = page.locator("#search-card.selected.expanded");
+  const selectedCard = page.locator(
+    '[data-testid="search-card"].selected.expanded',
+  );
   await expect(selectedCard).toHaveCount(1);
   await expect(
     moviePanel.getByRole("heading", { name: expectedMovie.title, exact: true }),
@@ -250,15 +273,14 @@ test("Basic happy path: search, check results are valid, select a movie search c
   await expect(moviePanel).toContainText(expectedMovie.imdbRow);
   // The IMDB link comes first, then the Wikipedia link
   const movieLinks = moviePanel.getByRole("link", {
-    name: "Link",
-    exact: true,
+    name: EXTERNAL_LINK_NAME,
   });
   await expect(movieLinks).toHaveCount(2);
   const imdbLink = movieLinks.first();
   await expect(imdbLink).toHaveAttribute("href", expectedMovie.imdbUrl);
   await expect(imdbLink).toHaveAttribute("target", "_blank");
   await expect(
-    moviePanel.getByRole("button", { name: "copy-imdb-link" }),
+    moviePanel.getByRole("button", { name: "Copy IMDB link" }),
   ).toBeVisible();
   await expect(moviePanel).toContainText("Wikipedia:Link");
   const wikipediaLink = movieLinks.last();
@@ -268,7 +290,7 @@ test("Basic happy path: search, check results are valid, select a movie search c
   );
   await expect(wikipediaLink).toHaveAttribute("target", "_blank");
   await expect(
-    moviePanel.getByRole("button", { name: "copy-wikipedia-link" }),
+    moviePanel.getByRole("button", { name: "Copy Wikipedia link" }),
   ).toBeVisible();
   for (const fact of expectedMovie.facts) {
     await expect(moviePanel).toContainText(fact);
@@ -305,7 +327,9 @@ test("Basic happy path: search, check results are valid, select a movie search c
   console.log("Unselecting the movie search card...");
   await page.goBack();
   await expect(moviePanel).toBeHidden();
-  await expect(page.locator("#search-card.selected")).toHaveCount(0);
+  await expect(
+    page.locator('[data-testid="search-card"].selected'),
+  ).toHaveCount(0);
   await expectHighlightGone(page, movieCard, unselectedColor);
   await expect(resultsWithSelection).toHaveCount(0);
   for (const cardText of expectedMovie.cardText) {
@@ -321,14 +345,18 @@ test("Basic happy path: search, check results are valid, select a movie search c
   await page.goBack();
   await expect(page).toHaveURL(searchUrl);
   await expect(moviePanel).toBeHidden();
-  await expect(page.locator("#search-card.selected")).toHaveCount(0);
+  await expect(
+    page.locator('[data-testid="search-card"].selected'),
+  ).toHaveCount(0);
   await expect(resultsWithSelection).toHaveCount(0);
 
   console.log("Using the browser forward button...");
   await page.goForward();
   await expect(page).toHaveURL(detailUrl);
   await expect(moviePanel).toBeVisible();
-  await expect(page.locator("#search-card.selected.expanded")).toHaveCount(1);
+  await expect(
+    page.locator('[data-testid="search-card"].selected.expanded'),
+  ).toHaveCount(1);
   await expect(
     moviePanel.getByRole("heading", { name: expectedMovie.title, exact: true }),
   ).toBeVisible();
@@ -337,17 +365,19 @@ test("Basic happy path: search, check results are valid, select a movie search c
   await page.reload();
   await expect(page).toHaveURL(detailUrl);
   await expect(moviePanel).toBeVisible();
-  await expect(page.locator("#search-card.selected.expanded")).toHaveCount(1);
+  await expect(
+    page.locator('[data-testid="search-card"].selected.expanded'),
+  ).toHaveCount(1);
   await expect(
     moviePanel.getByRole("heading", { name: expectedMovie.title, exact: true }),
   ).toBeVisible();
   await expect(
-    page.getByRole("textbox", { name: "search-query-input" }),
+    page.getByRole("textbox", { name: "Search movies, people, and TV shows" }),
   ).toHaveValue(expectedMovie.searchText);
   console.log("Checking the panel shown from a URL is not highlighted...");
   await expectNeverHighlighted(
     page,
-    page.locator("#search-card.selected.expanded"),
+    page.locator('[data-testid="search-card"].selected.expanded'),
     moviePanel,
   );
   await page.goBack();
@@ -423,16 +453,21 @@ test("Person happy path: search, check results are valid, select a person search
 }) => {
   console.log("Starting person happy path test...");
   const searchQueryInput = page.getByRole("textbox", {
-    name: "search-query-input",
+    name: "Search movies, people, and TV shows",
   });
   await searchQueryInput.fill(expectedPerson.searchText);
-  const searchButton = page.getByRole("button", { name: "search" });
+  const searchButton = page.getByRole("button", {
+    name: "Search",
+    exact: true,
+  });
   await searchButton.click();
 
   const personTextElement = page
     .getByText(expectedPerson.name, { exact: true })
     .first();
-  const personCard = personTextElement.locator("ancestor=#search-card");
+  const personCard = personTextElement.locator(
+    'ancestor=[data-testid="search-card"]',
+  );
   for (const cardText of expectedPerson.cardText) {
     expect(await personCard.textContent()).toContain(cardText);
   }
@@ -447,7 +482,9 @@ test("Person happy path: search, check results are valid, select a person search
 
   const personPanel = page.getByTestId("person-panel");
   await expect(personPanel).toBeVisible();
-  const selectedCard = page.locator("#search-card.selected.expanded");
+  const selectedCard = page.locator(
+    '[data-testid="search-card"].selected.expanded',
+  );
   await expect(selectedCard).toHaveCount(1);
   await expect(
     personPanel.getByRole("heading", {
@@ -463,15 +500,14 @@ test("Person happy path: search, check results are valid, select a person search
   await expect(personPanel).toContainText(expectedPerson.imdbRow);
   // The IMDB link comes first, then the Wikipedia link
   const personLinks = personPanel.getByRole("link", {
-    name: "Link",
-    exact: true,
+    name: EXTERNAL_LINK_NAME,
   });
   await expect(personLinks).toHaveCount(2);
   const imdbLink = personLinks.first();
   await expect(imdbLink).toHaveAttribute("href", expectedPerson.imdbUrl);
   await expect(imdbLink).toHaveAttribute("target", "_blank");
   await expect(
-    personPanel.getByRole("button", { name: "copy-imdb-link" }),
+    personPanel.getByRole("button", { name: "Copy IMDB link" }),
   ).toBeVisible();
   await expect(personPanel).toContainText("Wikipedia:Link");
   const wikipediaLink = personLinks.last();
@@ -481,7 +517,7 @@ test("Person happy path: search, check results are valid, select a person search
   );
   await expect(wikipediaLink).toHaveAttribute("target", "_blank");
   await expect(
-    personPanel.getByRole("button", { name: "copy-wikipedia-link" }),
+    personPanel.getByRole("button", { name: "Copy Wikipedia link" }),
   ).toBeVisible();
   for (const fact of expectedPerson.facts) {
     await expect(personPanel).toContainText(fact);
@@ -519,7 +555,9 @@ test("Person happy path: search, check results are valid, select a person search
   console.log("Unselecting the person search card...");
   await page.keyboard.press("Escape");
   await expect(personPanel).toBeHidden();
-  await expect(page.locator("#search-card.selected")).toHaveCount(0);
+  await expect(
+    page.locator('[data-testid="search-card"].selected'),
+  ).toHaveCount(0);
   await expectHighlightGone(page, personCard, unselectedColor);
   await expect(resultsWithSelection).toHaveCount(0);
   for (const cardText of expectedPerson.cardText) {
@@ -623,16 +661,21 @@ test("TV series happy path: search, check results are valid, select a TV series 
 }) => {
   console.log("Starting TV series happy path test...");
   const searchQueryInput = page.getByRole("textbox", {
-    name: "search-query-input",
+    name: "Search movies, people, and TV shows",
   });
   await searchQueryInput.fill(expectedTvSeries.searchText);
-  const searchButton = page.getByRole("button", { name: "search" });
+  const searchButton = page.getByRole("button", {
+    name: "Search",
+    exact: true,
+  });
   await searchButton.click();
 
   const tvSeriesTextElement = page
     .getByText(expectedTvSeries.name, { exact: true })
     .first();
-  const tvSeriesCard = tvSeriesTextElement.locator("ancestor=#search-card");
+  const tvSeriesCard = tvSeriesTextElement.locator(
+    'ancestor=[data-testid="search-card"]',
+  );
   for (const cardText of expectedTvSeries.cardText) {
     expect(await tvSeriesCard.textContent()).toContain(cardText);
   }
@@ -647,7 +690,9 @@ test("TV series happy path: search, check results are valid, select a TV series 
 
   const tvSeriesPanel = page.getByTestId("tv-series-panel");
   await expect(tvSeriesPanel).toBeVisible();
-  const selectedCard = page.locator("#search-card.selected.expanded");
+  const selectedCard = page.locator(
+    '[data-testid="search-card"].selected.expanded',
+  );
   await expect(selectedCard).toHaveCount(1);
   await expect(
     tvSeriesPanel.getByRole("heading", {
@@ -666,15 +711,14 @@ test("TV series happy path: search, check results are valid, select a TV series 
   await expect(tvSeriesPanel).toContainText(expectedTvSeries.imdbRow);
   // The IMDB link comes first, then the Wikipedia link
   const tvSeriesLinks = tvSeriesPanel.getByRole("link", {
-    name: "Link",
-    exact: true,
+    name: EXTERNAL_LINK_NAME,
   });
   await expect(tvSeriesLinks).toHaveCount(2);
   const imdbLink = tvSeriesLinks.first();
   await expect(imdbLink).toHaveAttribute("href", expectedTvSeries.imdbUrl);
   await expect(imdbLink).toHaveAttribute("target", "_blank");
   await expect(
-    tvSeriesPanel.getByRole("button", { name: "copy-imdb-link" }),
+    tvSeriesPanel.getByRole("button", { name: "Copy IMDB link" }),
   ).toBeVisible();
   await expect(tvSeriesPanel).toContainText("Wikipedia:Link");
   const wikipediaLink = tvSeriesLinks.last();
@@ -684,7 +728,7 @@ test("TV series happy path: search, check results are valid, select a TV series 
   );
   await expect(wikipediaLink).toHaveAttribute("target", "_blank");
   await expect(
-    tvSeriesPanel.getByRole("button", { name: "copy-wikipedia-link" }),
+    tvSeriesPanel.getByRole("button", { name: "Copy Wikipedia link" }),
   ).toBeVisible();
   for (const fact of expectedTvSeries.facts) {
     await expect(tvSeriesPanel).toContainText(fact);
@@ -743,7 +787,9 @@ test("TV series happy path: search, check results are valid, select a TV series 
   console.log("Unselecting the TV series search card...");
   await page.goBack();
   await expect(tvSeriesPanel).toBeHidden();
-  await expect(page.locator("#search-card.selected")).toHaveCount(0);
+  await expect(
+    page.locator('[data-testid="search-card"].selected'),
+  ).toHaveCount(0);
   await expectHighlightGone(page, tvSeriesCard, unselectedColor);
   await expect(resultsWithSelection).toHaveCount(0);
   for (const cardText of expectedTvSeries.cardText) {
@@ -857,15 +903,15 @@ const expectedTvSeason: ExpectedTvSeason = useMockHttpCalls
 // Search for the TV series, open its panel, and expand the expected season.
 async function openSeason(page: Page) {
   const searchQueryInput = page.getByRole("textbox", {
-    name: "search-query-input",
+    name: "Search movies, people, and TV shows",
   });
   await searchQueryInput.fill(expectedTvSeries.searchText);
-  await page.getByRole("button", { name: "search" }).click();
+  await page.getByRole("button", { name: "Search", exact: true }).click();
 
   const tvSeriesCard = page
     .getByText(expectedTvSeries.name, { exact: true })
     .first()
-    .locator("ancestor=#search-card");
+    .locator('ancestor=[data-testid="search-card"]');
   await tvSeriesCard.click();
   const tvSeriesPanel = page.getByTestId("tv-series-panel");
   await expect(tvSeriesPanel).toBeVisible();
@@ -974,13 +1020,12 @@ test("TV season happy path: open a TV series, expand a season card, check the se
     }),
   ).toBeVisible();
   const imdbLink = tvSeasonPanel.getByRole("link", {
-    name: "Link",
-    exact: true,
+    name: EXTERNAL_LINK_NAME,
   });
   await expect(imdbLink).toHaveAttribute("href", expectedTvSeries.imdbUrl);
   await expect(imdbLink).toHaveAttribute("target", "_blank");
   await expect(
-    tvSeasonPanel.getByRole("button", { name: "copy-imdb-link" }),
+    tvSeasonPanel.getByRole("button", { name: "Copy IMDB link" }),
   ).toHaveCount(0);
   for (const fact of expectedTvSeason.facts) {
     await expect(tvSeasonPanel).toContainText(fact);
@@ -1099,8 +1144,7 @@ test("TV episode happy path: open a TV season, expand an episode card, check the
   await expect(tvEpisodePanel).toContainText(expectedEpisode.seasonEpisode);
   await expect(tvEpisodePanel).toContainText(expectedEpisode.imdbRow);
   const imdbLinks = tvEpisodePanel.getByRole("link", {
-    name: "Link",
-    exact: true,
+    name: EXTERNAL_LINK_NAME,
   });
   await expect(imdbLinks).toHaveCount(2);
   await expect(imdbLinks.first()).toHaveAttribute(
@@ -1112,7 +1156,7 @@ test("TV episode happy path: open a TV season, expand an episode card, check the
     expectedTvSeries.imdbUrl,
   );
   await expect(
-    tvEpisodePanel.getByRole("button", { name: "copy-imdb-link" }),
+    tvEpisodePanel.getByRole("button", { name: "Copy IMDB link" }),
   ).toHaveCount(1);
   for (const fact of expectedEpisode.facts) {
     await expect(tvEpisodePanel).toContainText(fact);
@@ -1204,13 +1248,13 @@ test("Panel to panel: open a movie, open a cast member's person panel from it, o
 }) => {
   console.log("Starting panel to panel test...");
   const searchQueryInput = page.getByRole("textbox", {
-    name: "search-query-input",
+    name: "Search movies, people, and TV shows",
   });
   await searchQueryInput.fill(expectedMovie.searchText);
-  await page.getByRole("button", { name: "search" }).click();
+  await page.getByRole("button", { name: "Search", exact: true }).click();
   const movieCard = page
     .getByText(expectedMovie.title, { exact: true })
-    .locator("ancestor=#search-card");
+    .locator('ancestor=[data-testid="search-card"]');
   // Set while a card is selected, which hides the other results
   const resultsWithSelection = page.locator(".results-container.has-selection");
   await expect(resultsWithSelection).toHaveCount(0);
@@ -1219,7 +1263,9 @@ test("Panel to panel: open a movie, open a cast member's person panel from it, o
   await expect(moviePanel).toBeVisible();
   const movieUrl = new RegExp(`/movie/${expectedMovie.imdbId}\\?q=[^/&]+$`);
   await expect(page).toHaveURL(movieUrl);
-  const expandedCard = page.locator("#search-card.selected.expanded");
+  const expandedCard = page.locator(
+    '[data-testid="search-card"].selected.expanded',
+  );
 
   console.log("Clicking a cast card in the movie panel...");
   const castCard = await openSectionCard(
@@ -1366,7 +1412,9 @@ test("Panel to panel: open a movie, open a cast member's person panel from it, o
   await page.goBack();
   await expect(page).toHaveURL(/\/search\?q=[^/]+$/);
   await expect(moviePanel).toBeHidden();
-  await expect(page.locator("#search-card.selected")).toHaveCount(0);
+  await expect(
+    page.locator('[data-testid="search-card"].selected'),
+  ).toHaveCount(0);
   await expect(resultsWithSelection).toHaveCount(0);
   console.log("Panel to panel test finished.");
 });
@@ -1862,7 +1910,7 @@ const expectedOscars: ExpectedOscarsPage = useMockHttpCalls
     };
 
 async function openOscarsPage(page: Page): Promise<Locator> {
-  await page.getByRole("link", { name: "Oscars By Year" }).click();
+  await page.getByRole("link", { name: "Oscars", exact: true }).click();
   await expect(page).toHaveURL(/\/oscars$/);
   const oscarsPage = page.getByTestId("oscars-page");
   await expect(
@@ -1933,7 +1981,7 @@ async function checkOscarAsterisk(
 ) {
   const asterisk = container
     .locator("> h3.oscar-category-title, > h4.oscar-category-subsection-title")
-    .getByRole("button", { name: "original category name" });
+    .getByRole("button", { name: "Original category name" });
   if (originalName === undefined) {
     await expect(asterisk).toHaveCount(0);
     return;
@@ -2036,7 +2084,7 @@ test("Oscars By Year spot checks: open the page from the footer, check the most 
     "1927/281st Academy Awards",
   );
   const jumpToOptions = page
-    .getByRole("combobox", { name: "jump-to-year" })
+    .getByRole("combobox", { name: "Jump to year" })
     .locator("option:not([disabled])");
   await expect(jumpToOptions).toHaveCount(yearCount);
   await expect(jumpToOptions.first()).toHaveText(latestYear);
@@ -2080,7 +2128,7 @@ test("Oscars By Year interactions: expand and collapse all years, jump to a year
 
   console.log("Jumping to a year...");
   await page
-    .getByRole("combobox", { name: "jump-to-year" })
+    .getByRole("combobox", { name: "Jump to year" })
     .selectOption(String(expectedOscars.jumpTo));
   const jumpedTo = oscarYear(page, expectedOscars.jumpTo);
   await expect(jumpedTo).toHaveAttribute("open", "");
@@ -2108,7 +2156,7 @@ test("Oscars By Year interactions: expand and collapse all years, jump to a year
   }
   const noteLine = noteContainer.locator("> li").filter({ hasText: note.line });
   await expect(noteLine).toHaveCount(1);
-  await noteLine.getByRole("button", { name: "note" }).click();
+  await noteLine.getByRole("button", { name: "Note" }).click();
   await expect(noteLine.getByRole("tooltip")).toContainText(note.text);
   await page.keyboard.press("Escape");
   await expect(noteLine.getByRole("tooltip")).toHaveCount(0);
@@ -2198,9 +2246,7 @@ test("Reference pages: open IMDB Lists and the Aspect Ratio Reference from the f
   }
 
   console.log("Checking the Aspect Ratio Reference page...");
-  await page
-    .getByRole("link", { name: "Aspect Ratio Info", exact: true })
-    .click();
+  await page.getByRole("link", { name: "Aspect Ratios", exact: true }).click();
   await expect(page).toHaveURL(/\/aspect-ratios$/);
   const referencePage = page.getByTestId("aspect-ratio-reference-page");
   await expect(
@@ -2229,4 +2275,87 @@ test("Reference pages: open IMDB Lists and the Aspect Ratio Reference from the f
   expect(hasHorizontalScrollbar).toBe(false);
 
   console.log("Reference pages test finished.");
+});
+
+test("Theme: follow the OS setting until a theme is picked in the footer, and keep the picked theme across a reload", async ({
+  page,
+}) => {
+  console.log("Starting theme test...");
+  const DARK_BACKGROUND = "rgb(36, 36, 36)";
+  const LIGHT_BACKGROUND = "rgb(255, 255, 255)";
+  const root = page.locator("html");
+  const themeButton = (name: string) =>
+    page
+      .getByRole("group", { name: "Theme" })
+      .getByRole("button", { name, exact: true });
+
+  console.log("Checking the theme follows the OS setting...");
+  await expect(themeButton("Auto")).toHaveAttribute("aria-pressed", "true");
+  await expect(root).toHaveCSS("background-color", DARK_BACKGROUND);
+  await page.emulateMedia({ colorScheme: "light" });
+  await expect(root).toHaveCSS("background-color", LIGHT_BACKGROUND);
+
+  console.log("Picking the dark theme against the OS setting...");
+  await themeButton("Dark").click();
+  await expect(themeButton("Dark")).toHaveAttribute("aria-pressed", "true");
+  await expect(root).toHaveCSS("background-color", DARK_BACKGROUND);
+
+  console.log("Checking the picked theme survives a reload...");
+  await page.reload();
+  await expect(themeButton("Dark")).toHaveAttribute("aria-pressed", "true");
+  await expect(root).toHaveCSS("background-color", DARK_BACKGROUND);
+
+  console.log("Picking the light theme against the OS setting...");
+  await page.emulateMedia({ colorScheme: "dark" });
+  await themeButton("Light").click();
+  await expect(root).toHaveCSS("background-color", LIGHT_BACKGROUND);
+
+  console.log("Going back to following the OS setting...");
+  await themeButton("Auto").click();
+  await expect(root).toHaveCSS("background-color", DARK_BACKGROUND);
+
+  console.log("Theme test finished.");
+});
+
+test("Keyboard: tab to a result card, open its panel with Enter, and close it with Escape, with the focus following along", async ({
+  page,
+}) => {
+  console.log("Starting keyboard test...");
+  const searchQueryInput = page.getByRole("textbox", {
+    name: "Search movies, people, and TV shows",
+  });
+  await searchQueryInput.fill(expectedMovie.searchText);
+  await searchQueryInput.press("Enter");
+  const movieCard = page
+    .getByText(expectedMovie.title, { exact: true })
+    .locator('ancestor=[data-testid="search-card"]');
+  await expect(movieCard).toHaveRole("button");
+  await expect(page).toHaveTitle(`${expectedMovie.searchText} – Movie Search`);
+
+  console.log("Tabbing to the card...");
+  // From the search box, the cards follow the clear and search buttons
+  for (let presses = 0; presses < 30; presses++) {
+    await page.keyboard.press("Tab");
+    if (await movieCard.evaluate((card) => card === document.activeElement)) {
+      break;
+    }
+  }
+  await expect(movieCard).toBeFocused();
+
+  console.log("Opening the panel with Enter...");
+  await page.keyboard.press("Enter");
+  const moviePanel = page.getByTestId("movie-panel");
+  await expect(moviePanel).toBeVisible();
+  await expect(page).toHaveTitle(`${expectedMovie.title} – Movie Search`);
+  const panelCard = page.locator('[data-testid="search-card"].expanded');
+  await expect(panelCard).toBeFocused();
+  await expect(panelCard).not.toHaveRole("button");
+
+  console.log("Closing the panel with Escape...");
+  await page.keyboard.press("Escape");
+  await expect(moviePanel).toBeHidden();
+  await expect(movieCard).toHaveRole("button");
+  await expect(movieCard).toBeFocused();
+
+  console.log("Keyboard test finished.");
 });

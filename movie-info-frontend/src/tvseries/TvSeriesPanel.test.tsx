@@ -19,13 +19,15 @@ import TvSeriesPanel from "./TvSeriesPanel";
 async function searchAndSelectExampleTvSeries() {
   const utils = renderApp();
   const searchQueryInput = screen.getByRole("textbox", {
-    name: "search-query-input",
+    name: "Search movies, people, and TV shows",
   });
   fireEvent.change(searchQueryInput, { target: { value: "1" } });
-  fireEvent.click(screen.getByRole("button", { name: "search" }));
+  fireEvent.click(screen.getByRole("button", { name: "Search" }));
 
   const tvSeriesText = await screen.findByText("Example TV Series");
-  const tvSeriesCard = tvSeriesText.closest<HTMLDivElement>("#search-card");
+  const tvSeriesCard = tvSeriesText.closest<HTMLDivElement>(
+    '[data-testid="search-card"]',
+  );
   if (!tvSeriesCard) {
     throw new Error("TV series search card not found");
   }
@@ -181,7 +183,7 @@ describe("TvSeriesPanel", () => {
       }
       // A section with nothing in it is left out
       expect(
-        screen.getByRole("group", { name: "way to watch" }).textContent,
+        screen.getByRole("group", { name: "Way to watch" }).textContent,
       ).toBe("StreamBuy");
     });
 
@@ -349,7 +351,7 @@ describe("TvSeriesPanel", () => {
       await searchAndSelectExampleTvSeries();
       await screen.findByTestId("tv-series-panel");
 
-      fireEvent.click(screen.getByRole("button", { name: "copy-imdb-link" }));
+      fireEvent.click(screen.getByRole("button", { name: "Copy IMDB link" }));
       expect(await clipboard.copiedHtml()).toBe(
         '<a href="https://www.imdb.com/title/tt10000002">Link</a>',
       );
@@ -380,7 +382,7 @@ describe("TvSeriesPanel", () => {
       await screen.findByTestId("tv-series-panel");
 
       fireEvent.click(
-        screen.getByRole("button", { name: "copy-wikipedia-link" }),
+        screen.getByRole("button", { name: "Copy Wikipedia link" }),
       );
       expect(await clipboard.copiedHtml()).toBe(
         '<a href="https://en.wikipedia.org/wiki/Example_TV_Series">Link</a>',
@@ -416,10 +418,10 @@ describe("TvSeriesPanel", () => {
         expect(panel.textContent).not.toContain("Wikipedia");
         expect(screen.getAllByRole("link", { name: "Link" })).toHaveLength(1);
         expect(
-          screen.queryByRole("button", { name: "copy-wikipedia-link" }),
+          screen.queryByRole("button", { name: "Copy Wikipedia link" }),
         ).toBeNull();
         expect(
-          screen.getByRole("button", { name: "copy-imdb-link" }),
+          screen.getByRole("button", { name: "Copy IMDB link" }),
         ).toBeInTheDocument();
       },
     );
@@ -721,14 +723,14 @@ describe("TvSeriesPanel", () => {
         expect(panel).not.toBeInTheDocument();
         expect(tvSeriesCard).not.toHaveClass("selected");
         expect(tvSeriesCard).toHaveClass("deselecting");
-        const targetCard = targetPanel.closest("#search-card");
+        const targetCard = targetPanel.closest('[data-testid="search-card"]');
         expect(targetCard).not.toBe(tvSeriesCard);
         expect(targetCard).toHaveClass("selected");
         expect(targetCard).toHaveClass("expanded");
         expect(targetCard).toHaveClass("grow-in");
         expect(targetCard).toHaveClass("stand-in");
         expect(
-          container.querySelectorAll("#search-card.selected"),
+          container.querySelectorAll('[data-testid="search-card"].selected'),
         ).toHaveLength(1);
         expect(
           within(targetPanel).getByRole("heading", { name }),
@@ -779,7 +781,7 @@ describe("TvSeriesPanel", () => {
       const panel = await screen.findByTestId("tv-series-panel");
       fireEvent.click(findCard(panel, "cast-card", "Example Brown"));
       const targetPanel = await screen.findByTestId("person-panel");
-      const targetCard = targetPanel.closest("#search-card");
+      const targetCard = targetPanel.closest('[data-testid="search-card"]');
       const cardUrl = "/tvseries/tt10000002?q=1&cardType=cast&cardId=2";
 
       await goBack();
@@ -808,7 +810,9 @@ describe("TvSeriesPanel", () => {
       expect(card.parentElement).not.toHaveClass("has-selection");
       expect(card.closest("details")).not.toHaveClass("has-child-selection");
       expect(card.closest("details")?.open).toBe(true);
-      expect(container.querySelectorAll("#search-card")).toHaveLength(8);
+      expect(
+        container.querySelectorAll('[data-testid="search-card"]'),
+      ).toHaveLength(8);
 
       await goBack();
       expect(currentUrl()).toBe("/tvseries/tt10000002?q=1");
@@ -835,7 +839,9 @@ describe("TvSeriesPanel", () => {
       expect(currentUrl()).toBe("/person/2?q=1");
       await screen.findByTestId("person-panel");
       expect(tvSeriesCard).toHaveClass("deselecting");
-      expect(container.querySelectorAll("#search-card")).toHaveLength(9);
+      expect(
+        container.querySelectorAll('[data-testid="search-card"]'),
+      ).toHaveLength(9);
     });
 
     it("Should push the URL without the card when the highlighted card is clicked, and nothing else", async () => {

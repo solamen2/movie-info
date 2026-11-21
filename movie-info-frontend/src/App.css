@@ -25,9 +25,17 @@
   padding: 0.5rem;
   font-size: 1rem;
   border-radius: 6px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--input-border);
   background: inherit;
   color: inherit;
+}
+
+/* The note on the register page */
+.auth-note {
+  font-size: 1.5em;
+  font-weight: bold;
+  line-height: 1.5;
+  margin: 0.83em 0;
 }
 
 .form-actions {
@@ -52,7 +60,7 @@
 }
 
 /* Each logo sits on a white tile, since several of them are dark and would
-   otherwise disappear into the dark color scheme's background */
+   otherwise disappear into the dark theme's background */
 .data-credits img {
   display: block;
   box-sizing: content-box;
@@ -64,7 +72,7 @@
 }
 
 .error-message {
-  color: #e74c3c;
+  color: var(--error-text);
   margin: 0.5rem 0;
 }
 
@@ -98,9 +106,11 @@
   min-width: 0;
   /* Room on the right for the clear button */
   padding: 0.5rem 2.25rem 0.5rem 0.75rem;
+  /* The hint in the empty box is wider than the box on a phone */
+  text-overflow: ellipsis;
   font-size: 1rem;
   border-radius: 6px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--input-border);
   background: inherit;
   color: inherit;
 }
@@ -120,11 +130,11 @@
   background: none;
   font-size: 0.9rem;
   line-height: 1;
-  opacity: 0.6;
+  color: var(--muted-text);
 }
 
 .search-bar .search-clear-button:hover {
-  opacity: 1;
+  color: var(--text);
 }
 
 .logout-button {
@@ -156,7 +166,7 @@
    here. */
 .result-card {
   width: 260px;
-  border: 2px solid #444;
+  border: 2px solid var(--border);
   border-radius: 8px;
   padding: 0.75rem;
   cursor: pointer;
@@ -167,7 +177,7 @@
    would otherwise stick after a tap inside the panel and clear on a tap
    outside it. */
 .result-card:not(.selected):hover {
-  border-color: #888;
+  border-color: var(--border-hover);
 }
 
 .card-image {
@@ -184,23 +194,16 @@
   align-items: center;
   justify-content: center;
   border-radius: 4px;
-  background: #333;
-  color: #999;
+  background: var(--placeholder-background);
+  color: var(--placeholder-text);
   font-size: 0.9rem;
-}
-
-@media (prefers-color-scheme: light) {
-  .card-image-placeholder {
-    background: #e8e8e8;
-    color: #888;
-  }
 }
 
 .card-details {
   margin-top: 0.5rem;
 }
 
-.card-details h3.card-name {
+.card-details h2.card-name {
   margin: 0 0 0.4rem;
   font-size: 1rem;
   line-height: 1.3;
@@ -243,7 +246,7 @@
   .result-card.grow-in {
     opacity: 1;
     width: 110px;
-    border-color: blue;
+    border-color: var(--highlight);
   }
 }
 

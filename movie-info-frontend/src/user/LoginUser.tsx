@@ -1,11 +1,14 @@
 import { type SubmitEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { usePageTitle } from "../utilities/pageTitle";
 
 function LoginUser() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+
+  usePageTitle("Login");
 
   async function handleLogin(e: SubmitEvent) {
     e.preventDefault();
@@ -37,6 +40,10 @@ function LoginUser() {
           <input
             id="email"
             type="text"
+            autoComplete="username"
+            inputMode="email"
+            autoCapitalize="none"
+            spellCheck={false}
             value={email}
             onChange={(e) => {
               setEmail(e.target.value);
@@ -49,6 +56,7 @@ function LoginUser() {
           <input
             id="password"
             type="password"
+            autoComplete="current-password"
             value={password}
             onChange={(e) => {
               setPassword(e.target.value);
@@ -56,9 +64,13 @@ function LoginUser() {
             required
           />
         </div>
-        {error && <p className="error-message">{error}</p>}
+        {error && (
+          <p className="error-message" role="alert">
+            {error}
+          </p>
+        )}
         <div className="form-actions">
-          <button aria-label="login" id="login" type="submit">
+          <button id="login" type="submit">
             Login
           </button>
           {import.meta.env.DEV && (

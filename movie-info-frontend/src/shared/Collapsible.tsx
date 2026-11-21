@@ -6,6 +6,9 @@ interface CollapsibleProps {
   // How many items the section holds, shown beside its title. A section
   // with none has nothing to show, so it isn't rendered at all.
   count?: number;
+  // What to show for the count in place of the number itself, e.g.
+  // "2 wins, 3 noms"
+  countLabel?: string;
   // While true the section is kept open (e.g. because a card inside it is
   // selected via the URL). It is never closed automatically, so the user can
   // still collapse it, and it stays open for the deselect animation.
@@ -23,6 +26,7 @@ interface CollapsibleProps {
 function Collapsible({
   title,
   count,
+  countLabel,
   forceOpen,
   childSelected,
   lazy,
@@ -58,7 +62,9 @@ function Collapsible({
       <summary>
         <span className="chevron" aria-hidden="true" />
         {title}
-        {count != null && <span className="collapsible-count">({count})</span>}
+        {count != null && (
+          <span className="collapsible-count">({countLabel ?? count})</span>
+        )}
       </summary>
       <div className="collapsible-body">
         {lazy && !opened ? null : children}

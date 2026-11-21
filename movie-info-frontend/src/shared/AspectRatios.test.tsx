@@ -132,15 +132,15 @@ describe("AspectRatios", () => {
     renderAspectRatios([FULLSCREEN, UNNAMED]);
     expect(screen.queryByRole("tooltip")).toBeNull();
 
-    fireEvent.click(screen.getByRole("button", { name: "about 4:3" }));
+    fireEvent.click(screen.getByRole("button", { name: "About 4:3" }));
     expect(screen.getByRole("tooltip").textContent).toBe(
       "The shape of television before HD.",
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "about 4:3" }));
+    fireEvent.click(screen.getByRole("button", { name: "About 4:3" }));
     expect(screen.queryByRole("tooltip")).toBeNull();
 
-    fireEvent.click(screen.getByRole("button", { name: "about 3:2" }));
+    fireEvent.click(screen.getByRole("button", { name: "About 3:2" }));
     expect(screen.getByRole("tooltip").textContent).toBe(
       "The shape of a 35 mm still photograph.",
     );
@@ -148,7 +148,7 @@ describe("AspectRatios", () => {
 
   it("Should show the description while the mouse is over the info mark", () => {
     renderAspectRatios([FULLSCREEN, UNNAMED]);
-    const mark = screen.getByRole("button", { name: "about 3:2" });
+    const mark = screen.getByRole("button", { name: "About 3:2" });
 
     fireEvent.pointerEnter(mark, { pointerType: "mouse" });
     expect(screen.getByRole("tooltip").textContent).toBe(
@@ -162,7 +162,7 @@ describe("AspectRatios", () => {
 
   it("Should keep a clicked description open after the mouse leaves", () => {
     renderAspectRatios([FULLSCREEN]);
-    const mark = screen.getByRole("button", { name: "about 4:3" });
+    const mark = screen.getByRole("button", { name: "About 4:3" });
 
     fireEvent.pointerEnter(mark, { pointerType: "mouse" });
     fireEvent.click(mark);
@@ -175,7 +175,7 @@ describe("AspectRatios", () => {
 
   it("Should not treat a touch as a hover, which would never end", () => {
     renderAspectRatios([FULLSCREEN]);
-    const mark = screen.getByRole("button", { name: "about 4:3" });
+    const mark = screen.getByRole("button", { name: "About 4:3" });
 
     fireEvent.pointerEnter(mark, { pointerType: "touch" });
     expect(screen.queryByRole("tooltip")).toBeNull();
