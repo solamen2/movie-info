@@ -37,8 +37,10 @@
   line-height: 1.5;
 }
 
+/* Never split across lines, nor from its new-tab arrow */
 .inflation-adjustment-label {
   font-size: 0.8rem;
+  white-space: nowrap;
 }
 
 .inflation-money-now {
@@ -49,5 +51,5 @@
 }
 
 .inflation-unavailable {
-  color: #e74c3c;
+  color: var(--error-text);
 }

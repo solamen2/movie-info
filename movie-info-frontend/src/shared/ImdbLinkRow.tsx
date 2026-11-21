@@ -19,7 +19,7 @@ function ImdbLinkRow({ url, rating, votes, rank }: ImdbLinkRowProps) {
 
   return (
     <>
-      <ExternalLinkRow url={url} label="IMDB:" copyAriaLabel="copy-imdb-link">
+      <ExternalLinkRow url={url} label="IMDB:" copyAriaLabel="Copy IMDB link">
         {shownRating === "—" ? null : (
           <>
             {" "}

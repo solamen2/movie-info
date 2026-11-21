@@ -22,7 +22,7 @@ function AwardList({
 
   return (
     <div className="oscar-award-group" data-testid={`oscar-${title}`}>
-      <h4 className="oscar-award-group-title">{title}</h4>
+      <h3 className="oscar-award-group-title">{title}</h3>
       <ul className="oscar-award-list">
         {awards.map((award, i) => (
           <li key={i}>

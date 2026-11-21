@@ -10,14 +10,14 @@ describe("SuggestionSearchCard", () => {
     it("Should only show person search card data fields", async () => {
       renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
-        name: "search-query-input",
+        name: "Search movies, people, and TV shows",
       });
       fireEvent.change(searchQueryInput, { target: { value: "1" } });
-      const searchButton = screen.getByRole("button", { name: "search" });
+      const searchButton = screen.getByRole("button", { name: "Search" });
       fireEvent.click(searchButton);
 
       const personText = await screen.findByText("Example Smith");
-      const personCard = personText.closest("#search-card");
+      const personCard = personText.closest('[data-testid="search-card"]');
       expect(personCard?.textContent).toMatch(
         "Example SmithSearch Type: PersonRank: 3Known For: Actress, Example Film",
       );
@@ -27,14 +27,14 @@ describe("SuggestionSearchCard", () => {
     it("Should only show movie search card data fields", async () => {
       renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
-        name: "search-query-input",
+        name: "Search movies, people, and TV shows",
       });
       fireEvent.change(searchQueryInput, { target: { value: "1" } });
-      const searchButton = screen.getByRole("button", { name: "search" });
+      const searchButton = screen.getByRole("button", { name: "Search" });
       fireEvent.click(searchButton);
 
       const movieText = await screen.findByText("Example Movie");
-      const movieCard = movieText.closest("#search-card");
+      const movieCard = movieText.closest('[data-testid="search-card"]');
       expect(movieCard?.textContent).toMatch(
         "Example MovieSearch Type: MediaMedia Type: MovieRank: 4444Known For: Example Jones, Example BrownYear: 2016",
       );
@@ -44,14 +44,14 @@ describe("SuggestionSearchCard", () => {
     it("Should only show TV series search card data fields", async () => {
       renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
-        name: "search-query-input",
+        name: "Search movies, people, and TV shows",
       });
       fireEvent.change(searchQueryInput, { target: { value: "1" } });
-      const searchButton = screen.getByRole("button", { name: "search" });
+      const searchButton = screen.getByRole("button", { name: "Search" });
       fireEvent.click(searchButton);
 
       const tvSeriesText = await screen.findByText("Example TV Series");
-      const tvSeriesCard = tvSeriesText.closest("#search-card");
+      const tvSeriesCard = tvSeriesText.closest('[data-testid="search-card"]');
       expect(tvSeriesCard?.textContent).toMatch(
         "Example TV SeriesSearch Type: MediaMedia Type: TV SeriesRank: 4444Known For: John Smith, James JohnsonYears: 2001-2003",
       );
@@ -61,16 +61,18 @@ describe("SuggestionSearchCard", () => {
     it("Should only show TV mini series search card data fields", async () => {
       renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
-        name: "search-query-input",
+        name: "Search movies, people, and TV shows",
       });
       fireEvent.change(searchQueryInput, { target: { value: "1" } });
-      const searchButton = screen.getByRole("button", { name: "search" });
+      const searchButton = screen.getByRole("button", { name: "Search" });
       fireEvent.click(searchButton);
 
       const tvMiniSeriesText = await screen.findByText(
         "Example TV Mini Series",
       );
-      const tvMiniSeriesCard = tvMiniSeriesText.closest("#search-card");
+      const tvMiniSeriesCard = tvMiniSeriesText.closest(
+        '[data-testid="search-card"]',
+      );
       expect(tvMiniSeriesCard?.textContent).toMatch(
         "Example TV Mini SeriesSearch Type: MediaMedia Type: TV Mini SeriesRank: 4444Known For: Maria Garcia, James SmithYears: 1982-1982",
       );
@@ -80,14 +82,14 @@ describe("SuggestionSearchCard", () => {
     it("Should only show TV movie search card data fields", async () => {
       renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
-        name: "search-query-input",
+        name: "Search movies, people, and TV shows",
       });
       fireEvent.change(searchQueryInput, { target: { value: "1" } });
-      const searchButton = screen.getByRole("button", { name: "search" });
+      const searchButton = screen.getByRole("button", { name: "Search" });
       fireEvent.click(searchButton);
 
       const tvMovieText = await screen.findByText("Example TV Movie");
-      const tvMovieCard = tvMovieText.closest("#search-card");
+      const tvMovieCard = tvMovieText.closest('[data-testid="search-card"]');
       expect(tvMovieCard?.textContent).toMatch(
         "No imageExample TV MovieSearch Type: MediaMedia Type: TV MovieRank: 188333Known For: Michael Smith, David SmithYear: 2017",
       );
@@ -97,14 +99,16 @@ describe("SuggestionSearchCard", () => {
     it("Should only show TV special card data fields", async () => {
       renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
-        name: "search-query-input",
+        name: "Search movies, people, and TV shows",
       });
       fireEvent.change(searchQueryInput, { target: { value: "1" } });
-      const searchButton = screen.getByRole("button", { name: "search" });
+      const searchButton = screen.getByRole("button", { name: "Search" });
       fireEvent.click(searchButton);
 
       const tvSpecialText = await screen.findByText("Example TV Special");
-      const tvSpecialCard = tvSpecialText.closest("#search-card");
+      const tvSpecialCard = tvSpecialText.closest(
+        '[data-testid="search-card"]',
+      );
       expect(tvSpecialCard?.textContent).toMatch(
         "Example TV SpecialSearch Type: MediaMedia Type: TV SpecialRank: 1930011Known For: Maria Rodriguez, Mary SmithYear: 1999",
       );
@@ -114,14 +118,14 @@ describe("SuggestionSearchCard", () => {
     it("Should only show TV short search card data fields", async () => {
       renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
-        name: "search-query-input",
+        name: "Search movies, people, and TV shows",
       });
       fireEvent.change(searchQueryInput, { target: { value: "1" } });
-      const searchButton = screen.getByRole("button", { name: "search" });
+      const searchButton = screen.getByRole("button", { name: "Search" });
       fireEvent.click(searchButton);
 
       const tvShortText = await screen.findByText("Example TV Short");
-      const tvShortCard = tvShortText.closest("#search-card");
+      const tvShortCard = tvShortText.closest('[data-testid="search-card"]');
       expect(tvShortCard?.textContent).toMatch(
         "Example TV ShortSearch Type: MediaMedia Type: TV ShortRank: 2000Known For: Maria Martinez, James JohnsonYear: 1982",
       );
@@ -131,14 +135,14 @@ describe("SuggestionSearchCard", () => {
     it("Should only show short search card data fields", async () => {
       renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
-        name: "search-query-input",
+        name: "Search movies, people, and TV shows",
       });
       fireEvent.change(searchQueryInput, { target: { value: "1" } });
-      const searchButton = screen.getByRole("button", { name: "search" });
+      const searchButton = screen.getByRole("button", { name: "Search" });
       fireEvent.click(searchButton);
 
       const shortText = await screen.findByText("Example Short");
-      const shortCard = shortText.closest("#search-card");
+      const shortCard = shortText.closest('[data-testid="search-card"]');
       expect(shortCard?.textContent).toMatch(
         "Example ShortSearch Type: MediaMedia Type: ShortRank: 1124Known For: David Johnson, Maria HernandezYear: 1934",
       );
@@ -151,14 +155,16 @@ describe("SuggestionSearchCard", () => {
     it("Should only show video game search card data fields", async () => {
       renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
-        name: "search-query-input",
+        name: "Search movies, people, and TV shows",
       });
       fireEvent.change(searchQueryInput, { target: { value: "2" } });
-      const searchButton = screen.getByRole("button", { name: "search" });
+      const searchButton = screen.getByRole("button", { name: "Search" });
       fireEvent.click(searchButton);
 
       const videoGameText = await screen.findByText("Example Video Game");
-      const videoGameCard = videoGameText.closest("#search-card");
+      const videoGameCard = videoGameText.closest(
+        '[data-testid="search-card"]',
+      );
       expect(videoGameCard?.textContent).toMatch(
         "Example Video GameSearch Type: MediaMedia Type: Video GameRank: 989Known For: Action, Adventure, Sci-FiYear: 1996",
       );
@@ -168,14 +174,14 @@ describe("SuggestionSearchCard", () => {
     it("Should only show video search card data fields", async () => {
       renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
-        name: "search-query-input",
+        name: "Search movies, people, and TV shows",
       });
       fireEvent.change(searchQueryInput, { target: { value: "2" } });
-      const searchButton = screen.getByRole("button", { name: "search" });
+      const searchButton = screen.getByRole("button", { name: "Search" });
       fireEvent.click(searchButton);
 
       const videoText = await screen.findByText("Example Video");
-      const videoCard = videoText.closest("#search-card");
+      const videoCard = videoText.closest('[data-testid="search-card"]');
       expect(videoCard?.textContent).toMatch(
         "Example VideoSearch Type: MediaMedia Type: VideoRank: 65439Known For: Robert Johnson, James WilliamsYear: 2016",
       );
@@ -185,14 +191,16 @@ describe("SuggestionSearchCard", () => {
     it("Should only show music video search card data fields", async () => {
       renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
-        name: "search-query-input",
+        name: "Search movies, people, and TV shows",
       });
       fireEvent.change(searchQueryInput, { target: { value: "2" } });
-      const searchButton = screen.getByRole("button", { name: "search" });
+      const searchButton = screen.getByRole("button", { name: "Search" });
       fireEvent.click(searchButton);
 
       const musicVideoText = await screen.findByText("Example Music Video");
-      const musicVideoCard = musicVideoText.closest("#search-card");
+      const musicVideoCard = musicVideoText.closest(
+        '[data-testid="search-card"]',
+      );
       expect(musicVideoCard?.textContent).toMatch(
         "Example Music VideoSearch Type: MediaMedia Type: Music VideoRank: 4455Known For: James Brown, Jose GarciaYear: 2001",
       );
@@ -202,16 +210,18 @@ describe("SuggestionSearchCard", () => {
     it("Should only show podcast series search card data fields", async () => {
       renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
-        name: "search-query-input",
+        name: "Search movies, people, and TV shows",
       });
       fireEvent.change(searchQueryInput, { target: { value: "2" } });
-      const searchButton = screen.getByRole("button", { name: "search" });
+      const searchButton = screen.getByRole("button", { name: "Search" });
       fireEvent.click(searchButton);
 
       const podcastSeriesText = await screen.findByText(
         "Example Podcast Series",
       );
-      const podcastSeriesCard = podcastSeriesText.closest("#search-card");
+      const podcastSeriesCard = podcastSeriesText.closest(
+        '[data-testid="search-card"]',
+      );
       expect(podcastSeriesCard?.textContent).toMatch(
         "Example Podcast SeriesSearch Type: MediaMedia Type: Podcast SeriesRank: 27Known For: Maria Gonzalez, David BrownYear: 1992",
       );
@@ -223,10 +233,10 @@ describe("SuggestionSearchCard", () => {
     it("Should mark the results container with has-selection so other cards fade via CSS", async () => {
       const { container } = renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
-        name: "search-query-input",
+        name: "Search movies, people, and TV shows",
       });
       fireEvent.change(searchQueryInput, { target: { value: "1" } });
-      const searchButton = screen.getByRole("button", { name: "search" });
+      const searchButton = screen.getByRole("button", { name: "Search" });
       fireEvent.click(searchButton);
 
       const resultsContainer = container.querySelector(".results-container");
@@ -234,7 +244,7 @@ describe("SuggestionSearchCard", () => {
         throw new Error("results-container not found");
       }
       const personText = await screen.findByText("Example Smith");
-      const personCard = personText.closest("#search-card");
+      const personCard = personText.closest('[data-testid="search-card"]');
       if (!personCard) {
         throw new Error("Person search card not found");
       }
@@ -248,14 +258,16 @@ describe("SuggestionSearchCard", () => {
     it("Should set --orig-x and --orig-y CSS variables on the card so CSS can translate it to the upper-left", async () => {
       renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
-        name: "search-query-input",
+        name: "Search movies, people, and TV shows",
       });
       fireEvent.change(searchQueryInput, { target: { value: "1" } });
-      const searchButton = screen.getByRole("button", { name: "search" });
+      const searchButton = screen.getByRole("button", { name: "Search" });
       fireEvent.click(searchButton);
 
       const personText = await screen.findByText("Example Smith");
-      const personCard = personText.closest<HTMLDivElement>("#search-card");
+      const personCard = personText.closest<HTMLDivElement>(
+        '[data-testid="search-card"]',
+      );
       if (!personCard) {
         throw new Error("Person search card not found");
       }
@@ -274,10 +286,10 @@ describe("SuggestionSearchCard", () => {
     it("Should remove has-selection from the container and selected from the card so CSS reverses the animation", async () => {
       const { container } = renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
-        name: "search-query-input",
+        name: "Search movies, people, and TV shows",
       });
       fireEvent.change(searchQueryInput, { target: { value: "1" } });
-      const searchButton = screen.getByRole("button", { name: "search" });
+      const searchButton = screen.getByRole("button", { name: "Search" });
       fireEvent.click(searchButton);
 
       const resultsContainer = container.querySelector(".results-container");
@@ -285,7 +297,7 @@ describe("SuggestionSearchCard", () => {
         throw new Error("results-container not found");
       }
       const personText = await screen.findByText("Example Smith");
-      const personCard = personText.closest("#search-card");
+      const personCard = personText.closest('[data-testid="search-card"]');
       if (!personCard) {
         throw new Error("Person search card not found");
       }
@@ -309,10 +321,10 @@ describe("SuggestionSearchCard", () => {
     it("Should clear the selection state so CSS reverses the animation", async () => {
       const { container } = renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
-        name: "search-query-input",
+        name: "Search movies, people, and TV shows",
       });
       fireEvent.change(searchQueryInput, { target: { value: "1" } });
-      const searchButton = screen.getByRole("button", { name: "search" });
+      const searchButton = screen.getByRole("button", { name: "Search" });
       fireEvent.click(searchButton);
 
       const resultsContainer = container.querySelector(".results-container");
@@ -320,7 +332,7 @@ describe("SuggestionSearchCard", () => {
         throw new Error("results-container not found");
       }
       const personText = await screen.findByText("Example Smith");
-      const personCard = personText.closest("#search-card");
+      const personCard = personText.closest('[data-testid="search-card"]');
       if (!personCard) {
         throw new Error("Person search card not found");
       }
@@ -339,10 +351,10 @@ describe("SuggestionSearchCard", () => {
     it("Should go back to the previous URL when ESC is pressed and no card is selected", async () => {
       const { container, currentUrl } = renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
-        name: "search-query-input",
+        name: "Search movies, people, and TV shows",
       });
       fireEvent.change(searchQueryInput, { target: { value: "1" } });
-      const searchButton = screen.getByRole("button", { name: "search" });
+      const searchButton = screen.getByRole("button", { name: "Search" });
       fireEvent.click(searchButton);
       await screen.findByText("Example Smith");
       expect(currentUrl()).toBe("/search?q=1");
@@ -351,7 +363,9 @@ describe("SuggestionSearchCard", () => {
       await waitFor(() => {
         expect(currentUrl()).toBe("/search");
       });
-      expect(container.querySelectorAll("#search-card")).toHaveLength(0);
+      expect(
+        container.querySelectorAll('[data-testid="search-card"]'),
+      ).toHaveLength(0);
       expect(searchQueryInput).toHaveValue("");
     });
   });
@@ -360,14 +374,14 @@ describe("SuggestionSearchCard", () => {
     it("Should clear the selection and run the new search", async () => {
       const { container } = renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
-        name: "search-query-input",
+        name: "Search movies, people, and TV shows",
       });
       fireEvent.change(searchQueryInput, { target: { value: "1" } });
-      const searchButton = screen.getByRole("button", { name: "search" });
+      const searchButton = screen.getByRole("button", { name: "Search" });
       fireEvent.click(searchButton);
 
       const personText = await screen.findByText("Example Smith");
-      const personCard = personText.closest("#search-card");
+      const personCard = personText.closest('[data-testid="search-card"]');
       if (!personCard) {
         throw new Error("Person search card not found");
       }
@@ -400,14 +414,16 @@ describe("SuggestionSearchCard", () => {
     it("Should add a .deselecting class to that card so the exit animation plays", async () => {
       renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
-        name: "search-query-input",
+        name: "Search movies, people, and TV shows",
       });
       fireEvent.change(searchQueryInput, { target: { value: "1" } });
-      const searchButton = screen.getByRole("button", { name: "search" });
+      const searchButton = screen.getByRole("button", { name: "Search" });
       fireEvent.click(searchButton);
 
       const personText = await screen.findByText("Example Smith");
-      const personCard = personText.closest<HTMLDivElement>("#search-card");
+      const personCard = personText.closest<HTMLDivElement>(
+        '[data-testid="search-card"]',
+      );
       if (!personCard) {
         throw new Error("Person search card not found");
       }
@@ -427,10 +443,10 @@ describe("SuggestionSearchCard", () => {
     it("Should not have the .deselecting class", async () => {
       const { container } = renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
-        name: "search-query-input",
+        name: "Search movies, people, and TV shows",
       });
       fireEvent.change(searchQueryInput, { target: { value: "1" } });
-      const searchButton = screen.getByRole("button", { name: "search" });
+      const searchButton = screen.getByRole("button", { name: "Search" });
       fireEvent.click(searchButton);
 
       await screen.findByText("Example Smith");
@@ -445,14 +461,16 @@ describe("SuggestionSearchCard", () => {
     it("Should clear .deselecting and add .selected so the entry animation plays cleanly", async () => {
       renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
-        name: "search-query-input",
+        name: "Search movies, people, and TV shows",
       });
       fireEvent.change(searchQueryInput, { target: { value: "1" } });
-      const searchButton = screen.getByRole("button", { name: "search" });
+      const searchButton = screen.getByRole("button", { name: "Search" });
       fireEvent.click(searchButton);
 
       const personText = await screen.findByText("Example Smith");
-      const personCard = personText.closest<HTMLDivElement>("#search-card");
+      const personCard = personText.closest<HTMLDivElement>(
+        '[data-testid="search-card"]',
+      );
       if (!personCard) {
         throw new Error("Person search card not found");
       }
@@ -473,14 +491,16 @@ describe("SuggestionSearchCard", () => {
     it("Should clear the deselect tracking so a re-rendered card with a matching id does not animate", async () => {
       const { container } = renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
-        name: "search-query-input",
+        name: "Search movies, people, and TV shows",
       });
       fireEvent.change(searchQueryInput, { target: { value: "1" } });
-      const searchButton = screen.getByRole("button", { name: "search" });
+      const searchButton = screen.getByRole("button", { name: "Search" });
       fireEvent.click(searchButton);
 
       const personText = await screen.findByText("Example Smith");
-      const personCard = personText.closest<HTMLDivElement>("#search-card");
+      const personCard = personText.closest<HTMLDivElement>(
+        '[data-testid="search-card"]',
+      );
       if (!personCard) {
         throw new Error("Person search card not found");
       }

@@ -37,7 +37,7 @@ function PlotSection({ title, sources }: PlotSectionProps) {
   return (
     <Collapsible title={title}>
       <OptionToggle
-        label={`${title.toLowerCase()} source`}
+        label={`${title} source`}
         options={available.map((s) => s.name)}
         selected={shown.name}
         onSelect={setSelectedName}

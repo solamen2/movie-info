@@ -72,7 +72,9 @@ function FilterablePeopleList<T extends FilterablePerson>({
       />
       {children}
       {shown.length === 0 && people.length > 0 ? (
-        <p className="detail-empty">No matches</p>
+        <p className="detail-empty" role="status">
+          No matches
+        </p>
       ) : (
         <HorizontalList hasSelection={cards.isSelectedIn(cardType)}>
           {shown.map(({ person, cardProps }) => renderCard(person, cardProps))}

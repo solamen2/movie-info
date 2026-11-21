@@ -19,7 +19,7 @@ function renderAt(entries: string[], index: number) {
 test("The back button goes back through the history", async () => {
   renderAt(["/search", "/oscars"], 1);
 
-  fireEvent.click(screen.getByRole("button", { name: "back" }));
+  fireEvent.click(screen.getByRole("button", { name: "Back" }));
   expect(await screen.findByText("/search")).toBeInTheDocument();
 });
 
@@ -30,7 +30,7 @@ function scrollTo(y: number) {
 
 test("Scrolling down tucks the back button away, and scrolling up 20px or reaching the top brings it back", () => {
   renderAt(["/search"], 0);
-  const button = screen.getByRole("button", { name: "back" });
+  const button = screen.getByRole("button", { name: "Back" });
   fireEvent.touchStart(window);
   fireEvent.touchMove(window);
 
@@ -53,7 +53,7 @@ test("Scrolling down tucks the back button away, and scrolling up 20px or reachi
 
 test("Scrolling done by the app, not by a dragging finger, leaves the back button alone", () => {
   renderAt(["/search"], 0);
-  const button = screen.getByRole("button", { name: "back" });
+  const button = screen.getByRole("button", { name: "Back" });
 
   // A tap, then the app scrolls
   fireEvent.touchStart(window);
@@ -71,5 +71,5 @@ test("Scrolling done by the app, not by a dragging finger, leaves the back butto
 test("The login page has no back button", () => {
   renderAt(["/login"], 0);
 
-  expect(screen.queryByRole("button", { name: "back" })).toBeNull();
+  expect(screen.queryByRole("button", { name: "Back" })).toBeNull();
 });

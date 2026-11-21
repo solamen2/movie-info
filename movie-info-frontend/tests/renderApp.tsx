@@ -28,8 +28,10 @@ export function renderApp(initialEntry = "/search") {
 export async function findResultCards(count: number): Promise<Element[]> {
   await waitFor(() => {
     expect(
-      document.querySelectorAll("#search-card:not(.stand-in)"),
+      document.querySelectorAll('[data-testid="search-card"]:not(.stand-in)'),
     ).toHaveLength(count);
   });
-  return [...document.querySelectorAll("#search-card:not(.stand-in)")];
+  return [
+    ...document.querySelectorAll('[data-testid="search-card"]:not(.stand-in)'),
+  ];
 }

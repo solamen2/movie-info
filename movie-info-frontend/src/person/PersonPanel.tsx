@@ -32,6 +32,7 @@ import {
 import { imdbNameUrl, sortByDateDescending } from "./personTypes";
 import "../shared/shared.css";
 import "./person.css";
+import { usePageTitle } from "../utilities/pageTitle";
 
 const GENDER_LABELS: Record<TmdbGender, string> = {
   NotSetNotSpecified: "Not specified",
@@ -81,10 +82,14 @@ function PersonPanel({ itemId }: PersonPanelProps) {
   const [movieCrewFilter, setMovieCrewFilter] = useState(NO_CREW_FILTER);
   const [tvSeriesCrewFilter, setTvSeriesCrewFilter] = useState(NO_CREW_FILTER);
 
+  usePageTitle(person?.name, 1);
+
   if (error) {
     return (
       <div className="detail-panel">
-        <p className="error-message">{error}</p>
+        <p className="error-message" role="alert">
+          {error}
+        </p>
       </div>
     );
   }
@@ -92,7 +97,9 @@ function PersonPanel({ itemId }: PersonPanelProps) {
   if (!person) {
     return (
       <div className="detail-panel">
-        <p className="detail-loading">Loading person details…</p>
+        <p className="detail-loading" role="status">
+          Loading person details…
+        </p>
       </div>
     );
   }
@@ -212,7 +219,7 @@ function PersonPanel({ itemId }: PersonPanelProps) {
           <ExternalLinkRow
             url={person.wikipediaLink ?? ""}
             label="Wikipedia:"
-            copyAriaLabel="copy-wikipedia-link"
+            copyAriaLabel="Copy Wikipedia link"
           />
           <DetailFacts facts={facts} />
         </div>
@@ -246,7 +253,7 @@ function PersonPanel({ itemId }: PersonPanelProps) {
           {...cards.sectionProps("movie-crew-credits")}
         >
           <OptionToggle
-            label="movie crew credits filter"
+            label="Movie crew credits filter"
             options={MOVIE_CREW_FILTERS}
             labelOf={(filter) => crewFilterLabel(filter, movieCrewCredits)}
             selected={movieCrewFilter}

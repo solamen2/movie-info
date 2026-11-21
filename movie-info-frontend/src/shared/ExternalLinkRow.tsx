@@ -61,7 +61,7 @@ function ExternalLinkRow({
   searchUrl,
   label,
   copyButton = true,
-  copyAriaLabel = "copy-link",
+  copyAriaLabel = "Copy link",
   children,
 }: ExternalLinkRowProps) {
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "failed">(

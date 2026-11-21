@@ -30,6 +30,9 @@ export default defineConfig({
       ? process.env.E2E_TEST_BASE_URL
       : process.env.E2E_TEST_LOCAL_BASE_URL,
     headless: process.env.CI ? true : false,
+    /* The tests check colours of the dark theme, and the app follows the OS
+       setting, which Playwright otherwise emulates as light */
+    colorScheme: "dark",
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "retain-on-failure",
   },

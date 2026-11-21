@@ -34,7 +34,7 @@ function AspectRatios({ aspectRatios, searchUrl }: AspectRatiosProps) {
             <AspectRatioText aspectRatio={aspectRatio} />{" "}
             <InfoPopup
               trigger="ⓘ"
-              label={`about ${aspectRatio.ratio}`}
+              label={`About ${aspectRatio.ratio}`}
               showOnHover
             >
               {aspectRatio.description}

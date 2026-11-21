@@ -1,6 +1,7 @@
 import AspectRatioText from "../shared/AspectRatioText";
 import { useDetailData } from "../shared/useDetailData";
 import "../shared/shared.css";
+import { usePageTitle } from "../utilities/pageTitle";
 
 // Every aspect ratio the app knows by name or description, narrowest first
 // (the backend sends them in that order), each with the description that a
@@ -11,13 +12,19 @@ function AspectRatioReference() {
     "aspect ratios",
   );
 
+  usePageTitle("Aspect Ratio Reference");
+
   return (
     <div className="reference-page" data-testid="aspect-ratio-reference-page">
       <h1>Aspect Ratio Reference</h1>
       {error ? (
-        <p className="error-message">{error}</p>
+        <p className="error-message" role="alert">
+          {error}
+        </p>
       ) : !aspectRatios ? (
-        <p className="detail-loading">Loading aspect ratios…</p>
+        <p className="detail-loading" role="status">
+          Loading aspect ratios…
+        </p>
       ) : (
         <ul className="reference-list">
           {aspectRatios.map((aspectRatio) => (

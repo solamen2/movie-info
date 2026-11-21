@@ -67,7 +67,7 @@ function SuggestionSearchCard({
 
   return (
     <ExpandableCard
-      id="search-card"
+      testId="search-card"
       className={`result-card${standIn ? " stand-in" : ""}`}
       selected={selected}
       deselecting={deselecting}
@@ -95,7 +95,7 @@ function SuggestionSearchCard({
             <div className="card-image-placeholder">No image</div>
           )}
           <div className="card-details">
-            <h3 className="card-name">{item.name}</h3>
+            <h2 className="card-name">{item.name}</h2>
             {/* Lines with nothing to show are left out */}
             {searchTypeLabel !== "—" && (
               <p>

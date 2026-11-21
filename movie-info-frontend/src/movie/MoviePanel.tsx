@@ -30,6 +30,7 @@ import MovieOscars from "./MovieOscars";
 import RtCriticsConsensus from "./RtCriticsConsensus";
 import { imdbTitleUrl } from "./movieTypes";
 import "../shared/shared.css";
+import { usePageTitle } from "../utilities/pageTitle";
 
 interface MoviePanelProps {
   // The movie's IMDB or TMDB id (see isTmdbId)
@@ -49,10 +50,14 @@ function MoviePanel({ itemId }: MoviePanelProps) {
     },
   });
 
+  usePageTitle(movie?.title, 1);
+
   if (error) {
     return (
       <div className="detail-panel">
-        <p className="error-message">{error}</p>
+        <p className="error-message" role="alert">
+          {error}
+        </p>
       </div>
     );
   }
@@ -60,7 +65,9 @@ function MoviePanel({ itemId }: MoviePanelProps) {
   if (!movie) {
     return (
       <div className="detail-panel">
-        <p className="detail-loading">Loading movie details…</p>
+        <p className="detail-loading" role="status">
+          Loading movie details…
+        </p>
       </div>
     );
   }
@@ -157,7 +164,7 @@ function MoviePanel({ itemId }: MoviePanelProps) {
           <ExternalLinkRow
             url={movie.wikipediaLink ?? ""}
             label="Wikipedia:"
-            copyAriaLabel="copy-wikipedia-link"
+            copyAriaLabel="Copy Wikipedia link"
           />
           <DetailFacts facts={facts} />
         </div>

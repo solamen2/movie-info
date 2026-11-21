@@ -3,6 +3,11 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.tsx";
 import { repaintAfterHistoryMoves } from "./utilities/homeScreenRepaint";
+import {
+  applyTheme,
+  getStoredTheme,
+  onThemeChangedElsewhere,
+} from "./utilities/theme";
 
 async function enableMocking() {
   if (
@@ -18,6 +23,10 @@ async function enableMocking() {
 }
 
 repaintAfterHistoryMoves();
+
+// On every page, the ones without the footer's theme toggle included
+applyTheme(getStoredTheme());
+onThemeChangedElsewhere(applyTheme);
 
 void enableMocking().then(() => {
   createRoot(document.getElementById("root") ?? new HTMLElement()).render(

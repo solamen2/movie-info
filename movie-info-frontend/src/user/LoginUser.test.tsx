@@ -16,7 +16,7 @@ describe("LoginUser", () => {
       fireEvent.change(email, { target: { value: "test@example.com" } });
       const password = screen.getByLabelText("Password");
       fireEvent.change(password, { target: { value: "Pass123!@#" } });
-      const loginButton = screen.getByRole("button", { name: "login" });
+      const loginButton = screen.getByRole("button", { name: "Login" });
       fireEvent.click(loginButton);
     });
   });
@@ -55,7 +55,7 @@ describe("LoginUser", () => {
       fireEvent.change(email, { target: { value: "error" } });
       const password = screen.getByLabelText("Password");
       fireEvent.change(password, { target: { value: "error" } });
-      const loginButton = screen.getByRole("button", { name: "login" });
+      const loginButton = screen.getByRole("button", { name: "Login" });
       fireEvent.click(loginButton);
       const loginFailed = await screen.findByText(
         "Login failed. Please check your credentials and try again.",

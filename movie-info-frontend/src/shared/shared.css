@@ -191,7 +191,7 @@
   background: none;
   font: inherit;
   font-weight: 700;
-  color: #646cff;
+  color: var(--link);
   line-height: 1;
   cursor: pointer;
 }
@@ -209,23 +209,15 @@
   min-width: 12rem;
   max-width: min(24rem, 80vw);
   padding: 0.4rem 0.6rem;
-  border: 1px solid #666;
+  border: 1px solid var(--popup-border);
   border-radius: 6px;
-  background: #2e2e2e;
-  color: rgba(255, 255, 255, 0.87);
+  background: var(--popup-background);
+  color: var(--text);
   font-size: 0.85rem;
   font-weight: 400;
   line-height: 1.4;
   white-space: normal;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-}
-
-@media (prefers-color-scheme: light) {
-  .info-popup-content {
-    background: #fff;
-    color: #213547;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  }
+  box-shadow: 0 2px 8px var(--popup-shadow);
 }
 
 /* Each aspect ratio stays on one line with its info mark; a list of them wraps
@@ -237,7 +229,7 @@
 /* Collapsible sections */
 .detail-sections {
   margin-top: 1rem;
-  border-top: 1px solid #444;
+  border-top: 1px solid var(--border);
 }
 
 /* Every section can be left out for lack of data */
@@ -246,7 +238,7 @@
 }
 
 .collapsible {
-  border-bottom: 1px solid #444;
+  border-bottom: 1px solid var(--border);
 }
 
 .collapsible summary {
@@ -307,13 +299,17 @@
 }
 
 .option-toggle button {
-  padding: 0.2em 0.8em;
+  /* At least 24px tall, for a finger */
+  padding: 0.35em 0.8em;
   font-size: 0.8rem;
 }
 
+/* Underlined as well, so that the mark doesn't rest on colour alone */
 .option-toggle button[aria-pressed="true"] {
-  border-color: #646cff;
-  color: #646cff;
+  border-color: var(--link);
+  color: var(--link);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
 }
 
 /* The free-text box that filters a section's row of cards as the user types
@@ -327,7 +323,7 @@
   padding: 0.3em 0.6em;
   font: inherit;
   font-size: 16px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--input-border);
   border-radius: 6px;
   background: inherit;
   color: inherit;
@@ -463,6 +459,17 @@
     display 0.5s allow-discrete;
 }
 
+/* A card that can be pressed (see ExpandableCard) shows where the keyboard
+   is; a panel given the focus by the app doesn't */
+.expandable-card[role="button"]:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.expandable-card.expanded:focus {
+  outline: none;
+}
+
 /* Entry animation: fly the card from its layout slot to the upper-left of
    its .fly-origin while the others fade out. The `select-fly` keyframes end
    on translate(-orig, -orig); when the animation finishes (default
@@ -487,7 +494,7 @@
    usePanelCards). */
 .expandable-card.selected:not(.expanded),
 .expandable-card.highlighted {
-  border-color: blue;
+  border-color: var(--highlight);
 }
 
 /* Exit animation: the keyframe's `from` value snaps the transform to
@@ -532,7 +539,7 @@
 .expandable-card.expanded {
   width: calc(100% - 1.5rem - 4px);
   border-width: 2px;
-  border-color: #444;
+  border-color: var(--border);
   border-radius: 8px;
   padding: 0.75rem;
   cursor: default;
@@ -563,7 +570,7 @@
 .person-card,
 .watch-provider-card {
   flex: 0 0 auto;
-  border: 1px solid #444;
+  border: 1px solid var(--border);
   border-radius: 6px;
   padding: 0.5rem;
   text-align: center;
@@ -578,7 +585,7 @@
 }
 
 .person-card:not(.selected):not(.highlighted):hover {
-  border-color: #888;
+  border-color: var(--border-hover);
 }
 
 .person-card-image {
@@ -594,8 +601,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #333;
-  color: #999;
+  background: var(--placeholder-background);
+  color: var(--placeholder-text);
   font-size: 0.8rem;
 }
 
@@ -633,24 +640,6 @@
   font-size: 0.75rem;
   line-height: 1.3;
   overflow-wrap: anywhere;
-}
-
-@media (prefers-color-scheme: light) {
-  .detail-sections,
-  .collapsible {
-    border-color: #ccc;
-  }
-
-  .person-card,
-  .watch-provider-card {
-    border-color: #ccc;
-  }
-
-  .person-card-image-placeholder,
-  .watch-provider-logo-placeholder {
-    background: #e8e8e8;
-    color: #888;
-  }
 }
 
 @media (max-width: 640px) {

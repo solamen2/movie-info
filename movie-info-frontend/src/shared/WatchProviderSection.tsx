@@ -35,12 +35,12 @@ function WatchProviderSection({
   return (
     <Collapsible title="Where to Watch">
       <OptionToggle
-        label="way to watch"
+        label="Way to watch"
         options={available.map((a) => a.way)}
         selected={shown.way}
         onSelect={setSelectedWay}
       />
-      <HorizontalList>
+      <HorizontalList label="Where to watch">
         {sorted.map((p) => (
           <WatchProviderCard key={p.id} provider={p} />
         ))}

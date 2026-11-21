@@ -38,7 +38,7 @@ export function CategoryAsterisk({
   originalCategory: string;
 }) {
   return (
-    <InfoPopup trigger="*" label="original category name">
+    <InfoPopup trigger="*" label="Original category name">
       Original Category Name: {originalCategory}
     </InfoPopup>
   );
@@ -195,7 +195,7 @@ function OscarAwardLine({ award, context }: OscarAwardLineProps) {
       {award.note !== null && (
         <>
           {" "}
-          <InfoPopup trigger="ⓘ" label="note">
+          <InfoPopup trigger="ⓘ" label="Note">
             {award.note}
           </InfoPopup>
         </>

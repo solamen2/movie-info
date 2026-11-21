@@ -1,6 +1,7 @@
 import {
   type ReactNode,
   useEffect,
+  useId,
   useLayoutEffect,
   useRef,
   useState,
@@ -37,6 +38,7 @@ function InfoPopup({
   const shown = open || hovered;
   const rootRef = useRef<HTMLSpanElement>(null);
   const contentRef = useRef<HTMLSpanElement>(null);
+  const contentId = useId();
 
   // The popup opens rightwards from its mark (see the CSS), so a mark near
   // the right edge of the page would push it off the page: slide it back
@@ -63,6 +65,9 @@ function InfoPopup({
     function onKeyDown(e: KeyboardEvent) {
       if (e.key === "Escape") {
         setOpen(false);
+        // Escape closes the popup only, not the panel around it as well
+        // (see SuggestionSearch)
+        e.stopPropagation();
       }
     }
     document.addEventListener("pointerdown", onPointerDown);
@@ -91,6 +96,7 @@ function InfoPopup({
         className="info-popup-trigger"
         aria-label={label}
         aria-expanded={shown}
+        aria-describedby={shown ? contentId : undefined}
         onClick={() => {
           setOpen((o) => !o);
         }}
@@ -98,7 +104,12 @@ function InfoPopup({
         {trigger}
       </button>
       {shown && (
-        <span role="tooltip" className="info-popup-content" ref={contentRef}>
+        <span
+          role="tooltip"
+          id={contentId}
+          className="info-popup-content"
+          ref={contentRef}
+        >
           {children}
         </span>
       )}

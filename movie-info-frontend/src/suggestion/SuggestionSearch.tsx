@@ -4,6 +4,7 @@ import {
   useEffectEvent,
   useRef,
   useState,
+  useSyncExternalStore,
 } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import SuggestionSearchCard, { type Suggestion } from "./SuggestionSearchCard";
@@ -17,6 +18,7 @@ import {
   type PanelKind,
 } from "../utilities/utilities";
 import { MediaTypes, SEARCH_AUTO_SUBMIT_MS } from "../utilities/constants";
+import { APP_TITLE, usePageTitle } from "../utilities/pageTitle";
 
 function panelKindOf(item: Suggestion): PanelKind | null {
   return getPanelKind(item.searchType, item.mediaType?.value ?? null);
@@ -47,6 +49,25 @@ function placeholderSuggestion(
     year: null,
     years: null,
   };
+}
+
+// The hint in the empty search box. The full one is wider than the box on a
+// phone, which gets a short one instead (the same width as the CSS counts as
+// a narrow screen).
+const SEARCH_HINT = "Search movies, people, and TV shows";
+const SHORT_SEARCH_HINT = "Movies, people, TV";
+const NARROW_SCREEN = "(max-width: 640px)";
+
+function subscribeToNarrowScreen(onChange: () => void) {
+  const query = window.matchMedia(NARROW_SCREEN);
+  query.addEventListener("change", onChange);
+  return () => {
+    query.removeEventListener("change", onChange);
+  };
+}
+
+function isNarrowScreen() {
+  return window.matchMedia(NARROW_SCREEN).matches;
 }
 
 interface SuggestionSearchProps {
@@ -101,6 +122,12 @@ function SuggestionSearch({ panelKind }: SuggestionSearchProps) {
     });
 
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const narrowScreen = useSyncExternalStore(
+    subscribeToNarrowScreen,
+    isNarrowScreen,
+  );
+
+  usePageTitle(query);
 
   // Only a search that found nothing gets a message; otherwise the results
   // speak for themselves.
@@ -226,14 +253,17 @@ function SuggestionSearch({ panelKind }: SuggestionSearchProps) {
 
   return (
     <div className="search-page">
+      {/* The page's heading, for screen readers; the search box says it all
+          to everyone else */}
+      <h1 className="visually-hidden">{APP_TITLE}</h1>
       <div className="search-header">
-        <form className="search-bar" onSubmit={handleSearch}>
+        <form className="search-bar" role="search" onSubmit={handleSearch}>
           <div className="search-input">
             <input
               ref={searchInputRef}
-              aria-label="search-query-input"
+              aria-label={SEARCH_HINT}
               type="text"
-              placeholder="Search movies, people..."
+              placeholder={narrowScreen ? SHORT_SEARCH_HINT : SEARCH_HINT}
               value={searchQuery}
               onChange={(e) => {
                 setSearchQuery(e.target.value);
@@ -243,7 +273,7 @@ function SuggestionSearch({ panelKind }: SuggestionSearchProps) {
               // Empties the box, ready for a new query; the results stay
               // until one is submitted.
               <button
-                aria-label="clear-query"
+                aria-label="Clear search"
                 type="button"
                 className="search-clear-button"
                 onClick={() => {
@@ -255,15 +285,19 @@ function SuggestionSearch({ panelKind }: SuggestionSearchProps) {
               </button>
             )}
           </div>
-          <button aria-label="search" type="submit">
-            Search
-          </button>
+          <button type="submit">Search</button>
         </form>
       </div>
 
-      {error && <p className="error-message">{error}</p>}
+      {error && (
+        <p className="error-message" role="alert">
+          {error}
+        </p>
+      )}
       {!selectedId && searchMessage && (
-        <p className="search-message">{searchMessage}</p>
+        <p className="search-message" role="status">
+          {searchMessage}
+        </p>
       )}
 
       <div

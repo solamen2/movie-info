@@ -5,7 +5,9 @@ import { SEARCH_AUTO_SUBMIT_MS } from "../utilities/constants";
 
 function typeQuery(value: string) {
   fireEvent.change(
-    screen.getByRole("textbox", { name: "search-query-input" }),
+    screen.getByRole("textbox", {
+      name: "Search movies, people, and TV shows",
+    }),
     { target: { value } },
   );
 }
@@ -22,10 +24,10 @@ describe("SuggestionSearch", () => {
     it("Should return search results", async () => {
       renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
-        name: "search-query-input",
+        name: "Search movies, people, and TV shows",
       });
       fireEvent.change(searchQueryInput, { target: { value: "1" } });
-      const searchButton = screen.getByRole("button", { name: "search" });
+      const searchButton = screen.getByRole("button", { name: "Search" });
       fireEvent.click(searchButton);
       await findResultCards(8);
       // The number of results is only ever mentioned when it is zero
@@ -40,18 +42,18 @@ describe("SuggestionSearch", () => {
     it("Should offer a clear button that empties the box, focuses it, and keeps the results", async () => {
       const { currentUrl } = renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
-        name: "search-query-input",
+        name: "Search movies, people, and TV shows",
       });
-      expect(screen.queryByRole("button", { name: "clear-query" })).toBeNull();
+      expect(screen.queryByRole("button", { name: "Clear search" })).toBeNull();
 
       fireEvent.change(searchQueryInput, { target: { value: "1" } });
-      fireEvent.click(screen.getByRole("button", { name: "search" }));
+      fireEvent.click(screen.getByRole("button", { name: "Search" }));
       await findResultCards(8);
-      fireEvent.click(screen.getByRole("button", { name: "clear-query" }));
+      fireEvent.click(screen.getByRole("button", { name: "Clear search" }));
 
       expect(searchQueryInput).toHaveValue("");
       expect(searchQueryInput).toHaveFocus();
-      expect(screen.queryByRole("button", { name: "clear-query" })).toBeNull();
+      expect(screen.queryByRole("button", { name: "Clear search" })).toBeNull();
       await findResultCards(8);
       expect(currentUrl()).toBe("/search?q=1");
     });
@@ -60,10 +62,10 @@ describe("SuggestionSearch", () => {
     it("Should show 'No results. Please try another search.'", async () => {
       renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
-        name: "search-query-input",
+        name: "Search movies, people, and TV shows",
       });
       fireEvent.change(searchQueryInput, { target: { value: "empty" } });
-      const searchButton = screen.getByRole("button", { name: "search" });
+      const searchButton = screen.getByRole("button", { name: "Search" });
       fireEvent.click(searchButton);
       const noSearchResults = await screen.findByText(
         "No results. Please try another search.",
@@ -75,10 +77,10 @@ describe("SuggestionSearch", () => {
     it("Should show the 404 error and suggest another search", async () => {
       renderApp();
       const searchQueryInput = screen.getByRole("textbox", {
-        name: "search-query-input",
+        name: "Search movies, people, and TV shows",
       });
       fireEvent.change(searchQueryInput, { target: { value: "error" } });
-      const searchButton = screen.getByRole("button", { name: "search" });
+      const searchButton = screen.getByRole("button", { name: "Search" });
       fireEvent.click(searchButton);
       const errorSearchResults = await screen.findByText(
         "Search failed with status 404: Not a valid search query for mock. Please try another search.",
@@ -128,7 +130,7 @@ describe("SuggestionSearch", () => {
       vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
       const { router } = renderApp();
       typeQuery("1");
-      fireEvent.click(screen.getByRole("button", { name: "search" }));
+      fireEvent.click(screen.getByRole("button", { name: "Search" }));
       const locationKey = router.state.location.key;
       wait(SEARCH_AUTO_SUBMIT_MS * 2);
       expect(router.state.location.key).toBe(locationKey);

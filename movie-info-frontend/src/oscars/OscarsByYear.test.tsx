@@ -167,7 +167,7 @@ describe("OscarsByYear", () => {
     const { years } = await renderOscarsPage();
     const bestActress = categoriesOf(years[0])[1];
     const asterisk = within(bestActress).getByRole("button", {
-      name: "original category name",
+      name: "Original category name",
     });
 
     expect(within(bestActress).queryByRole("tooltip")).toBeNull();
@@ -195,7 +195,7 @@ describe("OscarsByYear", () => {
     fireEvent.click(within(bestPicture1928).getByText("Nominees"));
     const list = await within(bestPicture1928).findByTestId("oscar-nominees");
 
-    fireEvent.click(within(list).getByRole("button", { name: "note" }));
+    fireEvent.click(within(list).getByRole("button", { name: "Note" }));
     expect(within(list).getByRole("tooltip").textContent).toBe(
       "NOTE: An example note.",
     );
@@ -331,7 +331,7 @@ describe("OscarsByYear", () => {
     // A subsection under an older name has its own asterisk
     fireEvent.click(
       within(subsections[1]).getByRole("button", {
-        name: "original category name",
+        name: "Original category name",
       }),
     );
     expect(within(subsections[1]).getByRole("tooltip").textContent).toBe(
@@ -349,7 +349,7 @@ describe("OscarsByYear", () => {
     renderApp("/oscars");
     const years =
       await screen.findAllByTestId<HTMLDetailsElement>("oscar-year");
-    const jumpTo = screen.getByRole("combobox", { name: "jump-to-year" });
+    const jumpTo = screen.getByRole("combobox", { name: "Jump to year" });
 
     expect(
       [...jumpTo.querySelectorAll("option")].map((o) => o.textContent),

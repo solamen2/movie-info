@@ -110,3 +110,19 @@ export function ordinal(n: number): string {
 export function oscarYearElementId(ceremony: number): string {
   return `oscars-year-${String(ceremony)}`;
 }
+
+// What a panel's "Oscars" section says beside its title: how many of the
+// awards listed in it were won, and how many were nominations that did not
+// win (the section's two lists), e.g. "4 wins, 7 noms" or "1 win, 1 nom".
+// A kind there are none of is left out: "3 noms".
+export function oscarCountLabel(awards: { winner: boolean }[]): string {
+  const wins = awards.filter((award) => award.winner).length;
+  const nominations = awards.length - wins;
+  return [
+    wins > 0 && `${String(wins)} ${wins === 1 ? "win" : "wins"}`,
+    nominations > 0 &&
+      `${String(nominations)} ${nominations === 1 ? "nom" : "noms"}`,
+  ]
+    .filter(Boolean)
+    .join(", ");
+}

@@ -19,13 +19,15 @@ import MoviePanel from "./MoviePanel";
 async function searchAndSelectExampleMovie() {
   const utils = renderApp();
   const searchQueryInput = screen.getByRole("textbox", {
-    name: "search-query-input",
+    name: "Search movies, people, and TV shows",
   });
   fireEvent.change(searchQueryInput, { target: { value: "1" } });
-  fireEvent.click(screen.getByRole("button", { name: "search" }));
+  fireEvent.click(screen.getByRole("button", { name: "Search" }));
 
   const movieText = await screen.findByText("Example Movie");
-  const movieCard = movieText.closest<HTMLDivElement>("#search-card");
+  const movieCard = movieText.closest<HTMLDivElement>(
+    '[data-testid="search-card"]',
+  );
   if (!movieCard) {
     throw new Error("Movie search card not found");
   }
@@ -123,7 +125,7 @@ describe("MoviePanel", () => {
       const panel = await screen.findByTestId("movie-panel");
 
       const summaries = [...panel.querySelectorAll("summary")].map((s) =>
-        s.textContent.replace(/\(\d+\)$/, ""),
+        s.textContent.replace(/\([^)]+\)$/, ""),
       );
       expect(summaries).toEqual([
         "Cast",
@@ -145,7 +147,9 @@ describe("MoviePanel", () => {
         ["Cast", "Example Jones"],
         ["Where to Watch", "Example Stream"],
       ]) {
-        const details = screen.getByText(summary).closest("details");
+        const details = screen
+          .getByText(summary, { selector: "summary" })
+          .closest("details");
         if (!details) {
           throw new Error(`Collapsible for ${summary} not found`);
         }
@@ -154,7 +158,7 @@ describe("MoviePanel", () => {
       }
       // A section with nothing in it is left out
       expect(
-        screen.getByRole("group", { name: "way to watch" }).textContent,
+        screen.getByRole("group", { name: "Way to watch" }).textContent,
       ).toBe("StreamBuy");
       // The directors and writers are facts, not sections
       expect(screen.queryByText("Directors")).toBeNull();
@@ -511,9 +515,11 @@ describe("MoviePanel", () => {
         throw new Error("Oscars section not found");
       }
 
-      expect(oscars.querySelector("summary")?.textContent).toBe("Oscars(4)");
+      expect(oscars.querySelector("summary")?.textContent).toBe(
+        "Oscars(2 wins, 2 noms)",
+      );
       const wins = within(oscars).getByTestId("oscar-Wins");
-      expect(wins.querySelector("h4")?.textContent).toBe("Wins");
+      expect(wins.querySelector("h3")?.textContent).toBe("Wins");
       expect(
         [...wins.querySelectorAll("li")].map((li) => li.textContent),
       ).toEqual([
@@ -521,7 +527,7 @@ describe("MoviePanel", () => {
         "Best Original Song: “Example Song” — Music and Lyric by Example Composer and Example Lyricist, Jr.",
       ]);
       const nominations = within(oscars).getByTestId("oscar-Nominations");
-      expect(nominations.querySelector("h4")?.textContent).toBe("Nominations");
+      expect(nominations.querySelector("h3")?.textContent).toBe("Nominations");
       expect(
         [...nominations.querySelectorAll("li")].map((li) => li.textContent),
       ).toEqual([
@@ -678,7 +684,7 @@ describe("MoviePanel", () => {
       await searchAndSelectExampleMovie();
       await screen.findByTestId("movie-panel");
 
-      fireEvent.click(screen.getByRole("button", { name: "copy-imdb-link" }));
+      fireEvent.click(screen.getByRole("button", { name: "Copy IMDB link" }));
       expect(await clipboard.copiedHtml()).toBe(
         '<a href="https://www.imdb.com/title/tt0000001">Link</a>',
       );
@@ -709,7 +715,7 @@ describe("MoviePanel", () => {
       await screen.findByTestId("movie-panel");
 
       fireEvent.click(
-        screen.getByRole("button", { name: "copy-wikipedia-link" }),
+        screen.getByRole("button", { name: "Copy Wikipedia link" }),
       );
       expect(await clipboard.copiedHtml()).toBe(
         '<a href="https://en.wikipedia.org/wiki/Example_Movie">Link</a>',
@@ -725,7 +731,7 @@ describe("MoviePanel", () => {
       const panel = await screen.findByTestId("movie-panel");
 
       fireEvent.click(
-        within(panel).getByRole("button", { name: "about 2.39:1" }),
+        within(panel).getByRole("button", { name: "About 2.39:1" }),
       );
       expect(within(panel).getByRole("tooltip").textContent).toBe(
         movieDataJson1.aspectRatios[0].description,
@@ -801,10 +807,10 @@ describe("MoviePanel", () => {
         expect(panel.textContent).not.toContain("Wikipedia:");
         expect(screen.getAllByRole("link", { name: "Link" })).toHaveLength(1);
         expect(
-          screen.queryByRole("button", { name: "copy-wikipedia-link" }),
+          screen.queryByRole("button", { name: "Copy Wikipedia link" }),
         ).toBeNull();
         expect(
-          screen.getByRole("button", { name: "copy-imdb-link" }),
+          screen.getByRole("button", { name: "Copy IMDB link" }),
         ).toBeInTheDocument();
       },
     );
@@ -837,16 +843,16 @@ describe("MoviePanel", () => {
     function getSelects(fact: HTMLElement, name: string) {
       return {
         month: within(fact).getByRole<HTMLSelectElement>("combobox", {
-          name: `${name}-month`,
+          name: new RegExp(`^${name} month$`, "i"),
         }),
         year: within(fact).getByRole<HTMLSelectElement>("combobox", {
-          name: `${name}-year`,
+          name: new RegExp(`^${name} year$`, "i"),
         }),
       };
     }
 
     // Renders the panel and waits for the inflation data (the dropdowns) too
-    async function renderMovieFacts(waitFor = "budget-month") {
+    async function renderMovieFacts(waitFor = "Budget month") {
       render(
         <MemoryRouter>
           <MoviePanel itemId={movieDataJson1.imdbId} />
@@ -877,7 +883,7 @@ describe("MoviePanel", () => {
         expect(month.selectedOptions[0].textContent).toBe("Sep");
         expect(year.value).toBe("2016");
         expect(
-          within(fact).queryByRole("button", { name: `reset-${name}-date` }),
+          within(fact).queryByRole("button", { name: `Reset ${name} date` }),
         ).toBeNull();
         expect(fact.textContent).not.toContain("not available");
       }
@@ -958,11 +964,11 @@ describe("MoviePanel", () => {
       expect(revenue.querySelector("strong")).toBeNull();
       expect(getSelects(revenue, "revenue").year.value).toBe("2016");
       expect(
-        within(revenue).queryByRole("button", { name: "reset-revenue-date" }),
+        within(revenue).queryByRole("button", { name: "Reset revenue date" }),
       ).toBeNull();
 
       fireEvent.click(
-        within(budget).getByRole("button", { name: "reset-budget-date" }),
+        within(budget).getByRole("button", { name: "Reset budget date" }),
       );
       expect(budget.querySelector("strong")).toBeNull();
       expect(line.firstChild?.textContent).toBe("$25,000,000");
@@ -972,7 +978,7 @@ describe("MoviePanel", () => {
       expect(budgetSelects.month.value).toBe("9");
       expect(budgetSelects.year.value).toBe("2016");
       expect(
-        within(budget).queryByRole("button", { name: "reset-budget-date" }),
+        within(budget).queryByRole("button", { name: "Reset budget date" }),
       ).toBeNull();
     });
 
@@ -986,7 +992,7 @@ describe("MoviePanel", () => {
       fireEvent.change(month, { target: { value: "9" } });
       expect(revenue.querySelector("strong")).toBeNull();
       expect(
-        within(revenue).queryByRole("button", { name: "reset-revenue-date" }),
+        within(revenue).queryByRole("button", { name: "Reset revenue date" }),
       ).toBeNull();
       expect(year.value).toBe("2016");
     });
@@ -1070,7 +1076,7 @@ describe("MoviePanel", () => {
         </MemoryRouter>,
       );
       const panel = await screen.findByTestId("movie-panel");
-      await within(panel).findByRole("combobox", { name: "revenue-month" });
+      await within(panel).findByRole("combobox", { name: "Revenue month" });
 
       expect(() => getFact(panel, "Budget")).toThrow();
       expect(getFact(panel, "Revenue")).toBeInTheDocument();
@@ -1201,14 +1207,16 @@ describe("MoviePanel", () => {
     it("Should not expand into a movie panel", async () => {
       renderApp();
       fireEvent.change(
-        screen.getByRole("textbox", { name: "search-query-input" }),
+        screen.getByRole("textbox", {
+          name: "Search movies, people, and TV shows",
+        }),
         { target: { value: "2" } },
       );
-      fireEvent.click(screen.getByRole("button", { name: "search" }));
+      fireEvent.click(screen.getByRole("button", { name: "Search" }));
 
       const videoGameCard = (
         await screen.findByText("Example Video Game")
-      ).closest("#search-card");
+      ).closest('[data-testid="search-card"]');
       if (!videoGameCard) {
         throw new Error("Video game search card not found");
       }
@@ -1322,14 +1330,14 @@ describe("MoviePanel", () => {
         expect(panel).not.toBeInTheDocument();
         expect(movieCard).not.toHaveClass("selected");
         expect(movieCard).toHaveClass("deselecting");
-        const targetCard = targetPanel.closest("#search-card");
+        const targetCard = targetPanel.closest('[data-testid="search-card"]');
         expect(targetCard).not.toBe(movieCard);
         expect(targetCard).toHaveClass("selected");
         expect(targetCard).toHaveClass("expanded");
         expect(targetCard).toHaveClass("grow-in");
         expect(targetCard).toHaveClass("stand-in");
         expect(
-          container.querySelectorAll("#search-card.selected"),
+          container.querySelectorAll('[data-testid="search-card"].selected'),
         ).toHaveLength(1);
         expect(
           within(targetPanel).getByRole("heading", { name }),
@@ -1380,7 +1388,7 @@ describe("MoviePanel", () => {
       const panel = await screen.findByTestId("movie-panel");
       fireEvent.click(findCard(panel, "cast-card", "Example Brown"));
       const targetPanel = await screen.findByTestId("person-panel");
-      const targetCard = targetPanel.closest("#search-card");
+      const targetCard = targetPanel.closest('[data-testid="search-card"]');
       const cardUrl = "/movie/tt0000001?q=1&cardType=cast&cardId=2";
 
       await goBack();
@@ -1409,7 +1417,9 @@ describe("MoviePanel", () => {
       expect(card.parentElement).not.toHaveClass("has-selection");
       expect(card.closest("details")).not.toHaveClass("has-child-selection");
       expect(card.closest("details")?.open).toBe(true);
-      expect(container.querySelectorAll("#search-card")).toHaveLength(8);
+      expect(
+        container.querySelectorAll('[data-testid="search-card"]'),
+      ).toHaveLength(8);
 
       await goBack();
       expect(currentUrl()).toBe("/movie/tt0000001?q=1");
@@ -1436,7 +1446,9 @@ describe("MoviePanel", () => {
       expect(currentUrl()).toBe("/person/2?q=1");
       await screen.findByTestId("person-panel");
       expect(movieCard).toHaveClass("deselecting");
-      expect(container.querySelectorAll("#search-card")).toHaveLength(9);
+      expect(
+        container.querySelectorAll('[data-testid="search-card"]'),
+      ).toHaveLength(9);
     });
 
     it("Should push the URL without the card when the highlighted card is clicked, and nothing else", async () => {
@@ -1494,7 +1506,10 @@ describe("MoviePanel", () => {
       const section = card.closest("details");
       expect(section).not.toHaveClass("has-child-selection");
       expect(section?.open).toBe(true);
-      expect(screen.getByText("Oscars").closest("details")?.open).toBe(false);
+      expect(
+        screen.getByText("Oscars", { selector: "summary" }).closest("details")
+          ?.open,
+      ).toBe(false);
 
       await act(
         () => new Promise((resolve) => setTimeout(resolve, CARD_FLY_MS + 100)),

@@ -16,7 +16,7 @@ describe("RegisterUser", () => {
       fireEvent.change(email, { target: { value: "test@example.com" } });
       const password = screen.getByLabelText("Password");
       fireEvent.change(password, { target: { value: "Pass123!@#" } });
-      const registerButton = screen.getByRole("button", { name: "register" });
+      const registerButton = screen.getByRole("button", { name: "Register" });
       fireEvent.click(registerButton);
     });
   });
@@ -31,7 +31,7 @@ describe("RegisterUser", () => {
       fireEvent.change(email, { target: { value: "error" } });
       const password = screen.getByLabelText("Password");
       fireEvent.change(password, { target: { value: "error" } });
-      const registerButton = screen.getByRole("button", { name: "register" });
+      const registerButton = screen.getByRole("button", { name: "Register" });
       fireEvent.click(registerButton);
       const registrationFailed = await screen.findByText(
         "Email 'error' is invalid.",
